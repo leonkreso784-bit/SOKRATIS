@@ -1,9 +1,8 @@
 //! ZAŠTO RUST OVAKO (cigla M1/1 — profil · popravak C1)
 //! `#[serde(default)]`: polje koje u JSON-u nedostaje uzima vrijednost iz `impl Default` — a taj
 //! Default JE Sokrat Study (S-005). `deny_unknown_fields`: tipfeler u profilu je greška, ne tiho
-//! ignoriranje. `Patterns` drži kompilirane regexe (`Regex` nije `Serialize`), a
-//! `Regex::captures_len()` ondje prebroji grupe: regex iz profila bez grupe koju parser indeksira
-//! je greška s imenom polja, ne panika (nalaz C1).
+//! ignoriranje. `Patterns` drži kompilirane regexe (`Regex` nije `Serialize`), a tamo
+//! `Regex::captures_len()` prebroji grupe: regex bez grupe koju parser čita je greška, ne panika.
 use crate::ParseError;
 use crate::model::WorkKind;
 use regex::Regex;

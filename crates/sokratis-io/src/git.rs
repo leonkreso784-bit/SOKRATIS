@@ -1,14 +1,8 @@
-//! ZAŠTO RUST OVAKO (cigla M1/15 — git kroz proces)
-//! `std::process::Command` gradi poziv bez shella (nema quotinga, nema injekcije). `output()`
-//! vraća `Output { status, stdout, stderr }`; `String::from_utf8_lossy` toleriše tuđi ne-UTF-8
-//! bajt umjesto da sruši cijeli izvještaj. Greška se MAPIRA u `IoError` po uzroku (`map_err`).
-//!
-//! ZAŠTO RUST OVAKO (cigla M1/16 — grane, radna stabla, zadnja promjena)
-//! `HashSet<String>` u `branches` daje O(1) provjeru „je li grana spojena" umjesto linearnog
-//! pretraživanja liste. `let-else` (`let Some((name, t)) = ... else { continue }`) preskače
-//! redak bez ugniježđenog `if let`. `unwrap_or(0)` na `parse::<i64>()` je svjesna odluka, ne
-//! skrivena greška: git format `%(authordate:unix)` uvijek ispisuje broj, pa je alternativa
-//! (0) mrtav kod koji se nikad ne izvrši — provjereno testovima, ne pretpostavkom.
+//! ZAŠTO RUST OVAKO (cigle M1/15 i M1/16 — git kroz proces, grane i radna stabla)
+//! `std::process::Command` gradi poziv bez shella (nema quotinga, nema injekcije), a greška se
+//! MAPIRA u `IoError` po uzroku (`map_err`); `String::from_utf8_lossy` toleriše tuđi ne-UTF-8
+//! bajt umjesto da sruši izvještaj. `HashSet<String>` daje O(1) „je li grana spojena", `let-else`
+//! preskače neispravan redak, a `unwrap_or(0)` na `%(authordate:unix)` je svjesna alternativa.
 use crate::IoError;
 use sokratis_core::BranchInfo;
 use std::path::PathBuf;

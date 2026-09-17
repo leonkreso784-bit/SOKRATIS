@@ -1,3 +1,8 @@
+//! ZAŠTO RUST OVAKO (cigla M1/17 — testovi projekta)
+//! `mod common;` dijeli privremeni repo s `git_cli.rs` (isti modul, dva testna binarija), a
+//! `write()` je lokalni pomoćnik za ručne JSON-datoteke. Testovi zovu samo javni API
+//! (`Project::open`, `docs`, `input`); ono što čuvaju je ponašanje na RUBU — nema datoteke,
+//! putanja je direktorij, tipfeler u profilu, `--since` izvan profilskog prozora.
 mod common;
 use common::Repo;
 use sokratis_core::WorkKind;

@@ -1,12 +1,8 @@
 //! ZAŠTO RUST OVAKO (cigla M1/17 — projekt)
-//! `Project` POSJEDUJE `GitCli` i `Profile`; metode posuđuju `&self`. Za ručne JSON-datoteke
-//! (`profile.json`, `overrides.json`, `visions.json`) `Err(e) if e.kind() == NotFound` je JEDINO
-//! opravdanje za fallback — svaka DRUGA greška čitanja (npr. putanja je direktorij, nema dozvole)
-//! postaje `IoError::Io`/`IoError::Profile`/`IoError::Manual`, jer tiho gutanje bilo koje greške,
-//! ne samo „nema datoteke", je laž (nalaz recenzenta, krug popravka 1). Za obični tekst
-//! (dnevnik/plan u `input()`) `fs::read_to_string(..).ok()` ostaje dovoljan — ondje „ima ili nema"
-//! jest cijela semantika. Rekurzivni `walk` je obična funkcija koja puni `&mut Vec` — bez
-//! rekurzivnih zatvaranja.
+//! `Project` POSJEDUJE `GitCli` i `Profile`; metode posuđuju `&self`. Za ručne JSON-datoteke je
+//! `Err(e) if e.kind() == NotFound` JEDINO opravdanje za pad na zadano — svaka druga greška
+//! čitanja (putanja je direktorij, nema dozvole) mora biti vidljiva, jer tiho gutanje je laž.
+//! Za obični tekst `fs::read_to_string(..).ok()` je dovoljan; rekurzivni `walk` puni `&mut Vec`.
 use crate::{GitCli, GitSource, IoError};
 use sokratis_core::{DocFile, Profile, ReportInput, Vision, WorkKind};
 use std::collections::HashMap;

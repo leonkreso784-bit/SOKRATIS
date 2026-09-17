@@ -1,9 +1,8 @@
 //! ZAŠTO RUST OVAKO (cigla M1/21 — paritet s RAD.xlsx)
 //! Integracijski test u `tests/` (ne `#[cfg(test)]` u `src/`): vidi jezgru kao vanjski korisnik —
-//! poziva samo javni `build_report`, kao što će ga zvati `sokratis-cli`. `serde_json::Value` čita
-//! referencu bez posebne strukture: fixture je tuđi izlaz (Python), a treba nam samo šačica
-//! polja iz njega, ne cijeli oblik. Fixture je snimka; ako ovaj test padne, prvo pitaj „je li
-//! fixture snimljen s istog commita" (README uz fixture), tek onda „je li kod kriv".
+//! poziva samo javni `build_report`, kao `sokratis-cli`. `serde_json::Value` čita referencu bez
+//! posebne strukture: fixture je tuđi izlaz (Python). Ako test padne, prvo pitaj „je li fixture
+//! snimljen s istog commita" (README uz fixture), tek onda „je li kod kriv".
 use serde_json::Value;
 use sokratis_core::{Profile, ReportInput, build_report};
 use std::collections::HashMap;
