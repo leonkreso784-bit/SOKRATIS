@@ -1,6 +1,6 @@
 //! ZAŠTO RUST OVAKO (cigla M1/11a — faze)
 //! Zatvorene faze se BROJE iz commita (mjera), ne prepisuju (procjena). `plan_phases: Vec<Phase>`
-//! se uzima u VLASNIŠTVO i mutira u mjestu (`for ph in &mut phases`) — pozivatelju ionako ne
+//! se uzima u VLASNIŠTVO i mutira u mjestu (`for ph in &mut plan_phases`) — pozivatelju ionako ne
 //! treba stara verzija, pa nema kloniranja.
 use crate::civil::days_between;
 use crate::{Commit, Patterns, Phase, PhaseState};

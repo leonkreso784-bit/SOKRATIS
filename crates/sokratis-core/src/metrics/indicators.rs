@@ -20,17 +20,7 @@ pub struct IndicatorInput<'a> {
 pub fn indicators(input: &IndicatorInput<'_>, profile: &Profile, p: &Patterns) -> Vec<Indicator> {
     let r1 = |x: f64| (x * 10.0).round() / 10.0;
     let r3 = |x: f64| (x * 1000.0).round() / 1000.0;
-    let days = input.days.len() as f64;
-    let commits = input.commits.len() as f64;
-    let deliveries = input.deliveries.len() as f64;
-    let hours = r1(input.days.iter().map(|d| d.hours).sum());
-    let lines: u64 = input
-        .commits
-        .iter()
-        .flat_map(|c| &c.files)
-        .map(|f| f.added + f.deleted)
-        .sum();
-    let test_lines: u64 = input.days.iter().map(|d| d.test_lines).sum();
+    let per = |a: f64, b: f64| if b > 0.0 { a / b } else { 0.0 };
     let kind_count = |k: WorkKind| {
         input
             .commits
@@ -43,7 +33,53 @@ pub fn indicators(input: &IndicatorInput<'_>, profile: &Profile, p: &Patterns) -
         .iter()
         .filter(|ph| ph.state == PhaseState::Closed)
         .collect();
-    let per = |a: f64, b: f64| if b > 0.0 { a / b } else { 0.0 };
+    let lines: u64 = input
+        .commits
+        .iter()
+        .flat_map(|c| &c.files)
+        .map(|f| f.added + f.deleted)
+        .sum();
+    let test_lines: u64 = input.days.iter().map(|d| d.test_lines).sum();
+
+    // Svaka vrijednost niže odgovara TOČNO jednom retku brifove tablice 18 pokazatelja; `vec![...]`
+    // ispod time postaje čitljiv kao ta tablica, ne kao ugniježđeni izraz po pokazatelju.
+    let working_days = input.days.len() as f64;
+    let commits = input.commits.len() as f64;
+    let commits_per_day = r1(per(commits, working_days));
+    let deliveries = input.deliveries.len() as f64;
+    let deliveries_per_day = r1(per(deliveries, working_days));
+    let hours = r1(input.days.iter().map(|d| d.hours).sum());
+    let commits_per_hour = r1(per(commits, hours));
+    let lines_changed = lines as f64;
+    let test_lines_changed = test_lines as f64;
+    let test_share = r3(test_lines_changed / lines_changed.max(1.0));
+    let deploys = input.deliveries.iter().filter(|d| d.deploy).count() as f64;
+    let debugging_commits = kind_count(WorkKind::Debugging);
+    let debugging_share = r3(debugging_commits / commits.max(1.0));
+    let docs_share = r3(kind_count(WorkKind::Documentation) / commits.max(1.0));
+    let ci_fixes = input
+        .commits
+        .iter()
+        .filter(|c| p.ci_fix.is_match(&c.subject.to_lowercase()))
+        .count() as f64;
+    let owner_driven = input
+        .deliveries
+        .iter()
+        .filter(|d| d.title.to_lowercase().contains(&profile.owner_name))
+        .count() as f64;
+    let closed_in_range = closed
+        .iter()
+        .filter(|ph| {
+            ph.to
+                .as_deref()
+                .is_some_and(|t| t >= profile.since.as_str())
+        })
+        .count() as f64;
+    let avg_days = r1(per(
+        closed.iter().filter_map(|ph| ph.days).sum::<i64>() as f64,
+        closed.len() as f64,
+    ));
+
     let m = IndicatorKind::Measure;
     let x = IndicatorKind::Proxy;
     let mk = |id: &str, value: f64, kind: IndicatorKind, formula: &str| Indicator {
@@ -53,18 +89,23 @@ pub fn indicators(input: &IndicatorInput<'_>, profile: &Profile, p: &Patterns) -
         formula: formula.into(),
     };
     vec![
-        mk("working_days", days, m, "dana s bar jednim commitom"),
+        mk(
+            "working_days",
+            working_days,
+            m,
+            "dana s bar jednim commitom",
+        ),
         mk("commits", commits, m, "broj commita od since"),
         mk(
             "commits_per_day",
-            r1(per(commits, days)),
+            commits_per_day,
             m,
             "commits / working_days",
         ),
         mk("deliveries", deliveries, m, "naslova u dnevniku od since"),
         mk(
             "deliveries_per_day",
-            r1(per(deliveries, days)),
+            deliveries_per_day,
             m,
             "deliveries / working_days",
         ),
@@ -74,88 +115,45 @@ pub fn indicators(input: &IndicatorInput<'_>, profile: &Profile, p: &Patterns) -
             x,
             "git-hours: razmak < gap_h + start_h po sesiji, sortirano po author_time",
         ),
-        mk(
-            "commits_per_hour",
-            r1(per(commits, hours)),
-            x,
-            "commits / hours",
-        ),
-        mk("lines_changed", lines as f64, m, "Σ added + deleted"),
+        mk("commits_per_hour", commits_per_hour, x, "commits / hours"),
+        mk("lines_changed", lines_changed, m, "Σ added + deleted"),
         mk(
             "test_lines",
-            test_lines as f64,
+            test_lines_changed,
             m,
             "Σ redaka na testnim putanjama",
         ),
-        mk(
-            "test_share",
-            r3(test_lines as f64 / (lines.max(1)) as f64),
-            m,
-            "test_lines / lines_changed",
-        ),
-        mk(
-            "deploys",
-            input.deliveries.iter().filter(|d| d.deploy).count() as f64,
-            m,
-            "isporuke s 🚀/deploy",
-        ),
+        mk("test_share", test_share, m, "test_lines / lines_changed"),
+        mk("deploys", deploys, m, "isporuke s 🚀/deploy"),
         mk(
             "debugging_commits",
-            kind_count(WorkKind::Debugging),
+            debugging_commits,
             m,
             "effective_kind == debugging",
         ),
         mk(
             "debugging_share",
-            r3(kind_count(WorkKind::Debugging) / commits.max(1.0)),
+            debugging_share,
             m,
             "debugging_commits / commits",
         ),
-        mk(
-            "docs_share",
-            r3(kind_count(WorkKind::Documentation) / commits.max(1.0)),
-            m,
-            "documentation / commits",
-        ),
-        mk(
-            "ci_fixes",
-            input
-                .commits
-                .iter()
-                .filter(|c| p.ci_fix.is_match(&c.subject.to_lowercase()))
-                .count() as f64,
-            m,
-            "subject ~ ci_fix_pattern",
-        ),
+        mk("docs_share", docs_share, m, "documentation / commits"),
+        mk("ci_fixes", ci_fixes, m, "subject ~ ci_fix_pattern"),
         mk(
             "owner_driven_deliveries",
-            input
-                .deliveries
-                .iter()
-                .filter(|d| d.title.to_lowercase().contains(&profile.owner_name))
-                .count() as f64,
+            owner_driven,
             m,
             "naslov sadrži owner_name",
         ),
         mk(
             "closed_phases_in_range",
-            closed
-                .iter()
-                .filter(|ph| {
-                    ph.to
-                        .as_deref()
-                        .is_some_and(|t| t >= profile.since.as_str())
-                })
-                .count() as f64,
+            closed_in_range,
             m,
             "zatvorene faze s to >= since",
         ),
         mk(
             "closed_phase_avg_days",
-            r1(per(
-                closed.iter().filter_map(|ph| ph.days).sum::<i64>() as f64,
-                closed.len() as f64,
-            )),
+            avg_days,
             m,
             "mean(days) zatvorenih faza",
         ),
