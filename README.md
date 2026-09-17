@@ -4,7 +4,8 @@
 git-repozitorij, izračuna statistiku rada, ocijeni čistoću dokumentacije i javi smjer projekta
 s dokazom. Za više projekata odjednom.
 
-> 🚧 **U gradnji (rujan 2026).** Koda još nema: postoje dizajn i dokumentacija.
+> 🚧 **U gradnji (rujan 2026).** Milestone 1 pred zastankom: `core`/`io`/`cli` već rade nad pravom
+> git-povijesti (paritet s `RAD.xlsx` je test, ne tvrdnja). Nije još objavljeno na GitHubu.
 > Ulaz u dokumentaciju: [docs/README.md](./docs/README.md) · milestonei: [docs/plan/ROADMAP.md](./docs/plan/ROADMAP.md).
 
 ## Zašto postoji
@@ -30,8 +31,8 @@ Rust (`core` · `io` · `cli`) · Tauri 2 · Svelte 5 · dizajn-tokeni Sokrat St
 
 ## Pokretanje
 
-Nakon Milestonea 1: `cargo run -p sokratis-cli -- report <putanja-do-repoa>`.
-Do tada vidi [ROADMAP](./docs/plan/ROADMAP.md).
+Već radi (pred zastankom na kraju Milestonea 1): `cargo run -p sokratis-cli -- report
+<putanja-do-repoa>` (i `docs`, `signals`). Status i preostalo: [ROADMAP](./docs/plan/ROADMAP.md).
 
 ## Licenca
 
