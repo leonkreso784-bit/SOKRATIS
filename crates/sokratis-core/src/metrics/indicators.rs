@@ -59,8 +59,10 @@ pub fn indicators(input: &IndicatorInput<'_>, profile: &Profile, p: &Patterns) -
     let hours = r1(input.days.iter().map(|d| d.hours).sum()) + 0.0;
     let commits_per_hour = r1(per(commits, hours));
     let lines_changed = lines as f64;
-    let test_lines_changed = test_lines as f64;
-    let test_share = r3(test_lines_changed / lines_changed.max(1.0));
+    // Ime nosi TIP, ne drugu mjeru: ovo je isti `test_lines` (id pokazatelja i ključ u JSON-u)
+    // samo kao `f64`. Staro `test_lines_changed` je zvučalo kao treća, nepostojeća mjera.
+    let test_lines_f64 = test_lines as f64;
+    let test_share = r3(test_lines_f64 / lines_changed.max(1.0));
     let deploys = input.deliveries.iter().filter(|d| d.deploy).count() as f64;
     let debugging_commits = kind_count(WorkKind::Debugging);
     let debugging_share = r3(debugging_commits / commits.max(1.0));
@@ -123,7 +125,7 @@ pub fn indicators(input: &IndicatorInput<'_>, profile: &Profile, p: &Patterns) -
         mk("lines_changed", lines_changed, m, "Σ added + deleted"),
         mk(
             "test_lines",
-            test_lines_changed,
+            test_lines_f64,
             m,
             "Σ redaka na testnim putanjama",
         ),
