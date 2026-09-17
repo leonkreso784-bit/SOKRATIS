@@ -52,6 +52,13 @@ fn read_visions_or_empty(path: &Path) -> Result<Vec<Vision>, IoError> {
     }
 }
 
+/// Putanja za poruke o greškama: `root` dolazi iz gita s `/`, a `join` dodaje `\` (Windows), pa
+/// je poruka miješala oba razdjelnika (nalaz I5). `components().collect()` sastavi istu putanju
+/// natrag s razdjelnikom ovog sustava — sadržaj se ne mijenja, samo zapis.
+fn normalized(path: PathBuf) -> PathBuf {
+    path.components().collect()
+}
+
 /// Rekurzivno skuplja `*.md` pod `dir` u `out`, preskačući `SKIP_DIRS`.
 fn walk(dir: &Path, out: &mut Vec<PathBuf>) -> Result<(), IoError> {
     for entry in std::fs::read_dir(dir)? {
@@ -81,7 +88,7 @@ impl Project {
         // pa bi usporedba identiteta projekta (isti `common_dir`) lagala kad se otvori iz podmape.
         let git = GitCli::new(&root);
         let common_dir = git.common_dir()?;
-        let profile_path = root.join(".sokratis").join("profile.json");
+        let profile_path = normalized(root.join(".sokratis").join("profile.json"));
         let profile = match std::fs::read_to_string(&profile_path) {
             Ok(s) => serde_json::from_str(&s).map_err(|source| IoError::Profile {
                 path: profile_path.clone(),
@@ -100,12 +107,16 @@ impl Project {
 
     /// Ručni overridi klasifikacije po SHA-i commita (`.sokratis/overrides.json`).
     pub fn overrides(&self) -> Result<HashMap<String, WorkKind>, IoError> {
-        read_overrides_or_empty(&self.root.join(".sokratis").join("overrides.json"))
+        read_overrides_or_empty(&normalized(
+            self.root.join(".sokratis").join("overrides.json"),
+        ))
     }
 
     /// Ručno upisane vizije (`.sokratis/visions.json`).
     pub fn visions(&self) -> Result<Vec<Vision>, IoError> {
-        read_visions_or_empty(&self.root.join(".sokratis").join("visions.json"))
+        read_visions_or_empty(&normalized(
+            self.root.join(".sokratis").join("visions.json"),
+        ))
     }
 
     /// Svi `*.md` u korijenu i pod `profile.docs_dir`, sa sadržajem i zadnjom promjenom iz gita.

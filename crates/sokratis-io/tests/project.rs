@@ -170,6 +170,41 @@ fn profile_that_cannot_be_read_is_an_error_not_a_default() {
     );
 }
 
+/// I5 (završna recenzija M1): `#[error("profil {path}: {source}")]` je uzrok već ugradio u svoj
+/// `Display`, a `main` ispisuje `{e:#}` (anyhow doda cijeli `#[source]` lanac) — pa je serde-ova
+/// poruka s popisom svih 38 polja izlazila DVAPUT (~1,6 kB). Uzrok pripada lancu, ne poruci.
+/// Uz to: putanja je miješala `/` (dolazi iz gita) i `\` (dodaje `join`).
+#[test]
+fn profile_error_says_the_path_once_and_leaves_the_cause_to_the_chain() {
+    let r = Repo::init();
+    r.commit(
+        "a.txt",
+        "1",
+        "prvi",
+        "2026-09-01T10:00:00+02:00",
+        "2026-09-01T10:00:00+02:00",
+    );
+    write(&r, ".sokratis/profile.json", r#"{ "sinc": "x" }"#);
+    let err = Project::open(r.path()).unwrap_err();
+    let top = err.to_string();
+    assert!(top.contains("profil"), "{top}");
+    assert!(
+        !top.contains("unknown field"),
+        "uzrok se ne smije ugraditi u poruku: {top}"
+    );
+    let cause = std::error::Error::source(&err)
+        .map(|c| c.to_string())
+        .unwrap_or_default();
+    assert!(
+        cause.contains("unknown field"),
+        "uzrok mora ostati u lancu: {cause}"
+    );
+    assert!(
+        !(top.contains('/') && top.contains('\\')),
+        "putanja ne smije mijesati / i \\: {top}"
+    );
+}
+
 #[test]
 fn unknown_profile_field_is_an_error_and_missing_files_default() {
     let r = Repo::init();
