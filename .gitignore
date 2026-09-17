@@ -15,3 +15,6 @@
 *.log
 .DS_Store
 Thumbs.db
+
+# fixture pariteta: git log kao testni ulaz ne smije pasti pod *.log
+!crates/sokratis-core/tests/fixtures/*.log
