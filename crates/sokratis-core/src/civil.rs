@@ -1,4 +1,55 @@
+//! ZAŠTO RUST OVAKO (cigla M1/7 — civilni datumi)
+//! Nula ovisnosti: `chrono` bi ovdje bio top za muhu. `Option` kroz `?` u pomoćnoj funkciji:
+//! prvi neuspjeli `parse` vraća `None` i gotovo. Cijeli brojevi (`i64`) jer je danima mjesto u
+//! cijelim brojevima, a prijestupne godine rješava formula, ne tablica.
+
+/// Rastavlja `YYYY-MM-DD` u `(godina, mjesec, dan)`; `None` ako format ne valja.
+fn ymd(s: &str) -> Option<(i64, i64, i64)> {
+    let b = s.as_bytes();
+    if b.len() != 10 || b[4] != b'-' || b[7] != b'-' {
+        return None;
+    }
+    Some((
+        s[0..4].parse().ok()?,
+        s[5..7].parse().ok()?,
+        s[8..10].parse().ok()?,
+    ))
+}
+
+/// Dani od 1970-01-01 (algoritam H. Hinnanta, „days_from_civil").
+fn days_from_civil(y: i64, m: i64, d: i64) -> i64 {
+    let y = if m <= 2 { y - 1 } else { y };
+    let era = if y >= 0 { y } else { y - 399 } / 400;
+    let yoe = y - era * 400;
+    let mp = (m + 9) % 12;
+    let doy = (153 * mp + 2) / 5 + d - 1;
+    let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    era * 146097 + doe - 719468
+}
+
+/// Dani od `from` do `to` (`to − from`); negativno ako je `to` prije `from`.
+/// `None` ako bilo koji datum nije u formatu `YYYY-MM-DD`.
 pub fn days_between(from: &str, to: &str) -> Option<i64> {
-    let _ = (from, to);
-    todo!("cigla M1/7")
+    let (fy, fm, fd) = ymd(from)?;
+    let (ty, tm, td) = ymd(to)?;
+    Some(days_from_civil(ty, tm, td) - days_from_civil(fy, fm, fd))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn days_between_handles_month_and_year_edges() {
+        assert_eq!(days_between("2026-08-02", "2026-08-06"), Some(4));
+        assert_eq!(days_between("2026-08-07", "2026-09-01"), Some(25));
+        assert_eq!(days_between("2025-12-31", "2026-01-01"), Some(1));
+        assert_eq!(
+            days_between("2024-02-28", "2024-03-01"),
+            Some(2),
+            "prijestupna"
+        );
+        assert_eq!(days_between("2026-09-02", "2026-09-01"), Some(-1));
+        assert_eq!(days_between("2026-9-2", "2026-09-01"), None);
+        assert_eq!(days_between("x", "2026-09-01"), None);
+    }
 }
