@@ -1,0 +1,6 @@
+# Pin kompajlera (pravilo #6: ovisnosti se pinaju — i toolchain). Tuđi stroj s rustupom
+# dobiva točno ovu verziju umjesto poruke o editionu 2024 na starom stable-u.
+# Podigni verziju namjerno, kao zasebnu odluku, nikad nuspojavom.
+[toolchain]
+channel = "1.98.1"
+components = ["rustfmt", "clippy"]
