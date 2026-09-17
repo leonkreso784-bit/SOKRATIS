@@ -70,7 +70,46 @@ Namjerno **ne** postoje još: `architecture/`, `BUGS.md`, `HISTORY.md`, `archive
   `sokratis.io` (`feat/io`, T15→T17); `sokratis.cli` (`feat/cli`, T18→T19) čeka slobodno mjesto (limit
   4 graditelja istodobno).
 
+### Isporučeno (četvrti dio sesije — PARSE, DOCS+PRAVILA i IO spojeni u `main`, nalaz S-011)
+- **PARSE (T3, T6) pa (T4, T5)** spojeno (merge 1e33c3f, pa 7daaba8): parser git loga (371 commit
+  fixturea, `skipped_lines` 0), klasifikator vrste/podvrste (redoslijed planiranje > dokumentacija >
+  debugging > poliranje, ostalo izvođenje; provjeren nad 12 stvarnih naslova = paritet s Pythonom),
+  parser dnevnika (paritet 105/105 isporuka po danu), parser plana (paritet 7/7 faza). Recenzije: sve
+  SPOJIVO bez nalaza.
+- **DOCS+PRAVILA (T12–T14)** spojeno (merge 04398b3): `docs_health` sa sedam provjera (dead-link
+  preskače ograde kôda, not-indexed, multiple/no-active-plan, diary-in-definition, docs-lag,
+  key-file-budget; ocjena 100 minus zbroj težina, `saturating_sub`), pravila `unmerged-branches` i
+  `docs-lag` s dokazom u signalu. Recenzije: T12 SPOJIVO; T13 vraćen jednom (zaglavlje opisivalo
+  Ord/max na `Severity` koji u datoteci ne postoji → ispravljeno); T14 SPOJIVO. Napomena recenzenta za
+  T20: `docs_lag.rs` i `docs.rs::lag()` računaju isti razmak neovisno jedno o drugom — pogledati kod
+  integracije.
+- **IO (T15–T17)** spojeno (merge 060924e): `GitCli` (log/toplevel/common_dir/branch_exists/
+  current_branch, grane s brojem commita ispred i starošću, radna stabla, zadnja promjena putanje),
+  `Project` (otvaranje iz podmape i radnog stabla, profil s `deny_unknown_fields`, overridei/vizije,
+  docs s vremenom zadnje promjene, `ReportInput`); provjereno nad Sokrat Studyjem: 56 docs, 31 grana,
+  4301 redak loga. Recenzije: T15/T16 SPOJIVO; T17 SPOJIVO uz 2 prijedloga pretvorena u nalaze i
+  ispravljena (`common_dir` se računa iz korijena repoa, ne iz korisnikove putanje; greška čitanja
+  profila koja nije „datoteka ne postoji" se propagira, ne guta). Brifovi T15/T16 imali kriva
+  unix-vremena; plan traži da ih graditelj sam izračuna naredbom, što se i dogodilo.
+- **METRIKE (T7–T10)** gotovi i recenzirani na grani `feat/core-metrics` (T11 slijedi, još ne u
+  `main`-u): sati po `author_time` (S-007) — 0 negativnih dana na fixtureu, 33/37 dana identično
+  `RAD.xlsx`-u, razlika samo oko tri poznata cherry-picka.
+- **Novi nalaz, mjeren (drugi kvar tablice): `git log --since` bez sata uzima trenutno doba dana**
+  (approxidate). `git log main --since=2026-08-29` u 17:15 → 183 commita; `--since='2026-08-29 00:00'`
+  → 190. `rad-xlsx.py` (retci 154, 178) šalje goli datum → `RAD.xlsx` ovisi o satu pokretanja skripte;
+  dnevni zadatak u 23:45 zna izgubiti gotovo cijeli tekući dan. Isti kvar pogađa fiksne raspone
+  zatvorenih faza (MREŽA 20→25 commita, RAČUN R1 0→6 commita kad se doda puni dan). Zapisano kao
+  **S-011** u `DECISIONS.md`: `io` šalje `--since=<datum> 00:00:00`, jezgra filtrira po
+  `commit_date >= since`; referentni `expected.json` regeneriran Python-kopijom s dodanim `' 00:00'`
+  (tok FIXTURE, **T2b spojen u `main` merge-om 5e79d91**, uz `README.md` fixturea koji objašnjava
+  razliku). Kvar se ispravlja, ne prenosi (kao S-007). U `BACKLOG.md`: stavka da Leon razmotri isti
+  dodatak u `rad-xlsx.py` (tuđi repo, Leon odlučuje).
+- **Testovi na `main`-u:** `cargo test --workspace` = 30 passed.
+- **Praksa koja se pokazala:** brifovi nisu bili savršeni (kriva unix-vremena, generička
+  `read_json_or` zamijenjena dvjema konkretnim funkcijama jer `serde` nije izravna ovisnost `io`-a),
+  ali protokol graditelj → recenzent → orkestrator to hvata bez Leona.
+
 ### Što slijedi
-Tokovi PARSE · METRIKE · DOCS+PRAVILA · IO nastavljaju cigla po ciglu u svojim stablima; CLI kreće kad se
-oslobodi mjesto → spajanje svakog toka u `main` čim recenzent kaže SPOJIVO → kad su svi u `main`-u,
-INTEGRACIJA (T20–T22) u svom stablu → zastanak na kraju M1 (Leonov OK).
+METRIKE T11 (na grani `feat/core-metrics`) → CLI T18–T19 (`feat/cli`, čeka slobodno mjesto) →
+spajanje svakog toka u `main` čim recenzent kaže SPOJIVO → INTEGRACIJA (T20–T22) u svom stablu →
+zastanak na kraju M1 (Leonov OK). FIXTURE T2b je spojen (merge 5e79d91, uz ovaj unos).

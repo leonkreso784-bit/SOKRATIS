@@ -80,3 +80,19 @@ engleske natpise daje sučelje/CLI tablica.
 **Odluka:** što sustav radi = kod + testovi; zašto = ovdje; što vrijedi sad = `CLAUDE.md` + `product/` +
 aktivni spec; što se dogodilo = `records/`. Duplikat se briše, ne sinkronizira; brojka u prozi pokazuje na izvor.
 **Posljedice:** spec ne nosi odluke nego linka; `CLAUDE.md` ne nosi povijest; Sokratis to sam mjeri (dogfooding).
+
+## S-011 — `--since` računa cijeli dan, ne golo `git log --since` (2026-09-17)
+
+**Kontekst:** `git log --since=YYYY-MM-DD` bez sata koristi `approxidate` i uzima **trenutno doba dana**
+kao granicu, ne ponoć. Izmjereno na `main`-u Sokrat Studyja: `git log --since=2026-08-29` u 17:15 vrati
+183 commita, `--since='2026-08-29 00:00'` vrati 190. `rad-xlsx.py` (retci 154, 178) šalje goli datum →
+`RAD.xlsx` ovisi o satu pokretanja skripte; dnevni zadatak u 23:45 zna izgubiti gotovo cijeli dan.
+Isti kvar pogađa i fiksne raspone zatvorenih faza (npr. MREŽA 20→25 commita, RAČUN R1 0→6 commita kad
+se doda puni dan).
+**Odluka:** `io` šalje `git log` argument `--since=<datum> 00:00:00`; jezgra filtrira po
+`commit_date >= since` na ponoć tog dana. Referentni `expected.json` u fixtureu je regeneriran istom
+Python skriptom s dodanim `' 00:00'`, ne ručno prepravljen.
+**Posljedice:** paritet sa `rad-xlsx.py` je u satima i danima namjeran (kao S-007) — kvar tablice se
+**ispravlja, ne prenosi**. Alternativa (replicirati Pythonov approxidate-kvar radi doslovnog pariteta)
+odbijena: paritet je test korisnosti, ne test bugova. Backlog: javiti Leonu da `sokratstudy.dev`
+(tuđi repo, Leon odlučuje) doda ` 00:00` u `rad-xlsx.py` — `records/BACKLOG.md`.

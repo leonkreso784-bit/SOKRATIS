@@ -80,6 +80,7 @@ Hrvatske i engleske natpise daje sučelje. Jezgra je time objavljiva, sučelje d
 | ulaz | zadani oblik | izvor u Sokrat Studyju |
 |---|---|---|
 | git log | `@@%h\|%at\|%ct\|%ad\|%cd\|%s` + `--numstat` uz `--date=format:%Y-%m-%d` — unix-vremena za razmake, lokalni datumi za dan (`%ad` = autor, kao tablica) i za `since` (`%cd` = commit, kao git) | `git` |
+| `--since` prema `git log` | `io` šalje `<datum> 00:00:00`, ne goli datum — bez sata `git log --since` uzima trenutno doba dana (approxidate), pa isti dan daje različit broj commita ovisno kad se pokrene (S-011) | mjereno na `main`-u Sokrat Studyja |
 | dnevnik | `^## (\d{4}-\d{2}-\d{2})(?:\s*\(([^)]*)\))?\s*[—-]+\s*(.+)$` | `docs/records/PROGRESS.md` |
 | plan | cigla `^\| \*\*(F\d)/(\d+)\*\*\s*(✅?)` · faza `^### (F\d) · (.+)$` | `docs/plan/RASPORED.md` |
 | oznaka faze u commitu | `^(F\d/\d\|C\d[ab]?(?:/\d\w*)?\|MREZA[- ]?[A-E]\d?\|R\d\|T\d\|ALAT-\d\|BUG-\d+\|U\d)` | opis commita |

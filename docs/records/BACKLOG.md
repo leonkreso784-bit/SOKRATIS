@@ -17,6 +17,12 @@
 | Sokratis mjeri vlastiti repo (dogfooding): `.sokratis/profile.json` ovdje | M1 kraj | kad postoji CLI |
 | Instalater (Tauri bundler, MSI/NSIS) | M3 | |
 
+## Za Leona (tuđi repo, ne naš posao)
+
+| stavka | bilješka |
+|---|---|
+| `sokratstudy.dev/scripts/rad-xlsx.py`: dodati ` 00:00` uz `--since` (retci 154, 178) | S-011 — bez sata `git log --since` uzima trenutno doba dana; `RAD.xlsx` zato ovisi o satu pokretanja skripte, dnevni zadatak u 23:45 gubi gotovo cijeli tekući dan |
+
 ## Ideje, bez datuma
 
 | stavka | bilješka |
