@@ -92,6 +92,10 @@ impl GitSource for GitCli {
             "--date=format:%Y-%m-%d",
             "--format=@@%h|%at|%ct|%ad|%cd|%s",
             "--numstat",
+            // Završni `--` kaže gitu „dalje nema putanja": bez njega je ime grane dvosmisleno s
+            // datotekom istog imena (nalaz M2). Mora biti ZADNJI — sve iza `--` git čita kao
+            // putanju, pa bi `--` odmah iza grane pojeo naše opcije.
+            "--",
         ])
     }
     fn branches(&self, default_branch: &str) -> Result<Vec<BranchInfo>, IoError> {

@@ -11,6 +11,8 @@ pub enum IoError {
     GitMissing,
     #[error("{0} nije git repozitorij")]
     NotARepo(PathBuf),
+    #[error("{0}: repozitorij nema commita")]
+    NoCommits(PathBuf),
     #[error("git {cmd}: {stderr}")]
     Git { cmd: String, stderr: String },
     #[error("profil {path}")]

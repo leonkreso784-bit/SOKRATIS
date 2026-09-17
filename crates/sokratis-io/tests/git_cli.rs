@@ -1,6 +1,10 @@
+//! ZAŠTO RUST OVAKO (cigla M1/15–16 — testovi git-sloja)
+//! Integracijski testovi u `tests/` vide `sokratis-io` kao VANJSKI korisnik (samo javni API), a
+//! `mod common;` je zajednički pomoćni modul — privremeni repo s fiksnim datumima. Tvrdnje su na
+//! izlazu prave `git` naredbe, jer ovaj sloj i postoji zato da razgovara s procesom.
 mod common;
 use common::Repo;
-use sokratis_io::{GitCli, GitSource, IoError};
+use sokratis_io::{GitCli, GitSource, IoError, Project};
 
 #[test]
 fn log_has_fixture_format_and_since_filters_by_commit_date() {
@@ -103,6 +107,26 @@ fn toplevel_common_dir_and_branches() {
         r.path().canonicalize().unwrap()
     );
     assert!(g.common_dir().unwrap().ends_with(".git"));
+}
+
+/// M2 (završna recenzija M1): repozitorij bez ijednog commita je ispisivao git-ov savjet
+/// („ambiguous argument 'main' … Use '--' to separate paths from revisions") umjesto rečenice.
+/// Korijen: `git branch --show-current` ondje ispiše `main` iako ta grana još NEMA referencu —
+/// ime grane nije dokaz da grana postoji.
+#[test]
+fn repository_without_commits_is_a_typed_error() {
+    let r = Repo::init();
+    let err = Project::open(r.path())
+        .expect("prazan repo se smije otvoriti")
+        .input(None)
+        .unwrap_err();
+    let text = err.to_string();
+    assert!(matches!(err, IoError::NoCommits(_)), "{text}");
+    assert!(text.contains("nema commita"), "{text}");
+    assert!(
+        !text.contains("ambiguous"),
+        "git-ov savjet nije naša poruka: {text}"
+    );
 }
 
 #[test]

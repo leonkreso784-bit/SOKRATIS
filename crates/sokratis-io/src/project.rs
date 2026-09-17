@@ -155,7 +155,14 @@ impl Project {
         let branch = if self.git.branch_exists(&self.profile.default_branch)? {
             self.profile.default_branch.clone()
         } else {
-            self.git.current_branch()?
+            // M2: `git branch --show-current` ispiše ime grane i u repou BEZ ijednog commita
+            // (HEAD je „unborn"), pa ime nije dokaz da grana postoji — provjerava se referenca.
+            // Bez toga bi git odgovorio svojim savjetom o `--`, a ne rečenicom o repozitoriju.
+            let current = self.git.current_branch()?;
+            if current.is_empty() || !self.git.branch_exists(&current)? {
+                return Err(IoError::NoCommits(self.root.clone()));
+            }
+            current
         };
         let read_opt = |rel: &str| std::fs::read_to_string(self.root.join(rel)).ok();
         let since = since
