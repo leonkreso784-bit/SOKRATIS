@@ -1,3 +1,7 @@
+//! ZAŠTO RUST OVAKO (cigla M1/13 — registar pravila)
+//! `trait Rule` je ugovor; `Box<dyn Rule>` daje dinamički dispatch pa `default_rules()` vraća
+//! popis raznorodnih pravila iza jednog tipa. Novo pravilo se dodaje ovdje jednim retkom —
+//! pozivatelj (`evaluate_all`) se ne mijenja.
 pub mod docs_lag;
 pub mod unmerged_branches;
 use crate::{Context, Signal};
