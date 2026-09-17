@@ -1,0 +1,12 @@
+# Jedan kraj retka u repou (LF); Windows checkout ostaje LF da git ne prijavljuje lažne razlike.
+* text=auto eol=lf
+*.md text eol=lf
+*.rs text eol=lf
+*.toml text eol=lf
+*.json text eol=lf
+*.svelte text eol=lf
+*.ts text eol=lf
+*.css text eol=lf
+*.png binary
+*.ico binary
+*.woff2 binary
