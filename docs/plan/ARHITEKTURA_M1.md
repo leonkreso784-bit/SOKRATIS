@@ -58,7 +58,8 @@ core radi s podacima koje posjeduje, bez lifetimeova prema vanjskom svijetu.
 ### 2.1 Model
 
 ```rust
-struct Commit { sha, author_time: i64, commit_time: i64, subject: String,
+struct Commit { sha, author_time: i64, commit_time: i64, date: String /* YYYY-MM-DD autora */,
+                commit_date: String /* YYYY-MM-DD commita */, subject: String,
                 files: Vec<FileChange /* path, added, deleted */> }
 enum WorkKind { Planning, Documentation, Execution, Polish, Debugging }   // Leonovih pet
 enum SubKind  { Brick, GateOrMeasure, Deploy, Other }
@@ -78,7 +79,7 @@ Hrvatske i engleske natpise daje sučelje. Jezgra je time objavljiva, sučelje d
 
 | ulaz | zadani oblik | izvor u Sokrat Studyju |
 |---|---|---|
-| git log | `@@%h\|%at\|%ct\|%s` + `--numstat`, unix-vremena (bez lokalizacije) | `git` |
+| git log | `@@%h\|%at\|%ct\|%ad\|%cd\|%s` + `--numstat` uz `--date=format:%Y-%m-%d` — unix-vremena za razmake, lokalni datumi za dan (`%ad` = autor, kao tablica) i za `since` (`%cd` = commit, kao git) | `git` |
 | dnevnik | `^## (\d{4}-\d{2}-\d{2})(?:\s*\(([^)]*)\))?\s*[—-]+\s*(.+)$` | `docs/records/PROGRESS.md` |
 | plan | cigla `^\| \*\*(F\d)/(\d+)\*\*\s*(✅?)` · faza `^### (F\d) · (.+)$` | `docs/plan/RASPORED.md` |
 | oznaka faze u commitu | `^(F\d/\d\|C\d[ab]?(?:/\d\w*)?\|MREZA[- ]?[A-E]\d?\|R\d\|T\d\|ALAT-\d\|BUG-\d+\|U\d)` | opis commita |

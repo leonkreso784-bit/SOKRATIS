@@ -39,6 +39,17 @@ kašnjenje docs-a · novi znak. Zapisano kao S-001…S-010 u `DECISIONS.md`.
 `records/PROGRESS.md` · `records/CHANGELOG.md` · `records/DECISIONS.md` · `records/BACKLOG.md`.
 Namjerno **ne** postoje još: `architecture/`, `BUGS.md`, `HISTORY.md`, `archive/`, `ideas/`, `LICENSE` — nastaju kad imaju sadržaj.
 
+### Isporučeno (drugi dio sesije, nakon Leonova OK-a na spec)
+- **Plan M1** `docs/superpowers/plans/2026-09-17-m1-jezgra-i-cli.md`: 22 cigle, svaka s testom, kodom i
+  commit-porukom; 8 tokova s vlasništvom datoteka bez preklapanja (KOSTUR · FIXTURE · PARSE · METRIKE ·
+  DOCS+PRAVILA · IO · CLI · INTEGRACIJA). Ugovor tipova i cijeli zadani profil (Sokrat Study) su u T1.
+- **Odluke u planu koje spec dopunjuju:** git format dobiva `%ad` i `%cd` (dan = autor kao tablica, `since` =
+  commit kao git); `Context` u vlasništvu, jedini lifetime je `IndicatorInput<'a>`; `chrono` samo u `io`;
+  `WorkKind::id()`; podvrsta se računa, u izvještaj ulazi u M2.
+- **Agenti:** `.claude/agents/graditelj.md` · `recenzent.md` · `cuvar-dokumentacije.md` + protokol
+  `docs/workflow/AGENTI.md` (Leon: „više agenata na više branča a ti ih kontroliraš i nadzireš").
+- Spec §2.1/§2.2, TESTING §3, RUST §1/§2, docs/README, CLAUDE.md usklađeni s planom.
+
 ### Što slijedi
-Leon pregleda spec i dokumentaciju → plan implementacije M1 (`docs/superpowers/plans/`) → **M0 toolchain**
-(VS Build Tools C++ · rustup MSVC) → cigle M1, test-prvo, paritet s `RAD.xlsx`.
+**Compact** (Leonova riječ) → **M0 uz Leonov OK** (instalacija mijenja sustav) → T1 kostur na `main` →
+grane i stabla → paralelni tokovi → spajanje → integracija → zastanak na kraju M1.

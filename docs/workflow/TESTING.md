@@ -32,15 +32,18 @@
 Dokazuje da Sokratis daje **iste brojke** kao Python skripta za isti ulaz, i da su **jedina**
 razlika sati (ispravak S-007).
 
-1. **Snimi ulaz** (jednom, iz `sokratstudy.dev` na `main`, isti raspon kao tablica, od 2026-08-29):
+1. **Snimi ulaz** (jednom, iz `sokratstudy.dev` na `main`; od 2026-08-02 jer se zatvorene faze broje iz
+   commita, a metrike filtriraju `commit_date >= 2026-08-29`):
 
    ```
-   git log --since=2026-08-29 --reverse --format=@@%h|%at|%ct|%s --numstat > tests/fixtures/sokratstudy-2026-09-16.log
+   git log main --since=2026-08-02 --reverse --date=format:%Y-%m-%d --format=@@%h|%at|%ct|%ad|%cd|%s --numstat > tests/fixtures/sokratstudy-2026-09-17.log
    ```
 
-   plus kopije `docs/records/PROGRESS.md` i `docs/plan/RASPORED.md` s istog commita (`git show <sha>:<put>`).
-2. **Snimi očekivano** iz lista Sažetak `RAD.xlsx` generirane 2026-09-16: tempo po danu, vrste,
-   18 pokazatelja, faze — u `tests/fixtures/sokratstudy-2026-09-16.expected.json`.
+   plus `git show main:docs/records/PROGRESS.md` i `git show main:docs/plan/RASPORED.md` s istog commita
+   (SHA u `.sha` datoteci). Točan postupak: plan M1, cigla T2.
+2. **Snimi očekivano** iz lista Sažetak knjige koju `rad-xlsx.py` generira nad ISTIM stanjem (kopija skripte
+   sa svježim izlazom, bez ručnih overridea): tempo po danu, vrste, 18 pokazatelja, faze — u
+   `tests/fixtures/sokratstudy-2026-09-17.expected.json`.
 3. **Test tvrdi:** sve jednako **osim** `hours` po danu i ukupno; za sate tvrdi novu vrijednost i
    u komentaru navodi staru (−144,1 h) i razlog.
 

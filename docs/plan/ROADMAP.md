@@ -6,8 +6,9 @@
 
 ## Gdje smo (2026-09-17)
 
-**M0 nije napravljen** — na stroju nema Rusta. Spec za M1 je napisan i čeka Leonov pregled.
-Nakon pregleda: plan implementacije M1 → M0 → cigle.
+**Spec odobren, plan M1 napisan** (`docs/superpowers/plans/2026-09-17-m1-jezgra-i-cli.md`), agenti i protokol
+definirani (`workflow/AGENTI.md`). **M0 nije napravljen** — na stroju nema Rusta; instalacija traži Leonov OK.
+Zatim: T1 kostur → paralelni tokovi na granama → spajanje → integracija.
 
 ## Milestonei
 

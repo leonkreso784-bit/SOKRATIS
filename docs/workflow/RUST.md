@@ -17,6 +17,7 @@
 | **`///` doc-komentar na svakom javnom tipu i funkciji** | `cargo doc` postaje dokumentacija jezgre |
 | **`serde` derive na svemu što izlazi iz jezgre** | JSON je ugovor prema CLI-ju i sučelju |
 | **bez `async` u M1** | nema mreže; `notify` u M2 je jedini kandidat |
+| **lifetime samo gdje štedi kopiju koja bi boljela:** `IndicatorInput<'a>` je jedina iznimka u jezgri; `Context` je u vlasništvu (klonira se jednom po izvještaju) | pravila i parseri ostaju čitljivi bez `'a` |
 | **imenovanje:** tipovi `PascalCase`, funkcije/polja `snake_case`, engleski | S-008; clippy to i traži |
 
 ## 2 · Dopušteni crateovi (M1) i zašto
@@ -28,7 +29,7 @@
 | `thiserror` | tipizirane greške u `core`/`io` | kratke definicije enum-grešaka |
 | `anyhow` | greške u `cli` | binarnoj je dovoljno „što je pošlo krivo" |
 | `clap` (derive) | argumenti CLI-ja | `--json`, `--since` bez ručnog parsiranja |
-| `time` ili `chrono` | datumi iz unix-vremena | **odluka pri prvoj cigli koja ih treba**; jedan, ne oba |
+| `chrono` (samo `io`) | današnji lokalni datum za `ReportInput.today` | odlučeno u planu M1 (T17): lokalni datum na Windowsu bez feature-gatea; jezgra datume računa sama (`civil.rs`), bez ovisnosti |
 | `tempfile` (dev) | privremeni repo u io-testovima | čišćenje bez ručnog `rm` |
 | `insta` (dev) | snapshot testovi CLI izlaza | snimka JSON-a je čitljiva u PR-u |
 

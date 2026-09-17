@@ -62,11 +62,15 @@ sati zbog cherry-pickova — se u Sokratisu **ispravlja, ne prenosi** (S-007).
 `… docs <putanja>` · `… signals <putanja>` (izlazni kod 0 nema · 1 Warn · 2 Alert).
 Testovi i brane: `docs/workflow/TESTING.md`.
 
-## Stanje — TRENUTNO (2026-09-17)
-- **M0 NIJE napravljen.** Na stroju nema Rusta ni MSVC build-toolsa (provjereno 2026-09-17: Node 24,
-  Python 3.11, git 2.52, WebView2 postoji, `cargo` ne). Prvi korak je M0 (`docs/plan/ROADMAP.md`).
-- **Nema koda.** Postoji: dizajn-spec, ova dokumentacija, odluke S-001…S-010.
-- **Sljedeće:** Leon pregleda spec → plan implementacije M1 (`docs/superpowers/plans/`) → M0 → cigle M1.
+## Stanje — TRENUTNO (2026-09-17, večer)
+- **Spec odobren** (Leon: „super je"). **Plan M1 napisan:** `docs/superpowers/plans/2026-09-17-m1-jezgra-i-cli.md`
+  — 22 cigle u 8 tokova, svaki tok = svoja grana + radno stablo `sokratis.<tok>`, vlasništvo datoteka bez preklapanja.
+- **Agenti definirani:** `.claude/agents/{graditelj,recenzent,cuvar-dokumentacije}.md`; protokol nadzora
+  `docs/workflow/AGENTI.md` (orkestrator = ova sesija, jedini spaja u `main`).
+- **M0 NIJE napravljen.** Na stroju nema Rusta ni MSVC build-toolsa (Node 24, Python 3.11, git 2.52, WebView2 da,
+  `cargo` ne). **M0 mijenja sustav (~4 GB) → traži Leonov OK prije pokretanja** (plan T1, korak 1).
+- **Nema koda.** Redoslijed poslije compacta: M0 (uz OK) → T1 kostur na `main` (orkestrator) → grane i stabla →
+  paralelno T2 · T3–T6 · T7–T11 · T12–T14 · T15–T17 · T18–T19 → spajanje → T20–T22 → zastanak.
 - Što je isporučeno i kada zna `CHANGELOG.md`; tijek sesija `PROGRESS.md`. Ovaj odjeljak to ne ponavlja.
 
 ## Ključne odluke — samo žive
@@ -74,6 +78,11 @@ Puni tekst: `docs/records/DECISIONS.md`. **S-001** Rust · **S-002** core bez I/
 proces iza traita · **S-004** ručni podaci u `.sokratis/` u repou · **S-005** zadano = Sokrat Study, profil
 pregazi · **S-006** sučelje web (Svelte 5), ne Rust GUI · **S-007** sati po `author_time`, sortirano ·
 **S-008** engleski identifikatori u jezgri · **S-009** SQLite tek u M2 · **S-010** jedna činjenica, jedno mjesto.
+
+## Agenti — više grana, jedan orkestrator
+Uloge i protokol: `docs/workflow/AGENTI.md`. Graditelj radi **jednu ciglu u svom stablu**, recenzent presuđuje
+u dva prolaza, čuvar dokumentacije piše zapise; **samo orkestrator spaja u `main`**. Nakon compacta stanje se
+čita iz gita (`git log --oneline -15` · `git worktree list`), ne iz sjećanja.
 
 ## Dokumentacija — ulaz je SAMO `docs/README.md`
 Složena **po ulozi dokumenta** (kao Sokrat Study): `product/` ŠTO · `plan/` ŠTO SADA (**jedan** aktivni

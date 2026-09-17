@@ -62,6 +62,7 @@ zatvorenim milestoneom · `archive/` s prvim ispunjenim specom · `ideas/` s prv
 |---|---|
 | [TESTING.md](./workflow/TESTING.md) | Vrste testova, fixture-politika, paritet s RAD.xlsx, brane prije commita |
 | [RUST.md](./workflow/RUST.md) | Rust-konvencije, dopušteni crateovi, pravilo „zašto Rust ovako", pojmovnik koji raste |
+| [AGENTI.md](./workflow/AGENTI.md) | Više agenata na više grana: uloge (orkestrator · graditelj · recenzent · čuvar dokumentacije), tokovi i stabla, protokol po cigli, spajanje, compact |
 
 ## `records/` — povijest
 
@@ -74,4 +75,8 @@ zatvorenim milestoneom · `archive/` s prvim ispunjenim specom · `ideas/` s prv
 
 ## `superpowers/plans/` — planovi implementacije
 
-Nastaju iz aktivnog speca, jedan po milestoneu. Zasad prazno; prvi je plan M1.
+Nastaju iz aktivnog speca, jedan po milestoneu.
+
+| Dokument | Svrha |
+|---|---|
+| [2026-09-17-m1-jezgra-i-cli.md](./superpowers/plans/2026-09-17-m1-jezgra-i-cli.md) | **Plan M1**: 22 cigle u 8 tokova (kostur · fixture · parse · metrike · docs+pravila · io · cli · integracija) s testovima i kodom po koraku; vlasništvo datoteka po toku |
