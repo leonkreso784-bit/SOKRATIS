@@ -18,7 +18,9 @@ pub trait GitSource {
     /// parser datuma bez sata uzima TRENUTNO DOBA DANA (sat kad se naredba pokreće), ne ponoć —
     /// izmjereno nad Sokrat Studyjem (`--since=2026-08-29` u 17:15 → 183 commita,
     /// `--since='2026-08-29 00:00'` → 190). Bez fiksnog sata bi tablica ovisila o tome KADA se
-    /// izvještaj generira, ne samo o datumu.
+    /// izvještaj generira, ne samo o datumu. Uz to MORA dovući DAN VIŠE (nalaz I2): ta je ponoć
+    /// u zoni stroja, a datumi commita u zoni commita, pa granicu mora presuditi jezgrin
+    /// `commit_date >= since`, ne git. Rezerva ne mijenja nijednu brojku — jezgra je odbaci.
     fn log(&self, branch: &str, since: &str) -> Result<String, IoError>;
     fn branches(&self, default_branch: &str) -> Result<Vec<BranchInfo>, IoError>;
     fn worktrees(&self) -> Result<Vec<PathBuf>, IoError>;
@@ -77,8 +79,11 @@ impl GitCli {
 }
 impl GitSource for GitCli {
     fn log(&self, branch: &str, since: &str) -> Result<String, IoError> {
-        // ` 00:00:00` fiksira sat na ponoć — vidi doc-komentar `GitSource::log` (trait) za razlog.
-        let since_arg = format!("--since={since} 00:00:00");
+        // ` 00:00:00` fiksira sat na ponoć, a `prev_day` dodaje dan rezerve zbog zone — vidi
+        // doc-komentar `GitSource::log` (trait) za oba razloga. `unwrap_or_else` vraća neispravan
+        // datum nepromijenjen: njega jezgra prijavi kao `ParseError::BadDate` (C2), ne ovaj sloj.
+        let from = sokratis_core::civil::prev_day(since).unwrap_or_else(|| since.to_string());
+        let since_arg = format!("--since={from} 00:00:00");
         self.run(&[
             "log",
             branch,

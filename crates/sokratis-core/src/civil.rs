@@ -1,8 +1,8 @@
-//! ZAŠTO RUST OVAKO (cigla M1/7 — civilni datumi · popravak C2)
+//! ZAŠTO RUST OVAKO (cigla M1/7 — civilni datumi · popravci C2 i I2)
 //! Nula ovisnosti: `chrono` bi ovdje bio top za muhu. `Option` kroz `?` u pomoćnoj funkciji:
 //! prvi neuspjeli `parse` vraća `None` i gotovo. Cijeli brojevi (`i64`) jer je danima mjesto u
-//! cijelim brojevima, a prijestupne godine rješava formula, ne tablica. `is_ymd` je ČISTA
-//! funkcija nad `&str` (bez sata i bez zone) — zato ju smiju zvati i jezgra i `io`.
+//! cijelim brojevima, a prijestupne godine rješava formula, ne tablica. `is_ymd` i `prev_day` su
+//! ČISTE funkcije nad `&str` (bez sata i bez zone) — zato ih smiju zvati i jezgra i `io`.
 
 /// Rastavlja `YYYY-MM-DD` u `(godina, mjesec, dan)`; `None` ako format ne valja.
 fn ymd(s: &str) -> Option<(i64, i64, i64)> {
@@ -55,6 +55,28 @@ pub fn is_ymd(s: &str) -> bool {
     }
 }
 
+/// Dan prije `date`, isti oblik `YYYY-MM-DD`; `None` ako `date` nije valjan datum.
+/// Rezerva pri dovlačenju git-loga (nalaz I2): granica `--since` je ponoć u zoni STROJA, a
+/// datumi commita su u zoni COMMITA, pa se dovlači dan više i odluku prepušta jezgri.
+/// Prijelaz mjeseca i godine rješava `days_in_month`, ne tablica izuzetaka.
+pub fn prev_day(date: &str) -> Option<String> {
+    if !is_ymd(date) {
+        return None;
+    }
+    let (mut year, mut month, day) = ymd(date)?;
+    let day = if day > 1 {
+        day - 1
+    } else {
+        month -= 1;
+        if month == 0 {
+            month = 12;
+            year -= 1;
+        }
+        days_in_month(year, month)
+    };
+    Some(format!("{year:04}-{month:02}-{day:02}"))
+}
+
 /// Dani od `from` do `to` (`to − from`); negativno ako je `to` prije `from`.
 /// `None` ako bilo koji datum nije u formatu `YYYY-MM-DD`.
 pub fn days_between(from: &str, to: &str) -> Option<i64> {
@@ -100,5 +122,18 @@ mod tests {
         ] {
             assert!(!is_ymd(bad), "`{bad}` nije valjan datum");
         }
+    }
+
+    /// I2: rezerva od jednog dana mora preživjeti prijelaz mjeseca, godine i prijestupni 29.02.
+    #[test]
+    fn prev_day_crosses_month_and_year() {
+        assert_eq!(prev_day("2026-09-08").as_deref(), Some("2026-09-07"));
+        assert_eq!(prev_day("2026-09-01").as_deref(), Some("2026-08-31"));
+        assert_eq!(prev_day("2026-03-01").as_deref(), Some("2026-02-28"));
+        assert_eq!(prev_day("2024-03-01").as_deref(), Some("2024-02-29"));
+        assert_eq!(prev_day("2026-01-01").as_deref(), Some("2025-12-31"));
+        assert_eq!(prev_day("2026-05-01").as_deref(), Some("2026-04-30"));
+        assert_eq!(prev_day("banana"), None);
+        assert_eq!(prev_day("2026-02-30"), None);
     }
 }
