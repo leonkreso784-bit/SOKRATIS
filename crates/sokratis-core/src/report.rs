@@ -70,6 +70,7 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
             days: &days,
             phases: &phases,
             overrides: &input.overrides,
+            since: &input.since,
         },
         profile,
         &p,
@@ -184,6 +185,37 @@ mod tests {
         assert!(rules.contains(&"unmerged-branches"), "{rules:?}");
         assert!(!rules.contains(&"docs-lag"), "dnevnik je svježiji od koda");
         assert_eq!((r.generated_at, r.branch.as_str()), (input().now, "main"));
+    }
+
+    /// C3 (završna recenzija M1): pokazatelj `closed_phases_in_range` je uspoređivao s
+    /// `profile.since`, dok cijeli ostatak izvještaja filtrira po `input.since` — pa je jedan od
+    /// 18 pokazatelja bio kriv (u JSON-u i u tablici) kad god se `--since` razlikuje od profila.
+    #[test]
+    fn closed_phases_in_range_follows_input_since_not_profile_since() {
+        // Dva commita koja upadaju u DVIJE povijesne zatvorene faze zadanog profila:
+        // „MREŽA" (2026-08-31..2026-09-01) i „RAČUN R1" (2026-09-02..2026-09-02).
+        const LOG: &str = "@@m1|1787000000|1787000000|2026-08-31|2026-08-31|MREZA A1: baza\n1\t0\tjs/a.js\n\n@@r1|1788000000|1788000000|2026-09-02|2026-09-02|R1: Google prijava\n1\t0\tjs/b.js\n";
+        let closed_in_range = |since: &str| {
+            let mut i = input();
+            i.git_log = LOG.into();
+            i.since = since.into();
+            let r = build_report(&i, &Profile::default()).expect("valjan ulaz");
+            r.indicators
+                .iter()
+                .find(|x| x.id == "closed_phases_in_range")
+                .expect("pokazatelj postoji")
+                .value
+        };
+        assert_eq!(
+            closed_in_range("2026-08-29"),
+            3.0,
+            "tri faze završavaju 2026-08-29 ili poslije"
+        );
+        assert_eq!(
+            closed_in_range("2026-09-02"),
+            1.0,
+            "samo R1 završava 2026-09-02 ili poslije"
+        );
     }
 
     /// C2 (završna recenzija M1): neprovjeren `since` je tiho mijenjao prozor mjerenja —

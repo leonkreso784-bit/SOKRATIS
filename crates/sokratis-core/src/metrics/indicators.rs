@@ -15,6 +15,9 @@ pub struct IndicatorInput<'a> {
     pub days: &'a [DayStats],
     pub phases: &'a [Phase],
     pub overrides: &'a HashMap<String, WorkKind>,
+    /// Granica razdoblja iz `ReportInput.since` (`--since`), NE `profile.since`: cijeli
+    /// izvještaj filtrira po njoj, pa i pokazatelj o zatvorenim fazama mora (nalaz C3).
+    pub since: &'a str,
 }
 
 pub fn indicators(input: &IndicatorInput<'_>, profile: &Profile, p: &Patterns) -> Vec<Indicator> {
@@ -69,11 +72,7 @@ pub fn indicators(input: &IndicatorInput<'_>, profile: &Profile, p: &Patterns) -
         .count() as f64;
     let closed_in_range = closed
         .iter()
-        .filter(|ph| {
-            ph.to
-                .as_deref()
-                .is_some_and(|t| t >= profile.since.as_str())
-        })
+        .filter(|ph| ph.to.as_deref().is_some_and(|t| t >= input.since))
         .count() as f64;
     let avg_days = r1(per(
         closed.iter().filter_map(|ph| ph.days).sum::<i64>() as f64,
@@ -219,6 +218,7 @@ mod tests {
                 days: &days,
                 phases: &phases,
                 overrides: &ov,
+                since: "2026-08-29",
             },
             &profile,
             &p,
@@ -319,6 +319,7 @@ mod tests {
                 days: &days,
                 phases: &phases,
                 overrides: &overrides,
+                since,
             },
             &profile,
             &p,
