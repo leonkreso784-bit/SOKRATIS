@@ -25,7 +25,8 @@ impl Rule for DocsLag {
         else {
             return vec![];
         };
-        let lag = (code.author_time - docs_time) / 86_400;
+        // Formula je u `docs::lag_days` — ista i za pokazatelj i za ovaj signal (nalaz M8).
+        let lag = crate::docs::lag_days(code.author_time, docs_time);
         if lag < p.docs_lag_warn_days {
             return vec![];
         }

@@ -1,7 +1,8 @@
-//! ZAŠTO RUST OVAKO (cigla M1/6 — klasifikator)
+//! ZAŠTO RUST OVAKO (cigla M1/6 — klasifikator · popravak C1)
 //! `for (kind, re) in &p.classifier` posuđuje vektor parova bez kopiranja; `*kind` kopira `Copy`
 //! enum iz reference. Redoslijed pravila je dio ugovora (planiranje > dokumentacija > debugging >
-//! poliranje), zato je to `Vec`, ne `HashMap`.
+//! poliranje), zato je to `Vec`, ne `HashMap`. `and_then` + `Captures::get` umjesto `c[1]`: grupa
+//! koje u profilu nema vraća `None`, ne paniku (nalaz C1).
 use crate::{Patterns, SubKind, WorkKind};
 
 pub fn classify_kind(subject: &str, p: &Patterns) -> WorkKind {
@@ -28,7 +29,9 @@ pub fn classify_sub(subject: &str, p: &Patterns) -> SubKind {
 }
 
 pub fn phase_tag(subject: &str, p: &Patterns) -> Option<String> {
-    p.phase_tag.captures(subject).map(|c| c[1].to_string())
+    p.phase_tag
+        .captures(subject)
+        .and_then(|c| c.get(1).map(|m| m.as_str().to_string()))
 }
 
 #[cfg(test)]

@@ -1,14 +1,8 @@
-//! ZAŠTO RUST OVAKO (cigla M1/15 — git kroz proces)
-//! `std::process::Command` gradi poziv bez shella (nema quotinga, nema injekcije). `output()`
-//! vraća `Output { status, stdout, stderr }`; `String::from_utf8_lossy` toleriše tuđi ne-UTF-8
-//! bajt umjesto da sruši cijeli izvještaj. Greška se MAPIRA u `IoError` po uzroku (`map_err`).
-//!
-//! ZAŠTO RUST OVAKO (cigla M1/16 — grane, radna stabla, zadnja promjena)
-//! `HashSet<String>` u `branches` daje O(1) provjeru „je li grana spojena" umjesto linearnog
-//! pretraživanja liste. `let-else` (`let Some((name, t)) = ... else { continue }`) preskače
-//! redak bez ugniježđenog `if let`. `unwrap_or(0)` na `parse::<i64>()` je svjesna odluka, ne
-//! skrivena greška: git format `%(authordate:unix)` uvijek ispisuje broj, pa je alternativa
-//! (0) mrtav kod koji se nikad ne izvrši — provjereno testovima, ne pretpostavkom.
+//! ZAŠTO RUST OVAKO (cigle M1/15 i M1/16 — git kroz proces, grane i radna stabla)
+//! `std::process::Command` gradi poziv bez shella (nema quotinga, nema injekcije), a greška se
+//! MAPIRA u `IoError` po uzroku (`map_err`); `String::from_utf8_lossy` toleriše tuđi ne-UTF-8
+//! bajt umjesto da sruši izvještaj. `HashSet<String>` daje O(1) „je li grana spojena", `let-else`
+//! preskače neispravan redak, a `unwrap_or(0)` na `%(authordate:unix)` je svjesna alternativa.
 use crate::IoError;
 use sokratis_core::BranchInfo;
 use std::path::PathBuf;
@@ -18,7 +12,9 @@ pub trait GitSource {
     /// parser datuma bez sata uzima TRENUTNO DOBA DANA (sat kad se naredba pokreće), ne ponoć —
     /// izmjereno nad Sokrat Studyjem (`--since=2026-08-29` u 17:15 → 183 commita,
     /// `--since='2026-08-29 00:00'` → 190). Bez fiksnog sata bi tablica ovisila o tome KADA se
-    /// izvještaj generira, ne samo o datumu.
+    /// izvještaj generira, ne samo o datumu. Uz to MORA dovući DAN VIŠE (nalaz I2): ta je ponoć
+    /// u zoni stroja, a datumi commita u zoni commita, pa granicu mora presuditi jezgrin
+    /// `commit_date >= since`, ne git. Rezerva ne mijenja nijednu brojku — jezgra je odbaci.
     fn log(&self, branch: &str, since: &str) -> Result<String, IoError>;
     fn branches(&self, default_branch: &str) -> Result<Vec<BranchInfo>, IoError>;
     fn worktrees(&self) -> Result<Vec<PathBuf>, IoError>;
@@ -77,8 +73,11 @@ impl GitCli {
 }
 impl GitSource for GitCli {
     fn log(&self, branch: &str, since: &str) -> Result<String, IoError> {
-        // ` 00:00:00` fiksira sat na ponoć — vidi doc-komentar `GitSource::log` (trait) za razlog.
-        let since_arg = format!("--since={since} 00:00:00");
+        // ` 00:00:00` fiksira sat na ponoć, a `prev_day` dodaje dan rezerve zbog zone — vidi
+        // doc-komentar `GitSource::log` (trait) za oba razloga. `unwrap_or_else` vraća neispravan
+        // datum nepromijenjen: njega jezgra prijavi kao `ParseError::BadDate` (C2), ne ovaj sloj.
+        let from = sokratis_core::civil::prev_day(since).unwrap_or_else(|| since.to_string());
+        let since_arg = format!("--since={from} 00:00:00");
         self.run(&[
             "log",
             branch,
@@ -87,6 +86,10 @@ impl GitSource for GitCli {
             "--date=format:%Y-%m-%d",
             "--format=@@%h|%at|%ct|%ad|%cd|%s",
             "--numstat",
+            // Završni `--` kaže gitu „dalje nema putanja": bez njega je ime grane dvosmisleno s
+            // datotekom istog imena (nalaz M2). Mora biti ZADNJI — sve iza `--` git čita kao
+            // putanju, pa bi `--` odmah iza grane pojeo naše opcije.
+            "--",
         ])
     }
     fn branches(&self, default_branch: &str) -> Result<Vec<BranchInfo>, IoError> {

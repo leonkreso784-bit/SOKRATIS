@@ -11,4 +11,12 @@ pub enum ParseError {
     BadNumber { line: usize, text: String },
     #[error("neispravan regex u profilu: {0}")]
     Regex(#[from] regex::Error),
+    #[error("profil.{field}: regex mora imati {need} capture-grupa, ima {got}")]
+    BadPattern {
+        field: String,
+        need: usize,
+        got: usize,
+    },
+    #[error("{field}: datum mora biti oblika YYYY-MM-DD, a nije: `{text}`")]
+    BadDate { field: String, text: String },
 }

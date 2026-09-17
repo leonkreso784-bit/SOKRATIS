@@ -1,12 +1,8 @@
 //! ZAŠTO RUST OVAKO (cigla M1/17 — projekt)
-//! `Project` POSJEDUJE `GitCli` i `Profile`; metode posuđuju `&self`. Za ručne JSON-datoteke
-//! (`profile.json`, `overrides.json`, `visions.json`) `Err(e) if e.kind() == NotFound` je JEDINO
-//! opravdanje za fallback — svaka DRUGA greška čitanja (npr. putanja je direktorij, nema dozvole)
-//! postaje `IoError::Io`/`IoError::Profile`/`IoError::Manual`, jer tiho gutanje bilo koje greške,
-//! ne samo „nema datoteke", je laž (nalaz recenzenta, krug popravka 1). Za obični tekst
-//! (dnevnik/plan u `input()`) `fs::read_to_string(..).ok()` ostaje dovoljan — ondje „ima ili nema"
-//! jest cijela semantika. Rekurzivni `walk` je obična funkcija koja puni `&mut Vec` — bez
-//! rekurzivnih zatvaranja.
+//! `Project` POSJEDUJE `GitCli` i `Profile`; metode posuđuju `&self`. Za ručne JSON-datoteke je
+//! `Err(e) if e.kind() == NotFound` JEDINO opravdanje za pad na zadano — svaka druga greška
+//! čitanja (putanja je direktorij, nema dozvole) mora biti vidljiva, jer tiho gutanje je laž.
+//! Za obični tekst `fs::read_to_string(..).ok()` je dovoljan; rekurzivni `walk` puni `&mut Vec`.
 use crate::{GitCli, GitSource, IoError};
 use sokratis_core::{DocFile, Profile, ReportInput, Vision, WorkKind};
 use std::collections::HashMap;
@@ -52,6 +48,13 @@ fn read_visions_or_empty(path: &Path) -> Result<Vec<Vision>, IoError> {
     }
 }
 
+/// Putanja za poruke o greškama: `root` dolazi iz gita s `/`, a `join` dodaje `\` (Windows), pa
+/// je poruka miješala oba razdjelnika (nalaz I5). `components().collect()` sastavi istu putanju
+/// natrag s razdjelnikom ovog sustava — sadržaj se ne mijenja, samo zapis.
+fn normalized(path: PathBuf) -> PathBuf {
+    path.components().collect()
+}
+
 /// Rekurzivno skuplja `*.md` pod `dir` u `out`, preskačući `SKIP_DIRS`.
 fn walk(dir: &Path, out: &mut Vec<PathBuf>) -> Result<(), IoError> {
     for entry in std::fs::read_dir(dir)? {
@@ -81,7 +84,7 @@ impl Project {
         // pa bi usporedba identiteta projekta (isti `common_dir`) lagala kad se otvori iz podmape.
         let git = GitCli::new(&root);
         let common_dir = git.common_dir()?;
-        let profile_path = root.join(".sokratis").join("profile.json");
+        let profile_path = normalized(root.join(".sokratis").join("profile.json"));
         let profile = match std::fs::read_to_string(&profile_path) {
             Ok(s) => serde_json::from_str(&s).map_err(|source| IoError::Profile {
                 path: profile_path.clone(),
@@ -100,12 +103,16 @@ impl Project {
 
     /// Ručni overridi klasifikacije po SHA-i commita (`.sokratis/overrides.json`).
     pub fn overrides(&self) -> Result<HashMap<String, WorkKind>, IoError> {
-        read_overrides_or_empty(&self.root.join(".sokratis").join("overrides.json"))
+        read_overrides_or_empty(&normalized(
+            self.root.join(".sokratis").join("overrides.json"),
+        ))
     }
 
     /// Ručno upisane vizije (`.sokratis/visions.json`).
     pub fn visions(&self) -> Result<Vec<Vision>, IoError> {
-        read_visions_or_empty(&self.root.join(".sokratis").join("visions.json"))
+        read_visions_or_empty(&normalized(
+            self.root.join(".sokratis").join("visions.json"),
+        ))
     }
 
     /// Svi `*.md` u korijenu i pod `profile.docs_dir`, sa sadržajem i zadnjom promjenom iz gita.
@@ -144,11 +151,25 @@ impl Project {
         let branch = if self.git.branch_exists(&self.profile.default_branch)? {
             self.profile.default_branch.clone()
         } else {
-            self.git.current_branch()?
+            // M2: `git branch --show-current` ispiše ime grane i u repou BEZ ijednog commita
+            // (HEAD je „unborn"), pa ime nije dokaz da grana postoji — provjerava se referenca.
+            // Bez toga bi git odgovorio svojim savjetom o `--`, a ne rečenicom o repozitoriju.
+            let current = self.git.current_branch()?;
+            if current.is_empty() || !self.git.branch_exists(&current)? {
+                return Err(IoError::NoCommits(self.root.clone()));
+            }
+            current
         };
         let read_opt = |rel: &str| std::fs::read_to_string(self.root.join(rel)).ok();
+        let since = since
+            .map(str::to_string)
+            .unwrap_or_else(|| self.profile.since.clone());
+        // I1: prozor dovlačenja je NAJRANIJE od dvoje — profilskog (`log_since()`, koji uključuje
+        // i početke zatvorenih faza) i korisnikova `--since`. Bez tog `min`-a je `--since`
+        // stariji od profila tiho dobivao kraći log nego što `Report.since` tvrdi.
+        let fetch_since = self.profile.log_since().min(since.clone());
         Ok(ReportInput {
-            git_log: self.git.log(&branch, &self.profile.log_since())?,
+            git_log: self.git.log(&branch, &fetch_since)?,
             diary: read_opt(&self.profile.diary_path),
             plan: read_opt(&self.profile.plan_path),
             docs: self.docs()?,
@@ -160,9 +181,7 @@ impl Project {
                 .map(|d| d.as_secs() as i64)
                 .unwrap_or(0),
             today: chrono::Local::now().format("%Y-%m-%d").to_string(),
-            since: since
-                .map(str::to_string)
-                .unwrap_or_else(|| self.profile.since.clone()),
+            since,
             branch,
         })
     }

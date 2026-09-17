@@ -17,4 +17,3 @@ anyhow = "1"
 clap = { version = "4", features = ["derive"] }
 chrono = "0.4"
 tempfile = "3"
-insta = { version = "1", features = ["json", "redactions"] }

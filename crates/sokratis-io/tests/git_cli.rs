@@ -1,6 +1,10 @@
+//! ZAŠTO RUST OVAKO (cigla M1/15–16 — testovi git-sloja)
+//! Integracijski testovi u `tests/` vide `sokratis-io` kao VANJSKI korisnik (samo javni API), a
+//! `mod common;` je zajednički pomoćni modul — privremeni repo s fiksnim datumima. Tvrdnje su na
+//! izlazu prave `git` naredbe, jer ovaj sloj i postoji zato da razgovara s procesom.
 mod common;
 use common::Repo;
-use sokratis_io::{GitCli, GitSource, IoError};
+use sokratis_io::{GitCli, GitSource, IoError, Project};
 
 #[test]
 fn log_has_fixture_format_and_since_filters_by_commit_date() {
@@ -38,22 +42,32 @@ fn log_has_fixture_format_and_since_filters_by_commit_date() {
 }
 
 #[test]
-fn since_uses_midnight_of_the_day_not_the_current_time_of_day() {
-    // Izmjereno nad Sokrat Studyjem: `git log --since=2026-08-29` (goli datum) uzima TRENUTNO
-    // DOBA DANA kao sat since-granice (u 17:15 → 183 commita, `--since='2026-08-29 00:00'` → 190).
-    // Bez fiksnog `00:00:00` ovaj test ovisi o satu kad se pokrene — commit odmah iza ponoći
-    // since-datuma bi znao ispasti ako se testovi pokrenu popodne. S fiksnim `00:00:00` u
-    // `GitSource::log` granica je uvijek ponoć since-datuma, bez obzira na sat pokretanja.
+fn since_is_fetched_with_one_day_of_reserve_so_the_boundary_is_zone_neutral() {
+    // Dvije stvari se ovdje čuvaju.
+    // (1) Sat: `git log --since=2026-08-29` (goli datum) uzima TRENUTNO DOBA DANA kao granicu —
+    //     izmjereno nad Sokrat Studyjem (u 17:15 → 183 commita, s ` 00:00` → 190). Zato ` 00:00:00`.
+    // (2) Zona (nalaz I2): ponoć u `--since` je ponoć u zoni STROJA, a `%ad`/`%cd` (i jezgrin
+    //     filtar `commit_date >= since`) su u zoni COMMITA. Zapadno od pohranjenog pomaka git bi
+    //     odbacio commit koji jezgra zadržava, pa bi isti repo dao različite brojke po strojevima.
+    //     Zato `io` dovlači od DANA PRIJE i pušta da mjerodavan bude jezgrin string-filtar.
+    //     Rezerva ne mijenja nijednu brojku u `Report` — jezgra ionako odbaci dan rezerve.
     let r = Repo::init();
-    let before_midnight = r.commit(
+    let two_days_before = r.commit(
         "a.txt",
+        "1",
+        "dva dana prije",
+        "2026-09-06T12:00:00+02:00",
+        "2026-09-06T12:00:00+02:00",
+    );
+    let before_midnight = r.commit(
+        "b.txt",
         "1",
         "prije ponoci",
         "2026-09-07T23:55:00+02:00",
         "2026-09-07T23:55:00+02:00",
     );
     let after_midnight = r.commit(
-        "b.txt",
+        "c.txt",
         "1",
         "poslije ponoci",
         "2026-09-08T00:05:00+02:00",
@@ -62,12 +76,16 @@ fn since_uses_midnight_of_the_day_not_the_current_time_of_day() {
     let g = GitCli::new(r.path());
     let log = g.log("main", "2026-09-08").unwrap();
     assert!(
-        !log.contains(&before_midnight),
-        "23:55 dan prije since-datuma mora otpasti bez obzira na sat pokretanja testa"
+        log.contains(&after_midnight),
+        "00:05 na since-datum mora uci bez obzira na sat i zonu stroja"
     );
     assert!(
-        log.contains(&after_midnight),
-        "00:05 na since-datum mora uci bez obzira na sat pokretanja testa"
+        log.contains(&before_midnight),
+        "dan rezerve (2026-09-07) se dovlaci da granica ne ovisi o zoni stroja"
+    );
+    assert!(
+        !log.contains(&two_days_before),
+        "rezerva je TOCNO jedan dan, ne neograniceni log"
     );
 }
 
@@ -89,6 +107,26 @@ fn toplevel_common_dir_and_branches() {
         r.path().canonicalize().unwrap()
     );
     assert!(g.common_dir().unwrap().ends_with(".git"));
+}
+
+/// M2 (završna recenzija M1): repozitorij bez ijednog commita je ispisivao git-ov savjet
+/// („ambiguous argument 'main' … Use '--' to separate paths from revisions") umjesto rečenice.
+/// Korijen: `git branch --show-current` ondje ispiše `main` iako ta grana još NEMA referencu —
+/// ime grane nije dokaz da grana postoji.
+#[test]
+fn repository_without_commits_is_a_typed_error() {
+    let r = Repo::init();
+    let err = Project::open(r.path())
+        .expect("prazan repo se smije otvoriti")
+        .input(None)
+        .unwrap_err();
+    let text = err.to_string();
+    assert!(matches!(err, IoError::NoCommits(_)), "{text}");
+    assert!(text.contains("nema commita"), "{text}");
+    assert!(
+        !text.contains("ambiguous"),
+        "git-ov savjet nije naša poruka: {text}"
+    );
 }
 
 #[test]

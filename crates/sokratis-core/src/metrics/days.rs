@@ -1,9 +1,8 @@
 //! ZAŠTO RUST OVAKO (cigla M1/9 — tempo po danu)
-//! `BTreeMap<&str, Acc>` s privatnom `#[derive(Default)]` strukturom akumulatora: ključ je POSUĐEN
-//! (`c.date.as_str()`), ne kloniran u `String` — akumulacija traje samo dok `commits` postoji
-//! posuđen, pa nema razloga plaćati kopiju datuma za svaki dan. `entry().or_default()` stvara
-//! prazan akumulator kad dan prvi put naiđe; tek na izlazu (`date.to_string()`) datum se klonira,
-//! jer `DayStats` mora posjedovati svoje podatke. Zatim jedan prolaz uzlazno gradi kumulativ.
+//! `BTreeMap<&str, Acc>` s privatnim `#[derive(Default)]` akumulatorom: ključ je POSUĐEN
+//! (`c.date.as_str()`), ne kloniran — akumulacija traje samo dok `commits` postoji posuđen.
+//! `entry().or_default()` stvara prazan akumulator kad dan prvi put naiđe; tek na izlazu
+//! (`date.to_string()`) datum se klonira, jer `DayStats` mora posjedovati svoje podatke.
 use crate::{Commit, DayStats, Delivery, Profile};
 use std::collections::BTreeMap;
 

@@ -1,7 +1,10 @@
 # Fixture pariteta — Sokrat Study, main @ 090bd0c11f9ceafb064b2bf3f5dd06adac4a382d, snimljeno 2026-09-17
 
-- `.log` = `git log main --since=2026-08-02 --reverse --date=format:%Y-%m-%d --format=@@%h|%at|%ct|%ad|%cd|%s --numstat`
+- `.log` = `git log main --since='2026-08-02 00:00' --reverse --date=format:%Y-%m-%d --format=@@%h|%at|%ct|%ad|%cd|%s --numstat`
   (od 2026-08-02 jer se zatvorene faze BROJE iz commita; metrike filtriraju `commit_date >= 2026-08-29`).
+  **` 00:00` je obavezan** (S-011, nalaz M12): goli datum git kroz `approxidate` veže na **trenutno doba
+  dana** pokretanja, pa bi ponovno snimanje bez sata pomaknulo lijevi rub fixturea i s njim prvu
+  zatvorenu fazu — vidi mjerenje 183 naprama 190 commita u odjeljku ispod.
 - `.PROGRESS.md` / `.RASPORED.md` = `git show main:<put>` s istog commita.
 - `.expected.json` = list Sažetak knjige koju je `rad-xlsx.py` generirao nad ISTIM stanjem, bez ručnih overridea
   (svjež IZLAZ → nema `vrsta (ručno)`), izvučeno skriptom `extract_expected.py`.

@@ -1,8 +1,9 @@
-//! ZAŠTO RUST OVAKO (cigla M1/1 — profil)
-//! `#[serde(default)]` na strukturi: polje koje u JSON-u nedostaje uzima vrijednost iz
-//! `impl Default` — a taj Default JE Sokrat Study (S-005). `deny_unknown_fields`: tipfeler u
-//! profilu je greška, ne tiho ignoriranje. `Patterns` drži kompilirane regexe odvojeno od
-//! profila jer `Regex` nije `Serialize`; kompilira se jednom, koristi tisuću puta.
+//! ZAŠTO RUST OVAKO (cigla M1/1 — profil · popravak C1)
+//! `#[serde(default)]`: polje koje u JSON-u nedostaje uzima vrijednost iz `impl Default` — a taj
+//! Default JE Sokrat Study (S-005). `deny_unknown_fields`: tipfeler u profilu je greška, ne tiho
+//! ignoriranje. `Patterns` drži kompilirane regexe (`Regex` nije `Serialize`), a tamo
+//! `Regex::captures_len()` prebroji grupe: regex bez grupe koju parser čita je greška, ne panika.
+use crate::ParseError;
 use crate::model::WorkKind;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -159,6 +160,28 @@ impl Profile {
             .to_string()
     }
 
+    /// Svi datumi iz profila moraju biti `YYYY-MM-DD`: `since` i `closed_phases[].from/to` su
+    /// granice mjerenja, a tipfeler u njima tiho pomakne prozor (nalaz C2). Poruka nosi IME
+    /// polja jer profil piše čovjek.
+    pub fn validate_dates(&self) -> Result<(), ParseError> {
+        let bad = |field: String, text: &str| ParseError::BadDate {
+            field,
+            text: text.to_string(),
+        };
+        if !crate::civil::is_ymd(&self.since) {
+            return Err(bad("profil.since".into(), &self.since));
+        }
+        for (i, phase) in self.closed_phases.iter().enumerate() {
+            if !crate::civil::is_ymd(&phase.from) {
+                return Err(bad(format!("profil.closed_phases[{i}].from"), &phase.from));
+            }
+            if !crate::civil::is_ymd(&phase.to) {
+                return Err(bad(format!("profil.closed_phases[{i}].to"), &phase.to));
+            }
+        }
+        Ok(())
+    }
+
     pub fn is_test_path(&self, path: &str) -> bool {
         self.test_path_prefixes
             .iter()
@@ -186,6 +209,12 @@ impl Profile {
 }
 
 pub struct Patterns {
+    /// Poveznica na `.md` u markdownu: `](put/do.md#odjeljak)`. NIJE iz profila — konstanta je,
+    /// ali joj je dom ovdje da `docs.rs` ne mora `expect()` u produkcijskom kodu: `Regex::new`
+    /// se ovdje propagira `?`-om kao svaki drugi regex (nalaz M6).
+    pub md_link: Regex,
+    /// Datum oblika `20xx-xx-xx` u tekstu dokumenta; isto konstanta, isti razlog.
+    pub iso_date: Regex,
     pub diary_heading: Regex,
     pub diary_deploy: Regex,
     pub plan_brick: Regex,
@@ -199,14 +228,31 @@ pub struct Patterns {
     pub closed_phases: Vec<(ClosedPhase, Regex)>,
 }
 
+/// Kompilira regex iz profila i TRAŽI bar `need` capture-grupa, jer ih parser čita po broju.
+/// `captures_len()` broji i grupu 0 (cijeli pogodak), pa se od nje odbija jedinica.
+fn with_groups(field: &str, pattern: &str, need: usize) -> Result<Regex, ParseError> {
+    let re = Regex::new(pattern)?;
+    let got = re.captures_len() - 1;
+    if got < need {
+        return Err(ParseError::BadPattern {
+            field: field.into(),
+            need,
+            got,
+        });
+    }
+    Ok(re)
+}
+
 impl Patterns {
-    pub fn compile(p: &Profile) -> Result<Patterns, regex::Error> {
+    pub fn compile(p: &Profile) -> Result<Patterns, ParseError> {
         Ok(Patterns {
-            diary_heading: Regex::new(&p.diary_heading)?,
+            md_link: Regex::new(r"\]\(([^)\s]+\.md)(#[^)\s]*)?\)")?,
+            iso_date: Regex::new(r"\b20\d\d-\d\d-\d\d\b")?,
+            diary_heading: with_groups("diary_heading", &p.diary_heading, 3)?,
             diary_deploy: Regex::new(&p.diary_deploy_pattern)?,
-            plan_brick: Regex::new(&p.plan_brick)?,
-            plan_phase_name: Regex::new(&p.plan_phase_name)?,
-            phase_tag: Regex::new(&p.phase_tag)?,
+            plan_brick: with_groups("plan_brick", &p.plan_brick, 3)?,
+            plan_phase_name: with_groups("plan_phase_name", &p.plan_phase_name, 2)?,
+            phase_tag: with_groups("phase_tag", &p.phase_tag, 1)?,
             classifier: p
                 .classifier
                 .iter()
@@ -237,6 +283,45 @@ mod tests {
         assert_eq!(partial.since, "2026-09-01");
         assert_eq!(partial.default_branch, "main");
         assert!(serde_json::from_str::<Profile>(r#"{"sinc":"x"}"#).is_err());
+    }
+
+    /// C1: svako polje koje parser indeksira po grupi mora biti odbijeno ako grupe nema —
+    /// i to s IMENOM polja, da korisnik zna što u `profile.json` popraviti.
+    #[test]
+    fn patterns_without_required_capture_groups_name_the_field() {
+        let cases = [
+            (
+                "plan_brick",
+                Profile {
+                    plan_brick: r"^\| \*\*M".into(),
+                    ..Profile::default()
+                },
+            ),
+            (
+                "plan_phase_name",
+                Profile {
+                    plan_phase_name: r"^### F\d".into(),
+                    ..Profile::default()
+                },
+            ),
+            (
+                "phase_tag",
+                Profile {
+                    phase_tag: r"^F\d".into(),
+                    ..Profile::default()
+                },
+            ),
+        ];
+        for (field, profile) in cases {
+            let message = match Patterns::compile(&profile) {
+                Ok(_) => String::new(),
+                Err(e) => e.to_string(),
+            };
+            assert!(
+                message.contains(field),
+                "polje {field}: compile nije prijavio grešku ({message})"
+            );
+        }
     }
 
     #[test]

@@ -22,6 +22,16 @@ fn last_code_commit(commits: &[Commit], profile: &Profile) -> Option<Commit> {
 }
 
 pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, ParseError> {
+    // C2: `since` je granica mjerenja i usporedba je leksikografska, pa oblik MORA biti
+    // `YYYY-MM-DD` — inače tipfeler tiho promijeni prozor umjesto da se javi. Provjera je u
+    // jezgri (ne u `clap`-u) da isti ugovor vrijedi i za Tauri put u M2.
+    if !crate::civil::is_ymd(&input.since) {
+        return Err(ParseError::BadDate {
+            field: "since".into(),
+            text: input.since.clone(),
+        });
+    }
+    profile.validate_dates()?;
     let p = Patterns::compile(profile)?;
     let parsed = parse_git_log(&input.git_log)?;
     let all = parsed.commits;
@@ -60,6 +70,7 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
             days: &days,
             phases: &phases,
             overrides: &input.overrides,
+            since: &input.since,
         },
         profile,
         &p,
@@ -174,6 +185,108 @@ mod tests {
         assert!(rules.contains(&"unmerged-branches"), "{rules:?}");
         assert!(!rules.contains(&"docs-lag"), "dnevnik je svježiji od koda");
         assert_eq!((r.generated_at, r.branch.as_str()), (input().now, "main"));
+    }
+
+    /// I8 (završna recenzija M1): zatvorena faza bez ijednog pogođenog commita je TUĐA povijest,
+    /// ne naša. Nad praznim repoom sa ZADANIM profilom (S-005) je pisalo „zatvorenih faza u
+    /// razdoblju 3" i „prosječno trajanje 8.5" — dva od 18 pokazatelja izmišljena za svaki
+    /// projekt osim Sokrat Studyja. Faze ostaju u ispisu (0/0), ali se ne broje.
+    #[test]
+    fn closed_phase_without_commits_is_not_counted() {
+        let mut empty = input();
+        empty.git_log = String::new();
+        empty.plan = None;
+        empty.diary = None;
+        let r = build_report(&empty, &Profile::default()).expect("prazan log je valjan ulaz");
+        let value = |id: &str| {
+            r.indicators
+                .iter()
+                .find(|i| i.id == id)
+                .unwrap_or_else(|| panic!("{id}"))
+                .value
+        };
+        assert_eq!(value("closed_phases_in_range"), 0.0);
+        assert_eq!(value("closed_phase_avg_days"), 0.0);
+        assert!(
+            r.phases.iter().all(|p| p.commits == 0),
+            "prazan log ne može pogoditi ni jednu fazu"
+        );
+    }
+
+    /// C3 (završna recenzija M1): pokazatelj `closed_phases_in_range` je uspoređivao s
+    /// `profile.since`, dok cijeli ostatak izvještaja filtrira po `input.since` — pa je jedan od
+    /// 18 pokazatelja bio kriv (u JSON-u i u tablici) kad god se `--since` razlikuje od profila.
+    #[test]
+    fn closed_phases_in_range_follows_input_since_not_profile_since() {
+        // Dva commita koja upadaju u DVIJE povijesne zatvorene faze zadanog profila:
+        // „MREŽA" (2026-08-31..2026-09-01) i „RAČUN R1" (2026-09-02..2026-09-02).
+        const LOG: &str = "@@m1|1787000000|1787000000|2026-08-31|2026-08-31|MREZA A1: baza\n1\t0\tjs/a.js\n\n@@r1|1788000000|1788000000|2026-09-02|2026-09-02|R1: Google prijava\n1\t0\tjs/b.js\n";
+        let closed_in_range = |since: &str| {
+            let mut i = input();
+            i.git_log = LOG.into();
+            i.since = since.into();
+            let r = build_report(&i, &Profile::default()).expect("valjan ulaz");
+            r.indicators
+                .iter()
+                .find(|x| x.id == "closed_phases_in_range")
+                .expect("pokazatelj postoji")
+                .value
+        };
+        assert_eq!(
+            closed_in_range("2026-08-29"),
+            2.0,
+            "MREŽA (to 2026-09-01) i R1 (to 2026-09-02); faza bez commita ne ulazi (I8)"
+        );
+        assert_eq!(
+            closed_in_range("2026-09-02"),
+            1.0,
+            "samo R1 završava 2026-09-02 ili poslije"
+        );
+    }
+
+    /// C2 (završna recenzija M1): neprovjeren `since` je tiho mijenjao prozor mjerenja —
+    /// `2026-9-17` je leksikografski VEĆI od `2026-09-17` pa je davao 0 commita i izlaz 0, a
+    /// `17.09.2026` je manji od svakog `2026-…` pa je propuštao sve. Tipfeler mora biti greška.
+    #[test]
+    fn malformed_since_is_an_error_not_a_silent_window() {
+        for bad in ["2026-9-17", "17.09.2026", "banana", "2026-02-30", ""] {
+            let mut bad_input = input();
+            bad_input.since = bad.into();
+            match build_report(&bad_input, &Profile::default()) {
+                Ok(r) => panic!("since `{bad}` je prošao: {} commita", r.touched.commits),
+                Err(e) => {
+                    let text = e.to_string();
+                    assert!(text.contains("since"), "greška ne imenuje polje: {text}");
+                }
+            }
+        }
+        assert!(
+            build_report(&input(), &Profile::default()).is_ok(),
+            "ispravan `YYYY-MM-DD` mora proći"
+        );
+    }
+
+    /// Isti tipfeler u `profile.json` (`since`, `closed_phases[].from/to`) mora reći KOJE polje
+    /// je krivo — profil piše čovjek, pa poruka mora pokazati na redak koji se popravlja.
+    #[test]
+    fn malformed_profile_dates_name_the_field() {
+        let bad_since = Profile {
+            since: "17.09.2026".into(),
+            ..Profile::default()
+        };
+        let e = build_report(&input(), &bad_since)
+            .err()
+            .map(|e| e.to_string())
+            .unwrap_or_default();
+        assert!(e.contains("profil.since"), "{e}");
+
+        let mut bad_phase = Profile::default();
+        bad_phase.closed_phases[1].to = "2026-13-01".into();
+        let e = build_report(&input(), &bad_phase)
+            .err()
+            .map(|e| e.to_string())
+            .unwrap_or_default();
+        assert!(e.contains("closed_phases[1].to"), "{e}");
     }
 
     #[test]

@@ -7,6 +7,10 @@ publish.workspace = true
 
 [dependencies]
 serde.workspace = true
-serde_json.workspace = true
 regex.workspace = true
 thiserror.workspace = true
+
+# `serde_json` jezgri ne treba za rad — koristi se samo u testovima (fixture `expected.json`,
+# provjere serijalizacije). Pravilo #6: svaka ovisnost je namjerna i na svom mjestu.
+[dev-dependencies]
+serde_json.workspace = true

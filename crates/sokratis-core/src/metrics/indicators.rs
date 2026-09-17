@@ -15,6 +15,9 @@ pub struct IndicatorInput<'a> {
     pub days: &'a [DayStats],
     pub phases: &'a [Phase],
     pub overrides: &'a HashMap<String, WorkKind>,
+    /// Granica razdoblja iz `ReportInput.since` (`--since`), NE `profile.since`: cijeli
+    /// izvještaj filtrira po njoj, pa i pokazatelj o zatvorenim fazama mora (nalaz C3).
+    pub since: &'a str,
 }
 
 pub fn indicators(input: &IndicatorInput<'_>, profile: &Profile, p: &Patterns) -> Vec<Indicator> {
@@ -28,10 +31,13 @@ pub fn indicators(input: &IndicatorInput<'_>, profile: &Profile, p: &Patterns) -
             .filter(|c| effective_kind(c, input.overrides, p) == k)
             .count() as f64
     };
+    // I8: zatvorena faza bez ijednog POGOĐENOG commita ne ulazi u pokazatelje. Zatvorene faze
+    // dolaze iz profila (tuđa povijest kad profil nije naš), a `commits > 0` je dokaz da je faza
+    // stvarno vidljiva u ovom repozitoriju — bez njega tuđi projekt dobije faze iz zraka.
     let closed: Vec<&Phase> = input
         .phases
         .iter()
-        .filter(|ph| ph.state == PhaseState::Closed)
+        .filter(|ph| ph.state == PhaseState::Closed && ph.commits > 0)
         .collect();
     let lines: u64 = input
         .commits
@@ -48,11 +54,15 @@ pub fn indicators(input: &IndicatorInput<'_>, profile: &Profile, p: &Patterns) -
     let commits_per_day = r1(per(commits, working_days));
     let deliveries = input.deliveries.len() as f64;
     let deliveries_per_day = r1(per(deliveries, working_days));
-    let hours = r1(input.days.iter().map(|d| d.hours).sum());
+    // `+ 0.0` briše predznak nule: `f64::sum()` nad praznim iteratorom vrati `-0.0`, a
+    // `(-0.0) + 0.0` je po IEEE 754 `+0.0` — bez toga prazan raspon ispisuje `-0` (nalaz M1).
+    let hours = r1(input.days.iter().map(|d| d.hours).sum()) + 0.0;
     let commits_per_hour = r1(per(commits, hours));
     let lines_changed = lines as f64;
-    let test_lines_changed = test_lines as f64;
-    let test_share = r3(test_lines_changed / lines_changed.max(1.0));
+    // Ime nosi TIP, ne drugu mjeru: ovo je isti `test_lines` (id pokazatelja i ključ u JSON-u)
+    // samo kao `f64`. Staro `test_lines_changed` je zvučalo kao treća, nepostojeća mjera.
+    let test_lines_f64 = test_lines as f64;
+    let test_share = r3(test_lines_f64 / lines_changed.max(1.0));
     let deploys = input.deliveries.iter().filter(|d| d.deploy).count() as f64;
     let debugging_commits = kind_count(WorkKind::Debugging);
     let debugging_share = r3(debugging_commits / commits.max(1.0));
@@ -69,11 +79,7 @@ pub fn indicators(input: &IndicatorInput<'_>, profile: &Profile, p: &Patterns) -
         .count() as f64;
     let closed_in_range = closed
         .iter()
-        .filter(|ph| {
-            ph.to
-                .as_deref()
-                .is_some_and(|t| t >= profile.since.as_str())
-        })
+        .filter(|ph| ph.to.as_deref().is_some_and(|t| t >= input.since))
         .count() as f64;
     let avg_days = r1(per(
         closed.iter().filter_map(|ph| ph.days).sum::<i64>() as f64,
@@ -119,7 +125,7 @@ pub fn indicators(input: &IndicatorInput<'_>, profile: &Profile, p: &Patterns) -
         mk("lines_changed", lines_changed, m, "Σ added + deleted"),
         mk(
             "test_lines",
-            test_lines_changed,
+            test_lines_f64,
             m,
             "Σ redaka na testnim putanjama",
         ),
@@ -219,6 +225,7 @@ mod tests {
                 days: &days,
                 phases: &phases,
                 overrides: &ov,
+                since: "2026-08-29",
             },
             &profile,
             &p,
@@ -259,6 +266,32 @@ mod tests {
                 .count()
                 == 2
         );
+    }
+
+    /// M1 (završna recenzija M1): `f64::sum()` nad PRAZNIM iteratorom počinje od `-0.0`, pa je
+    /// `report --since <budući datum>` davao `"value": -0.0` u JSON-u i `sati rada … -0` u
+    /// tablici. Nula u IEEE 754 ima predznak; mjera ga ne smije imati.
+    #[test]
+    fn empty_range_gives_positive_zero_hours() {
+        let profile = Profile::default();
+        let p = Patterns::compile(&profile).unwrap();
+        let overrides = HashMap::new();
+        let ind = indicators(
+            &IndicatorInput {
+                commits: &[],
+                deliveries: &[],
+                days: &[],
+                phases: &[],
+                overrides: &overrides,
+                since: "2026-08-29",
+            },
+            &profile,
+            &p,
+        );
+        let hours = v_of(&ind, "hours");
+        assert_eq!(hours, 0.0);
+        assert!(hours.is_sign_positive(), "sati su -0.0");
+        assert_eq!(format!("{hours}"), "0", "tablica ne smije ispisati -0");
     }
 
     /// Paritet sa Sokrat Studyjevim `rad-xlsx.py` nad stvarnim repozitorijem (191 dan povijesti,
@@ -319,6 +352,7 @@ mod tests {
                 days: &days,
                 phases: &phases,
                 overrides: &overrides,
+                since,
             },
             &profile,
             &p,
