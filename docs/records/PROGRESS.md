@@ -206,8 +206,30 @@ Orkestrator: Fable 5.1; završna recenzija, popravljač i čuvar: opus; ponovna 
   (CLI radi; `signals .` je danas 0 jer su sve grane tokova spojene). `sokratis docs .` = **100/100,
   0 nalaza**, `git branch --no-merged main` prazno.
 
-### Što slijedi
+### Što slijedi (na kraju sesije 2026-09-17)
 **Zastanak — Leonov OK.** Na njega čekaju: brisanje 8 grana tokova i njihovih radnih stabala, push i
 objava (remote još ne postoji), odluka o `rust-toolchain.toml`. Napomena: `.claude/agents/*.md` su
 globalno git-ignorirani, pa definicije agenata **nisu** u repou — i to je Leonova odluka. Nakon OK-a:
 spec za M2 (desktop).
+
+---
+
+## 2026-09-18 (FABLE) — Leonov OK, grane i stabla obrisani, M1 zatvoren
+
+**Odmah iza ponoći, nastavak zastanka s kraja M1.**
+
+- **Leon je dao izričit OK** za brisanje: svih **8 radnih stabala** `sokratis.<tok>` (sva čista, 0
+  nepohranjenih promjena) i svih **8 grana** `feat/*` (sve spojene u `main`, `git branch -d`). `git
+  worktree list` sad pokazuje samo `sokratis` na `main`; `git branch -a` samo `main`.
+- **Provjera nakon brisanja:** `cargo test --workspace` = 64 testa zeleno; `sokratis signals .` = 0
+  (kod 0); `sokratis docs .` = 100/100, 0 nalaza. Brojke nepromijenjene u odnosu na kraj M1.
+- **M1 je time zatvoren** (main = 0e24ffe). Od stavki koje su čekale Leona ostaju samo: push/objava na
+  GitHub (remote još ne postoji), odluka o `rust-toolchain.toml`, uvođenje `.claude/agents/*.md` u
+  repo (danas globalno git-ignorirani).
+- **Čuvar dokumentacije (Način A):** `CLAUDE.md` „Stanje — TRENUTNO" i „Agenti" odjeljak, `ROADMAP.md`
+  (M1 red i „Gdje smo"), `AGENTI.md` §2/§7 i `README.md` usklađeni s ovim stanjem — nijedna živa
+  tvrdnja da grane/stabla tokova još postoje ili čekaju brisanje.
+
+### Što slijedi
+**Spec za M2 (desktop).** Brainstorming s Leonom → jedan aktivni spec `docs/plan/ARHITEKTURA_M2.md` →
+plan cigla-po-cigla → agenti kao u M1 (nove grane/stabla otvara plan M2, ne postoje danas).

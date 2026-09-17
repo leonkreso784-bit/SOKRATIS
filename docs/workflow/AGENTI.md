@@ -34,6 +34,10 @@ pri startu), orkestrator šalje `general-purpose` agenta i u prompt zalijepi **c
 Tokovi se **ne dodiruju po datotekama**, pa merge nema sudara. Jedina zajednička točka je T1 (ugovor tipova):
 zato T1 ide prvi i sam, pa se spoji u `main` prije nego se otvore ostala stabla.
 
+**Ova tablica je povijest M1.** Sve grane `feat/*` i stabla `sokratis.<tok>` iz nje su 2026-09-18
+obrisana uz Leonov OK (sve su bile spojene) — objašnjava merge-povijest, ne trenutno stanje. M2 dobiva
+svoju tablicu tokova kad plan M2 odredi vlasništvo datoteka.
+
 ## 3 · Protokol po cigli
 
 ```
@@ -76,5 +80,6 @@ i `git worktree list` — stanje se čita iz gita, ne iz sjećanja.
 
 `sokratis signals .` nad ovim repoom prijavljuje `unmerged-branches` za tokove koji predugo žive izvan
 `main`-a — orkestrator ga vrti nakon svakog spajanja. Na kraju M1 daje **0 signala** jer su sve grane
-tokova spojene (grane i stabla čekaju Leonov OK za brisanje); pravilo je dokazano nad Sokrat Studyjem,
-gdje hvata dvije stvarno nespojene grane. Sokratis nadzire vlastitu gradnju.
+tokova bile spojene; pravilo je dokazano nad Sokrat Studyjem, gdje hvata dvije stvarno nespojene grane.
+Grane i stabla tokova su 2026-09-18 obrisane uz Leonov OK — `main` je jedina grana i jedino stablo.
+Sokratis nadzire vlastitu gradnju.

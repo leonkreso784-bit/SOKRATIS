@@ -4,9 +4,9 @@
 git-repozitorij, izračuna statistiku rada, ocijeni čistoću dokumentacije i javi smjer projekta
 s dokazom. Za više projekata odjednom.
 
-> 🚧 **U gradnji (rujan 2026).** Milestone 1 je isporučen i recenziran — verzija 0.1.0:
+> 🚧 **U gradnji (rujan 2026).** Milestone 1 je zatvoren (2026-09-18) — verzija 0.1.0:
 > `core`/`io`/`cli` rade nad pravom git-povijesti (paritet s `RAD.xlsx` je test, ne tvrdnja).
-> Milestone se zatvara uz odluku autora; nije još objavljeno na GitHubu. Ulaz u dokumentaciju:
+> Objava na GitHub i push čekaju autorov izričit OK. Ulaz u dokumentaciju:
 > [docs/README.md](./docs/README.md) · milestonei: [docs/plan/ROADMAP.md](./docs/plan/ROADMAP.md) ·
 > isporučeno: [docs/records/CHANGELOG.md](./docs/records/CHANGELOG.md).
 
