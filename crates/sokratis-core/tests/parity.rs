@@ -77,14 +77,17 @@ fn matches_rad_xlsx_except_fixed_hours() {
             ),
         ] {
             if got != want {
-                mismatches.push(format!("{} {name}: {got} != {want}", d.date));
+                mismatches.push(format!(
+                    "{} {name}: Sokratis {got} != RAD.xlsx {want}",
+                    d.date
+                ));
             }
         }
         assert!(d.hours >= 0.0, "{}: negativni sati {}", d.date, d.hours);
         let hours_fixed = e["hours_fixed"].as_f64().unwrap();
         if (d.hours - hours_fixed).abs() > HOURS_TOLERANCE {
             mismatches.push(format!(
-                "{} hours: {} != hours_fixed {hours_fixed}",
+                "{} hours: Sokratis {} != RAD.xlsx(hours_fixed) {hours_fixed}",
                 d.date, d.hours
             ));
         }
@@ -100,13 +103,25 @@ fn matches_rad_xlsx_except_fixed_hours() {
         );
         let got = (k.commits as f64, k.share, k.lines as f64);
         if got.0 != want.0 || (got.1 - want.1).abs() > 0.001 || got.2 != want.2 {
-            mismatches.push(format!("kind {}: {:?} != {:?}", k.kind.id(), got, want));
+            mismatches.push(format!(
+                "kind {}: Sokratis {:?} != RAD.xlsx {:?}",
+                k.kind.id(),
+                got,
+                want
+            ));
         }
     }
 
     // Pokazatelji: 16 od 18 jednaki referenci na bit; `hours` i `commits_per_hour` se uspoređuju
     // s ispravljenom referencom (`hours_fixed`/`commits_per_hour_fixed`), ne sa zastarjelim
     // proxyjem koji tablica danas prikazuje (`hours_legacy`/`commits_per_hour_legacy`).
+    // M9: petlja ide po RUSTOVIM pokazateljima, pa bi bez ovog `assert_eq!` paritet ostao zelen
+    // i kad bi jedan pokazatelj ispao iz `indicators()` — usporedba bi se samo prestala raditi.
+    assert_eq!(
+        r.indicators.len(),
+        18,
+        "brif tvrdi 18 pokazatelja; paritet mora pasti i kad jedan NEDOSTAJE"
+    );
     for i in &r.indicators {
         let (want, tol) = match i.id.as_str() {
             "hours" => (
@@ -127,7 +142,10 @@ fn matches_rad_xlsx_except_fixed_hours() {
             ),
         };
         if (i.value - want).abs() > tol {
-            mismatches.push(format!("indicator {}: {} != {want}", i.id, i.value));
+            mismatches.push(format!(
+                "indicator {}: Sokratis {} != RAD.xlsx {want}",
+                i.id, i.value
+            ));
         }
     }
 
@@ -152,7 +170,7 @@ fn matches_rad_xlsx_except_fixed_hours() {
             || state != want["state"]
         {
             mismatches.push(format!(
-                "phase {} ({}): {}/{} {:?} != {}",
+                "phase {} ({}): Sokratis {}/{} {:?} != RAD.xlsx {}",
                 got.name, got.id, got.done_bricks, got.total_bricks, got.state, want
             ));
         }
