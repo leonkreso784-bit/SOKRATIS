@@ -1,7 +1,9 @@
 //! ZAŠTO RUST OVAKO (cigla M1/13 — pravilo nespojenih grana)
 //! `impl Rule for UnmergedBranches` je ugovor iz `rules/mod.rs`; pravilo nema stanja (unit struct)
-//! pa se konstruira golim imenom. `Severity` derivira `Ord` → usporedba bira težu težinu bez `if`
-//! grananja po varijanti; brojanje prekršitelja i najstarija starost rade se u jednom prolazu.
+//! pa se konstruira golim imenom. Prekršitelji se skupljaju jednim `filter`/`map` lancem nad
+//! granama, najstarija starost je `.max()` nad `i64`, a `Severity` se bira jednim `if/else` nad
+//! booleovim uvjetom (starost ILI broj); `Ord` na `Severity` ovdje nije potreban jer nema
+//! stapanja više signala u jedan.
 use super::Rule;
 use crate::{Context, Severity, Signal};
 
