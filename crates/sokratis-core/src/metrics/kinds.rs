@@ -22,11 +22,13 @@ pub fn kind_stats(
     WorkKind::ALL
         .iter()
         .map(|&kind| {
-            let mine = commits
+            let n = commits
                 .iter()
-                .filter(|c| effective_kind(c, overrides, p) == kind);
-            let n = mine.clone().count() as u32;
-            let lines = mine
+                .filter(|c| effective_kind(c, overrides, p) == kind)
+                .count() as u32;
+            let lines = commits
+                .iter()
+                .filter(|c| effective_kind(c, overrides, p) == kind)
                 .flat_map(|c| c.files.iter())
                 .map(|f| f.added + f.deleted)
                 .sum();
