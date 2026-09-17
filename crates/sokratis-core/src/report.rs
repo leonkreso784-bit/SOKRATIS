@@ -2,7 +2,6 @@
 //! Ovo je jedino mjesto koje zna REDOSLIJED koraka; svaki korak je funkcija iz svog modula.
 //! `Context` klonira `commits`/`branches`/`docs` u vlasništvo — jedna kopija po izvještaju, a
 //! zauzvrat nijedan lifetime u potpisu pravila (S-002, RUST.md §1).
-use crate::classify;
 use crate::docs::docs_health;
 use crate::metrics::indicators::IndicatorInput;
 use crate::metrics::{
@@ -81,9 +80,8 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
         last_code_commit: last_code,
     };
     let signals = evaluate_all(&default_rules(), &ctx);
-    // `classify_sub` ostaje javan za M2 (Dnevnik pogled po commitu); ova linija samo dokumentira
-    // da modul postoji i da build_report svjesno (još) ne poziva podvrstu.
-    let _ = classify::classify_sub;
+    // `classify_sub` ostaje javan za M2 (Dnevnik pogled po commitu); build_report ga svjesno
+    // (još) ne poziva.
     Ok(Report {
         generated_at: input.now,
         since: input.since.clone(),
