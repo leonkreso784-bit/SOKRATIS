@@ -7,6 +7,7 @@
       "cumulative": 10,
       "lines": 5348,
       "hours_legacy": 4.9,
+      "hours_fixed": 4.9,
       "deliveries": 4,
       "deploys": 0,
       "test_lines": 493
@@ -16,6 +17,7 @@
       "cumulative": 19,
       "lines": 7717,
       "hours_legacy": 8,
+      "hours_fixed": 8,
       "deliveries": 7,
       "deploys": 0,
       "test_lines": 5
@@ -25,6 +27,7 @@
       "cumulative": 44,
       "lines": 12503,
       "hours_legacy": 14.7,
+      "hours_fixed": 14.7,
       "deliveries": 16,
       "deploys": 0,
       "test_lines": 2664
@@ -34,6 +37,7 @@
       "cumulative": 86,
       "lines": 18476,
       "hours_legacy": 15.3,
+      "hours_fixed": 15.3,
       "deliveries": 33,
       "deploys": 1,
       "test_lines": 743
@@ -43,6 +47,7 @@
       "cumulative": 98,
       "lines": 1971,
       "hours_legacy": 4.5,
+      "hours_fixed": 4.5,
       "deliveries": 9,
       "deploys": 4,
       "test_lines": 168
@@ -52,6 +57,7 @@
       "cumulative": 100,
       "lines": 743,
       "hours_legacy": 1,
+      "hours_fixed": 1,
       "deliveries": 0,
       "deploys": 0,
       "test_lines": 27
@@ -61,6 +67,7 @@
       "cumulative": 113,
       "lines": 4545,
       "hours_legacy": 6.7,
+      "hours_fixed": 6.7,
       "deliveries": 7,
       "deploys": 1,
       "test_lines": 655
@@ -70,6 +77,7 @@
       "cumulative": 135,
       "lines": 6978,
       "hours_legacy": 11.6,
+      "hours_fixed": 11.6,
       "deliveries": 13,
       "deploys": 1,
       "test_lines": 1018
@@ -79,6 +87,7 @@
       "cumulative": 154,
       "lines": 2828,
       "hours_legacy": -195.3,
+      "hours_fixed": 5.9,
       "deliveries": 7,
       "deploys": 0,
       "test_lines": 1333
@@ -88,6 +97,7 @@
       "cumulative": 158,
       "lines": 1051,
       "hours_legacy": 3,
+      "hours_fixed": 3,
       "deliveries": 2,
       "deploys": 0,
       "test_lines": 220
@@ -97,6 +107,7 @@
       "cumulative": 161,
       "lines": 546,
       "hours_legacy": -21.9,
+      "hours_fixed": 1.1,
       "deliveries": 2,
       "deploys": 0,
       "test_lines": 102
@@ -106,6 +117,7 @@
       "cumulative": 168,
       "lines": 1585,
       "hours_legacy": 3.2,
+      "hours_fixed": 3.3,
       "deliveries": 2,
       "deploys": 0,
       "test_lines": 348
@@ -115,6 +127,7 @@
       "cumulative": 180,
       "lines": 3110,
       "hours_legacy": 2.6,
+      "hours_fixed": 2.5,
       "deliveries": 2,
       "deploys": 0,
       "test_lines": 401
@@ -124,6 +137,7 @@
       "cumulative": 190,
       "lines": 2763,
       "hours_legacy": 2.5,
+      "hours_fixed": 2.5,
       "deliveries": 1,
       "deploys": 0,
       "test_lines": 745
@@ -163,7 +177,9 @@
     "deliveries": 105,
     "deliveries_per_day": 7.5,
     "hours_legacy": -139.2,
+    "hours_fixed": 85,
     "commits_per_hour_legacy": -1.4,
+    "commits_per_hour_fixed": 2.2,
     "lines_changed": 70164,
     "test_lines": 8922,
     "test_share": 0.127,
