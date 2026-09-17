@@ -1,10 +1,8 @@
-//! ZAŠTO RUST OVAKO (cigla M1/5 — parser plana)
-//! Dva prolaza kroz retke: prvi u `HashMap` skuplja imena faza (redoslijed ovdje nije bitan),
-//! drugi broji cigle. Redoslijed PRVOG POJAVLJIVANJA faza čuva `Vec` uz `position()` +
-//! indeksiranje (`&mut phases[idx]`) — posudba traje samo dok se brojevi upisuju, za razliku od
-//! `iter_mut().find()` koja bi držala `&mut` kroz cijeli `match` i tražila `expect()` na "upravo
-//! dodanom" elementu. Bez `expect()` je čitljivije i nema izlaza iz pravila #6 (bez `expect` u
-//! jezgri).
+//! ZAŠTO RUST OVAKO (cigla M1/5 — parser plana · popravak C1)
+//! Dva prolaza kroz retke: prvi u `HashMap` skuplja imena faza, drugi broji cigle. Redoslijed
+//! PRVOG POJAVLJIVANJA čuva `Vec` uz `position()` + indeksiranje (`&mut phases[idx]`), bez
+//! `expect()` na „upravo dodanom" elementu (pravilo #6). Grupe iz `Captures` čitamo `get(n)` uz
+//! `Option`, ne `c[n]`: indeksiranje PANICIRA kad regex iz profila tu grupu nema (nalaz C1).
 use crate::{Patterns, Phase, PhaseState};
 use std::collections::HashMap;
 
@@ -12,13 +10,19 @@ pub fn parse_plan(text: &str, p: &Patterns) -> Vec<Phase> {
     let names: HashMap<String, String> = text
         .lines()
         .filter_map(|l| p.plan_phase_name.captures(l))
-        .map(|c| (c[1].to_string(), c[2].trim().to_string()))
+        .filter_map(|c| {
+            let id = c.get(1)?.as_str().to_string();
+            let name = c.get(2)?.as_str().trim().to_string();
+            Some((id, name))
+        })
         .collect();
 
     let mut phases: Vec<Phase> = Vec::new();
     for c in text.lines().filter_map(|l| p.plan_brick.captures(l)) {
-        let id = c[1].to_string();
-        let done = !c[3].is_empty();
+        let Some(id) = c.get(1).map(|m| m.as_str().to_string()) else {
+            continue;
+        };
+        let done = c.get(3).is_some_and(|m| !m.as_str().is_empty());
         let idx = match phases.iter().position(|ph| ph.id == id) {
             Some(i) => i,
             None => {
@@ -85,6 +89,30 @@ mod tests {
         );
         assert_eq!(ph[3].state, PhaseState::Closed);
         assert!(ph[0].from.is_none() && ph[0].commits == 0);
+    }
+
+    /// C1 (završna recenzija M1): profil smije sadržavati VALJAN regex bez capture-grupa.
+    /// Stari kod je na `c[1]` paniciralo („no group at index '1'", izlaz 101); danas takav regex
+    /// odbije `Patterns::compile` s imenom polja, pa CLI vrati izlaz 3.
+    #[test]
+    fn plan_regex_without_capture_groups_is_an_error_not_a_panic() {
+        let profile = Profile {
+            plan_brick: r"^\| \*\*M".into(),
+            ..Profile::default()
+        };
+        let message = match Patterns::compile(&profile) {
+            Err(e) => e.to_string(),
+            Ok(p) => {
+                // Druga brana: ako provjera grupa jednom ispadne iz `compile`, `parse_plan`
+                // svejedno ne smije paničariti — `Captures::get` vraća `Option`, ne panika.
+                assert!(parse_plan("| **M1/1** ✅ |\n", &p).is_empty());
+                return;
+            }
+        };
+        assert!(
+            message.contains("plan_brick"),
+            "greška mora imenovati polje profila: {message}"
+        );
     }
 
     /// Paritet sa Sokrat Studyjevim `rad-xlsx.py`: isti `RASPORED.md`, iste cigle i stanja.

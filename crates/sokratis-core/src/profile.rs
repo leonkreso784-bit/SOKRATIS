@@ -1,8 +1,10 @@
-//! ZAŠTO RUST OVAKO (cigla M1/1 — profil)
-//! `#[serde(default)]` na strukturi: polje koje u JSON-u nedostaje uzima vrijednost iz
-//! `impl Default` — a taj Default JE Sokrat Study (S-005). `deny_unknown_fields`: tipfeler u
-//! profilu je greška, ne tiho ignoriranje. `Patterns` drži kompilirane regexe odvojeno od
-//! profila jer `Regex` nije `Serialize`; kompilira se jednom, koristi tisuću puta.
+//! ZAŠTO RUST OVAKO (cigla M1/1 — profil · popravak C1)
+//! `#[serde(default)]`: polje koje u JSON-u nedostaje uzima vrijednost iz `impl Default` — a taj
+//! Default JE Sokrat Study (S-005). `deny_unknown_fields`: tipfeler u profilu je greška, ne tiho
+//! ignoriranje. `Patterns` drži kompilirane regexe (`Regex` nije `Serialize`), a
+//! `Regex::captures_len()` ondje prebroji grupe: regex iz profila bez grupe koju parser indeksira
+//! je greška s imenom polja, ne panika (nalaz C1).
+use crate::ParseError;
 use crate::model::WorkKind;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -199,14 +201,29 @@ pub struct Patterns {
     pub closed_phases: Vec<(ClosedPhase, Regex)>,
 }
 
+/// Kompilira regex iz profila i TRAŽI bar `need` capture-grupa, jer ih parser čita po broju.
+/// `captures_len()` broji i grupu 0 (cijeli pogodak), pa se od nje odbija jedinica.
+fn with_groups(field: &str, pattern: &str, need: usize) -> Result<Regex, ParseError> {
+    let re = Regex::new(pattern)?;
+    let got = re.captures_len() - 1;
+    if got < need {
+        return Err(ParseError::BadPattern {
+            field: field.into(),
+            need,
+            got,
+        });
+    }
+    Ok(re)
+}
+
 impl Patterns {
-    pub fn compile(p: &Profile) -> Result<Patterns, regex::Error> {
+    pub fn compile(p: &Profile) -> Result<Patterns, ParseError> {
         Ok(Patterns {
-            diary_heading: Regex::new(&p.diary_heading)?,
+            diary_heading: with_groups("diary_heading", &p.diary_heading, 3)?,
             diary_deploy: Regex::new(&p.diary_deploy_pattern)?,
-            plan_brick: Regex::new(&p.plan_brick)?,
-            plan_phase_name: Regex::new(&p.plan_phase_name)?,
-            phase_tag: Regex::new(&p.phase_tag)?,
+            plan_brick: with_groups("plan_brick", &p.plan_brick, 3)?,
+            plan_phase_name: with_groups("plan_phase_name", &p.plan_phase_name, 2)?,
+            phase_tag: with_groups("phase_tag", &p.phase_tag, 1)?,
             classifier: p
                 .classifier
                 .iter()
@@ -237,6 +254,45 @@ mod tests {
         assert_eq!(partial.since, "2026-09-01");
         assert_eq!(partial.default_branch, "main");
         assert!(serde_json::from_str::<Profile>(r#"{"sinc":"x"}"#).is_err());
+    }
+
+    /// C1: svako polje koje parser indeksira po grupi mora biti odbijeno ako grupe nema —
+    /// i to s IMENOM polja, da korisnik zna što u `profile.json` popraviti.
+    #[test]
+    fn patterns_without_required_capture_groups_name_the_field() {
+        let cases = [
+            (
+                "plan_brick",
+                Profile {
+                    plan_brick: r"^\| \*\*M".into(),
+                    ..Profile::default()
+                },
+            ),
+            (
+                "plan_phase_name",
+                Profile {
+                    plan_phase_name: r"^### F\d".into(),
+                    ..Profile::default()
+                },
+            ),
+            (
+                "phase_tag",
+                Profile {
+                    phase_tag: r"^F\d".into(),
+                    ..Profile::default()
+                },
+            ),
+        ];
+        for (field, profile) in cases {
+            let message = match Patterns::compile(&profile) {
+                Ok(_) => String::new(),
+                Err(e) => e.to_string(),
+            };
+            assert!(
+                message.contains(field),
+                "polje {field}: compile nije prijavio grešku ({message})"
+            );
+        }
     }
 
     #[test]
