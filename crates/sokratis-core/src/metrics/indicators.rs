@@ -54,7 +54,9 @@ pub fn indicators(input: &IndicatorInput<'_>, profile: &Profile, p: &Patterns) -
     let commits_per_day = r1(per(commits, working_days));
     let deliveries = input.deliveries.len() as f64;
     let deliveries_per_day = r1(per(deliveries, working_days));
-    let hours = r1(input.days.iter().map(|d| d.hours).sum());
+    // `+ 0.0` briše predznak nule: `f64::sum()` nad praznim iteratorom vrati `-0.0`, a
+    // `(-0.0) + 0.0` je po IEEE 754 `+0.0` — bez toga prazan raspon ispisuje `-0` (nalaz M1).
+    let hours = r1(input.days.iter().map(|d| d.hours).sum()) + 0.0;
     let commits_per_hour = r1(per(commits, hours));
     let lines_changed = lines as f64;
     let test_lines_changed = test_lines as f64;
@@ -262,6 +264,32 @@ mod tests {
                 .count()
                 == 2
         );
+    }
+
+    /// M1 (završna recenzija M1): `f64::sum()` nad PRAZNIM iteratorom počinje od `-0.0`, pa je
+    /// `report --since <budući datum>` davao `"value": -0.0` u JSON-u i `sati rada … -0` u
+    /// tablici. Nula u IEEE 754 ima predznak; mjera ga ne smije imati.
+    #[test]
+    fn empty_range_gives_positive_zero_hours() {
+        let profile = Profile::default();
+        let p = Patterns::compile(&profile).unwrap();
+        let overrides = HashMap::new();
+        let ind = indicators(
+            &IndicatorInput {
+                commits: &[],
+                deliveries: &[],
+                days: &[],
+                phases: &[],
+                overrides: &overrides,
+                since: "2026-08-29",
+            },
+            &profile,
+            &p,
+        );
+        let hours = v_of(&ind, "hours");
+        assert_eq!(hours, 0.0);
+        assert!(hours.is_sign_positive(), "sati su -0.0");
+        assert_eq!(format!("{hours}"), "0", "tablica ne smije ispisati -0");
     }
 
     /// Paritet sa Sokrat Studyjevim `rad-xlsx.py` nad stvarnim repozitorijem (191 dan povijesti,
