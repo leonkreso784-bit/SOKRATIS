@@ -74,6 +74,40 @@ Test za pravilo: **Leon može pročitati datoteku i reći što radi.** Ako ne mo
 | `todo!()` kao stub-konvencija | M1 (T1, svi stubovi) | makro koji panicira porukom pri pozivu; potpis funkcije postoji prije tijela, pa cigla koja nedostaje puca jasnom porukom umjesto da tiho vrati krivu vrijednost |
 | `impl Into<PathBuf>` | M1 (T1, `io/git.rs`) | argument prima bilo što pretvorivo u `PathBuf` (`&str`, `String`, `PathBuf`); pozivatelj ne mora sam zvati `.into()` |
 | `collect::<Result<_, _>>()` | M1 (T1, `profile.rs:214,223`) | iterator stavki `Result<T, E>` se "okreće" u jedan `Result<Vec<T>, E>` — prvi `Err` prekida i vraća se, inače se skupe sve `Ok` vrijednosti |
+| `let … else` | M1 (T3, `gitlog.rs`; kasnije `docs.rs`, `git.rs`) | rani izlazak (`return`/`continue`) kad uzorak ne odgovara, bez ugnježđenog `match` za jedan slučaj |
+| `splitn(n, pat)` | M1 (T3, `gitlog.rs`) | dijeli string na najviše `n` dijelova; ostatak (npr. poruka commita sa `\|`) ostaje netaknut u zadnjem |
+| `Vec::last_mut()` | M1 (T3, `gitlog.rs`) | izmjenjiva posudba zadnjeg elementa (npr. dodavanje sljedećeg `numstat` retka trenutnom commitu) bez ponovnog pretraživanja |
+| `?` na `Option<T>` | M1 (T3, `civil.rs`; kasnije `docs.rs`) | isto načelo kao `?` na `Result`, ali funkcija prekida s `None` umjesto propagirane greške |
+| byte-indeksiranje `&str` uz provjeru duljine | M1 (T3, `civil.rs`) | rezanje stringa po bajtovima puca na neispravnoj UTF-8 granici osim ako je duljina (ovdje: ASCII datum `YYYY-MM-DD`) provjerena unaprijed |
+| Hinnantov `days_from_civil` | M1 (T3, `civil.rs`) | poznati algoritam (Howard Hinnant) za datum → broj dana bez kalendarske ovisnosti (`chrono` ostaje samo u `io`, S-011 kontekst) |
+| `HashSet<&str>` / `HashSet<String>` za članstvo | M1 (T12, `docs.rs`; kasnije `git.rs`) | skup za provjeru „je li unutra" u O(1), bez duplikata i bez brige za redoslijed |
+| `rsplit_once` | M1 (T12, `docs.rs`) | dijeli string na zadnjem pojavljivanju uzorka, vraća `Option<(prefiks, sufiks)>` |
+| struct-update `..Default::default()` | M1 (T12, `docs.rs` test) | preostala polja literala preuzimaju zadane vrijednosti; test postavlja samo polje koje testira |
+| `for (kind, re) in &p.classifier` + `*kind` na Copy-enumu; `Vec` umjesto `HashMap` kad je redoslijed ugovor | M1 (T6, `classify.rs`) | iteracija po posuđenom vektoru parova čuva ugovoreni redoslijed (planiranje > dokumentacija > …); `HashMap` ga ne bi garantirao |
+| `lines()+filter_map(captures)` vs `(?m)`; stabilan `sort_by` | M1 (T4, `diary.rs`) | red-po-red s regexom bez multiline-zastavice je čitljiviji od jednog `(?m)` uzorka; `sort_by` čuva izvorni poredak jednakih ključeva |
+| `include_str!` za fixture u testu | M1 (T4, `diary.rs`; kasnije `plan.rs`) | ugrađuje sadržaj datoteke u binarku pri kompajliranju — test ne čita disk u vrijeme izvođenja |
+| `Vec::position()` + `&mut v[idx]` umjesto `iter_mut().find()`+`expect` | M1 (T5, `plan.rs`) | nađi indeks pa uzmi izmjenjivu referencu — izbjegava dvostruku posudbu koju kasnija izmjena susjednog polja komplicira |
+| unit struct kao pravilo | M1 (T13, `rules/*.rs`) | struct bez polja koji nosi samo `impl Rule`; identitet pravila je u tipu, ne u podacima |
+| `std::process::Command` bez shella | M1 (T15, `git.rs`) | pokreće vanjski proces s argumentima kao vektorom, bez interpretacije shella — nema escapinga ni injekcije |
+| `Output { status, stdout, stderr }` | M1 (T15, `git.rs`) | rezultat pokrenutog procesa razdvaja izlazni kod od dva odvojena toka teksta |
+| `String::from_utf8_lossy` | M1 (T15, `git.rs`) | pretvara bajtove u tekst; neispravan UTF-8 zamjenjuje znakom umjesto da panicira |
+| `map_err` `io::Error` → `IoError` po `ErrorKind` | M1 (T15, `git.rs`) | grana po vrsti sistemske greške (npr. `NotFound`) prije pretvorbe u naš tipizirani error |
+| `TempDir` RAII | M1 (T15, `tests/common`) | privremena mapa se obriše kad vrijednost izađe iz opsega — čišćenje bez ručnog `rm`, i kad test panicira |
+| `GIT_AUTHOR_DATE`/`GIT_COMMITTER_DATE` kroz `Command::env` | M1 (T15, `tests/common`) | test postavlja okolišne varijable da `git commit` dobije točan, ponovljiv datum umjesto trenutka izvođenja |
+| `strip_prefix` + `filter_map` | M1 (T16, `git.rs`) | `strip_prefix` vrati `Option`; `filter_map` u istom prolazu odbaci retke gdje je rezultat `None` |
+| `ErrorKind::NotFound` kao jedini opravdan fallback | M1 (T17, `project.rs`) | jedino „datoteka ne postoji" smije tiho pasti na zadano; svaka druga greška čitanja profila se propagira |
+| rekurzivna fn s `&mut Vec` | M1 (T17, `project.rs`) | funkcija poziva samu sebe i puni zajednički izmjenjivi vektor (npr. popis docs-a po podmapama) umjesto da vraća i spaja rezultate |
+| `strip_prefix` + `replace('\\', '/')` za prenosive putanje | M1 (T17, `project.rs`) | ukloni apsolutni prefiks pa zamijeni Windows-separator kosom crtom da izlaz bude isti na svim OS-ovima |
+| `std::path::Component::ParentDir` | M1 (T17, `tests/project.rs`) | prepoznaje `..` segment putanje kao zaseban tip komponente, ne kao običan string za usporedbu |
+| `Vec<&Commit>` | *na grani `feat/core-metrics`* | vektor referenci umjesto vlasništva kad metrika samo čita commite koje već drži pozivatelj |
+| `BTreeMap` | *na grani `feat/core-metrics`* | mapa sortirana po ključu — korisna kad se ispisuje po danu uzlazno bez naknadnog sortiranja |
+| `entry().or_insert()` / `or_default()` | *na grani `feat/core-metrics`* | dohvati-ili-umetni u jednom potezu, bez dvostrukog pretraživanja mape |
+| `Option::is_some_and` | *na grani `feat/core-metrics`* | provjerava predikat nad sadržajem `Option` bez ručnog `match`/`unwrap` |
+| `Option::filter` | *na grani `feat/core-metrics`* | zadrži `Some` samo ako sadržaj zadovoljava predikat, inače `None` |
+| `BTreeMap<&str, Acc>` s posuđenim ključem | *na grani `feat/core-metrics`* | ključ mape je posudba iz izvornih podataka, ne kopija — akumulator ne smije nadživjeti izvor |
+| privatni `#[derive(Default)]` akumulator | *na grani `feat/core-metrics`* | pomoćni struct vidljiv samo unutar modula, s automatskim nula-stanjem za zbrajanje po danu/vrsti |
+| `unwrap_or_else` s lijenim closureom | *na grani `feat/core-metrics`* | zadana vrijednost se računa tek ako stvarno treba, ne unaprijed kao kod `unwrap_or` |
+| `flat_map().map().sum()` | *na grani `feat/core-metrics`* | spljošti ugniježđene kolekcije, preslikaj pa zbroji u jednom cjevovodu |
 | lifetime (`'a`) | *kad se pojavi* | koliko dugo posudba vrijedi; u `core` ih izbjegavamo vlasništvom |
 
 Redak se dodaje **u cigli u kojoj se pojam prvi put pojavi**, s referencom na datoteku.

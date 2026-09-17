@@ -22,3 +22,20 @@ Prva verzija s kodom bit će 0.1.0 (M1). Isporuka = ono što je u `main`-u; sesi
   (371 commit od 2026-08-02) + očekivane brojke (`expected.json`: 14 dana, 5 vrsta rada, 18 pokazatelja,
   11 faza, 185 commita od 2026-08-29) u `crates/sokratis-core/tests/fixtures/`, uključujući poznati kvar
   S-007 (dva negativna dana u starom `RAD.xlsx`-obračunu) koji Sokratis mora ispraviti, ne prenijeti.
+- 2026-09-17 — **PARSE (T3–T6) u `main`-u** — parser git loga (371 commit fixturea, `skipped_lines` 0),
+  klasifikator vrste i podvrste rada (redoslijed planiranje > dokumentacija > debugging > poliranje,
+  ostalo izvođenje; provjeren nad 12 stvarnih naslova commita), parser dnevnika (paritet 105/105
+  isporuka po danu s `PROGRESS.md`) i parser plana (paritet 7/7 faza s `RASPORED.md`).
+- 2026-09-17 — **DOCS+PRAVILA (T12–T14) u `main`-u** — `docs_health` sa sedam provjera (mrtva
+  poveznica koja preskače ograde kôda, dokument nije u indeksu, više/nijedan aktivan plan, dnevnik
+  unutar definicije, kašnjenje dnevnika za kodom, proračun ključnih datoteka), ocjena 100 minus zbroj
+  težina; pravila `unmerged-branches` i `docs-lag`, oba s dokazom u signalu.
+- 2026-09-17 — **IO (T15–T17) u `main`-u** — `GitCli` čita git kroz proces (log zadane grane, grane s
+  udaljenošću od `main`-a, radna stabla, zadnja promjena putanje); `Project` otvara repo iz podmape ili
+  radnog stabla, čita profil (nepoznato polje = greška), ručne podatke (`overrides.json`,
+  `visions.json`) i docs s vremenom zadnje promjene; provjereno nad Sokrat Studyjem: 56 docs, 31 grana,
+  4301 redak loga. `--since` sada šalje puni dan (S-011) — ispravlja kvar `rad-xlsx.py` gdje je
+  `git log --since` bez sata ovisio o dobu dana pokretanja.
+- 2026-09-17 — **METRIKE (T7–T10) na grani `feat/core-metrics`, još ne u `main`-u** — sati po
+  `author_time` (S-007): 0 negativnih dana na fixtureu, 33/37 dana identično `RAD.xlsx`-u, razlika samo
+  oko tri poznata cherry-picka.

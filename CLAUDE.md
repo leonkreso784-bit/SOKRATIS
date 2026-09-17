@@ -63,26 +63,27 @@ sati zbog cherry-pickova — se u Sokratisu **ispravlja, ne prenosi** (S-007).
 `… docs <putanja>` · `… signals <putanja>` (izlazni kod 0 nema · 1 Warn · 2 Alert).
 Testovi i brane: `docs/workflow/TESTING.md`.
 
-## Stanje — TRENUTNO (2026-09-17, nakon compacta)
-- **M0 gotovo, uz Leonov OK:** Visual Studio Build Tools (MSVC) + rustup stable
-  (`stable-x86_64-pc-windows-msvc`) na stroju; `cargo`/`rustfmt`/`clippy` rade.
-- **T1 (kostur) i T2 (fixture) spojeni u `main`:** Cargo workspace triju crateova, ugovor tipova
-  jezgre, zadani profil (Sokrat Study, S-005), stubovi svih preostalih cigli, fixture pariteta sa
-  Sokrat Studyja za testiranje parsera i metrika. `cargo test` zeleno. Brojke: `CHANGELOG.md`.
-- **Paralelni tokovi u tijeku u radnim stablima:** `sokratis.parse` · `sokratis.metrics` ·
-  `sokratis.rules` · `sokratis.io` grade cigle prema `docs/superpowers/plans/2026-09-17-m1-jezgra-i-cli.md`;
-  `sokratis.cli` čeka slobodno mjesto (limit 4 graditelja istodobno).
+## Stanje — TRENUTNO (2026-09-17, nakon spajanja PARSE/DOCS+PRAVILA/IO)
+- **M0, T1 (kostur), T2 (fixture) gotovi**; u `main`-u su i **PARSE (T3–T6)**, **DOCS+PRAVILA (T12–T14)**
+  i **IO (T15–T17)**: parser git loga i dnevnika i plana, klasifikator vrste/podvrste, `docs_health`,
+  pravila `unmerged-branches`/`docs-lag`, `GitCli` i `Project` kroz `io`. `cargo test --workspace` zeleno.
+  Brojke: `CHANGELOG.md`.
+- **METRIKE (T7–T10) gotove na grani `feat/core-metrics`** (T11 slijedi, još ne spojeno); **CLI
+  (T18–T19)** čeka slobodno mjesto — `sokratis` je i dalje stub do tada.
+- **S-011 (novo):** `--since` sada šalje puni dan, ne goli datum — ispravlja izmjeren kvar `rad-xlsx.py`
+  (`git log --since` bez sata ovisi o dobu dana pokretanja). Vidi `DECISIONS.md`.
 - **Agenti definirani:** `.claude/agents/{graditelj,recenzent,cuvar-dokumentacije}.md`; protokol nadzora
   `docs/workflow/AGENTI.md` (orkestrator = ova sesija, jedini spaja u `main`).
-- Sljedeće: spajanje tokova u `main` čim recenzent kaže SPOJIVO → kad su svi spojeni, integracija
-  (T20–T22) → zastanak na kraju M1 (Leonov OK).
+- Sljedeće: METRIKE T11 → CLI T18–T19 → spajanje → integracija (T20–T22) → zastanak na kraju M1
+  (Leonov OK).
 - Što je isporučeno i kada zna `CHANGELOG.md`; tijek sesija `PROGRESS.md`. Ovaj odjeljak to ne ponavlja.
 
 ## Ključne odluke — samo žive
 Puni tekst: `docs/records/DECISIONS.md`. **S-001** Rust · **S-002** core bez I/O-a · **S-003** git kroz
 proces iza traita · **S-004** ručni podaci u `.sokratis/` u repou · **S-005** zadano = Sokrat Study, profil
 pregazi · **S-006** sučelje web (Svelte 5), ne Rust GUI · **S-007** sati po `author_time`, sortirano ·
-**S-008** engleski identifikatori u jezgri · **S-009** SQLite tek u M2 · **S-010** jedna činjenica, jedno mjesto.
+**S-008** engleski identifikatori u jezgri · **S-009** SQLite tek u M2 · **S-010** jedna činjenica, jedno
+mjesto · **S-011** `--since` računa cijeli dan, ne goli datum.
 
 ## Agenti — više grana, jedan orkestrator
 Uloge i protokol: `docs/workflow/AGENTI.md`. Graditelj radi **jednu ciglu u svom stablu**, recenzent presuđuje
