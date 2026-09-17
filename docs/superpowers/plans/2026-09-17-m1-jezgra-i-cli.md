@@ -2048,7 +2048,15 @@ fn resolve(from_file: &str, link: &str) -> Option<String> {
 fn dead_links(files: &[DocFile], known: &HashSet<&str>, out: &mut Vec<Finding>) {
     let re = Regex::new(r"\]\(([^)\s]+\.md)(#[^)\s]*)?\)").expect("regex konstanta");
     for f in files {
+        let mut in_fence = false; // poveznica unutar ``` bloka je primjer, ne poveznica
         for (i, line) in f.content.lines().enumerate() {
+            if line.trim_start().starts_with("```") {
+                in_fence = !in_fence;
+                continue;
+            }
+            if in_fence {
+                continue;
+            }
             for c in re.captures_iter(line) {
                 let link = &c[1];
                 if link.contains("://") { continue; }
@@ -3268,6 +3276,6 @@ Expected: tablica sa 16 pokazatelja jednakih tablici + ispravni sati; docs-nalaz
 
 **Tipovi:** `Commit.date` (autor) i `Commit.commit_date` dodani u T1 i korišteni dosljedno (dan = `date`, `since` = `commit_date`). `Patterns` polja: `diary_heading`, `diary_deploy`, `plan_brick`, `plan_phase_name`, `phase_tag`, `classifier`, `gate`, `deploy`, `ci_fix`, `paused`, `closed_phases` — sva korištena u T4–T14. `IndicatorInput<'a>` je jedini lifetime; RUST.md §1 to bilježi kao svjesnu iznimku. `WorkKind::id()` uveden u T20, koristi T19 i T21.
 
-**Placeholderi:** nema `TBD`/`TODO`; `todo!("cigla M1/N")` u T1 su stubovi koje kasniji taskovi zamjenjuju, svaki imenovan. Unix-vremena u io-testovima su označena kao „izračunaj naredbom prije pokretanja" — to je uputa, ne rupa.
+**Placeholderi:** nema nedovršenih oznaka; `todo!("cigla M1/N")` u T1 su stubovi koje kasniji taskovi zamjenjuju, svaki imenovan. Provjera mrtvih poveznica preskače ``` blokove (T12) — primjer u testu nije poveznica. Unix-vremena u io-testovima su označena kao „izračunaj naredbom prije pokretanja" — to je uputa, ne rupa.
 
 **Rizici koje orkestrator prati:** (1) prvi `cargo build` s Tauri-jem tek u M2 — M1 ne treba MSVC ništa osim linkera; (2) `serde(default)` + `deny_unknown_fields` na `Profile` — ako serde-verzija prigovori, `default` ide po polju; (3) paritet može otkriti Python/git razlike — T21 kaže: git je istina.
