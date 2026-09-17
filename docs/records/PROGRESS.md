@@ -191,8 +191,11 @@ Orkestrator: Fable 5.1; završna recenzija, popravljač i čuvar: opus; ponovna 
   Tauri. `rust-toolchain.toml` je ostavljen **Leonu** jer pin tjera `rustup` da skine još jednu
   kopiju toolchaina na njegov stroj.
 - **Leon usred sesije (20:18):** logo Sokratisa postoji (`C:\Users\leonk\Downloads\sokratis logo .png`)
-  i u sučelju želi **logo umjesto teksta „Sokratis"** te **splash s animacijom logotipa** pri
-  učitavanju. To je zahtjev za M2; zapisan je u `plan/ROADMAP.md` (red M2), nigdje drugdje.
+  i treba biti **ikona aplikacije** (prozor, tray, instalacija); pri otvaranju aplikacije ide
+  **animacija** s natpisom „Sokratis" u kojem logo stoji **na mjestu slova „o"** (logo predstavlja to
+  slovo, ne zamjenjuje cijelu riječ). Prvi zapis ove poruke (logo umjesto cijelog teksta + splash) bio
+  je pogrešan; Leon ga je kasnije iste večeri ispravio. Zahtjev za M2 stoji u `plan/ROADMAP.md`
+  (red M2), nigdje drugdje.
 - **Dokumentacijsko zatvaranje** (ovaj commit): `ARCHITECTURE.md` usklađen s kodom nakon popravaka
   (provjera ulaza, prozor dovlačenja s rezervom, izlazni kodovi, §11 dopunjen), `CHANGELOG.md` dobio
   popravke i broj testova, `DECISIONS.md` dopunu S-011, `TESTING.md`/`RUST.md` bez `insta` i

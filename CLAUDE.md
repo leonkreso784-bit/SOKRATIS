@@ -76,7 +76,7 @@ Testovi i brane: `docs/workflow/TESTING.md`.
   `docs/records/BACKLOG.md`.
 - **Milestone se zatvara tek Leonovim OK-om.** Na njega čekaju: brisanje 8 grana tokova i njihovih
   radnih stabala, push i objava (remote još ne postoji), odluka o `rust-toolchain.toml`.
-  Sljedeće nakon OK-a: **spec za M2 (desktop)**; Leonov zahtjev za znak/splash stoji u
+  Sljedeće nakon OK-a: **spec za M2 (desktop)**; Leonov zahtjev za znak/animaciju pri otvaranju stoji u
   `docs/plan/ROADMAP.md` (red M2).
 - **Prva radnja nove sesije:** `git log --oneline -15` · `git worktree list` · ledger
   `.superpowers/sdd/2026-09-17-m1-jezgra-i-cli/progress.md`, odjeljak „STANJE ZA NOVU SESIJU"
