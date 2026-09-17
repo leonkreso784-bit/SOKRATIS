@@ -1,6 +1,9 @@
 //! ZAŠTO RUST OVAKO (cigla M1/9 — tempo po danu)
-//! `BTreeMap<String, Acc>` s privatnom `#[derive(Default)]` strukturom akumulatora: `entry().or_default()`
-//! stvara prazan akumulator kad dan prvi put naiđe. Zatim jedan prolaz uzlazno gradi kumulativ.
+//! `BTreeMap<&str, Acc>` s privatnom `#[derive(Default)]` strukturom akumulatora: ključ je POSUĐEN
+//! (`c.date.as_str()`), ne kloniran u `String` — akumulacija traje samo dok `commits` postoji
+//! posuđen, pa nema razloga plaćati kopiju datuma za svaki dan. `entry().or_default()` stvara
+//! prazan akumulator kad dan prvi put naiđe; tek na izlazu (`date.to_string()`) datum se klonira,
+//! jer `DayStats` mora posjedovati svoje podatke. Zatim jedan prolaz uzlazno gradi kumulativ.
 use crate::{Commit, DayStats, Delivery, Profile};
 use std::collections::BTreeMap;
 
@@ -39,15 +42,17 @@ pub fn day_stats(
     acc.into_iter()
         .map(|(date, a)| {
             cumulative += a.commits;
-            let on_day = deliveries.iter().filter(|d| d.date == date);
             DayStats {
                 date: date.to_string(),
                 commits: a.commits,
                 commits_cumulative: cumulative,
                 lines: a.lines,
                 hours: hours.get(date).copied().unwrap_or(0.0),
-                deliveries: on_day.clone().count() as u32,
-                deploys: on_day.filter(|d| d.deploy).count() as u32,
+                deliveries: deliveries.iter().filter(|d| d.date == date).count() as u32,
+                deploys: deliveries
+                    .iter()
+                    .filter(|d| d.date == date && d.deploy)
+                    .count() as u32,
                 test_lines: a.test_lines,
             }
         })

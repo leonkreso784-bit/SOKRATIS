@@ -19,15 +19,11 @@ pub fn hours_per_day(commits: &[Commit], gap_h: f64, start_h: f64) -> BTreeMap<S
     let mut prev: Option<i64> = None;
     for c in sorted {
         let gap = prev.map(|p| (c.author_time - p) as f64 / 3600.0);
-        // Imenovana odluka (umjesto `match` koji je tiho spajao "nema prethodnika" i "razmak
-        // prevelik" u istu granu): `is_some_and` vraća false i kad je `gap` `None`, pa oba slučaja
-        // padaju u "nova sesija" bez promjene ponašanja.
-        let same_session = gap.is_some_and(|g| g < gap_h);
-        let add = if same_session {
-            gap.unwrap_or(start_h)
-        } else {
-            start_h
-        };
+        // `Option::filter` prirodno spaja "nema prethodnika" (`None`) i "razmak prevelik"
+        // (predikat lažan) u isti ishod: oba padaju kroz `unwrap_or(start_h)` (nova sesija).
+        // Bez ovoga bi `gap.unwrap_or(start_h)` unutar `if same_session` granu djelovao kao mrtav
+        // kod (grana koja se navodno ne može dogoditi) — ovaj izraz tu dvosmislenost briše.
+        let add = gap.filter(|&g| g < gap_h).unwrap_or(start_h);
         *hours.entry(c.date.clone()).or_insert(0.0) += add;
         prev = Some(c.author_time);
     }
