@@ -95,10 +95,19 @@ fn common_dir_is_the_same_from_root_and_from_a_subdirectory() {
     let from_subdir = Project::open(&r.path().join("docs").join("records"))
         .unwrap()
         .common_dir;
+    // BEZ `canonicalize()`: `canonicalize()` sam razrješava `..`, pa bi ova provjera prošla i sa
+    // starim (krivim) kodom koji je `common_dir` računao iz korisnikove (pod)putanje umjesto iz
+    // `root`-a (nalaz recenzenta, krug popravka 1) — sirova usporedba i odsutnost `..` komponente
+    // stvarno čuvaju popravak.
     assert_eq!(
-        from_root.canonicalize().unwrap(),
-        from_subdir.canonicalize().unwrap(),
+        from_root, from_subdir,
         "isti projekt bez obzira odakle se otvara"
+    );
+    assert!(
+        !from_subdir
+            .components()
+            .any(|c| c == std::path::Component::ParentDir),
+        "common_dir iz podmape ne smije sadrzavati '..': {from_subdir:?}"
     );
 }
 
