@@ -310,4 +310,18 @@ mod tests {
         assert!(b.message.contains("5 B"), "mjeri se bez CR: {}", b.message);
         assert_eq!(h.lag_days, None);
     }
+
+    #[test]
+    fn lag_none_when_code_exists_but_docs_have_no_change_time() {
+        let p = Profile::default();
+        let pat = Patterns::compile(&p).unwrap();
+        let files = vec![
+            f("docs/README.md", "", None),
+            f("docs/records/PROGRESS.md", "", None),
+            f("docs/records/CHANGELOG.md", "", None),
+        ];
+        let h = docs_health(&files, Some(13 * DAY), &p, &pat).unwrap();
+        assert_eq!(h.lag_days, None);
+        assert!(!h.findings.iter().any(|x| x.check == "docs-lag"));
+    }
 }
