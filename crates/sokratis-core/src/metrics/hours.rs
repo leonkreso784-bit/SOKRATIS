@@ -19,9 +19,14 @@ pub fn hours_per_day(commits: &[Commit], gap_h: f64, start_h: f64) -> BTreeMap<S
     let mut prev: Option<i64> = None;
     for c in sorted {
         let gap = prev.map(|p| (c.author_time - p) as f64 / 3600.0);
-        let add = match gap {
-            Some(g) if g < gap_h => g,
-            _ => start_h,
+        // Imenovana odluka (umjesto `match` koji je tiho spajao "nema prethodnika" i "razmak
+        // prevelik" u istu granu): `is_some_and` vraća false i kad je `gap` `None`, pa oba slučaja
+        // padaju u "nova sesija" bez promjene ponašanja.
+        let same_session = gap.is_some_and(|g| g < gap_h);
+        let add = if same_session {
+            gap.unwrap_or(start_h)
+        } else {
+            start_h
         };
         *hours.entry(c.date.clone()).or_insert(0.0) += add;
         prev = Some(c.author_time);
@@ -65,6 +70,11 @@ mod tests {
             h["2026-09-07"], 1.5,
             "x otvara novu sesiju (+0,5), z zatvara razmak od 1 h"
         );
+    }
+
+    #[test]
+    fn empty_input_gives_empty_map() {
+        assert!(hours_per_day(&[], 2.0, 0.5).is_empty());
     }
 
     #[test]
