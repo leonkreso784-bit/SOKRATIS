@@ -187,6 +187,32 @@ mod tests {
         assert_eq!((r.generated_at, r.branch.as_str()), (input().now, "main"));
     }
 
+    /// I8 (završna recenzija M1): zatvorena faza bez ijednog pogođenog commita je TUĐA povijest,
+    /// ne naša. Nad praznim repoom sa ZADANIM profilom (S-005) je pisalo „zatvorenih faza u
+    /// razdoblju 3" i „prosječno trajanje 8.5" — dva od 18 pokazatelja izmišljena za svaki
+    /// projekt osim Sokrat Studyja. Faze ostaju u ispisu (0/0), ali se ne broje.
+    #[test]
+    fn closed_phase_without_commits_is_not_counted() {
+        let mut empty = input();
+        empty.git_log = String::new();
+        empty.plan = None;
+        empty.diary = None;
+        let r = build_report(&empty, &Profile::default()).expect("prazan log je valjan ulaz");
+        let value = |id: &str| {
+            r.indicators
+                .iter()
+                .find(|i| i.id == id)
+                .unwrap_or_else(|| panic!("{id}"))
+                .value
+        };
+        assert_eq!(value("closed_phases_in_range"), 0.0);
+        assert_eq!(value("closed_phase_avg_days"), 0.0);
+        assert!(
+            r.phases.iter().all(|p| p.commits == 0),
+            "prazan log ne može pogoditi ni jednu fazu"
+        );
+    }
+
     /// C3 (završna recenzija M1): pokazatelj `closed_phases_in_range` je uspoređivao s
     /// `profile.since`, dok cijeli ostatak izvještaja filtrira po `input.since` — pa je jedan od
     /// 18 pokazatelja bio kriv (u JSON-u i u tablici) kad god se `--since` razlikuje od profila.
@@ -208,8 +234,8 @@ mod tests {
         };
         assert_eq!(
             closed_in_range("2026-08-29"),
-            3.0,
-            "tri faze završavaju 2026-08-29 ili poslije"
+            2.0,
+            "MREŽA (to 2026-09-01) i R1 (to 2026-09-02); faza bez commita ne ulazi (I8)"
         );
         assert_eq!(
             closed_in_range("2026-09-02"),

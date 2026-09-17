@@ -31,10 +31,13 @@ pub fn indicators(input: &IndicatorInput<'_>, profile: &Profile, p: &Patterns) -
             .filter(|c| effective_kind(c, input.overrides, p) == k)
             .count() as f64
     };
+    // I8: zatvorena faza bez ijednog POGOĐENOG commita ne ulazi u pokazatelje. Zatvorene faze
+    // dolaze iz profila (tuđa povijest kad profil nije naš), a `commits > 0` je dokaz da je faza
+    // stvarno vidljiva u ovom repozitoriju — bez njega tuđi projekt dobije faze iz zraka.
     let closed: Vec<&Phase> = input
         .phases
         .iter()
-        .filter(|ph| ph.state == PhaseState::Closed)
+        .filter(|ph| ph.state == PhaseState::Closed && ph.commits > 0)
         .collect();
     let lines: u64 = input
         .commits

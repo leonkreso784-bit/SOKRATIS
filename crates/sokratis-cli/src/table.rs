@@ -3,7 +3,7 @@
 //! ovdje, u sučelju, a ne u jezgri (S-008). `writeln!(s, …)` na `String` kroz `std::fmt::Write`
 //! gradi izlaz bez međuvektora — nema `unwrap()`: `write!` na `String` ne može stvarno pasti,
 //! ali potpis vraća `Result` pa se ignorira eksplicitno kroz `let _ =`.
-use sokratis_core::{DocsHealth, IndicatorKind, Report, Severity, Signal};
+use sokratis_core::{DocsHealth, IndicatorKind, PhaseState, Report, Severity, Signal};
 use std::fmt::Write;
 
 /// Hrvatski natpis za engleski identifikator pokazatelja/vrste/provjere. Nepoznat id se ispisuje
@@ -89,7 +89,13 @@ pub fn render(r: &Report) -> String {
         let _ = writeln!(s, "{:<44}{:>10}{}", label(&i.id), i.value, kind);
     }
     let _ = writeln!(s, "\nFAZE");
-    for p in &r.phases {
+    // I8: zatvorenu fazu bez ijednog pogođenog commita tablica preskače — pokazatelji je ne
+    // broje, pa je ni ispis ne smije prikazati kao našu povijest.
+    for p in r
+        .phases
+        .iter()
+        .filter(|p| p.state != PhaseState::Closed || p.commits > 0)
+    {
         let _ = writeln!(
             s,
             "{:<50} {:?} {}/{}",
@@ -197,5 +203,47 @@ mod tests {
         }]);
         assert!(sig.contains("WARN") && sig.contains("docs-lag") && sig.contains("  - dokaz"));
         assert_eq!(render_signals(&[]), "nema signala");
+    }
+
+    /// I8: zatvorena faza bez pogođenih commita je tuđa povijest — pokazatelji je ne broje, pa je
+    /// ni tablica ne ispisuje. Zatvorena faza S commitima i aktivna faza bez njih ostaju.
+    #[test]
+    fn closed_phase_without_commits_is_skipped_in_the_table() {
+        let phase = |name: &str, state: PhaseState, commits: u32| Phase {
+            id: name.into(),
+            name: name.into(),
+            state,
+            total_bricks: commits,
+            done_bricks: commits,
+            from: None,
+            to: None,
+            days: None,
+            commits,
+        };
+        let r = Report {
+            generated_at: 0,
+            since: "2026-08-29".into(),
+            branch: "main".into(),
+            touched: Touched {
+                commits: 0,
+                lines: 0,
+                files: 0,
+                skipped_lines: 0,
+            },
+            days: vec![],
+            kinds: vec![],
+            indicators: vec![],
+            phases: vec![
+                phase("TUĐA POVIJEST", PhaseState::Closed, 0),
+                phase("NAŠA FAZA", PhaseState::Closed, 7),
+                phase("PLANIRANA", PhaseState::Planned, 0),
+            ],
+            visions: vec![],
+            docs: None,
+            signals: vec![],
+        };
+        let s = render(&r);
+        assert!(!s.contains("TUĐA POVIJEST"), "{s}");
+        assert!(s.contains("NAŠA FAZA") && s.contains("PLANIRANA"), "{s}");
     }
 }
