@@ -23,6 +23,7 @@ pub trait GitSource {
     fn branch_exists(&self, name: &str) -> Result<bool, IoError>;
     fn current_branch(&self) -> Result<String, IoError>;
 }
+#[derive(Debug)]
 pub struct GitCli {
     pub repo: PathBuf,
 }
