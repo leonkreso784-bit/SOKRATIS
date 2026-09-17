@@ -57,21 +57,24 @@ sati zbog cherry-pickova — se u Sokratisu **ispravlja, ne prenosi** (S-007).
 8. **PRIJE SVAKOG COMPACTA:** proći sve `.md` (root + `docs/**`) i ispraviti zastarjelo.
 
 ## Komande
-`cargo build` · `cargo test` · `cargo clippy --all-targets -- -D warnings` · `cargo fmt` rade od M0
-(workspace se gradi i testira zeleno). CLI podnaredbe su ugovor iz T1, sam CLI je stub do T18–T19:
+`cargo build` · `cargo test` · `cargo clippy --all-targets -- -D warnings` · `cargo fmt` ·
 `cargo run -p sokratis-cli -- report <putanja> [--since YYYY-MM-DD] [--json|--table]` ·
-`… docs <putanja>` · `… signals <putanja>` (izlazni kod 0 nema · 1 Warn · 2 Alert).
+`… docs <putanja>` · `… signals <putanja>` (izlazni kod 0 nema · 1 Warn · 2 Alert · 3 greška) —
+sve rade nad pravim repozitorijem (potvrđeno nad Sokrat Studyjem).
 Testovi i brane: `docs/workflow/TESTING.md`.
 
-## Stanje — TRENUTNO (2026-09-17, nakon spajanja PARSE/DOCS+PRAVILA/IO)
-- **M0, T1 (kostur), T2 (fixture) gotovi**; u `main`-u su i **PARSE (T3–T6)**, **DOCS+PRAVILA (T12–T14)**
-  i **IO (T15–T17)**: parser git loga i dnevnika i plana, klasifikator vrste/podvrste, `docs_health`,
-  pravila `unmerged-branches`/`docs-lag`, `GitCli` i `Project` kroz `io`. `cargo test --workspace` zeleno.
-  Brojke: `CHANGELOG.md`.
-- **METRIKE (T7–T10) gotove na grani `feat/core-metrics`** (T11 slijedi, još ne spojeno); **CLI
-  (T18–T19)** čeka slobodno mjesto — `sokratis` je i dalje stub do tada.
-- **S-011 (novo):** `--since` sada šalje puni dan, ne goli datum — ispravlja izmjeren kvar `rad-xlsx.py`
-  (`git log --since` bez sata ovisi o dobu dana pokretanja). Vidi `DECISIONS.md`.
+## Stanje — TRENUTNO (2026-09-17, večer — pred zastankom na kraju M1)
+- **M0 gotov, T1–T21 spojeni u `main`.** Cijeli lanac radi nad pravim repozitorijem: `sokratis
+  report/docs/signals` čitaju git kroz `io`, jezgra računa dane, sate, vrste rada, faze, 18
+  pokazatelja, docs-ocjenu i signale, CLI ih ispisuje kao JSON ili tablicu s hrvatskim natpisima.
+  Test pariteta s `RAD.xlsx` (`crates/sokratis-core/tests/parity.rs`) zelen. Brojke i dogfooding
+  nad Sokrat Studyjem: `CHANGELOG.md`; tijek sesije: `PROGRESS.md`.
+- **Preostaje samo T22** (dogfooding `.sokratis/profile.json`, `cargo build --release` + izvještaj,
+  `ARCHITECTURE.md`, aktivni spec seli u `archive/`, `CHANGELOG.md` dobiva 0.1.0) → **završna
+  recenzija cijelog M1** s jednim krugom popravaka → **zastanak, Leonov OK**.
+- **Prva radnja nove sesije:** `git log --oneline -15` · `git worktree list` · ledger
+  `.superpowers/sdd/2026-09-17-m1-jezgra-i-cli/progress.md`, odjeljak „STANJE ZA NOVU SESIJU"
+  (operativna uputa, ne izvor činjenica o projektu — te su u `CHANGELOG.md`/`PROGRESS.md`).
 - **Agenti definirani:** `.claude/agents/{graditelj,recenzent,cuvar-dokumentacije}.md`; protokol nadzora
   `docs/workflow/AGENTI.md` (orkestrator = ova sesija, jedini spaja u `main`).
 - Sljedeće: METRIKE T11 → CLI T18–T19 → spajanje → integracija (T20–T22) → zastanak na kraju M1

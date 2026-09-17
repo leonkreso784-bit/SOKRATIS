@@ -99,15 +99,25 @@ Test za pravilo: **Leon može pročitati datoteku i reći što radi.** Ako ne mo
 | rekurzivna fn s `&mut Vec` | M1 (T17, `project.rs`) | funkcija poziva samu sebe i puni zajednički izmjenjivi vektor (npr. popis docs-a po podmapama) umjesto da vraća i spaja rezultate |
 | `strip_prefix` + `replace('\\', '/')` za prenosive putanje | M1 (T17, `project.rs`) | ukloni apsolutni prefiks pa zamijeni Windows-separator kosom crtom da izlaz bude isti na svim OS-ovima |
 | `std::path::Component::ParentDir` | M1 (T17, `tests/project.rs`) | prepoznaje `..` segment putanje kao zaseban tip komponente, ne kao običan string za usporedbu |
-| `Vec<&Commit>` | *na grani `feat/core-metrics`* | vektor referenci umjesto vlasništva kad metrika samo čita commite koje već drži pozivatelj |
-| `BTreeMap` | *na grani `feat/core-metrics`* | mapa sortirana po ključu — korisna kad se ispisuje po danu uzlazno bez naknadnog sortiranja |
-| `entry().or_insert()` / `or_default()` | *na grani `feat/core-metrics`* | dohvati-ili-umetni u jednom potezu, bez dvostrukog pretraživanja mape |
-| `Option::is_some_and` | *na grani `feat/core-metrics`* | provjerava predikat nad sadržajem `Option` bez ručnog `match`/`unwrap` |
-| `Option::filter` | *na grani `feat/core-metrics`* | zadrži `Some` samo ako sadržaj zadovoljava predikat, inače `None` |
-| `BTreeMap<&str, Acc>` s posuđenim ključem | *na grani `feat/core-metrics`* | ključ mape je posudba iz izvornih podataka, ne kopija — akumulator ne smije nadživjeti izvor |
-| privatni `#[derive(Default)]` akumulator | *na grani `feat/core-metrics`* | pomoćni struct vidljiv samo unutar modula, s automatskim nula-stanjem za zbrajanje po danu/vrsti |
-| `unwrap_or_else` s lijenim closureom | *na grani `feat/core-metrics`* | zadana vrijednost se računa tek ako stvarno treba, ne unaprijed kao kod `unwrap_or` |
-| `flat_map().map().sum()` | *na grani `feat/core-metrics`* | spljošti ugniježđene kolekcije, preslikaj pa zbroji u jednom cjevovodu |
-| lifetime (`'a`) | *kad se pojavi* | koliko dugo posudba vrijedi; u `core` ih izbjegavamo vlasništvom |
+| `Vec<&Commit>` | M1 (T8, `metrics/hours.rs`) | vektor referenci umjesto vlasništva kad metrika samo čita commite koje već drži pozivatelj |
+| `BTreeMap` | M1 (T8, `metrics/hours.rs`) | mapa sortirana po ključu — korisna kad se ispisuje po danu uzlazno bez naknadnog sortiranja |
+| `entry().or_insert()` / `or_default()` | M1 (T8, `metrics/hours.rs`; kasnije `metrics/days.rs`) | dohvati-ili-umetni u jednom potezu, bez dvostrukog pretraživanja mape |
+| `Option::is_some_and` | M1 (T11b, `metrics/indicators.rs`) | provjerava predikat nad sadržajem `Option` bez ručnog `match`/`unwrap` |
+| `Option::filter` | M1 (T8, `metrics/hours.rs`) | zadrži `Some` samo ako sadržaj zadovoljava predikat, inače `None` |
+| `BTreeMap<&str, Acc>` s posuđenim ključem | M1 (T9, `metrics/days.rs`) | ključ mape je posudba iz izvornih podataka, ne kopija — akumulator ne smije nadživjeti izvor |
+| privatni `#[derive(Default)]` akumulator | M1 (T9, `metrics/days.rs`) | pomoćni struct vidljiv samo unutar modula, s automatskim nula-stanjem za zbrajanje po danu/vrsti |
+| `unwrap_or_else` s lijenim closureom | M1 (T10, `metrics/kinds.rs`) | zadana vrijednost se računa tek ako stvarno treba, ne unaprijed kao kod `unwrap_or` |
+| `flat_map().map().sum()` | M1 (T10, `metrics/kinds.rs`) | spljošti ugniježđene kolekcije, preslikaj pa zbroji u jednom cjevovodu |
+| `for ph in &mut plan_phases` | M1 (T11a, `metrics/phases.rs`) | mutabilna iteracija po vlastitom vektoru: svaka faza se popuni (`from`/`to`/`days`/`commits`) u mjestu, bez alokacije novog vektora |
+| zamka E0507 i `.as_deref()` | M1 (T11a, `metrics/phases.rs`, test) | `v[i].polje` kroz `Index` je posudba, ne vlasništvo — `Option<String>` se iz nje ne smije pomaknuti (E0507); `.as_deref()` posuđuje `Option<&str>` umjesto toga |
+| lifetime (`'a`) | M1 (T11b, `metrics/indicators.rs`, `IndicatorInput<'a>`; već u §1) | koliko dugo posudba vrijedi; u `core` ih izbjegavamo vlasništvom — ovo je jedina iznimka |
+| `clap` derive (`Parser`/`Subcommand`/`#[command]`/`#[arg(long)]`) | M1 (T18, `cli/main.rs`) | struktura/enum postaju CLI naredbe i argumenti bez ručnog parsiranja; `--help` se generira iz komentara i atributa |
+| `anyhow::Result<i32>` do `main` | M1 (T18, `cli/main.rs`) | `run()` vraća izlazni kod umjesto da ga sam ispisuje; `?` diže bilo koju grešku (io/parse) do jednog mjesta koje odlučuje |
+| `process::exit` na jednom mjestu | M1 (T18, `cli/main.rs`) | `main` je jedina funkcija koja stvarno završava proces zadanim kodom; svugdje drugdje kod je samo vrijednost koja putuje kroz `Result` |
+| `env!("CARGO_BIN_EXE_sokratis")` u integracijskom testu | M1 (T18, `cli/tests/cli.rs`; kasnije `core/tests/parity.rs`) | staza do binarke koju je Cargo upravo izgradio, poznata u vrijeme kompajliranja — test pokreće pravi proces, ne funkciju |
+| integracijski test u `tests/` (crate kao vanjski korisnik) | M1 (T18, `cli/tests/cli.rs`; kasnije `core/tests/parity.rs`) | datoteka u `tests/` vidi samo javni API crate-a, kao vanjski korisnik — ne može posegnuti za privatnim poljima kao `#[cfg(test)]` unutar `src/` |
+| `std::fmt::Write` + `writeln!` u `String` | M1 (T19, `cli/table.rs`) | isti `writeln!` makro kao za stdout, ali cilj je `String` koji raste u memoriji — bez međuvektora redaka |
+| `match &str` kao tablica prijevoda | M1 (T19, `cli/table.rs`) | grananje po tekstualnoj vrijednosti (ne enumu) prevodi engleski identifikator u hrvatski natpis; `_ => id` je siguran pad na nepoznati slučaj |
+| `serde_json::Value` indeksiranje | M1 (T21, `core/tests/parity.rs`) | čitanje tuđeg JSON-a (Python fixture) bez definiranja Rust-tipa za njega — `value["polje"]` posuđuje po ključu/indeksu |
 
 Redak se dodaje **u cigli u kojoj se pojam prvi put pojavi**, s referencom na datoteku.

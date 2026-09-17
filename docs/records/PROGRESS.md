@@ -109,7 +109,33 @@ Namjerno **ne** postoje još: `architecture/`, `BUGS.md`, `HISTORY.md`, `archive
   `read_json_or` zamijenjena dvjema konkretnim funkcijama jer `serde` nije izravna ovisnost `io`-a),
   ali protokol graditelj → recenzent → orkestrator to hvata bez Leona.
 
+### Isporučeno (peti dio sesije — CLI, METRIKE, FIXTURE T2c i INTEGRACIJA spojeni u `main`)
+- **CLI (T18–T19)** spojeno (merge 708e373): naredbe `report [path] [--since] [--json|--table]`,
+  `docs`, `signals`; izlazni kodovi 0/1/2/3 (0 nema signala, 1 Warn, 2 Alert, 3 greška — poruka iz
+  `IoError` na stderr); tablični ispis s hrvatskim natpisima (`table::label()`), identifikatori
+  ostaju engleski (S-008). Recenzije: SPOJIVO.
+- **METRIKE (T7–T11)** spojeno (merge 4f2f7d9): `days_between` bez ovisnosti (Hinnant, `civil.rs`),
+  sati po `author_time` (S-007), tempo po danu, vrste rada s overrideom, faze (zatvorene po
+  `commit_date`, dosljedno S-011) i 18 pokazatelja. Recenzije: T7/T8/T10/T11 SPOJIVO; T9 i T10
+  vraćeni jednom (zaglavlje nije odgovaralo kodu, obrazac s nepotrebnim `clone()`) i ispravljeni.
+  Paritet 16/18 pokazatelja neovisno preračunat od recenzenta.
+- **FIXTURE T2c** spojeno (merge 6e9e676): `expected.json` dobio `hours_fixed` (Python-kopija
+  generatora s dodanim sortiranjem po autoru) — Rustovi sati po danu jednaki `hours_fixed` na
+  14/14 dana, 85,0 h (stara tablica: −139,2 h zbog cherry-pickova, S-007).
+- **INTEGRACIJA (T20–T21)** spojeno (merge cbc7d71): `build_report` (recept od 12 koraka, `Context`
+  u vlasništvu — S-002/RUST.md §1) i `tests/parity.rs` (integracijski test): svi dani, vrste,
+  pokazatelji i faze jednaki referenci, sati jednaki `hours_fixed`; test dokazano pada kad se
+  brojka pomakne. Dogfooding nad Sokrat Studyjem (recenzent ponovio neovisno): 14 dana, 190
+  commita, 105 isporuka, 85 h, docs 100/100 (lag 0 dana), 1 signal ALERT `unmerged-branches`
+  (`fix/kadar-nalicje` 11 dana/12 commita, `feat/tinder-kadar` 8 dana/34 commita) — potvrđeno
+  izravno gitom; `sokratis signals` nad repoom vraća izlazni kod 2.
+- **Testovi na `main`-u:** `cargo test --workspace` = 47 passed.
+- **Preostaje za M1:** T22 (`.sokratis/profile.json` dogfooding nad Sokrat Studyjem, `cargo build
+  --release` + izvještaj, `ARCHITECTURE.md`, aktivni spec seli u `archive/`, `CHANGELOG.md` dobiva
+  0.1.0), pa završna recenzija cijelog M1 s jednim krugom popravaka, pa zastanak i Leonov OK.
+  **M1 još NIJE isporučen** — `CHANGELOG.md` ostaje pod `[Unreleased]`.
+
 ### Što slijedi
-METRIKE T11 (na grani `feat/core-metrics`) → CLI T18–T19 (`feat/cli`, čeka slobodno mjesto) →
-spajanje svakog toka u `main` čim recenzent kaže SPOJIVO → INTEGRACIJA (T20–T22) u svom stablu →
-zastanak na kraju M1 (Leonov OK). FIXTURE T2b je spojen (merge 5e79d91, uz ovaj unos).
+T22 (`feat/integracija` ili novo stablo) → završna recenzija cijelog M1 → zastanak na kraju M1
+(Leonov OK). Svi ostali tokovi (KOSTUR, FIXTURE, PARSE, METRIKE, DOCS+PRAVILA, IO, CLI, INTEGRACIJA
+T20–T21) su spojeni u `main`.

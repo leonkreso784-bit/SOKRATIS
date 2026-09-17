@@ -4,21 +4,23 @@
 > [ARHITEKTURA_M1.md](./ARHITEKTURA_M1.md); što je isporučeno zna
 > [records/CHANGELOG.md](../records/CHANGELOG.md), a tijek sesija [records/PROGRESS.md](../records/PROGRESS.md).
 
-## Gdje smo (2026-09-17)
+## Gdje smo (2026-09-17, večer)
 
-**M0 gotovo.** Plan M1 u izvedbi: u `main`-u su KOSTUR (T1), FIXTURE (T2, T2b), PARSE (T3–T6),
-DOCS+PRAVILA (T12–T14) i IO (T15–T17); `cargo test --workspace` = 30 passed. METRIKE (T7–T10) su gotove
-na grani `feat/core-metrics`, T11 slijedi; CLI (T18–T19) čeka slobodno mjesto. Usput izmjeren i
-ispravljen drugi kvar tablice: `git log --since` bez sata (S-011) — fixture T2b je već regeneriran s
-punim danom. Detalji i brojke: `records/CHANGELOG.md`, tijek sesije: `records/PROGRESS.md`. Zatim:
-METRIKE → CLI → spajanje → integracija (T20–T22) → zastanak na kraju M1.
+**M0 gotovo.** Plan M1 skoro gotov: u `main`-u su KOSTUR (T1), FIXTURE (T2, T2b, T2c), PARSE (T3–T6),
+METRIKE (T7–T11), DOCS+PRAVILA (T12–T14), IO (T15–T17), CLI (T18–T19) i INTEGRACIJA (T20–T21);
+`cargo test --workspace` = 47 passed. `sokratis report/docs/signals` rade nad pravim repozitorijem
+i daju paritet s `RAD.xlsx` (test `tests/parity.rs`). Dogfooding nad Sokrat Studyjem potvrđen:
+14 dana, 190 commita, 105 isporuka, 85 h, docs 100/100, signal `unmerged-branches` ALERT. Detalji i
+brojke: `records/CHANGELOG.md`, tijek sesije: `records/PROGRESS.md`. **Preostaje samo T22**
+(dogfooding profila, `ARCHITECTURE.md`, spec u `archive/`, `CHANGELOG.md` 0.1.0) → završna
+recenzija cijelog M1 → **zastanak na kraju M1** (Leonov OK).
 
 ## Milestonei
 
 | # | naziv | sadržaj | gotovo kad Leon može… | status |
 |---|---|---|---|---|
 | **M0** | **Toolchain** | Visual Studio Build Tools (workload „Desktop development with C++") · rustup s MSVC targetom · `cargo --version` · workspace koji se builda | …pokrenuti `cargo test` u ovom folderu i dobiti zeleno na praznom testu | ✅ gotovo (2026-09-17) |
-| **M1** | **Jezgra + CLI** | `core` · `io` (git-proces, profil, ručni podaci) · `cli` · paritet s `RAD.xlsx` · ispravak sati · docs-ocjena · signali `unmerged-branches` i `docs-lag` | …nad Sokrat Studyjem iz terminala dobiti iste brojke kao u tablici, ispravne sate, ocjenu docs-a i dva signala s dokazom; staviti `sokratis signals` u preflight | 🔨 u tijeku (T1–T6, T12–T17 u `main`; T7–T11 na grani; T18–T22 preostaju) |
+| **M1** | **Jezgra + CLI** | `core` · `io` (git-proces, profil, ručni podaci) · `cli` · paritet s `RAD.xlsx` · ispravak sati · docs-ocjena · signali `unmerged-branches` i `docs-lag` | …nad Sokrat Studyjem iz terminala dobiti iste brojke kao u tablici, ispravne sate, ocjenu docs-a i dva signala s dokazom; staviti `sokratis signals` u preflight | 🔨 pred zastankom (T1–T21 u `main`; T22 preostaje) |
 | **M2** | **Desktop** | Tauri 2 · Svelte 5 · tokeni Sokrat Studyja · SQLite snimke · watcher · tray · obavijesti | …otvoriti Sokratis iz traya, vidjeti sve projekte i dobiti obavijest kad signal padne na Alert | 📋 planirano |
 | **M3** | **Objava** | ostala pravila · profil za tuđe projekte · HR/EN · instalater · znak · README EN · licenca · GitHub | …instalirati Sokratis s GitHuba na čist stroj i priključiti tuđi repo | 📋 planirano |
 
