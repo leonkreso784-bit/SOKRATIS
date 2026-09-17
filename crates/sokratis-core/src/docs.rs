@@ -1,9 +1,9 @@
-//! ZAŠTO RUST OVAKO (cigla M1/12 — čistoća dokumentacije)
+//! ZAŠTO RUST OVAKO (cigla M1/12 — čistoća dokumentacije · popravci M6 i M8)
 //! Svaka provjera je mala privatna funkcija koja PUNI `Vec<Finding>` kroz `&mut` — jedan
 //! vlasnik vektora (ova funkcija), više posudbi u nizu, nikad istodobno. `HashSet<&str>` nad
-//! putanjama daje O(1) provjeru „postoji li cilj poveznice" bez kopiranja stringova.
+//! putanjama daje O(1) provjeru „postoji li cilj poveznice" bez kopiranja stringova. Regexi su
+//! u `Patterns` (i konstantni), pa u ovoj datoteci nema ni jednog `expect()` (nalaz M6).
 use crate::{DocFile, DocsHealth, Finding, Patterns, Profile};
-use regex::Regex;
 use std::collections::HashSet;
 
 fn finding(check: &str, path: &str, line: Option<usize>, message: String) -> Finding {
@@ -36,8 +36,8 @@ fn resolve(from_file: &str, link: &str) -> Option<String> {
     Some(parts.join("/"))
 }
 
-fn dead_links(files: &[DocFile], known: &HashSet<&str>, out: &mut Vec<Finding>) {
-    let re = Regex::new(r"\]\(([^)\s]+\.md)(#[^)\s]*)?\)").expect("regex konstanta");
+fn dead_links(files: &[DocFile], known: &HashSet<&str>, p: &Patterns, out: &mut Vec<Finding>) {
+    let re = &p.md_link;
     for f in files {
         let mut in_fence = false; // poveznica unutar ``` bloka je primjer, ne poveznica
         for (i, line) in f.content.lines().enumerate() {
@@ -49,7 +49,10 @@ fn dead_links(files: &[DocFile], known: &HashSet<&str>, out: &mut Vec<Finding>) 
                 continue;
             }
             for c in re.captures_iter(line) {
-                let link = &c[1];
+                // Grupa 1 je zajamčena: regex je konstanta iz `Patterns`, a ne iz profila.
+                let Some(link) = c.get(1).map(|m| m.as_str()) else {
+                    continue;
+                };
                 if link.contains("://") {
                     continue;
                 }
@@ -125,9 +128,9 @@ fn active_plans(files: &[DocFile], p: &Profile, pat: &Patterns, out: &mut Vec<Fi
     }
 }
 
-fn diary_in_definition(files: &[DocFile], p: &Profile, out: &mut Vec<Finding>) {
-    let re = Regex::new(r"\b20\d\d-\d\d-\d\d\b").expect("regex konstanta");
-    let prefix = format!("{}/", p.product_dir);
+fn diary_in_definition(files: &[DocFile], profile: &Profile, p: &Patterns, out: &mut Vec<Finding>) {
+    let re = &p.iso_date;
+    let prefix = format!("{}/", profile.product_dir);
     for f in files.iter().filter(|f| f.path.starts_with(&prefix)) {
         let n = re.find_iter(&f.content).count();
         if n > 3 {
@@ -155,6 +158,13 @@ fn key_file_budget(files: &[DocFile], p: &Profile, out: &mut Vec<Finding>) {
     }
 }
 
+/// Kašnjenje dokumentacije u CIJELIM danima: od zadnjeg commita koda do zadnje promjene
+/// dnevnika/changeloga. Formula živi na JEDNOM mjestu (nalaz M8) — dijele je pokazatelj
+/// (`docs_health`) i pravilo (`rules::docs_lag`), pa brojka i signal ne mogu reći različito.
+pub fn lag_days(code_time: i64, docs_time: i64) -> i64 {
+    (code_time - docs_time) / 86_400
+}
+
 fn lag(
     files: &[DocFile],
     last_code: Option<i64>,
@@ -167,7 +177,7 @@ fn lag(
         .filter(|f| f.path == p.diary_path || f.path == p.changelog_path)
         .filter_map(|f| f.last_change_time)
         .max()?;
-    let days = (code - docs_time) / 86_400;
+    let days = lag_days(code, docs_time);
     if days <= 0 {
         return Some(0);
     }
@@ -194,10 +204,10 @@ pub fn docs_health(
     }
     let known: HashSet<&str> = files.iter().map(|f| f.path.as_str()).collect();
     let mut findings = Vec::new();
-    dead_links(files, &known, &mut findings);
+    dead_links(files, &known, p, &mut findings);
     not_indexed(files, profile, &mut findings);
     active_plans(files, profile, p, &mut findings);
-    diary_in_definition(files, profile, &mut findings);
+    diary_in_definition(files, profile, p, &mut findings);
     key_file_budget(files, profile, &mut findings);
     let lag_days = lag(files, last_code_commit_time, profile, &mut findings);
     let w = &profile.docs_weights;

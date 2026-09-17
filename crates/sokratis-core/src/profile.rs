@@ -209,6 +209,12 @@ impl Profile {
 }
 
 pub struct Patterns {
+    /// Poveznica na `.md` u markdownu: `](put/do.md#odjeljak)`. NIJE iz profila — konstanta je,
+    /// ali joj je dom ovdje da `docs.rs` ne mora `expect()` u produkcijskom kodu: `Regex::new`
+    /// se ovdje propagira `?`-om kao svaki drugi regex (nalaz M6).
+    pub md_link: Regex,
+    /// Datum oblika `20xx-xx-xx` u tekstu dokumenta; isto konstanta, isti razlog.
+    pub iso_date: Regex,
     pub diary_heading: Regex,
     pub diary_deploy: Regex,
     pub plan_brick: Regex,
@@ -240,6 +246,8 @@ fn with_groups(field: &str, pattern: &str, need: usize) -> Result<Regex, ParseEr
 impl Patterns {
     pub fn compile(p: &Profile) -> Result<Patterns, ParseError> {
         Ok(Patterns {
+            md_link: Regex::new(r"\]\(([^)\s]+\.md)(#[^)\s]*)?\)")?,
+            iso_date: Regex::new(r"\b20\d\d-\d\d-\d\d\b")?,
             diary_heading: with_groups("diary_heading", &p.diary_heading, 3)?,
             diary_deploy: Regex::new(&p.diary_deploy_pattern)?,
             plan_brick: with_groups("plan_brick", &p.plan_brick, 3)?,
