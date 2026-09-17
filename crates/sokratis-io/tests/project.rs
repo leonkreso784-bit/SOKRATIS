@@ -81,6 +81,46 @@ fn open_reads_profile_manual_data_and_docs() {
     assert_eq!(input.branches.len(), 1);
 }
 
+/// I1 (završna recenzija M1): `--since` stariji od profilskog prozora se tiho odrezao — log je
+/// dolazio samo od `profile.log_since()`, a `Report.since` je ipak tvrdio korisnikov datum
+/// (nad Sokrat Studyjem: `--since 2026-01-01`, a prvi dan u tablici 2026-08-02).
+#[test]
+fn cli_since_older_than_the_profile_widens_the_fetch_window() {
+    let r = Repo::init();
+    let old = r.commit(
+        "js/a.js",
+        "1",
+        "F1/1 staro",
+        "2026-07-01T10:00:00+02:00",
+        "2026-07-01T10:00:00+02:00",
+    );
+    r.commit(
+        "js/b.js",
+        "1",
+        "F1/2 novo",
+        "2026-09-01T10:00:00+02:00",
+        "2026-09-01T10:00:00+02:00",
+    );
+    // Bez `closed_phases` prozor profila je točno `since` (zadani profil bi ga razvukao na
+    // 2026-08-02, početak prve povijesne faze Sokrat Studyja).
+    write(
+        &r,
+        ".sokratis/profile.json",
+        r#"{ "since": "2026-08-29", "closed_phases": [] }"#,
+    );
+    let p = Project::open(r.path()).unwrap();
+    assert!(
+        !p.input(None).unwrap().git_log.contains(&old),
+        "bez `--since` prozor ostaje profilski"
+    );
+    let wider = p.input(Some("2026-07-01")).unwrap();
+    assert!(
+        wider.git_log.contains(&old),
+        "`--since` stariji od profila mora dovući i stariji commit"
+    );
+    assert_eq!(wider.since, "2026-07-01");
+}
+
 #[test]
 fn common_dir_is_the_same_from_root_and_from_a_subdirectory() {
     let r = Repo::init();

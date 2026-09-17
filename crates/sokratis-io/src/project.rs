@@ -147,8 +147,15 @@ impl Project {
             self.git.current_branch()?
         };
         let read_opt = |rel: &str| std::fs::read_to_string(self.root.join(rel)).ok();
+        let since = since
+            .map(str::to_string)
+            .unwrap_or_else(|| self.profile.since.clone());
+        // I1: prozor dovlačenja je NAJRANIJE od dvoje — profilskog (`log_since()`, koji uključuje
+        // i početke zatvorenih faza) i korisnikova `--since`. Bez tog `min`-a je `--since`
+        // stariji od profila tiho dobivao kraći log nego što `Report.since` tvrdi.
+        let fetch_since = self.profile.log_since().min(since.clone());
         Ok(ReportInput {
-            git_log: self.git.log(&branch, &self.profile.log_since())?,
+            git_log: self.git.log(&branch, &fetch_since)?,
             diary: read_opt(&self.profile.diary_path),
             plan: read_opt(&self.profile.plan_path),
             docs: self.docs()?,
@@ -160,9 +167,7 @@ impl Project {
                 .map(|d| d.as_secs() as i64)
                 .unwrap_or(0),
             today: chrono::Local::now().format("%Y-%m-%d").to_string(),
-            since: since
-                .map(str::to_string)
-                .unwrap_or_else(|| self.profile.since.clone()),
+            since,
             branch,
         })
     }
