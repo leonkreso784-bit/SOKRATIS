@@ -161,6 +161,28 @@ impl Profile {
             .to_string()
     }
 
+    /// Svi datumi iz profila moraju biti `YYYY-MM-DD`: `since` i `closed_phases[].from/to` su
+    /// granice mjerenja, a tipfeler u njima tiho pomakne prozor (nalaz C2). Poruka nosi IME
+    /// polja jer profil piše čovjek.
+    pub fn validate_dates(&self) -> Result<(), ParseError> {
+        let bad = |field: String, text: &str| ParseError::BadDate {
+            field,
+            text: text.to_string(),
+        };
+        if !crate::civil::is_ymd(&self.since) {
+            return Err(bad("profil.since".into(), &self.since));
+        }
+        for (i, phase) in self.closed_phases.iter().enumerate() {
+            if !crate::civil::is_ymd(&phase.from) {
+                return Err(bad(format!("profil.closed_phases[{i}].from"), &phase.from));
+            }
+            if !crate::civil::is_ymd(&phase.to) {
+                return Err(bad(format!("profil.closed_phases[{i}].to"), &phase.to));
+            }
+        }
+        Ok(())
+    }
+
     pub fn is_test_path(&self, path: &str) -> bool {
         self.test_path_prefixes
             .iter()

@@ -17,4 +17,6 @@ pub enum ParseError {
         need: usize,
         got: usize,
     },
+    #[error("{field}: datum mora biti oblika YYYY-MM-DD, a nije: `{text}`")]
+    BadDate { field: String, text: String },
 }

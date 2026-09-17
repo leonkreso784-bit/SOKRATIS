@@ -22,6 +22,16 @@ fn last_code_commit(commits: &[Commit], profile: &Profile) -> Option<Commit> {
 }
 
 pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, ParseError> {
+    // C2: `since` je granica mjerenja i usporedba je leksikografska, pa oblik MORA biti
+    // `YYYY-MM-DD` — inače tipfeler tiho promijeni prozor umjesto da se javi. Provjera je u
+    // jezgri (ne u `clap`-u) da isti ugovor vrijedi i za Tauri put u M2.
+    if !crate::civil::is_ymd(&input.since) {
+        return Err(ParseError::BadDate {
+            field: "since".into(),
+            text: input.since.clone(),
+        });
+    }
+    profile.validate_dates()?;
     let p = Patterns::compile(profile)?;
     let parsed = parse_git_log(&input.git_log)?;
     let all = parsed.commits;
@@ -174,6 +184,51 @@ mod tests {
         assert!(rules.contains(&"unmerged-branches"), "{rules:?}");
         assert!(!rules.contains(&"docs-lag"), "dnevnik je svježiji od koda");
         assert_eq!((r.generated_at, r.branch.as_str()), (input().now, "main"));
+    }
+
+    /// C2 (završna recenzija M1): neprovjeren `since` je tiho mijenjao prozor mjerenja —
+    /// `2026-9-17` je leksikografski VEĆI od `2026-09-17` pa je davao 0 commita i izlaz 0, a
+    /// `17.09.2026` je manji od svakog `2026-…` pa je propuštao sve. Tipfeler mora biti greška.
+    #[test]
+    fn malformed_since_is_an_error_not_a_silent_window() {
+        for bad in ["2026-9-17", "17.09.2026", "banana", "2026-02-30", ""] {
+            let mut bad_input = input();
+            bad_input.since = bad.into();
+            match build_report(&bad_input, &Profile::default()) {
+                Ok(r) => panic!("since `{bad}` je prošao: {} commita", r.touched.commits),
+                Err(e) => {
+                    let text = e.to_string();
+                    assert!(text.contains("since"), "greška ne imenuje polje: {text}");
+                }
+            }
+        }
+        assert!(
+            build_report(&input(), &Profile::default()).is_ok(),
+            "ispravan `YYYY-MM-DD` mora proći"
+        );
+    }
+
+    /// Isti tipfeler u `profile.json` (`since`, `closed_phases[].from/to`) mora reći KOJE polje
+    /// je krivo — profil piše čovjek, pa poruka mora pokazati na redak koji se popravlja.
+    #[test]
+    fn malformed_profile_dates_name_the_field() {
+        let bad_since = Profile {
+            since: "17.09.2026".into(),
+            ..Profile::default()
+        };
+        let e = build_report(&input(), &bad_since)
+            .err()
+            .map(|e| e.to_string())
+            .unwrap_or_default();
+        assert!(e.contains("profil.since"), "{e}");
+
+        let mut bad_phase = Profile::default();
+        bad_phase.closed_phases[1].to = "2026-13-01".into();
+        let e = build_report(&input(), &bad_phase)
+            .err()
+            .map(|e| e.to_string())
+            .unwrap_or_default();
+        assert!(e.contains("closed_phases[1].to"), "{e}");
     }
 
     #[test]
