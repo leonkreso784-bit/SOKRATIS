@@ -32,7 +32,6 @@ opisuje [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §1
 | Detached HEAD dobiva poruku „repozitorij nema commita" jer je `git branch --show-current` prazan | M2 | parkirano uz krug popravaka; nije regresija, rubno stanje koje CLI ne cilja |
 | Snapshot JSON-a (`Report`) kad se oblik zaključa za Tauri; `insta` se tada vraća jednim retkom | M2 | I7; do tada bi snimka zamrznula oblik koji se još mijenja |
 | Testni redak mjeriti tako da fixture ne prevlada (izuzeti `fixtures/` ili mjeriti drukčije) | M2 | odgođena 8; zašto brojka danas vara vlastitog autora: `architecture/ARCHITECTURE.md` §10 |
-| `rust-toolchain.toml` (pin kompajlera, ne samo crateova) | **Leonova odluka** | M15; pin na konkretnu verziju tjera `rustup` da skine još jednu kopiju toolchaina na Leonov stroj — promjena njegova sustava, korisno prije M3 |
 
 ## Za Leona (tuđi repo, ne naš posao)
 

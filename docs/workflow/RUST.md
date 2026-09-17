@@ -37,6 +37,12 @@ Nova ovisnost = namjerna radnja: redak ovdje + obrazloženje u commitu (CLAUDE.m
 ijednog poziva, a neiskorištena ovisnost je pravilo #6 naopako; snapshot JSON-a čeka M2, kad se oblik
 `Report`-a zaključa za Tauri (`workflow/TESTING.md` §1).
 
+**`rust-toolchain.toml`** (korijen repoa, od 2026-09-18) pina i sam kompajler, ne samo crateove:
+`channel = "1.98.1"` + `rustfmt`/`clippy` kao komponente. Rustup ga čita sam kad se pokrene bilo koja
+`cargo`/`rustup` naredba u repou i po potrebi preuzme točno tu verziju — tuđi stroj dobiva isti
+toolchain bez ručnog koraka. Podizanje verzije je namjerna radnja kao i nova ovisnost: promjena
+brojke + commit s obrazloženjem, ne tiha nuspojava.
+
 ## 3 · Pravilo „zašto Rust ovako" (CLAUDE.md #5)
 
 Svaka cigla u zaglavlju datoteke (ili modula) nosi 2–5 redaka:

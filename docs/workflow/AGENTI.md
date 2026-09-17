@@ -2,7 +2,8 @@
 
 > Leon (2026-09-17): *„kreirat nekoliko agenata da se sustavno radi na cijelom projektu… više agenata
 > na više branča a ti ih kontroliraš i nadzireš."* Ovo je protokol. Definicije agenata su u
-> `.claude/agents/*.md`; plan koji izvode je `docs/superpowers/plans/2026-09-17-m1-jezgra-i-cli.md`.
+> `.claude/agents/*.md`, praćene u repou od 2026-09-18 (prije toga globalno git-ignorirane); plan koji
+> izvode je `docs/superpowers/plans/2026-09-17-m1-jezgra-i-cli.md`.
 
 ## 1 · Uloge
 

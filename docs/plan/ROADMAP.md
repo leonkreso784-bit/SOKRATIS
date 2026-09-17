@@ -18,8 +18,9 @@ radi: `architecture/ARCHITECTURE.md` (§11).
 
 **Leon je dao izričit OK 2026-09-18:** svih 8 grana tokova i njihovih radnih stabala je obrisano
 (sve su bile spojene) — `main` je sada jedina grana i jedino stablo. Time je Milestone 1 zatvoren.
-Na Leona i dalje čekaju (ne rade se bez njegova OK-a): push i objava (remote još ne postoji), odluka
-o `rust-toolchain.toml`, uvođenje `.claude/agents/*.md` u repo. **Sljedeće se piše spec za M2**
+Toolchain je pinan (`rust-toolchain.toml`, 1.98.1) i definicije agenata su u repou
+(`.claude/agents/*.md`) — obje odluke Leon je odobrio isti dan. Na Leona i dalje čeka (ne radi se
+bez njegova OK-a): push i objava na GitHub (remote još ne postoji). **Sljedeće se piše spec za M2**
 (desktop) kroz brainstorming s Leonom. Nalazi recenzije koji nisu popravljeni u M1 stoje u
 `records/BACKLOG.md`, nijedan nije skriven.
 

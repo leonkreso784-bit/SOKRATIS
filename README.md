@@ -34,8 +34,9 @@ Rust (`core` · `io` · `cli`) · Tauri 2 · Svelte 5 · dizajn-tokeni Sokrat St
 ## Pokretanje
 
 Radi iz izvornog koda (0.1.0): `cargo run -p sokratis-cli -- report <putanja-do-repoa>` (i `docs`,
-`signals`). Izlazni kod `signals` je ugovor prema preflightu (0 nema · 1 Warn · 2 Alert · 3 greška).
-Status i preostalo: [ROADMAP](./docs/plan/ROADMAP.md).
+`signals`). Toolchain je pinan u `rust-toolchain.toml` (1.98.1) — rustup ga sam preuzme pri prvom
+pokretanju `cargo`, bez ručnog koraka. Izlazni kod `signals` je ugovor prema preflightu (0 nema ·
+1 Warn · 2 Alert · 3 greška). Status i preostalo: [ROADMAP](./docs/plan/ROADMAP.md).
 
 ## Licenca
 

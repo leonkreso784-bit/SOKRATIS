@@ -229,6 +229,13 @@ spec za M2 (desktop).
 - **Čuvar dokumentacije (Način A):** `CLAUDE.md` „Stanje — TRENUTNO" i „Agenti" odjeljak, `ROADMAP.md`
   (M1 red i „Gdje smo"), `AGENTI.md` §2/§7 i `README.md` usklađeni s ovim stanjem — nijedna živa
   tvrdnja da grane/stabla tokova još postoje ili čekaju brisanje.
+- **Leon je (~00:20) dao izričit OK za još dva koraka.** Korijenski `rust-toolchain.toml` pina
+  kompajler na `1.98.1` (`components = ["rustfmt", "clippy"]`); rustup ga sam preuzeo, brane (`fmt`,
+  `clippy`, `cargo test --workspace` = 64) zelene pod pinom (`de107b8`).
+- `.claude/agents/{graditelj,recenzent,cuvar-dokumentacije}.md` su ušli u repo s `git add -f` — bili
+  su globalno git-ignorirani u `~/.config/git/ignore`; jednom praćeni, taj ignore više ne vrijedi
+  (`1996cc0`).
+- Push/remote/objava na GitHub i dalje čeka Leona: remote ne postoji, `gh` nije instaliran na stroju.
 
 ### Što slijedi
 **Spec za M2 (desktop).** Brainstorming s Leonom → jedan aktivni spec `docs/plan/ARHITEKTURA_M2.md` →

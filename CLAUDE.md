@@ -51,8 +51,9 @@ sati zbog cherry-pickova — se u Sokratisu **ispravlja, ne prenosi** (S-007).
 5. **„Zašto Rust ovako":** svaka cigla u zaglavlju datoteke nosi 2–5 redaka o Rust-konstruktu koji
    uvodi i zašto baš njega; pojmovnik raste u `docs/workflow/RUST.md`. **Kod koji Leon ne može
    pročitati nije gotov.**
-6. **Ovisnosti se pinaju.** `Cargo.lock` se commita; nova ovisnost je namjerna radnja s obrazloženjem
-   u commitu, nikad nuspojava. Popis dopuštenih crateova i zašto: `docs/workflow/RUST.md`.
+6. **Ovisnosti se pinaju** — i toolchain (`rust-toolchain.toml`). `Cargo.lock` se commita; nova
+   ovisnost je namjerna radnja s obrazloženjem u commitu, nikad nuspojava. Popis dopuštenih crateova
+   i zašto: `docs/workflow/RUST.md`.
 7. **Test-prvo** za parsere, metrike i pravila: fixture (tekst) → očekivano → implementacija.
    Paritet s `RAD.xlsx` je **test**, ne tvrdnja (`docs/workflow/TESTING.md`).
 8. **PRIJE SVAKOG COMPACTA:** proći sve `.md` (root + `docs/**`) i ispraviti zastarjelo.
@@ -77,19 +78,20 @@ Testovi i brane: `docs/workflow/TESTING.md`.
 - **Leon je 2026-09-18 dao izričit OK: svih 8 grana `feat/*` i njihovih 8 radnih stabala
   `sokratis.<tok>` je obrisano** (sve su bile spojene). `main` je sada **jedina grana i jedino
   stablo** (`git worktree list` · `git branch -a`). Time je M1 zatvoren.
-- **Na Leona i dalje čekaju** (nijedno se ne radi bez njegova izričitog OK-a): push/remote/objava na
-  GitHub, odluka o `rust-toolchain.toml` (pin bi na njegov stroj skinuo drugu kopiju toolchaina),
-  uvođenje `.claude/agents/*.md` u repo (danas globalno git-ignorirani).
+- **Na Leona i dalje čeka** (ne radi se bez njegova izričitog OK-a): push/remote/objava na GitHub
+  (privatni remote prvo; javna objava tek nakon ograde putanja iz profila, BACKLOG I9). Toolchain je
+  pinan (`rust-toolchain.toml`, 1.98.1) i definicije agenata su u repou — obje odluke Leon je odobrio
+  2026-09-18.
 - **Sljedeće: spec za M2 (desktop).** Brainstorming s Leonom → jedan aktivni spec
   `docs/plan/ARHITEKTURA_M2.md` → plan cigla-po-cigla → agenti kao u M1. Leonov zahtjev za
   znak/animaciju pri otvaranju stoji u `docs/plan/ROADMAP.md` (red M2).
 - **Prva radnja nove sesije:** `git log --oneline -15` · `git worktree list` · ledger
   `.superpowers/sdd/2026-09-17-m1-jezgra-i-cli/progress.md`, odjeljak „STANJE ZA NOVU SESIJU" na dnu
   (operativna uputa, ne izvor činjenica o projektu), pa `docs/README.md`.
-- **Agenti definirani:** `.claude/agents/{graditelj,recenzent,cuvar-dokumentacije}.md`; protokol nadzora
-  `docs/workflow/AGENTI.md` (orkestrator = ova sesija, jedini spaja u `main`). Te su datoteke
-  **globalno git-ignorirane**, pa definicije agenata nisu u repou — Leonova odluka. Radna stabla
-  tokova trenutno ne postoje — otvaraju se opet kad plan M2 odredi svoje tokove.
+- **Agenti definirani:** `.claude/agents/{graditelj,recenzent,cuvar-dokumentacije}.md`, praćene u
+  repou od 2026-09-18; protokol nadzora `docs/workflow/AGENTI.md` (orkestrator = ova sesija, jedini
+  spaja u `main`). Radna stabla tokova trenutno ne postoje — otvaraju se opet kad plan M2 odredi svoje
+  tokove.
 - Što je isporučeno i kada zna `CHANGELOG.md`; tijek sesija `PROGRESS.md`. Ovaj odjeljak to ne ponavlja.
 
 ## Ključne odluke — samo žive
