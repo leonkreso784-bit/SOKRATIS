@@ -27,7 +27,9 @@ enum Cmd {
         path: Option<PathBuf>,
         #[arg(long)]
         since: Option<String>,
-        #[arg(long)]
+        /// `conflicts_with`: dva oblika ispisa odjednom su pogrešna uporaba (izlaz 3), a ne
+        /// „zadnji pobjeđuje" — prije je `--json --table` tiho ispisao JSON (nalaz M10).
+        #[arg(long, conflicts_with = "table")]
         json: bool,
         #[arg(long)]
         table: bool,

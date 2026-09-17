@@ -106,6 +106,24 @@ fn signals_exit_2_on_an_old_unmerged_branch() {
     );
 }
 
+/// M10: `report --json --table` je tiho ispisao JSON. Dva zahtjeva za dva oblika ispisa su
+/// pogrešna uporaba, ne „zadnji pobjeđuje" — repo je PRAVI, pa izlaz 3 dolazi od `clap`-a.
+#[test]
+fn json_and_table_together_is_a_usage_error() {
+    let r = repo_with_one_commit_on_main();
+    let out = bin()
+        .args(["report", r.path().to_str().unwrap(), "--json", "--table"])
+        .output()
+        .unwrap();
+    assert_eq!(
+        out.status.code(),
+        Some(3),
+        "stdout: {}",
+        String::from_utf8_lossy(&out.stdout)
+    );
+    assert!(String::from_utf8_lossy(&out.stderr).contains("--table"));
+}
+
 #[test]
 fn not_a_repo_exits_3_with_message() {
     let dir = tempfile::tempdir().unwrap();
