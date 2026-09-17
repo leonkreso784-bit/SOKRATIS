@@ -1,5 +1,189 @@
-use crate::{ParseError, Profile, Report, ReportInput};
+//! ZAŠTO RUST OVAKO (cigla M1/20 — sastavljanje izvještaja)
+//! Ovo je jedino mjesto koje zna REDOSLIJED koraka; svaki korak je funkcija iz svog modula.
+//! `Context` klonira `commits`/`branches`/`docs` u vlasništvo — jedna kopija po izvještaju, a
+//! zauzvrat nijedan lifetime u potpisu pravila (S-002, RUST.md §1).
+use crate::docs::docs_health;
+use crate::metrics::indicators::IndicatorInput;
+use crate::metrics::{
+    active_phases, closed_phases, day_stats, hours_per_day, indicators, kind_stats,
+};
+use crate::parse::{parse_diary, parse_git_log, parse_plan};
+use crate::rules::{default_rules, evaluate_all};
+use crate::{Commit, Context, ParseError, Patterns, Profile, Report, ReportInput, Touched};
+
+/// Zadnji commit (po `author_time`) koji dira bar jednu putanju koju profil smatra kodom —
+/// ulaz za docs-lag pravilo (dokumentacija smije kasniti za dnevnikom, ne za kodom).
+fn last_code_commit(commits: &[Commit], profile: &Profile) -> Option<Commit> {
+    commits
+        .iter()
+        .filter(|c| c.files.iter().any(|f| profile.is_code_path(&f.path)))
+        .max_by_key(|c| c.author_time)
+        .cloned()
+}
+
 pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, ParseError> {
-    let _ = (input, profile);
-    todo!("cigla M1/20")
+    let p = Patterns::compile(profile)?;
+    let parsed = parse_git_log(&input.git_log)?;
+    let all = parsed.commits;
+    // S-011: filtar `since` u jezgri je po `commit_date` (kao git `--since`), leksikografski
+    // usporediv jer je oblika `YYYY-MM-DD`.
+    let commits: Vec<Commit> = all
+        .iter()
+        .filter(|c| c.commit_date.as_str() >= input.since.as_str())
+        .cloned()
+        .collect();
+    let deliveries = input
+        .diary
+        .as_deref()
+        .map(|d| parse_diary(d, &p, &input.since))
+        .unwrap_or_default();
+    let plan_phases = input
+        .plan
+        .as_deref()
+        .map(|t| parse_plan(t, &p))
+        .unwrap_or_default();
+    let hours = hours_per_day(
+        &commits,
+        profile.session_gap_hours,
+        profile.session_start_hours,
+    );
+    let days = day_stats(&commits, &deliveries, &hours, profile);
+    let kinds = kind_stats(&commits, &input.overrides, &p);
+    // Zatvorene faze se broje iz SVIH commita loga (mogu prethoditi `since`); aktivne samo iz
+    // filtriranih, jer prate napredak od danas unatrag.
+    let mut phases = closed_phases(&all, &p);
+    phases.extend(active_phases(plan_phases, &commits, &input.today));
+    let indicators = indicators(
+        &IndicatorInput {
+            commits: &commits,
+            deliveries: &deliveries,
+            days: &days,
+            phases: &phases,
+            overrides: &input.overrides,
+        },
+        profile,
+        &p,
+    );
+    let last_code = last_code_commit(&commits, profile);
+    let docs = docs_health(
+        &input.docs,
+        last_code.as_ref().map(|c| c.author_time),
+        profile,
+        &p,
+    );
+    let ctx = Context {
+        profile: profile.clone(),
+        now: input.now,
+        commits: commits.clone(),
+        branches: input.branches.clone(),
+        docs: input.docs.clone(),
+        last_code_commit: last_code,
+    };
+    let signals = evaluate_all(&default_rules(), &ctx);
+    // `classify_sub` ostaje javan za M2 (Dnevnik pogled po commitu); build_report ga svjesno
+    // (još) ne poziva.
+    Ok(Report {
+        generated_at: input.now,
+        since: input.since.clone(),
+        branch: input.branch.clone(),
+        touched: Touched {
+            commits: commits.len(),
+            lines: commits
+                .iter()
+                .flat_map(|c| &c.files)
+                .map(|f| f.added + f.deleted)
+                .sum(),
+            files: commits.iter().map(|c| c.files.len()).sum(),
+            skipped_lines: parsed.skipped_lines,
+        },
+        days,
+        kinds,
+        indicators,
+        phases,
+        visions: input.visions.clone(),
+        docs,
+        signals,
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{BranchInfo, DocFile, WorkKind};
+    use std::collections::HashMap;
+
+    const LOG: &str = "@@a1|1788700000|1788700000|2026-08-28|2026-08-28|F1/1 prije since\n1\t0\tjs/a.js\n\n@@b2|1788854400|1788854400|2026-09-04|2026-09-04|fix: kvar u js\n5\t1\tjs/b.js\n\n@@c3|1788858000|1788858000|2026-09-04|2026-09-04|docs: zapis\n3\t0\tdocs/records/PROGRESS.md\n";
+
+    fn input() -> ReportInput {
+        ReportInput {
+            git_log: LOG.into(),
+            diary: Some("## 2026-09-04 (X) — 🚀 deploy nečega\n".into()),
+            plan: Some("| **F1/1** ✅ |\n| **F1/2** |\n".into()),
+            docs: vec![DocFile {
+                path: "docs/records/PROGRESS.md".into(),
+                content: String::new(),
+                last_change_time: Some(1788858000),
+            }],
+            branches: vec![BranchInfo {
+                name: "feat/stara".into(),
+                last_commit_time: 1788854400 - 20 * 86_400,
+                ahead_of_default: 4,
+                merged: false,
+            }],
+            overrides: HashMap::from([("b2".to_string(), WorkKind::Polish)]),
+            visions: vec![],
+            now: 1788854400 + 86_400,
+            today: "2026-09-05".into(),
+            since: "2026-08-29".into(),
+            branch: "main".into(),
+        }
+    }
+
+    #[test]
+    fn assembles_everything_and_filters_by_since() {
+        let r = build_report(&input(), &Profile::default()).unwrap();
+        assert_eq!(
+            (
+                r.touched.commits,
+                r.touched.lines,
+                r.touched.files,
+                r.touched.skipped_lines
+            ),
+            (2, 9, 2, 0)
+        );
+        assert_eq!(r.days.len(), 1);
+        assert_eq!((r.days[0].deliveries, r.days[0].deploys), (1, 1));
+        let polish = r.kinds.iter().find(|k| k.kind == WorkKind::Polish).unwrap();
+        assert_eq!(polish.commits, 1, "override b2 → polish");
+        assert_eq!(r.indicators.len(), 18);
+        let f1 = r.phases.iter().find(|p| p.id == "F1").unwrap();
+        assert_eq!(
+            (f1.total_bricks, f1.done_bricks, f1.commits),
+            (2, 1, 0),
+            "F1/1 je prije since pa se ne broji"
+        );
+        assert_eq!(
+            r.phases
+                .iter()
+                .filter(|p| p.state == crate::PhaseState::Closed)
+                .count(),
+            4
+        );
+        assert!(r.docs.is_some());
+        let rules: Vec<&str> = r.signals.iter().map(|s| s.rule.as_str()).collect();
+        assert!(rules.contains(&"unmerged-branches"), "{rules:?}");
+        assert!(!rules.contains(&"docs-lag"), "dnevnik je svježiji od koda");
+        assert_eq!((r.generated_at, r.branch.as_str()), (input().now, "main"));
+    }
+
+    #[test]
+    fn all_five_work_kinds_have_stable_ids() {
+        // Recenzent T1: potvrda da `WorkKind::id()` (S-008) pokriva SVE varijante, ne samo
+        // one koje se pojave u fixtureu iznad — inače bi nova vrsta rada mogla proći bez ida.
+        assert_eq!(WorkKind::Planning.id(), "planning");
+        assert_eq!(WorkKind::Documentation.id(), "documentation");
+        assert_eq!(WorkKind::Execution.id(), "execution");
+        assert_eq!(WorkKind::Polish.id(), "polish");
+        assert_eq!(WorkKind::Debugging.id(), "debugging");
+    }
 }
