@@ -5,6 +5,8 @@
 use crate::civil::days_between;
 use crate::{Commit, Patterns, Phase, PhaseState};
 
+/// Raspon `[from, to]` se filtrira po `commit_date` (S-011: dosljedno tomu kako jezgra svugdje
+/// filtrira `since`, i Pythonu — `git --since/--until` gleda datum commita, ne autora).
 pub fn closed_phases(all_commits: &[Commit], p: &Patterns) -> Vec<Phase> {
     p.closed_phases
         .iter()
@@ -12,8 +14,8 @@ pub fn closed_phases(all_commits: &[Commit], p: &Patterns) -> Vec<Phase> {
             let n = all_commits
                 .iter()
                 .filter(|c| {
-                    c.date.as_str() >= cp.from.as_str()
-                        && c.date.as_str() <= cp.to.as_str()
+                    c.commit_date.as_str() >= cp.from.as_str()
+                        && c.commit_date.as_str() <= cp.to.as_str()
                         && re.is_match(&c.subject)
                 })
                 .count() as u32;
@@ -93,6 +95,34 @@ mod tests {
         );
         let mreza = ph.iter().find(|x| x.name.starts_with("MREŽA")).unwrap();
         assert_eq!((mreza.commits, mreza.days), (1, Some(2)));
+    }
+
+    #[test]
+    fn closed_phases_filters_by_commit_date_not_author_date() {
+        // Cherry-pick obrazac: autorov datum (`date`) upada u raspon R1, ali `commit_date` (kad je
+        // commit stvarno stigao u granu) je izvan njega. S-011 broji po `commit_date`, pa se ovaj
+        // commit NE smije ubrojiti u R1 (za razliku od "a"/"b" koji ostaju unutra).
+        let p = Patterns::compile(&Profile::default()).unwrap();
+        let all = vec![
+            c("a", 1, "2026-09-02", "R1: Google prijava"),
+            c("b", 2, "2026-09-02", "R1/U5: id_token"),
+            Commit {
+                sha: "e".into(),
+                author_time: 5,
+                commit_time: 5,
+                date: "2026-09-02".into(),
+                commit_date: "2026-09-05".into(),
+                subject: "R1/X9: cherry-pick s docs grane".into(),
+                files: vec![],
+            },
+        ];
+        let ph = closed_phases(&all, &p);
+        let r1 = ph.iter().find(|x| x.name.starts_with("RAČUN R1")).unwrap();
+        assert_eq!(
+            (r1.commits, r1.done_bricks, r1.total_bricks),
+            (2, 2, 2),
+            "commit 'e' ima commit_date izvan raspona pa se ne broji, iako mu je author date unutra"
+        );
     }
 
     #[test]
