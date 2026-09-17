@@ -62,7 +62,7 @@ Test za pravilo: **Leon može pročitati datoteku i reći što radi.** Ako ne mo
 | `Option<T>` | M1 (docs) | vrijednost ili ništa, bez `null` |
 | `Vec<T>`, `HashMap<K, V>` | M1 (metrike) | rastući niz; mapa ključ → vrijednost |
 | iteratori (`iter().filter().map()`) | M1 (metrike) | lijeni cjevovod nad kolekcijom; `collect()` ga materijalizira |
-| `trait` i trait objekt (`Box<dyn Rule>`) | M1 (pravila) | ugovor koji tip ispunjava; `dyn` = poziv preko ugovora u vrijeme izvođenja |
+| `trait` i trait objekt (`Box<dyn Rule>`) | M1 (T13, `rules/mod.rs`) | ugovor koji tip ispunjava; `dyn` = poziv preko ugovora u vrijeme izvođenja, pa jedan `Vec` drži raznorodna pravila |
 | `derive` | M1 (model) | kompajler generira implementaciju (`Debug`, `Clone`, `Serialize`) |
 | `mod` i `pub` | M1 (workspace) | moduli su datoteke/mape; ništa nije javno dok ne kažeš |
 | `#[cfg(test)]` | M1 (prvi test) | kod koji postoji samo pri `cargo test` |
@@ -83,6 +83,7 @@ Test za pravilo: **Leon može pročitati datoteku i reći što radi.** Ako ne mo
 | `HashSet<&str>` / `HashSet<String>` za članstvo | M1 (T12, `docs.rs`; kasnije `git.rs`) | skup za provjeru „je li unutra" u O(1), bez duplikata i bez brige za redoslijed |
 | `rsplit_once` | M1 (T12, `docs.rs`) | dijeli string na zadnjem pojavljivanju uzorka, vraća `Option<(prefiks, sufiks)>` |
 | struct-update `..Default::default()` | M1 (T12, `docs.rs` test) | preostala polja literala preuzimaju zadane vrijednosti; test postavlja samo polje koje testira |
+| `saturating_sub` | M1 (T12, `docs.rs`) | oduzimanje koje se zaustavlja na granici tipa umjesto da se prelije — ocjena docs-a zato nikad ne padne ispod 0 |
 | `for (kind, re) in &p.classifier` + `*kind` na Copy-enumu; `Vec` umjesto `HashMap` kad je redoslijed ugovor | M1 (T6, `classify.rs`) | iteracija po posuđenom vektoru parova čuva ugovoreni redoslijed (planiranje > dokumentacija > …); `HashMap` ga ne bi garantirao |
 | `lines()+filter_map(captures)` vs `(?m)`; stabilan `sort_by` | M1 (T4, `diary.rs`) | red-po-red s regexom bez multiline-zastavice je čitljiviji od jednog `(?m)` uzorka; `sort_by` čuva izvorni poredak jednakih ključeva |
 | `include_str!` za fixture u testu | M1 (T4, `diary.rs`; kasnije `plan.rs`) | ugrađuje sadržaj datoteke u binarku pri kompajliranju — test ne čita disk u vrijeme izvođenja |
@@ -107,6 +108,7 @@ Test za pravilo: **Leon može pročitati datoteku i reći što radi.** Ako ne mo
 | `BTreeMap<&str, Acc>` s posuđenim ključem | M1 (T9, `metrics/days.rs`) | ključ mape je posudba iz izvornih podataka, ne kopija — akumulator ne smije nadživjeti izvor |
 | privatni `#[derive(Default)]` akumulator | M1 (T9, `metrics/days.rs`) | pomoćni struct vidljiv samo unutar modula, s automatskim nula-stanjem za zbrajanje po danu/vrsti |
 | `unwrap_or_else` s lijenim closureom | M1 (T10, `metrics/kinds.rs`) | zadana vrijednost se računa tek ako stvarno treba, ne unaprijed kao kod `unwrap_or` |
+| `Option::copied` | M1 (T10, `metrics/kinds.rs`) | `Option<&T>` (posudba iz mape) postaje `Option<T>` kopijom sadržaja — posudba ne nadživi poziv |
 | `flat_map().map().sum()` | M1 (T10, `metrics/kinds.rs`) | spljošti ugniježđene kolekcije, preslikaj pa zbroji u jednom cjevovodu |
 | `for ph in &mut plan_phases` | M1 (T11a, `metrics/phases.rs`) | mutabilna iteracija po vlastitom vektoru: svaka faza se popuni (`from`/`to`/`days`/`commits`) u mjestu, bez alokacije novog vektora |
 | zamka E0507 i `.as_deref()` | M1 (T11a, `metrics/phases.rs`, test) | `v[i].polje` kroz `Index` je posudba, ne vlasništvo — `Option<String>` se iz nje ne smije pomaknuti (E0507); `.as_deref()` posuđuje `Option<&str>` umjesto toga |
@@ -118,6 +120,7 @@ Test za pravilo: **Leon može pročitati datoteku i reći što radi.** Ako ne mo
 | integracijski test u `tests/` (crate kao vanjski korisnik) | M1 (T18, `cli/tests/cli.rs`; kasnije `core/tests/parity.rs`) | datoteka u `tests/` vidi samo javni API crate-a, kao vanjski korisnik — ne može posegnuti za privatnim poljima kao `#[cfg(test)]` unutar `src/` |
 | `std::fmt::Write` + `writeln!` u `String` | M1 (T19, `cli/table.rs`) | isti `writeln!` makro kao za stdout, ali cilj je `String` koji raste u memoriji — bez međuvektora redaka |
 | `match &str` kao tablica prijevoda | M1 (T19, `cli/table.rs`) | grananje po tekstualnoj vrijednosti (ne enumu) prevodi engleski identifikator u hrvatski natpis; `_ => id` je siguran pad na nepoznati slučaj |
+| `let _ = ` za namjerno ignoriran `Result` | M1 (T19, `cli/table.rs`) | eksplicitno „znam da ovo vraća `Result` i svjesno ga ne gledam" (`write!` u `String` ne može pasti) — clippy time zna da nije zabuna |
 | `serde_json::Value` indeksiranje | M1 (T21, `core/tests/parity.rs`) | čitanje tuđeg JSON-a (Python fixture) bez definiranja Rust-tipa za njega — `value["polje"]` posuđuje po ključu/indeksu |
 
 Redak se dodaje **u cigli u kojoj se pojam prvi put pojavi**, s referencom na datoteku.

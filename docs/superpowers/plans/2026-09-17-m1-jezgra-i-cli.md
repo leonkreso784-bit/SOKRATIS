@@ -8,7 +8,7 @@
 
 **Tech Stack:** Rust stable (edition 2024, MSVC) · serde/serde_json · regex · thiserror/anyhow · clap · chrono (samo io) · tempfile/insta (dev).
 
-**Spec:** `docs/plan/ARHITEKTURA_M1.md` · definicija: `docs/product/PRD.md` · odluke: `docs/records/DECISIONS.md` · konvencije: `docs/workflow/RUST.md` · testovi: `docs/workflow/TESTING.md` · agenti: `docs/workflow/AGENTI.md`
+**Spec:** `docs/archive/ARHITEKTURA_M1.md` (ispunjen 2026-09-17; izgrađeno opisuje `docs/architecture/ARCHITECTURE.md`) · definicija: `docs/product/PRD.md` · odluke: `docs/records/DECISIONS.md` · konvencije: `docs/workflow/RUST.md` · testovi: `docs/workflow/TESTING.md` · agenti: `docs/workflow/AGENTI.md`
 
 ## Global Constraints
 

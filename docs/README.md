@@ -12,22 +12,24 @@ Model je preuzet iz Sokrat Studyja; uzeto je samo ono što ovom projektu treba.
 | mapa | uloga | mijenja se |
 |---|---|---|
 | **`product/`** | **ŠTO** gradimo — definicija + kriteriji prihvaćanja | rijetko, uz odluku |
-| **`plan/`** | **ŠTO SADA** — točno **jedan** aktivni spec + roadmap | stalno |
+| **`plan/`** | **ŠTO SADA** — najviše **jedan** aktivni spec + roadmap | stalno |
+| **`architecture/`** | **ŠTO JE IZGRAĐENO** — sustav kakav stoji u `crates/`, bez kronologije | kad kod pomakne granicu |
 | **`workflow/`** | **KAKO RADIMO** — testiranje, Rust-konvencije i pojmovnik | povremeno |
 | **`records/`** | **POVIJEST** — dnevnik, changelog, odluke, backlog | stalno |
+| **`archive/`** | **ISPUNJENI SPECOVI** — referenca, **nikad izvor istine** | kad milestone završi |
 | **`superpowers/plans/`** | planovi implementacije (cigla po cigla) za aktivni spec | po milestoneu |
 
-**Što još NE postoji i kad nastaje:** `architecture/` kad M1 isporuči kod (spec seli u `archive/`,
-izgrađeno opisuje `ARCHITECTURE.md`) · `records/BUGS.md` s prvim bugom · `records/HISTORY.md` s prvim
-zatvorenim milestoneom · `archive/` s prvim ispunjenim specom · `ideas/` s prvom idejom koja je prevelika za redak u backlogu.
+**Što još NE postoji i kad nastaje:** `records/BUGS.md` s prvim bugom · `records/HISTORY.md` s prvim
+zatvorenim milestoneom · `ideas/` s prvom idejom koja je prevelika za redak u backlogu.
 
 ### Gdje što ide — **jedna činjenica, jedno mjesto** (S-010)
 
 | vrsta znanja | JEDINO mjesto | ostali |
 |---|---|---|
 | **što sustav radi** | **kod + testovi** | dokument to samo *opisuje*, nikad ne *definira* |
+| **kakav je sustav danas** | `architecture/ARCHITECTURE.md` | spec u `archive/` govori samo što je bilo zamišljeno |
 | **zašto je tako** | `records/DECISIONS.md` (S-xxx) | ostali linkaju odluku |
-| **što vrijedi sad** | `../CLAUDE.md` + `product/` + aktivni spec | **nikad dnevnik** |
+| **što vrijedi sad** | `../CLAUDE.md` + `product/` + aktivni spec | **nikad dnevnik, nikad `archive/`** |
 | **što se kad dogodilo** | `records/PROGRESS.md` (sesija) · `records/CHANGELOG.md` (isporuka) | `CLAUDE.md` ih ne ponavlja |
 | **što nije riješeno** | `records/BACKLOG.md` | plan ne nosi tuđe stavke |
 | **što Rust-pojam znači** | `workflow/RUST.md` (pojmovnik) | zaglavlje cigle kaže samo *zašto ovdje* |
@@ -36,7 +38,8 @@ zatvorenim milestoneom · `archive/` s prvim ispunjenim specom · `ideas/` s prv
 
 ### Pravila
 
-1. **Jedan aktivni plan.** `plan/` ima točno jedan spec. Ispunjen → `archive/` isti dan, s datumom.
+1. **Jedan aktivni plan.** `plan/` ima najviše jedan spec. Ispunjen → `archive/` isti dan, s datumom
+   i pečatom „referenca, ne izvor istine". Između milestonea `plan/` nosi samo `ROADMAP.md`.
 2. **`product/` nije dnevnik.** Svaka mogućnost ima kriterij prihvaćanja oblika *„gotovo kad korisnik može ‹X›"*.
 3. **`records/` nije izvor istine.** Povijest objašnjava zašto, ne što vrijedi sad.
 4. **Svaki `.md` je naveden ovdje.** Dokument koji nije u indeksu je duh. (Sokratis će ovo sam mjeriti — dogfooding.)
@@ -51,10 +54,18 @@ zatvorenim milestoneom · `archive/` s prvim ispunjenim specom · `ideas/` s prv
 
 ## `plan/` — što sada
 
+Spec Milestonea 1 je **ispunjen i arhiviran** ([archive/ARHITEKTURA_M1.md](./archive/ARHITEKTURA_M1.md));
+spec za M2 (desktop) **tek dolazi**. Do tada `plan/` nosi samo živi roadmap.
+
 | Dokument | Svrha |
 |---|---|
-| [ARHITEKTURA_M1.md](./plan/ARHITEKTURA_M1.md) | 🟩 **aktivni spec** — arhitektura cijelog sustava + precizan opseg Milestonea 1 |
-| [ROADMAP.md](./plan/ROADMAP.md) | Milestonei M0–M3, status, što je sljedeće |
+| [ROADMAP.md](./plan/ROADMAP.md) | 🟩 **živ** — milestonei M0–M3, status, što je sljedeće |
+
+## `architecture/` — što je izgrađeno
+
+| Dokument | Svrha |
+|---|---|
+| [ARCHITECTURE.md](./architecture/ARCHITECTURE.md) | Sustav kakav stoji u `crates/`: granice crateova, tok podataka, **sva polja profila sa zadanim vrijednostima**, formati `.sokratis/*.json`, izlazni kodovi CLI-ja |
 
 ## `workflow/` — kako radimo
 
@@ -72,6 +83,15 @@ zatvorenim milestoneom · `archive/` s prvim ispunjenim specom · `ideas/` s prv
 | [CHANGELOG.md](./records/CHANGELOG.md) | Isporuke po datumu |
 | [DECISIONS.md](./records/DECISIONS.md) | Odluke S-001… i zašto |
 | [BACKLOG.md](./records/BACKLOG.md) | Parkiralište: što čeka, što je odbijeno i zašto |
+
+## `archive/` — ispunjeni specovi
+
+**Nikad izvor istine.** Ovdje se čita zašto je nešto bilo zamišljeno; što danas stoji u kodu govori
+`architecture/`, a što vrijedi sada `../CLAUDE.md`.
+
+| Dokument | Svrha |
+|---|---|
+| [ARHITEKTURA_M1.md](./archive/ARHITEKTURA_M1.md) | ✅ ISPUNJEN 2026-09-17 — spec arhitekture i opsega Milestonea 1 (jezgra · io · CLI) |
 
 ## `superpowers/plans/` — planovi implementacije
 

@@ -1,14 +1,54 @@
 # Changelog — Sokratis
 
 Format: [Keep a Changelog](https://keepachangelog.com/) · Verzioniranje: [SemVer](https://semver.org/).
-Prva verzija s kodom bit će 0.1.0 (M1). Isporuka = ono što je u `main`-u; sesije su u `PROGRESS.md`.
+Isporuka = ono što je u `main`-u; sesije su u `PROGRESS.md`.
 
-## [Unreleased] — rad u tijeku (cilj: 0.1.0 = M1)
+## [Unreleased] — rad u tijeku
+
+*(prazno — sljedeće je Milestone 2: desktop. Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md).)*
+
+## [0.1.0] — 2026-09-17 — Jezgra i CLI (Milestone 1)
+
+**Prva verzija s kodom.** `sokratis` iz terminala čita git-povijest projekta i vraća statistiku rada,
+ocjenu čistoće dokumentacije i signale smjera — svaki s dokazom. Bez ijedne postavke radi po
+konvencijama Sokrat Studyja (S-005); `.sokratis/profile.json` ih pregazi. Što je izgrađeno i kako je
+složeno: [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md).
+
+### Što korisnik CLI-ja dobiva
+
+- `sokratis report [putanja] [--since YYYY-MM-DD] [--json|--table]` — cijeli izvještaj: tempo po danu
+  (commiti, kumulativ, redaka, sati, isporuke, deployi, testni redci), vrste rada, 18 pokazatelja
+  kvalitete i brzine, faze, vizije, ocjena dokumentacije, signali. Bez zastavice ispisuje JSON,
+  `--table` daje tablicu s hrvatskim natpisima. Izlazni kod 0.
+- `sokratis docs [putanja] [--json]` — ocjena 0–100 s popisom nalaza (`datoteka:redak`) i kašnjenjem
+  dnevnika za kodom. Projekt bez mape s dokumentacijom dobiva `null`, ne nulu. Izlazni kod 0.
+- `sokratis signals [putanja] [--json]` — signali s dokazom; **izlazni kod je ugovor prema
+  preflightu: 0 nema signala · 1 Warn · 2 Alert**. Greška okoline (nema `git`-a, putanja nije
+  repozitorij, pokvaren profil) → poruka na stderr i **kod 3**.
+- Radi iz korijena repoa, iz podmape i iz radnog stabla; ništa ne zapisuje u mjereni projekt.
+- Ručni podaci putuju kroz git u `.sokratis/`: `profile.json` (konvencije projekta),
+  `overrides.json` (vrsta rada po SHA-i), `visions.json`.
+
+### Izmjereno nad prvim korisnikom (Sokrat Study, release build, 2026-09-17)
+
+Jedino mjesto s brojkama dogfoodinga; dokument koji ih prepiše ostari.
+
+- `report --table`: dotaknuto **190 commita, 70 164 redaka, 1801 izmjena datoteka, 0 preskočenih
+  redaka**; 14 radnih dana od 2026-08-29; **105 isporuka** (7,5/dan), 13,6 commita/dan; **85 h**
+  (proxy, 2,2 commita/h); 8922 testnih redaka (udio 0,127); 7 deploya; 22 debugging commita
+  (udio 0,116); vrste rada: izvođenje 61 · vođenje dokumentacije 55 · planiranje 26 · poliranje 26 ·
+  debugging 22 commita.
+- `docs`: **100/100, 0 nalaza**, kašnjenje 0 dana → izlazni kod 0.
+- `signals`: **ALERT `unmerged-branches`** s dokazom (`fix/kadar-nalicje` 11 dana / 12 commita
+  ispred `main`-a, `feat/tinder-kadar` 8 dana / 34 commita) → **izlazni kod 2**, spreman za preflight.
+- **Sokratis nad samim sobom** (vlastiti `.sokratis/profile.json`): docs **100/100, 0 nalaza**,
+  **0 signala**, izlazni kod 0 — sve grane tokova M1 su spojene u `main`.
 
 ### Dodano
+
 - 2026-09-17 — **Dokumentacija projekta** po modelu Sokrat Studyja: `CLAUDE.md`, `README.md`, `docs/`
-  (product · plan · workflow · records), aktivni spec `docs/plan/ARHITEKTURA_M1.md`, odluke S-001…S-010.
-  Bez koda.
+  (product · plan · workflow · records), spec `ARHITEKTURA_M1.md` (danas u `docs/archive/`), odluke
+  S-001…S-010. Bez koda.
 - 2026-09-17 — **Plan implementacije M1** (22 cigle, 8 tokova, testovi i kod po koraku) i **agenti**
   (graditelj · recenzent · čuvar dokumentacije) s protokolom nadzora `docs/workflow/AGENTI.md`. Bez koda.
 - 2026-09-17 — **M0: Rust toolchain na stroju** — Visual Studio Build Tools (MSVC) + rustup stable
@@ -16,8 +56,7 @@ Prva verzija s kodom bit će 0.1.0 (M1). Isporuka = ono što je u `main`-u; sesi
 - 2026-09-17 — **T1: kostur workspacea** (`main`) — Cargo workspace triju crateova (`sokratis-core` bez
   I/O-a, `sokratis-io`, binarna `sokratis-cli`), ugovor tipova jezgre (`model.rs`, `profile.rs`,
   `error.rs`) i zadani profil (konvencije Sokrat Studyja, S-005) na mjestu; sve preostale cigle su
-  potpisane, ali `todo!()`. `cargo test` zeleno (3 smoke-testa). CLI naredbe iz `CLAUDE.md` su ugovor,
-  još ne rade — dolaze u T18–T19.
+  potpisane, ali `todo!()`. `cargo test` zeleno (3 smoke-testa).
 - 2026-09-17 — **T2: fixture pariteta** — pravi git log, dnevnik i plan sa `main`-a Sokrat Studyja
   (371 commit od 2026-08-02) + očekivane brojke (`expected.json`: 14 dana, 5 vrsta rada, 18 pokazatelja,
   11 faza, 185 commita od 2026-08-29) u `crates/sokratis-core/tests/fixtures/`, uključujući poznati kvar
@@ -36,9 +75,6 @@ Prva verzija s kodom bit će 0.1.0 (M1). Isporuka = ono što je u `main`-u; sesi
   `visions.json`) i docs s vremenom zadnje promjene; provjereno nad Sokrat Studyjem: 56 docs, 31 grana,
   4301 redak loga. `--since` sada šalje puni dan (S-011) — ispravlja kvar `rad-xlsx.py` gdje je
   `git log --since` bez sata ovisio o dobu dana pokretanja.
-- 2026-09-17 — **METRIKE (T7–T10) na grani `feat/core-metrics`, još ne u `main`-u** — sati po
-  `author_time` (S-007): 0 negativnih dana na fixtureu, 33/37 dana identično `RAD.xlsx`-u, razlika samo
-  oko tri poznata cherry-picka.
 - 2026-09-17 — **FIXTURE T2b u `main`-u** — `expected.json` regeneriran za S-011 (`--since` s punim
   danom); dodan `README.md` fixturea koji objašnjava razliku prema staroj snimci.
 - 2026-09-17 — **CLI (T18–T19) u `main`-u** — naredbe `sokratis report [path] [--since] [--json|
@@ -53,6 +89,9 @@ Prva verzija s kodom bit će 0.1.0 (M1). Isporuka = ono što je u `main`-u; sesi
   −139,2 h u staroj tablici).
 - 2026-09-17 — **INTEGRACIJA (T20–T21) u `main`-u** — `sokratis report` sada vraća cjelovit
   izvještaj (dani, vrste, pokazatelji, faze, docs-ocjena, signali) sastavljen u jednom koraku;
-  test pariteta s `RAD.xlsx` zelen nad cijelim fixtureom. Dogfooding nad Sokrat Studyjem: 14 dana,
-  190 commita, 105 isporuka, 85 h, docs 100/100, signal `unmerged-branches` ALERT za dvije
-  nespojene grane starije od praga.
+  test pariteta s `RAD.xlsx` (`crates/sokratis-core/tests/parity.rs`) zelen nad cijelim fixtureom —
+  paritet je test, ne tvrdnja.
+- 2026-09-17 — **INTEGRACIJA (T22) u `main`-u** — Sokratis mjeri **sam sebe**: vlastiti
+  `.sokratis/profile.json` (plan je `ROADMAP.md`, nema zatvorenih faza, oznaka cigle `M1/N`, testovi
+  u `crates/*/tests/`). `cargo build --release` i sve tri naredbe pokrenute release binarkom nad
+  Sokrat Studyjem, isključivo čitanjem — brojke gore. `cargo test --workspace` = **47 testova, 0 padova**.

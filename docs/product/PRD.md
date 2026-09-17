@@ -2,8 +2,9 @@
 
 **Status:** 🟩 VRIJEDI · **Otvoren:** 2026-09-17 · **Vlasnik:** Leon Kreso
 
-> Ovaj dokument kaže **ŠTO** gradimo i **kad je gotovo**. Kako je građeno kaže aktivni spec
-> ([plan/ARHITEKTURA_M1.md](../plan/ARHITEKTURA_M1.md)); zašto — [records/DECISIONS.md](../records/DECISIONS.md).
+> Ovaj dokument kaže **ŠTO** gradimo i **kad je gotovo**. Kako je izgrađeno kaže
+> [architecture/ARCHITECTURE.md](../architecture/ARCHITECTURE.md) (spec M1 je ispunjen i arhiviran:
+> [archive/ARHITEKTURA_M1.md](../archive/ARHITEKTURA_M1.md)); zašto — [records/DECISIONS.md](../records/DECISIONS.md).
 > Bez kronologije: to je posao `records/`.
 
 ---

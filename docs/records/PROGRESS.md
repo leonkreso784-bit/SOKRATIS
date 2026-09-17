@@ -35,9 +35,11 @@ kašnjenje docs-a · novi znak. Zapisano kao S-001…S-010 u `DECISIONS.md`.
 
 ### Isporučeno (samo dokumentacija)
 `CLAUDE.md` · `README.md` · `.gitignore` · `docs/README.md` · `product/PRD.md` ·
-`plan/ARHITEKTURA_M1.md` (aktivni spec) · `plan/ROADMAP.md` · `workflow/TESTING.md` · `workflow/RUST.md` ·
+`plan/ARHITEKTURA_M1.md` (tada aktivni spec, danas u `archive/`) · `plan/ROADMAP.md` ·
+`workflow/TESTING.md` · `workflow/RUST.md` ·
 `records/PROGRESS.md` · `records/CHANGELOG.md` · `records/DECISIONS.md` · `records/BACKLOG.md`.
-Namjerno **ne** postoje još: `architecture/`, `BUGS.md`, `HISTORY.md`, `archive/`, `ideas/`, `LICENSE` — nastaju kad imaju sadržaj.
+Tada namjerno još nisu postojali: `architecture/`, `BUGS.md`, `HISTORY.md`, `archive/`, `ideas/`,
+`LICENSE` — nastaju kad imaju sadržaj (`architecture/` i `archive/` nastali su na kraju M1, šesti dio sesije).
 
 ### Isporučeno (drugi dio sesije, nakon Leonova OK-a na spec)
 - **Plan M1** `docs/superpowers/plans/2026-09-17-m1-jezgra-i-cli.md`: 22 cigle, svaka s testom, kodom i
@@ -130,12 +132,39 @@ Namjerno **ne** postoje još: `architecture/`, `BUGS.md`, `HISTORY.md`, `archive
   (`fix/kadar-nalicje` 11 dana/12 commita, `feat/tinder-kadar` 8 dana/34 commita) — potvrđeno
   izravno gitom; `sokratis signals` nad repoom vraća izlazni kod 2.
 - **Testovi na `main`-u:** `cargo test --workspace` = 47 passed.
-- **Preostaje za M1:** T22 (`.sokratis/profile.json` dogfooding nad Sokrat Studyjem, `cargo build
-  --release` + izvještaj, `ARCHITECTURE.md`, aktivni spec seli u `archive/`, `CHANGELOG.md` dobiva
-  0.1.0), pa završna recenzija cijelog M1 s jednim krugom popravaka, pa zastanak i Leonov OK.
-  **M1 još NIJE isporučen** — `CHANGELOG.md` ostaje pod `[Unreleased]`.
+- **Na kraju petog dijela preostajalo je za M1:** T22 (`.sokratis/profile.json` dogfooding nad Sokrat
+  Studyjem, `cargo build --release` + izvještaj, `ARCHITECTURE.md`, aktivni spec seli u `archive/`,
+  `CHANGELOG.md` dobiva 0.1.0), pa završna recenzija cijelog M1, pa zastanak i Leonov OK. Tada M1
+  još nije bio isporučen i `CHANGELOG.md` je stajao pod `[Unreleased]` — riješeno u šestom dijelu.
+
+### Isporučeno (šesti dio sesije, večer — T22 spojen, M1 kod isporučen)
+Orkestrator: Fable 5.1; graditelj i recenzent: sonnet.
+- **INTEGRACIJA (T22)** spojena (commit 7e07c9e, merge 231bee8): `.sokratis/profile.json` kojim
+  Sokratis mjeri sam sebe, pa release build i sve tri naredbe nad Sokrat Studyjem (isključivo
+  čitanje; `git status` provjeren prije i poslije — ništa se u tuđem repou nije promijenilo).
+  Recenzija: SPOJIVO. **Time su sve cigle M1 (T1–T22) u `main`-u.** Brane zelene (`cargo fmt
+  --check`, `cargo clippy --all-targets -- -D warnings`, `cargo test --workspace` bez padova);
+  brojke i ispisi: `CHANGELOG.md`.
+- **Odstupanja od najave (git je istinitiji od naloga):**
+  1. `signals .` nad samim Sokratisom daje **kod 0, ne 1** — nalog je očekivao `unmerged-branches`,
+     ali su sve grane tokova već spojene u `main` (provjereno `git branch --merged main`). Pravilo je
+     zasebno dokazano nad Sokrat Studyjem, gdje hvata dvije stvarno nespojene grane (kod 2).
+  2. `docs` nad Sokrat Studyjem daje **0 nalaza**, a nalog je očekivao nalaze s `datoteka:redak`;
+     njegova dokumentacija je zatečeno čista prema Sokratisovim pravilima. Ništa nije „popravljano"
+     da bi ispis izgledao kao u nalogu.
+  3. **`debugging` = 0 % u Sokratisovu vlastitom izvještaju** jer njegove poruke commita (`M1/N: …`)
+     ne pogađaju zadani klasifikacijski regex (pisan za vokabular Sokrat Studyja). Nije kvar jezgre
+     nego posljedica zadanog profila; Sokratis dobiva vlastiti `classifier` u M2.
+  4. Profil je dobio `test_path_contains: ["/tests/"]` izvan brifa (uputa orkestratora) jer zadani
+     prefiks `tests/` ne hvata `crates/*/tests/`. Poznato ograničenje ostaje zapisano: inline
+     `#[cfg(test)]` moduli **ne** ulaze u „redaka u testovima" jer se testni redak prepoznaje samo
+     po putanji (opisano u `architecture/ARCHITECTURE.md` §10).
+- **Dokumentacijsko zatvaranje M1** (ovaj commit): nastao `docs/architecture/ARCHITECTURE.md` (što JE
+  izgrađeno — granice crateova, tok podataka, sva polja profila, formati `.sokratis/*.json`, izlazni
+  kodovi); spec `ARHITEKTURA_M1.md` preseljen u `docs/archive/` s pečatom „ISPUNJEN 2026-09-17 —
+  referenca, ne izvor istine"; `docs/README.md` dobio sekcije `architecture/` i `archive/`;
+  `CHANGELOG.md` dobio **0.1.0**; `ROADMAP.md`, `CLAUDE.md` i pojmovnik `RUST.md` §4 usklađeni.
 
 ### Što slijedi
-T22 (`feat/integracija` ili novo stablo) → završna recenzija cijelog M1 → zastanak na kraju M1
-(Leonov OK). Svi ostali tokovi (KOSTUR, FIXTURE, PARSE, METRIKE, DOCS+PRAVILA, IO, CLI, INTEGRACIJA
-T20–T21) su spojeni u `main`.
+**Završna recenzija cijelog M1** (ne cigle, nego lanca) s jednim krugom popravaka → **zastanak i
+Leonov OK**. Grane tokova i radna stabla brišu se tek uz njegov OK. Nakon toga: spec za M2 (desktop).

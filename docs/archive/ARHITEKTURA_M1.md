@@ -1,8 +1,10 @@
 # ARHITEKTURA + MILESTONE 1 — dizajn Sokratisa
 
-**Status:** 🟩 AKTIVAN · **Otvoren:** 2026-09-17 · Odobren, plan izveden (T1–T21 u `main`); **čeka:**
-T22 (§7 izlazni uvjet) pa seli u `archive/` — status i brojke: [ROADMAP.md](./ROADMAP.md),
-[../records/CHANGELOG.md](../records/CHANGELOG.md)
+**Status:** ✅ ISPUNJEN 2026-09-17 — referenca, ne izvor istine
+
+Što je od ovoga stvarno izgrađeno opisuje [architecture/ARCHITECTURE.md](../architecture/ARCHITECTURE.md);
+status milestonea je u [plan/ROADMAP.md](../plan/ROADMAP.md), isporuke u
+[records/CHANGELOG.md](../records/CHANGELOG.md).
 
 > **Što ovaj dokument JEST:** arhitektura cijelog sustava (da odluke imaju jedno mjesto) i
 > **precizan opseg Milestonea 1**, iz kojeg se piše prvi plan implementacije

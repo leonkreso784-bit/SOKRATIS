@@ -10,7 +10,8 @@
 Desktop aplikacija koja se priključi na git-repozitorij projekta, izračuna statistiku rada (ono što
 danas radi `docs/records/RAD.xlsx` u Sokrat Studyju), ocijeni čistoću dokumentacije i javi smjer
 projekta **s dokazom**. Prati više projekata. Izgled kao Sokrat Study. Kasnije open-source na GitHubu.
-Definicija: `docs/product/PRD.md` · aktivni spec: `docs/plan/ARHITEKTURA_M1.md` · milestonei: `docs/plan/ROADMAP.md`.
+Definicija: `docs/product/PRD.md` · što je izgrađeno: `docs/architecture/ARCHITECTURE.md` ·
+milestonei: `docs/plan/ROADMAP.md` · ispunjeni spec M1: `docs/archive/ARHITEKTURA_M1.md`.
 
 **Prvi korisnik je Sokrat Study** (`C:\Users\leonk\Documents\sokratstudy.dev` + radna stabla
 `sokratstudy.f21` · `.f22` · `.f25` · `.f3` = **jedan** projekt). Referentna implementacija za paritet:
@@ -63,22 +64,21 @@ sati zbog cherry-pickova — se u Sokratisu **ispravlja, ne prenosi** (S-007).
 sve rade nad pravim repozitorijem (potvrđeno nad Sokrat Studyjem).
 Testovi i brane: `docs/workflow/TESTING.md`.
 
-## Stanje — TRENUTNO (2026-09-17, večer — pred zastankom na kraju M1)
-- **M0 gotov, T1–T21 spojeni u `main`.** Cijeli lanac radi nad pravim repozitorijem: `sokratis
-  report/docs/signals` čitaju git kroz `io`, jezgra računa dane, sate, vrste rada, faze, 18
-  pokazatelja, docs-ocjenu i signale, CLI ih ispisuje kao JSON ili tablicu s hrvatskim natpisima.
-  Test pariteta s `RAD.xlsx` (`crates/sokratis-core/tests/parity.rs`) zelen. Brojke i dogfooding
-  nad Sokrat Studyjem: `CHANGELOG.md`; tijek sesije: `PROGRESS.md`.
-- **Preostaje samo T22** (dogfooding `.sokratis/profile.json`, `cargo build --release` + izvještaj,
-  `ARCHITECTURE.md`, aktivni spec seli u `archive/`, `CHANGELOG.md` dobiva 0.1.0) → **završna
-  recenzija cijelog M1** s jednim krugom popravaka → **zastanak, Leonov OK**.
+## Stanje — TRENUTNO (2026-09-17, večer — kod M1 isporučen, M1 još nije zatvoren)
+- **M0 gotov. Kod M1 isporučen: T1–T22 u `main`-u, verzija 0.1.0.** Cijeli lanac radi nad pravim
+  repozitorijem: `sokratis report/docs/signals` čitaju git kroz `io`, jezgra računa dane, sate, vrste
+  rada, faze, 18 pokazatelja, docs-ocjenu i signale, CLI ih ispisuje kao JSON ili tablicu s hrvatskim
+  natpisima. Test pariteta s `RAD.xlsx` (`crates/sokratis-core/tests/parity.rs`) zelen. Sokratis mjeri
+  i sam sebe (`.sokratis/profile.json`). Brojke i dogfooding: `CHANGELOG.md` (0.1.0); tijek sesije:
+  `PROGRESS.md`; što je izgrađeno: `docs/architecture/ARCHITECTURE.md`.
+- **Preostaje do zatvaranja M1:** **završna recenzija cijelog M1** (lanca, ne cigle) s jednim krugom
+  popravaka → **zastanak, Leonov OK**. Grane tokova i radna stabla se brišu tek uz njegov OK.
 - **Prva radnja nove sesije:** `git log --oneline -15` · `git worktree list` · ledger
   `.superpowers/sdd/2026-09-17-m1-jezgra-i-cli/progress.md`, odjeljak „STANJE ZA NOVU SESIJU"
   (operativna uputa, ne izvor činjenica o projektu — te su u `CHANGELOG.md`/`PROGRESS.md`).
 - **Agenti definirani:** `.claude/agents/{graditelj,recenzent,cuvar-dokumentacije}.md`; protokol nadzora
   `docs/workflow/AGENTI.md` (orkestrator = ova sesija, jedini spaja u `main`).
-- Sljedeće: METRIKE T11 → CLI T18–T19 → spajanje → integracija (T20–T22) → zastanak na kraju M1
-  (Leonov OK).
+- Sljedeće: završna recenzija M1 → krug popravaka → zastanak i Leonov OK → spec za **M2 (desktop)**.
 - Što je isporučeno i kada zna `CHANGELOG.md`; tijek sesija `PROGRESS.md`. Ovaj odjeljak to ne ponavlja.
 
 ## Ključne odluke — samo žive
@@ -94,7 +94,8 @@ u dva prolaza, čuvar dokumentacije piše zapise; **samo orkestrator spaja u `ma
 čita iz gita (`git log --oneline -15` · `git worktree list`), ne iz sjećanja.
 
 ## Dokumentacija — ulaz je SAMO `docs/README.md`
-Složena **po ulozi dokumenta** (kao Sokrat Study): `product/` ŠTO · `plan/` ŠTO SADA (**jedan** aktivni
-spec + ROADMAP) · `workflow/` KAKO RADIMO · `records/` POVIJEST (nikad izvor istine).
-`architecture/` **nastaje kad M1 isporuči kod** (spec tada seli u `archive/`, a što je izgrađeno opisuje
-`ARCHITECTURE.md`). Ne traži fajlove napamet — otvori indeks.
+Složena **po ulozi dokumenta** (kao Sokrat Study): `product/` ŠTO · `plan/` ŠTO SADA (najviše **jedan**
+aktivni spec + ROADMAP; spec za M2 tek dolazi) · `architecture/` **ŠTO JE IZGRAĐENO**
+(`docs/architecture/ARCHITECTURE.md` — granice crateova, tok podataka, sva polja profila, formati
+`.sokratis/*.json`, izlazni kodovi) · `workflow/` KAKO RADIMO · `records/` POVIJEST ·
+`archive/` ispunjeni specovi — oboje **nikad izvor istine**. Ne traži fajlove napamet — otvori indeks.
