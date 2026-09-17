@@ -1,5 +1,13 @@
 # Milestone 1 — Jezgra + CLI: plan implementacije
 
+**Status:** ✅ IZVRŠEN 2026-09-17 — sve 22 cigle su u `main`-u, uz krug popravaka nakon završne
+recenzije. Ovo je **zapis plana**, ne izvor istine: što je izgrađeno kaže
+[`../../architecture/ARCHITECTURE.md`](../../architecture/ARCHITECTURE.md), što je isporučeno
+[`../../records/CHANGELOG.md`](../../records/CHANGELOG.md), a odstupanja od plana
+[`../../records/PROGRESS.md`](../../records/PROGRESS.md). Dvije razlike prema tekstu ispod:
+`insta` je nakon završne recenzije **uklonjen** (neiskorišten — pravilo #6; snapshot `Report`-a je M2),
+a `serde_json` je u jezgri **dev-ovisnost**.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Rust CLI `sokratis` koji nad Sokrat Studyjem daje iste brojke kao `RAD.xlsx` (s ispravnim satima), ocjenu čistoće dokumentacije i dva signala s dokazom.

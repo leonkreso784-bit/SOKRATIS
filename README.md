@@ -4,9 +4,11 @@
 git-repozitorij, izračuna statistiku rada, ocijeni čistoću dokumentacije i javi smjer projekta
 s dokazom. Za više projekata odjednom.
 
-> 🚧 **U gradnji (rujan 2026).** Milestone 1 pred zastankom: `core`/`io`/`cli` već rade nad pravom
-> git-povijesti (paritet s `RAD.xlsx` je test, ne tvrdnja). Nije još objavljeno na GitHubu.
-> Ulaz u dokumentaciju: [docs/README.md](./docs/README.md) · milestonei: [docs/plan/ROADMAP.md](./docs/plan/ROADMAP.md).
+> 🚧 **U gradnji (rujan 2026).** Milestone 1 je isporučen i recenziran — verzija 0.1.0:
+> `core`/`io`/`cli` rade nad pravom git-povijesti (paritet s `RAD.xlsx` je test, ne tvrdnja).
+> Milestone se zatvara uz odluku autora; nije još objavljeno na GitHubu. Ulaz u dokumentaciju:
+> [docs/README.md](./docs/README.md) · milestonei: [docs/plan/ROADMAP.md](./docs/plan/ROADMAP.md) ·
+> isporučeno: [docs/records/CHANGELOG.md](./docs/records/CHANGELOG.md).
 
 ## Zašto postoji
 
@@ -31,8 +33,9 @@ Rust (`core` · `io` · `cli`) · Tauri 2 · Svelte 5 · dizajn-tokeni Sokrat St
 
 ## Pokretanje
 
-Već radi (pred zastankom na kraju Milestonea 1): `cargo run -p sokratis-cli -- report
-<putanja-do-repoa>` (i `docs`, `signals`). Status i preostalo: [ROADMAP](./docs/plan/ROADMAP.md).
+Radi iz izvornog koda (0.1.0): `cargo run -p sokratis-cli -- report <putanja-do-repoa>` (i `docs`,
+`signals`). Izlazni kod `signals` je ugovor prema preflightu (0 nema · 1 Warn · 2 Alert · 3 greška).
+Status i preostalo: [ROADMAP](./docs/plan/ROADMAP.md).
 
 ## Licenca
 

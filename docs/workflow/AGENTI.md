@@ -22,7 +22,7 @@ pri startu), orkestrator šalje `general-purpose` agenta i u prompt zalijepi **c
 
 | tok | grana | stablo | cigle | vlasništvo |
 |---|---|---|---|---|
-| KOSTUR | `main` | `sokratis` | T1 | sve (orkestrator) |
+| KOSTUR | `feat/kostur` | `sokratis.kostur` | T1 | sve (orkestrator) |
 | FIXTURE | `feat/fixtures` | `sokratis.fixtures` | T2 | `crates/sokratis-core/tests/fixtures/sokratstudy-*` |
 | PARSE | `feat/core-parse` | `sokratis.parse` | T3 · T6 · T4 · T5 | `core/src/parse/**`, `core/src/classify.rs` |
 | METRIKE | `feat/core-metrics` | `sokratis.metrics` | T7–T11 | `core/src/metrics/**`, `core/src/civil.rs` |
@@ -32,7 +32,7 @@ pri startu), orkestrator šalje `general-purpose` agenta i u prompt zalijepi **c
 | INTEGRACIJA | `feat/integracija` | `sokratis.integracija` | T20–T22 | `core/src/report.rs`, `core/src/model.rs` (samo `WorkKind::id`), `tests/parity.rs`, `.sokratis/`, `docs/` |
 
 Tokovi se **ne dodiruju po datotekama**, pa merge nema sudara. Jedina zajednička točka je T1 (ugovor tipova):
-zato T1 ide prvi, sam, na `main`, i tek onda se otvaraju stabla.
+zato T1 ide prvi i sam, pa se spoji u `main` prije nego se otvore ostala stabla.
 
 ## 3 · Protokol po cigli
 
@@ -72,7 +72,9 @@ Prije svakog compacta: **čuvar dokumentacije, način B** + orkestrator osvježi
 je cigla gdje, što čeka recenziju, što je spojeno). Nakon compacta prva radnja je `git -C sokratis log --oneline -15`
 i `git worktree list` — stanje se čita iz gita, ne iz sjećanja.
 
-## 7 · Što se mjeri (dogfooding od T22)
+## 7 · Što se mjeri (dogfooding, radi od T22)
 
-Kad CLI proradi, `sokratis signals .` nad ovim repoom pokazuje `unmerged-branches` za tokove koji predugo
-žive izvan `main`-a — orkestrator ga vrti nakon svakog spajanja. Sokratis nadzire vlastitu gradnju.
+`sokratis signals .` nad ovim repoom prijavljuje `unmerged-branches` za tokove koji predugo žive izvan
+`main`-a — orkestrator ga vrti nakon svakog spajanja. Na kraju M1 daje **0 signala** jer su sve grane
+tokova spojene (grane i stabla čekaju Leonov OK za brisanje); pravilo je dokazano nad Sokrat Studyjem,
+gdje hvata dvije stvarno nespojene grane. Sokratis nadzire vlastitu gradnju.

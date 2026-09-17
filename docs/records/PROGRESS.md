@@ -197,6 +197,11 @@ Orkestrator: Fable 5.1; završna recenzija, popravljač i čuvar: opus; ponovna 
   (provjera ulaza, prozor dovlačenja s rezervom, izlazni kodovi, §11 dopunjen), `CHANGELOG.md` dobio
   popravke i broj testova, `DECISIONS.md` dopunu S-011, `TESTING.md`/`RUST.md` bez `insta` i
   snapshot-testova, `BACKLOG.md` nalaze za M2, `ROADMAP.md` i `CLAUDE.md` stanje.
+- **Audit svih `.md` pred zastankom** (CLAUDE.md #8): plan M1 dobio pečat „IZVRŠEN" (bio je bez
+  statusa, a nosi `insta` iz vremena pisanja), `README.md` govori 0.1.0 umjesto „pred zastankom",
+  `AGENTI.md` ispravio tok KOSTUR (T1 je nastao na `feat/kostur`, ne na `main`-u) i dogfooding-odjeljak
+  (CLI radi; `signals .` je danas 0 jer su sve grane tokova spojene). `sokratis docs .` = **100/100,
+  0 nalaza**, `git branch --no-merged main` prazno.
 
 ### Što slijedi
 **Zastanak — Leonov OK.** Na njega čekaju: brisanje 8 grana tokova i njihovih radnih stabala, push i
