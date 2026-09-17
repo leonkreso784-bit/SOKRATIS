@@ -19,10 +19,15 @@ fn ymd(s: &str) -> Option<(i64, i64, i64)> {
 /// Dani od 1970-01-01 (algoritam H. Hinnanta, „days_from_civil").
 fn days_from_civil(y: i64, m: i64, d: i64) -> i64 {
     let y = if m <= 2 { y - 1 } else { y };
+    // era = redni broj 400-godišnjeg ciklusa (npr. 0 za 1600.-1999., -1 za 1200.-1599.)
     let era = if y >= 0 { y } else { y - 399 } / 400;
+    // yoe = godina unutar ere (year of era), 0..399
     let yoe = y - era * 400;
+    // mp = mjesec pomaknut tako da ožujak bude mjesec 0 (siječanj/veljača idu na kraj prošle godine)
     let mp = (m + 9) % 12;
+    // doy = redni dan unutar (pomaknute) godine, 0..365
     let doy = (153 * mp + 2) / 5 + d - 1;
+    // doe = dan unutar 400-godišnje ere (day of era), 0..146096
     let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
     era * 146097 + doe - 719468
 }
