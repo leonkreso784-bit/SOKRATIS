@@ -41,7 +41,7 @@ pub fn render(r: &Report) -> String {
     let mut s = String::new();
     let _ = writeln!(
         s,
-        "Sokratis — analiza rada · grana {} · od {} · dotaknuto: {} commita, {} redaka, {} datoteka, preskočeno {} redaka\n",
+        "Sokratis — analiza rada · grana {} · od {} · dotaknuto: {} commita, {} redaka, {} izmjena datoteka, preskočeno {} redaka\n",
         r.branch,
         r.since,
         r.touched.commits,
@@ -194,6 +194,10 @@ mod tests {
                 && s.contains("commita")
                 && s.contains("dotaknuto: 3 commita")
         );
+        // M4: `touched.files` je broj IZMJENA datoteka kroz commite (ista datoteka u tri commita
+        // su tri izmjene), a ne broj datoteka — ARCHITECTURE §3/§10 i CHANGELOG to već kažu
+        // točno, tablica je bila zadnje mjesto s netočnim natpisom.
+        assert!(s.contains("2 izmjena datoteka"), "{s}");
         let sig = render_signals(&[Signal {
             rule: "docs-lag".into(),
             severity: Severity::Warn,
