@@ -1,6 +1,7 @@
 # ARCHITECTURE — što je izgrađeno
 
-**Status:** ✅ opisuje kod koji je u `main`-u (Milestone 1, verzija 0.1.0) · **Zadnja provjera:** 2026-09-17
+**Status:** ✅ opisuje kod koji je u `main`-u (Milestone 1, verzija 0.1.0, uključujući krug popravaka
+nakon završne recenzije) · **Zadnja provjera:** 2026-09-17
 
 > **Što ovaj dokument JEST:** opis sustava kakav stoji u `crates/` — granice između crateova, tok
 > podataka, formati koje čita i ugovori prema korisniku CLI-ja. **Što NIJE:** kronologija (to su
@@ -51,19 +52,29 @@ putanja repoa
 
 Korak po korak, redoslijed je u `core/src/report.rs` (`build_report`) i nigdje drugdje:
 
-1. `Patterns::compile` — regexi iz profila se kompiliraju jednom po izvještaju.
+1. **provjera ulaza:** `Patterns::compile` kompilira regexe iz profila jednom po izvještaju i traži
+   da imaju grupe koje parser čita (`diary_heading` 3 · `plan_brick` 3 · `plan_phase_name` 2 ·
+   `phase_tag` 1) → `ParseError::BadPattern`; `Profile::validate_dates` i provjera `input.since`
+   traže oblik `YYYY-MM-DD` → `ParseError::BadDate { field, text }`. Valjan JSON s regexom bez grupe
+   ili s tipfelerom u datumu je **greška s imenom polja** (izlaz 3), ne panika i ne tiha kriva brojka.
 2. `parse_git_log` — tekst loga → `Vec<Commit>` + broj preskočenih redaka.
 3. filtar `since`: ostaju commiti s `commit_date >= since` (S-011 — isti kriterij kao `git log --since`).
 4. `parse_diary` — naslovi dnevnika → `Vec<Delivery>`; `parse_plan` — redovi plana → faze.
 5. `hours_per_day` — sati po danu (sortirano po `author_time`, S-007).
 6. `day_stats` — redak po danu s commitom; `kind_stats` — vrste rada (ručni override po SHA pregazi klasifikator).
-7. faze: zatvorene se **broje** iz cijelog loga, aktivne iz plana i filtriranih commita.
-8. `indicators` — 18 pokazatelja, svaki s `kind` (`measure` ili `proxy`) i formulom.
+7. faze: zatvorene se **broje** iz cijelog loga, aktivne iz plana i filtriranih commita. Zatvorena
+   faza **bez ijednog pogođenog commita** ne ulazi ni u pokazatelje ni u tablicu — zatvorene faze
+   dolaze iz profila, pa bi tuđi projekt sa zadanim profilom (S-005) dobio faze iz zraka.
+8. `indicators` — 18 pokazatelja, svaki s `kind` (`measure` ili `proxy`) i formulom. `IndicatorInput`
+   nosi i `since` (iz `ReportInput`, dakle `--since`): pokazatelj o zatvorenim fazama mjeri isto
+   razdoblje kao ostatak izvještaja, ne `profile.since`.
 9. `docs_health` — ocjena i nalazi; `evaluate_all(default_rules())` — signali.
 10. `Report` se sastavi i serializira (`serde`).
 
 **Grana:** metrike se računaju nad `profile.default_branch` ako ta grana postoji, inače nad trenutnom
-granom (`io/src/project.rs::input`). Ostale grane ulaze **samo u signale**.
+granom (`io/src/project.rs::input`). Ostale grane ulaze **samo u signale**. Ako ni jedna ni druga ne
+postoji kao referenca (repo nakon `git init`, bez commita), `io` vraća `IoError::NoCommits` →
+`<putanja>: repozitorij nema commita` i izlaz 3; prije je korisnik dobivao gitov savjet o `--`.
 
 ## 3 · Što `Report` nosi
 
@@ -83,9 +94,11 @@ bi bila laž) · `signals`.
 ## 4 · Profil projekta — sva polja i zadane vrijednosti
 
 **Izvor je `crates/sokratis-core/src/profile.rs`** (`impl Default for Profile`); ova tablica prati
-njega. Zadane vrijednosti **jesu** konvencije Sokrat Studyja (S-005): prvi korisnik radi bez ijedne
-postavke. Profil je `#[serde(default, deny_unknown_fields)]` — polje koje nedostaje uzima zadano,
-polje s tipfelerom je greška, ne tiho ignoriranje. Ovo je jedina tablica profila u dokumentaciji.
+njega i ima jednako redaka koliko struktura ima polja (**38**). Zadane vrijednosti **jesu**
+konvencije Sokrat Studyja (S-005): prvi korisnik radi bez ijedne postavke. Profil je
+`#[serde(default, deny_unknown_fields)]` — polje koje nedostaje uzima zadano, polje s tipfelerom je
+greška, ne tiho ignoriranje (i to jedna poruka s putanjom, ne dvije). Ovo je jedina tablica profila
+u dokumentaciji.
 
 | polje | zadano | čemu služi |
 |---|---|---|
@@ -106,7 +119,7 @@ polje s tipfelerom je greška, ne tiho ignoriranje. Ovo je jedina tablica profil
 | `diary_deploy_pattern` | regex (blok §5) | unos u dnevniku koji znači deploy |
 | `plan_brick` | regex (blok §5) | redak cigle u planu; `✅` znači gotova |
 | `plan_phase_name` | regex (blok §5) | naslov faze u planu |
-| `phase_tag` | regex (blok §5) | oznaka faze u opisu commita |
+| `phase_tag` | regex (blok §5) | oznaka faze u opisu commita; **rezervirano — jezgra ga u 0.1.0 ne čita** (vidi §11) |
 | `classifier` | 4 pravila (blok §5) | uređena lista `(vrsta, regex)`; **redoslijed je ugovor** |
 | `gate_pattern` | regex (blok §5) | podvrsta „brana i mjerenje" |
 | `deploy_pattern` | regex (blok §5) | podvrsta „deploy" |
@@ -120,7 +133,7 @@ polje s tipfelerom je greška, ne tiho ignoriranje. Ovo je jedina tablica profil
 | `session_gap_hours` | `2.0` | razmak manji od toga = neprekinut rad |
 | `session_start_hours` | `0.5` | fiksni dodatak za prvi commit nove sesije |
 | `closed_phases` | 4 faze Sokrat Studyja | `{name, from, to, tag_pattern, note}`; broje se iz commita |
-| `include_unmerged` | `false` | **deklarirano, jezgra ga u 0.1.0 još ne čita** (vidi §11) |
+| `include_unmerged` | `false` | **rezervirano — jezgra ga u 0.1.0 ne čita** (vidi §11) |
 | `unmerged_warn_days` | `5` | grana starija od toga → Warn |
 | `unmerged_alert_days` | `10` | …starija od toga → Alert |
 | `unmerged_alert_count` | `3` | …ili više od toliko takvih grana → Alert |
@@ -129,7 +142,9 @@ polje s tipfelerom je greška, ne tiho ignoriranje. Ovo je jedina tablica profil
 | `docs_weights` | `dead_link 5` · `not_indexed 3` · `multiple_plans 15` · `no_active_plan 10` · `diary_in_definition 5` · `lag 10` · `key_file_budget 5` | koliko koji nalaz odbija od 100 |
 
 `Profile::log_since()` uzima **najraniji** datum od `since` i početaka zatvorenih faza — git log mora
-dovući i commite starije od `since` da bi se zatvorene faze mogle prebrojati.
+dovući i commite starije od `since` da bi se zatvorene faze mogle prebrojati. Prozor dovlačenja je
+zatim `min(log_since(), --since)`: bez tog `min`-a je `--since` stariji od profila tiho dobivao
+kraći log nego što `Report.since` tvrdi (zaglavlje i podaci moraju se odnositi na isto razdoblje).
 
 ## 5 · Zadani regexi i klasifikator — doslovno
 
@@ -158,11 +173,19 @@ Regexi su preneseni 1:1 iz `rad-xlsx.py` Sokrat Studyja, zato su hrvatski i zato
 Puni tekst svakog je u `profile.rs` — ovdje su skraćeni tri točkice tamo gdje je lista dugačka.
 
 **Format git loga** koji `io` traži i jezgra razumije (`io/src/git.rs`, `core/src/parse/gitlog.rs`):
-`--format=@@%h|%at|%ct|%ad|%cd|%s` + `--numstat` + `--date=format:%Y-%m-%d` + `--reverse`. Unix-vremena
-(`%at`, `%ct`) služe za razmake, lokalni datumi za dan u tablici (`%ad`, autorov — paritet s
-`RAD.xlsx`) i za filtar `since` (`%cd`, commitov — kao git). `--since` se **uvijek** šalje sa satom
-`00:00:00` (S-011): bez sata git uzima trenutno doba dana, pa bi isti datum davao različit broj
-commita ovisno o tome kad se izvještaj pokreće.
+`--format=@@%h|%at|%ct|%ad|%cd|%s` + `--numstat` + `--date=format:%Y-%m-%d` + `--reverse` + završni
+`--` (bez njega je ime grane dvosmisleno s datotekom istog imena). Unix-vremena (`%at`, `%ct`) služe
+za razmake, lokalni datumi za dan u tablici (`%ad`, autorov — paritet s `RAD.xlsx`) i za filtar
+`since` (`%cd`, commitov — kao git). `--since` se **uvijek** šalje sa satom `00:00:00` (S-011): bez
+sata git uzima trenutno doba dana, pa bi isti datum davao različit broj commita ovisno o tome kad se
+izvještaj pokreće.
+
+**Rezerva od jednog dana:** `io` traži log od **dana prije** granice (`civil::prev_day`). Razlog je
+zona: `--since … 00:00:00` je ponoć u zoni **stroja**, a datumi u logu su u zoni **commita**, pa bi
+stroj zapadnije od pohranjenog pomaka odbacio commite koje jezgrin filtar zadržava (najosjetljiviji
+je prvi dan zatvorene faze). Mjerodavan je i ostaje jezgrin filtar `commit_date >= since` nad
+tekstom; rezerva zato ne mijenja ni jednu brojku, samo čini izvještaj neovisnim o zoni stroja
+(dopuna S-011).
 
 ## 6 · `.sokratis/` — ručni podaci u repou (S-004)
 
@@ -172,6 +195,8 @@ druga (mapa umjesto datoteke, nema dozvole, pokvaren JSON) se javlja s putanjom.
 
 **`.sokratis/profile.json`** — bilo koji podskup polja iz §4. Primjer je profil kojim Sokratis mjeri
 sam sebe (dogfooding): vlastiti plan nema cigle ni faze, a testovi mu žive u `crates/*/tests/`.
+`phase_tag` je u njemu upisan, ali u 0.1.0 ne radi ništa (rezervirano — §11): aktivne faze se vežu
+na commite tvrdo kodiranim prefiksom `"{id}/"`.
 
 ```json
 {
@@ -242,13 +267,17 @@ radnog stabla — korijen se dobiva iz `git rev-parse --show-toplevel`.
 
 | naredba | ispis | izlazni kod |
 |---|---|---|
-| `sokratis report [putanja] [--since YYYY-MM-DD] [--json\|--table]` | cijeli `Report`; **bez zastavice je JSON**, `--table` daje tablicu s hrvatskim natpisima | 0 |
+| `sokratis report [putanja] [--since YYYY-MM-DD] [--json\|--table]` | cijeli `Report`; **bez zastavice je JSON**, `--table` daje tablicu s hrvatskim natpisima; zastavice su **isključive** (`--json --table` je pogrešna uporaba, ne „zadnja pobjeđuje") | 0 |
 | `sokratis docs [putanja] [--json]` | ocjena, broj nalaza, kašnjenje; bez `docs_dir` poruka `docs: nema mape s dokumentacijom (n/a)` | 0 |
 | `sokratis signals [putanja] [--json]` | signali s dokazom, ili `nema signala` | **0** nema · **1** Warn · **2** Alert |
 
-Svaka greška okoline (nema `git`-a na PATH-u, putanja nije repozitorij, pokvaren profil) ispisuje se
-na stderr kao `sokratis: <poruka>` i daje **izlazni kod 3**. `process::exit` je u `main` i nigdje
-drugdje: izlazni kod je ugovor prema preflightu, a ne nuspojava.
+Svaka greška okoline (nema `git`-a na PATH-u, putanja nije repozitorij, repozitorij bez commita,
+pokvaren profil, tipfeler u datumu ili regex bez grupe) ispisuje se na stderr kao
+`sokratis: <poruka>` i daje **izlazni kod 3**. Isti kod dobiva i **pogrešna uporaba CLI-ja**
+(nepoznata zastavica, `--json --table`): `clap` bi sam izašao s **2**, a 2 je rezerviran za Alert, pa
+`main` koristi `try_parse` i razliku presuđuje po tome piše li `clap` na stderr — `--help` i
+`--version` idu na stdout i daju **0**. `process::exit` je u `main` i nigdje drugdje: izlazni kod je
+ugovor prema preflightu, a ne nuspojava.
 
 `--since` postoji samo na `report`; `docs` i `signals` uzimaju `since` iz profila.
 
@@ -260,20 +289,52 @@ drugdje: izlazni kod je ugovor prema preflightu, a ne nuspojava.
    (živi u istoj datoteci kao produkcijski kod), a **sve** pod testnom putanjom se broji — i fixture
    datoteke pod `tests/`, koje nisu kod testa. Sokratis zato u svom profilu ima
    `test_path_contains: ["/tests/"]`: njegovi testovi žive u `crates/*/tests/`, što zadani prefiks
-   `tests/` ne hvata.
+   `tests/` ne hvata. Posljedica koju treba znati pri čitanju **Sokratisova vlastitog** udjela
+   testnih redaka: pod tom putanjom leže i fixture datoteke (snimka `PROGRESS.md` Sokrat Studyja ima
+   767 kB), pa je većina njegovih „testnih redaka" fixture, ne kod testa.
 2. **`touched.files` je broj izmjena datoteka, ne broj različitih datoteka** (§3). Ista datoteka
    dirnuta u deset commita doda deset. Brojka odgovara na „koliko je izmjena pročitano", ne na
    „koliko datoteka projekt ima".
 
-## 11 · Što stoji u kodu, a još ne izlazi (0.1.0)
+## 11 · Što stoji u kodu, a još ne izlazi ili ne radi (0.1.0)
 
-Uredno zapisani propusti, ne skrivene rupe (CLAUDE.md #4):
+Uredno zapisani propusti, ne skrivene rupe (CLAUDE.md #4). Ovo je **stanje koda**; što se od toga
+planira uzeti i kada je u [`../records/BACKLOG.md`](../records/BACKLOG.md).
 
-- **`include_unmerged`** je polje profila, ali ga jezgra još ne čita: metrike su uvijek samo nad
-  zadanom granom, a nespojene grane ulaze isključivo u signale.
-- **`classify_sub`** (podvrsta commita: cigla · brana/mjerenje · deploy · ostalo) se računa i testira,
-  ali ne ulazi u `Report` — čeka pogled Dnevnik u M2.
+**Rezervirana polja profila** (deklarirana, jezgra ih ne čita):
+
+- **`include_unmerged`** — metrike su uvijek samo nad zadanom granom, a nespojene grane ulaze
+  isključivo u signale.
+- **`phase_tag`** — aktivne faze se na commite vežu tvrdo kodiranim prefiksom `"{id}/"`
+  (`metrics/phases.rs`), ne ovim regexom; projekt koji cigle označava drukčije (`M1-3`, `[M1.3]`)
+  dobiva `from`/`days`/`commits` kao `None`/`0`, bez poruke. Jedini potrošač polja,
+  `classify::phase_tag()`, se izvan testova ne zove.
+
+**Izračunato, ali ne izlazi u `Report`:**
+
+- **`classify_sub`** (podvrsta commita: cigla · brana/mjerenje · deploy · ostalo) se računa i
+  testira — čeka pogled Dnevnik u M2.
 - **`GitSource::worktrees`** je implementiran i testiran, ali izvještaj ga ne koristi: identitet
   projekta preko više radnih stabala je posao M2.
+- **vizije** prolaze kroz izvještaj nepromijenjene: nema zbroja po stanju (spec §2.3 ga je tražio) i
+  tablični ispis ih ne prikazuje uopće.
+
+**Rubovi koje kod danas ne pokriva:**
+
+- **Putanje iz profila nisu ograđene na korijen repoa.** `root.join(docs_dir)` prihvaća i `..` i
+  apsolutnu putanju (Rustov `join` apsolutnu **zamijeni**), pa `"docs_dir": "../.."` pročita `.md`
+  datoteke iznad repoa i zatim padne na gitu s porukom koja ne kaže što je krivo. Sadržaj tih
+  datoteka ne izlazi u `Report` (izlaze putanje u nalazima), pa je učinak ograničen — ali
+  „alat čita izvan repoa koji mjeri" nije svojstvo koje se objavljuje.
+- **Detached HEAD:** `git branch --show-current` je prazan i kad repo ima commite, pa takav radni
+  primjerak dobiva poruku `repozitorij nema commita` — kriva poruka u rubnom stanju koje CLI ne cilja.
+- **Tablični ispis (`cli/src/table.rs`) nije dovršen kao sučelje:** udjeli su goli razlomci
+  (`0.589`) dok VRSTE RADA imaju procente, stanje faze ide kroz `{:?}` pa u hrvatskoj tablici stoji
+  `Closed`/`Running`/`Planned` bez prijevoda (S-008: natpise daje sučelje), prazan naslov „FAZE"
+  ostaje bez ijednog retka, a ime faze dulje od 50 znakova prelije stupac. JSON je ugovor i on je
+  točan; tablica je pomoć za terminal.
+- **Cijena su procesi, ne parsiranje:** izvještaj nad Sokrat Studyjem traje ~3,2 s jer se zove
+  `git log -1` za **svaku** `.md` datoteku (56) i `rev-list --count` za **svaku** granu (31); jezgra
+  uz to klasificira svaki commit više puta. Nad Sokratisom je to 0,7 s. Mjerljivo, ne pogađano.
 - **SQLite snimke, watcher i popis projekata** su M2 (S-009); 0.1.0 sve računa na zahtjev i ne piše
   ništa osim onoga što korisnik sam stavi u `.sokratis/`.

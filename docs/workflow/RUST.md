@@ -24,17 +24,18 @@
 
 | crate | uloga | zašto baš on |
 |---|---|---|
-| `serde` + `serde_json` | JSON profil, ručni podaci, `Report` | de-facto standard; derive = bez ručnog koda |
+| `serde` + `serde_json` | JSON profil, ručni podaci, `Report` | de-facto standard; derive = bez ručnog koda. U `core` je `serde_json` **dev-ovisnost** — jezgra ga koristi samo u testovima, čitanje i pisanje JSON-a rade `io` i `cli` |
 | `regex` | parseri dnevnika, plana, klasifikator | regexi se prenose 1:1 iz Python skripte |
 | `thiserror` | tipizirane greške u `core`/`io` | kratke definicije enum-grešaka |
 | `anyhow` | greške u `cli` | binarnoj je dovoljno „što je pošlo krivo" |
 | `clap` (derive) | argumenti CLI-ja | `--json`, `--since` bez ručnog parsiranja |
 | `chrono` (samo `io`) | današnji lokalni datum za `ReportInput.today` | odlučeno u planu M1 (T17): lokalni datum na Windowsu bez feature-gatea; jezgra datume računa sama (`civil.rs`), bez ovisnosti |
-| `tempfile` (dev) | privremeni repo u io-testovima | čišćenje bez ručnog `rm` |
-| `insta` (dev) | snapshot testovi CLI izlaza | snimka JSON-a je čitljiva u PR-u |
+| `tempfile` (dev) | privremeni repo u io- i cli-testovima | čišćenje bez ručnog `rm` |
 
 Nova ovisnost = namjerna radnja: redak ovdje + obrazloženje u commitu (CLAUDE.md #6).
-`Cargo.lock` se commita.
+`Cargo.lock` se commita. **`insta` je izašao** u krugu popravaka M1: stajao je u dva manifesta bez
+ijednog poziva, a neiskorištena ovisnost je pravilo #6 naopako; snapshot JSON-a čeka M2, kad se oblik
+`Report`-a zaključa za Tauri (`workflow/TESTING.md` §1).
 
 ## 3 · Pravilo „zašto Rust ovako" (CLAUDE.md #5)
 
@@ -103,7 +104,7 @@ Test za pravilo: **Leon može pročitati datoteku i reći što radi.** Ako ne mo
 | `Vec<&Commit>` | M1 (T8, `metrics/hours.rs`) | vektor referenci umjesto vlasništva kad metrika samo čita commite koje već drži pozivatelj |
 | `BTreeMap` | M1 (T8, `metrics/hours.rs`) | mapa sortirana po ključu — korisna kad se ispisuje po danu uzlazno bez naknadnog sortiranja |
 | `entry().or_insert()` / `or_default()` | M1 (T8, `metrics/hours.rs`; kasnije `metrics/days.rs`) | dohvati-ili-umetni u jednom potezu, bez dvostrukog pretraživanja mape |
-| `Option::is_some_and` | M1 (T11b, `metrics/indicators.rs`) | provjerava predikat nad sadržajem `Option` bez ručnog `match`/`unwrap` |
+| `Option::is_some_and` | M1 (T11b, `metrics/indicators.rs`; kasnije popravak C1, `parse/plan.rs`) | provjerava predikat nad sadržajem `Option` bez ručnog `match`/`unwrap` — nad `Captures::get` to je „grupa postoji **i** nije prazna" u jednom izrazu |
 | `Option::filter` | M1 (T8, `metrics/hours.rs`) | zadrži `Some` samo ako sadržaj zadovoljava predikat, inače `None` |
 | `BTreeMap<&str, Acc>` s posuđenim ključem | M1 (T9, `metrics/days.rs`) | ključ mape je posudba iz izvornih podataka, ne kopija — akumulator ne smije nadživjeti izvor |
 | privatni `#[derive(Default)]` akumulator | M1 (T9, `metrics/days.rs`) | pomoćni struct vidljiv samo unutar modula, s automatskim nula-stanjem za zbrajanje po danu/vrsti |
@@ -122,5 +123,17 @@ Test za pravilo: **Leon može pročitati datoteku i reći što radi.** Ako ne mo
 | `match &str` kao tablica prijevoda | M1 (T19, `cli/table.rs`) | grananje po tekstualnoj vrijednosti (ne enumu) prevodi engleski identifikator u hrvatski natpis; `_ => id` je siguran pad na nepoznati slučaj |
 | `let _ = ` za namjerno ignoriran `Result` | M1 (T19, `cli/table.rs`) | eksplicitno „znam da ovo vraća `Result` i svjesno ga ne gledam" (`write!` u `String` ne može pasti) — clippy time zna da nije zabuna |
 | `serde_json::Value` indeksiranje | M1 (T21, `core/tests/parity.rs`) | čitanje tuđeg JSON-a (Python fixture) bez definiranja Rust-tipa za njega — `value["polje"]` posuđuje po ključu/indeksu |
+| `Captures::get(n) -> Option<Match>` | M1 (popravak C1, `parse/plan.rs`, `classify.rs`, `docs.rs`) | dohvat capture-grupe koji vraća `Option`; indeksiranje `c[n]` istu stvar radi **panikom** kad grupe nema, a regex dolazi iz tuđeg profila |
+| `Regex::captures_len()` | M1 (popravak C1, `profile.rs`) | broj capture-grupa regexa + grupa 0; time se regex iz profila provjerava **prije** uporabe, pa je krivo napisan uzorak greška s imenom polja |
+| enum-varijanta u obliku structa (`BadPattern { field, need, got }`) | M1 (popravak C1/C2/M2, `core/src/error.rs`, `io/src/error.rs`) | varijanta greške nosi **podatke**, ne samo tekst — poruka onda može imenovati krivca (koje polje, koji tekst), a pozivatelj po njoj granati |
+| `Display` varijante vs lanac `#[source]` (`{e}` vs `{e:#}`) | M1 (popravak I5, `io/src/error.rs`) | poruka varijante i lanac uzroka su dvije stvari; `{e:#}` (anyhow) ispiše cijeli lanac, pa ga poruka ne smije ponavljati — inače se ista serde-greška vidi dvaput |
+| `#[error(transparent)]` | M1 (popravak I5, `io/src/error.rs`) | varijanta bez vlastite rečenice prepušta cijeli `Display` uzroku (npr. `std::io::Error`) |
+| `Path::components().collect::<PathBuf>()` | M1 (popravak I5, `io/src/project.rs`) | ponovno sastavljanje putanje iz komponenata normalizira razdjelnike (`/` iz gita + `\` iz `join`) u jedan oblik |
+| `clap::Error::use_stderr()` + `try_parse()` | M1 (popravak I4, `cli/src/main.rs`) | `try_parse` vrati grešku umjesto da sam izađe; `use_stderr()` razlikuje pogrešnu uporabu (stderr → izlaz 3) od `--help`/`--version` (stdout → 0) |
+| `#[arg(long, conflicts_with = "…")]` | M1 (popravak M10, `cli/src/main.rs`) | isključivost dvije zastavice je **deklaracija** u atributu, ne `if` u kodu; `clap` je sam prijavi kao pogrešnu uporabu |
+| `min()` nad `String` (leksikografski `Ord`) | M1 (popravak I1, `io/src/project.rs`) | `YYYY-MM-DD` se kao tekst poredava isto kao kalendarski, pa je „najraniji datum" običan `min` bez parsiranja |
+| predznak nule u IEEE 754 (`-0.0`, `is_sign_positive`) | M1 (popravak M1, `metrics/indicators.rs`) | `f64::sum()` praznog iteratora je `-0.0`, a `assert_eq!(-0.0, 0.0)` je istina — mjera zato dobiva `+ 0.0`, a test gleda predznak |
+| `[dev-dependencies]` | M1 (popravak M7, `core/Cargo.toml`) | ovisnost koju traže samo testovi ne ulazi u isporučenu biblioteku; ne dijeli se ni između crateova (zato `cli` ima svoj `tests/common`) |
+| `mod common;` dijeljen između testnih binarija | M1 (popravak I7, `cli/tests/common/mod.rs`) | svaki `tests/*.rs` je **svoj** crate, pa se pomoćni modul u njega uključuje izvorno (`mod`), a ne linka kao biblioteka |
 
 Redak se dodaje **u cigli u kojoj se pojam prvi put pojavi**, s referencom na datoteku.

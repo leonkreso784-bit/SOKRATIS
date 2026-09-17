@@ -44,6 +44,36 @@ Jedino mjesto s brojkama dogfoodinga; dokument koji ih prepiše ostari.
 - **Sokratis nad samim sobom** (vlastiti `.sokratis/profile.json`): docs **100/100, 0 nalaza**,
   **0 signala**, izlazni kod 0 — sve grane tokova M1 su spojene u `main`.
 
+### Popravci nakon završne recenzije M1 (2026-09-17, jedan krug, 19 commita)
+
+Recenzija cijelog lanca (3 Critical · 9 Important · 15 Minor) → **22 stavke riješene**, ponovna
+recenzija SPOJIVO. Što korisnik CLI-ja time dobiva:
+
+- **Tipfeler u datumu je greška s imenom polja, ne tiha kriva brojka.** `--since 2026-9-17`,
+  `17.09.2026` ili `banana` prije su tiho promijenili prozor mjerenja (0 ili svi commiti); sada je to
+  `since: datum mora biti oblika YYYY-MM-DD` i **izlaz 3**. Isto vrijedi za `since` i
+  `closed_phases[].from/to` u profilu (poruka imenuje polje).
+- **Regex iz profila bez capture-grupe više ne obara binarnu.** Valjan JSON s valjanim regexom bez
+  grupe (npr. `plan_brick`) davao je paniku i izlaz 101; sada je greška koja kaže koje polje i koliko
+  grupa treba → izlaz 3.
+- **Pokazatelj „zatvorenih faza u razdoblju" sluša `--since`**, ne datum iz profila; prije je bio
+  jedan od 18 pokazatelja koji je kriv kad god se `--since` razlikuje od profila.
+- **Zaglavlje i podaci se odnose na isto razdoblje:** `--since` stariji od profila više se ne odrezuje
+  (prozor dovlačenja je `min(profil, --since)`), a log se dovlači s rezervom od jednog dana pa brojke
+  ne ovise o zoni stroja.
+- **Zatvorena faza bez ijednog pogođenog commita se ne broji** ni u pokazateljima ni u tablici — tuđi
+  projekt sa zadanim profilom više ne dobiva faze iz zraka.
+- **Pogrešna uporaba CLI-ja daje 3, ne 2** (2 je rezerviran za Alert); `--help`/`--version` daju 0.
+  `--json` i `--table` su **isključivi** — prije je `--json --table` tiho ispisao JSON.
+- **Poruka o pokvarenom profilu se ispisuje jednom** (bila je dvaput, ~1,6 kB s popisom svih polja),
+  s normaliziranom putanjom.
+- **Repozitorij bez commita dobiva rečenicu** (`repozitorij nema commita`), ne gitov savjet o `--`.
+- Sati u praznom rasponu su `0.0`, ne `-0.0`; tablica piše „izmjena datoteka" (ne „datoteka").
+- Iznutra: `serde_json` u jezgri je dev-ovisnost, `insta` je **uklonjen** (neiskorišten, pravilo #6),
+  formula kašnjenja docs-a živi na jednom mjestu, `docs.rs` je bez `expect()`, test pariteta sam
+  tvrdi da pokazatelja ima 18. **`cargo test --workspace` = 64 testa, 0 padova** (bilo 47).
+- Brojke nad Sokrat Studyjem (gore) su **nepromijenjene** — nijedan popravak nije pomaknuo mjeru.
+
 ### Dodano
 
 - 2026-09-17 — **Dokumentacija projekta** po modelu Sokrat Studyja: `CLAUDE.md`, `README.md`, `docs/`
@@ -94,4 +124,5 @@ Jedino mjesto s brojkama dogfoodinga; dokument koji ih prepiše ostari.
 - 2026-09-17 — **INTEGRACIJA (T22) u `main`-u** — Sokratis mjeri **sam sebe**: vlastiti
   `.sokratis/profile.json` (plan je `ROADMAP.md`, nema zatvorenih faza, oznaka cigle `M1/N`, testovi
   u `crates/*/tests/`). `cargo build --release` i sve tri naredbe pokrenute release binarkom nad
-  Sokrat Studyjem, isključivo čitanjem — brojke gore. `cargo test --workspace` = **47 testova, 0 padova**.
+  Sokrat Studyjem, isključivo čitanjem — brojke gore. `cargo test --workspace` tada **47 testova, 0
+  padova** (nakon kruga popravaka 64 — vidi gore).

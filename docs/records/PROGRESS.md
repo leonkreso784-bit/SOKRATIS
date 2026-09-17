@@ -165,6 +165,41 @@ Orkestrator: Fable 5.1; graditelj i recenzent: sonnet.
   referenca, ne izvor istine"; `docs/README.md` dobio sekcije `architecture/` i `archive/`;
   `CHANGELOG.md` dobio **0.1.0**; `ROADMAP.md`, `CLAUDE.md` i pojmovnik `RUST.md` §4 usklađeni.
 
+### Isporučeno (sedmi dio sesije, večer — završna recenzija M1 i jedini krug popravaka)
+Orkestrator: Fable 5.1; završna recenzija, popravljač i čuvar: opus; ponovna recenzija: sonnet.
+- **Završna recenzija cijelog M1** (lanca, ne cigle; raspon `8816d1a..7f1697a`): **3 Critical, 9
+  Important, 15 Minor**, ocjena „uz popravke", brane zelene. Tri Critical nalaza su bila „kriva
+  brojka ili pad", ne stil: regex iz profila **bez capture-grupe** obarao je proces s kodom 101
+  (valjan JSON, valjan regex — jedino mjesto gdje korisnikova ispravna konfiguracija ruši binarnu);
+  **`--since` se nije provjeravao**, pa je tipfeler (`2026-9-17`, `17.09.2026`) tiho mijenjao prozor
+  mjerenja; **pokazatelj zatvorenih faza** gledao je `profile.since` umjesto `--since`, pa je jedan
+  od 18 pokazatelja bio kriv kad god se ta dva razlikuju. Recenzent je uz to presudio osam odgođenih
+  sitnica i preispitao odluke orkestratora (S-011 potvrđen, ali kao nepotpun — vidi dopunu S-011).
+- **Jedini krug popravaka** (19 commita, spojeni u `main`): **22 stavke riješene** — C1 C2 C3, I1 I2
+  I4 I5 I7 I8, M1 M2 M4 M5 M6 M7 M8 M9 M10 M12 i pet odgođenih sitnica. Testova **47 → 64**; brojke
+  nad Sokrat Studyjem **nepromijenjene** (190 commita / 70 164 redaka / 1801 izmjena), paritet zelen.
+  Što korisnik CLI-ja time dobiva: `CHANGELOG.md` (0.1.0, „Popravci nakon završne recenzije M1").
+- **Ponovna recenzija kruga: SPOJIVO** — svih 22 stavki potvrđeno s dokazom `datoteka:redak` i
+  testom, bez novih kvarova; prihvaćena su tri graditeljeva odstupanja (popravak C1 primijenjen i na
+  `classify.rs` i na `diary_heading`; regexi `docs.rs` premješteni u `Patterns` umjesto `LazyLock`;
+  testna brojka za C3 se kroz I8 promijenila iz 3 u 2).
+- **Što je svjesno otišlo u M2, ne skriveno** (svaka stavka u `BACKLOG.md`, stanje koda u
+  `ARCHITECTURE.md` §11): mrtvo polje `phase_tag` s tvrdim prefiksom `"{id}/"` za aktivne faze;
+  vizije bez zbroja po stanju; putanje iz profila neograđene na korijen repoa (prije objave);
+  jedinice i natpisi tablice; performanse (≈90 `git` poziva po izvještaju, 3,2 s nad Sokrat
+  Studyjem); poruka u detached-HEAD stanju; snapshot JSON-a kad se oblik `Report`-a zaključa za
+  Tauri. `rust-toolchain.toml` je ostavljen **Leonu** jer pin tjera `rustup` da skine još jednu
+  kopiju toolchaina na njegov stroj.
+- **Leon usred sesije (20:18):** logo Sokratisa postoji (`C:\Users\leonk\Downloads\sokratis logo .png`)
+  i u sučelju želi **logo umjesto teksta „Sokratis"** te **splash s animacijom logotipa** pri
+  učitavanju. To je zahtjev za M2; zapisan je u `plan/ROADMAP.md` (red M2), nigdje drugdje.
+- **Dokumentacijsko zatvaranje** (ovaj commit): `ARCHITECTURE.md` usklađen s kodom nakon popravaka
+  (provjera ulaza, prozor dovlačenja s rezervom, izlazni kodovi, §11 dopunjen), `CHANGELOG.md` dobio
+  popravke i broj testova, `DECISIONS.md` dopunu S-011, `TESTING.md`/`RUST.md` bez `insta` i
+  snapshot-testova, `BACKLOG.md` nalaze za M2, `ROADMAP.md` i `CLAUDE.md` stanje.
+
 ### Što slijedi
-**Završna recenzija cijelog M1** (ne cigle, nego lanca) s jednim krugom popravaka → **zastanak i
-Leonov OK**. Grane tokova i radna stabla brišu se tek uz njegov OK. Nakon toga: spec za M2 (desktop).
+**Zastanak — Leonov OK.** Na njega čekaju: brisanje 8 grana tokova i njihovih radnih stabala, push i
+objava (remote još ne postoji), odluka o `rust-toolchain.toml`. Napomena: `.claude/agents/*.md` su
+globalno git-ignorirani, pa definicije agenata **nisu** u repou — i to je Leonova odluka. Nakon OK-a:
+spec za M2 (desktop).

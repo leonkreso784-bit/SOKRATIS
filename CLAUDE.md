@@ -60,25 +60,30 @@ sati zbog cherry-pickova — se u Sokratisu **ispravlja, ne prenosi** (S-007).
 ## Komande
 `cargo build` · `cargo test` · `cargo clippy --all-targets -- -D warnings` · `cargo fmt` ·
 `cargo run -p sokratis-cli -- report <putanja> [--since YYYY-MM-DD] [--json|--table]` ·
-`… docs <putanja>` · `… signals <putanja>` (izlazni kod 0 nema · 1 Warn · 2 Alert · 3 greška) —
-sve rade nad pravim repozitorijem (potvrđeno nad Sokrat Studyjem).
+`… docs <putanja>` · `… signals <putanja>` (izlazni kod 0 nema · 1 Warn · 2 Alert · 3 greška **ili
+pogrešna uporaba**; `--help`/`--version` = 0) — sve rade nad pravim repozitorijem (potvrđeno nad
+Sokrat Studyjem).
 Testovi i brane: `docs/workflow/TESTING.md`.
 
-## Stanje — TRENUTNO (2026-09-17, večer — kod M1 isporučen, M1 još nije zatvoren)
-- **M0 gotov. Kod M1 isporučen: T1–T22 u `main`-u, verzija 0.1.0.** Cijeli lanac radi nad pravim
-  repozitorijem: `sokratis report/docs/signals` čitaju git kroz `io`, jezgra računa dane, sate, vrste
-  rada, faze, 18 pokazatelja, docs-ocjenu i signale, CLI ih ispisuje kao JSON ili tablicu s hrvatskim
-  natpisima. Test pariteta s `RAD.xlsx` (`crates/sokratis-core/tests/parity.rs`) zelen. Sokratis mjeri
-  i sam sebe (`.sokratis/profile.json`). Brojke i dogfooding: `CHANGELOG.md` (0.1.0); tijek sesije:
-  `PROGRESS.md`; što je izgrađeno: `docs/architecture/ARCHITECTURE.md`.
-- **Preostaje do zatvaranja M1:** **završna recenzija cijelog M1** (lanca, ne cigle) s jednim krugom
-  popravaka → **zastanak, Leonov OK**. Grane tokova i radna stabla se brišu tek uz njegov OK.
+## Stanje — TRENUTNO (2026-09-17, večer — kod M1 isporučen i recenziran, zastanak pred Leonom)
+- **M0 gotov. Kod M1 isporučen, recenziran i popravljen: T1–T22 + krug popravaka u `main`-u, verzija
+  0.1.0.** Cijeli lanac radi nad pravim repozitorijem: `sokratis report/docs/signals` čitaju git kroz
+  `io`, jezgra računa dane, sate, vrste rada, faze, 18 pokazatelja, docs-ocjenu i signale, CLI ih
+  ispisuje kao JSON ili tablicu s hrvatskim natpisima. Test pariteta s `RAD.xlsx`
+  (`crates/sokratis-core/tests/parity.rs`) zelen. Sokratis mjeri i sam sebe (`.sokratis/profile.json`).
+  Brojke, popravci i broj testova: `CHANGELOG.md` (0.1.0); tijek sesije: `PROGRESS.md`; što je
+  izgrađeno i **što još ne radi**: `docs/architecture/ARCHITECTURE.md` (§11); što čeka M2:
+  `docs/records/BACKLOG.md`.
+- **Milestone se zatvara tek Leonovim OK-om.** Na njega čekaju: brisanje 8 grana tokova i njihovih
+  radnih stabala, push i objava (remote još ne postoji), odluka o `rust-toolchain.toml`.
+  Sljedeće nakon OK-a: **spec za M2 (desktop)**; Leonov zahtjev za znak/splash stoji u
+  `docs/plan/ROADMAP.md` (red M2).
 - **Prva radnja nove sesije:** `git log --oneline -15` · `git worktree list` · ledger
   `.superpowers/sdd/2026-09-17-m1-jezgra-i-cli/progress.md`, odjeljak „STANJE ZA NOVU SESIJU"
   (operativna uputa, ne izvor činjenica o projektu — te su u `CHANGELOG.md`/`PROGRESS.md`).
 - **Agenti definirani:** `.claude/agents/{graditelj,recenzent,cuvar-dokumentacije}.md`; protokol nadzora
-  `docs/workflow/AGENTI.md` (orkestrator = ova sesija, jedini spaja u `main`).
-- Sljedeće: završna recenzija M1 → krug popravaka → zastanak i Leonov OK → spec za **M2 (desktop)**.
+  `docs/workflow/AGENTI.md` (orkestrator = ova sesija, jedini spaja u `main`). Te su datoteke
+  **globalno git-ignorirane**, pa definicije agenata nisu u repou — Leonova odluka.
 - Što je isporučeno i kada zna `CHANGELOG.md`; tijek sesija `PROGRESS.md`. Ovaj odjeljak to ne ponavlja.
 
 ## Ključne odluke — samo žive

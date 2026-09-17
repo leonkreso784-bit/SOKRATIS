@@ -12,10 +12,27 @@
 | GitHub adapter: CI status po grani, PR-ovi | M3 (opcionalno) | mreža; `gh` nije na stroju |
 | Vercel adapter: deployi umjesto `🚀` u dnevniku | M3 (opcionalno) | mreža |
 | HR/EN natpisi u CLI tablici i sučelju | M2/M3 | jezgra je već engleska (S-008) |
-| Znak Sokratisa | M2/M3 | nov; Sokratov logo se ne dira |
 | README na engleskom · LICENCA (MIT kao Sokrat Study — potvrditi) · GitHub Actions | M3 | prije objave |
-| Sokratis mjeri vlastiti repo (dogfooding): `.sokratis/profile.json` ovdje | M1 kraj | kad postoji CLI |
 | Instalater (Tauri bundler, MSI/NSIS) | M3 | |
+
+## Iz završne recenzije M1 (nalazi koji nisu popravljeni u M1)
+
+Izvor je izvještaj završne recenzije (`.superpowers/sdd/2026-09-17-m1-jezgra-i-cli/final-review-report.md`
+— radni zapis izvan gita), zato je uz svaku stavku broj nalaza. **Stanje koda** (što danas ne radi)
+opisuje [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §11; ovdje stoji **plan**.
+
+| stavka | za | bilješka |
+|---|---|---|
+| Aktivne faze vezati na `Patterns.phase_tag` umjesto tvrdog prefiksa `"{id}/"` — time polje i `classify::phase_tag()` prestaju biti mrtvi | M2 | I3 + M14; projekt koji cigle označava `M1-3` ili `[M1.3]` danas dobiva praznu fazu bez poruke |
+| Vizije: zbroj po stanju + odjeljak u ispisu (spec M1 §2.3 ga je tražio, plan mu nije dao ciglu) | M2 (pogled Vizije) | I6 |
+| Ograditi putanje iz profila na korijen repoa (`docs_dir: "../.."` danas čita iznad repoa) | **M2, prije objave** | I9; jedna funkcija `inside_root(rel)` + poruka koje je polje krivo |
+| Jedinice i natpisi tablice: udjeli u %, prijevod `Closed/Running/Planned`, „nema faza" umjesto praznog naslova, širina stupca | M2 (sučelje) | M3; JSON je ugovor i on je točan, tablica je pomoć za terminal |
+| Performanse: jedan `git log --name-only` za sve docs umjesto `log -1` po datoteci, `for-each-ref` s ahead-behind umjesto `rev-list` po grani, klasifikacija commita jednom po izvještaju | M2 (watcher ih plaća u petlji) | M11; 3,2 s nad Sokrat Studyjem, 0,7 s nad Sokratisom |
+| `include_unmerged`: metrike i nad nespojenim granama (danas polje postoji, jezgra ga ne čita) | M2 | odgođena 7 |
+| Detached HEAD dobiva poruku „repozitorij nema commita" jer je `git branch --show-current` prazan | M2 | parkirano uz krug popravaka; nije regresija, rubno stanje koje CLI ne cilja |
+| Snapshot JSON-a (`Report`) kad se oblik zaključa za Tauri; `insta` se tada vraća jednim retkom | M2 | I7; do tada bi snimka zamrznula oblik koji se još mijenja |
+| Testni redak mjeriti tako da fixture ne prevlada (izuzeti `fixtures/` ili mjeriti drukčije) | M2 | odgođena 8; danas je većina Sokratisovih „testnih redaka" fixture (767 kB snimka `PROGRESS.md`) |
+| `rust-toolchain.toml` (pin kompajlera, ne samo crateova) | **Leonova odluka** | M15; pin na konkretnu verziju tjera `rustup` da skine još jednu kopiju toolchaina na Leonov stroj — promjena njegova sustava, korisno prije M3 |
 
 ## Za Leona (tuđi repo, ne naš posao)
 

@@ -96,3 +96,16 @@ Python skriptom s dodanim `' 00:00'`, ne ručno prepravljen.
 **ispravlja, ne prenosi**. Alternativa (replicirati Pythonov approxidate-kvar radi doslovnog pariteta)
 odbijena: paritet je test korisnosti, ne test bugova. Backlog: javiti Leonu da `sokratstudy.dev`
 (tuđi repo, Leon odlučuje) doda ` 00:00` u `rad-xlsx.py` — `records/BACKLOG.md`.
+
+**Dopuna (2026-09-17, nakon završne recenzije M1) — dvije stvari koje je spec prešutio:**
+
+1. **Zatvorene faze filtriraju po `commit_date`,** ne po datumu autora. Dosljedno je i gitu
+   (`--since`/`--until` gledaju committer-vrijeme) i Python-referenci, a cherry-pick obrazac koji bi
+   to pomaknuo čuva test `closed_phases_filters_by_commit_date_not_author_date`
+   (`core/src/metrics/phases.rs`). Sate i dalje računa `author_time` (S-007) — to su dvije različite
+   mjere s dva različita razloga.
+2. **Log se dovlači s rezervom od jednog dana** (`--since=<datum − 1> 00:00:00`). Sat je fiksiran na
+   ponoć, ali ponoć je u zoni **stroja**, a datumi u logu su u zoni **commita**; bez rezerve bi stroj
+   zapadnije od pohranjenog pomaka odbacio commite koje jezgrin filtar zadržava (prvi dan zatvorene
+   faze prvi strada). Mjerodavan ostaje jezgrin `commit_date >= since`, pa rezerva ne mijenja ni
+   jednu brojku — čini izvještaj neovisnim o stroju, što je uvjet za CI (M3).

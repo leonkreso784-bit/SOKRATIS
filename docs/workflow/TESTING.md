@@ -9,9 +9,13 @@
 |---|---|---|---|
 | **jedinični (core)** | `crates/sokratis-core/src/**` uz kod (`#[cfg(test)]`) i `tests/` | parser vraća točno ove strukture; metrika daje točno ovu brojku; pravilo daje točno ovaj signal s dokazom | **tekst fixture** — nikad živi git |
 | **integracijski (io)** | `crates/sokratis-io/tests/` | git-proces, radna stabla, profil, ručni podaci | **privremeni repo** stvoren u testu |
-| **snapshot (cli)** | `crates/sokratis-cli/tests/` | JSON izlaz i izlazni kod za poznat repo | privremeni repo |
+| **izlazni kodovi (cli)** | `crates/sokratis-cli/tests/cli.rs` | ugovor prema preflightu: **0** (nema signala) i **2** (Alert) nad repoom s poznatom poviješću, **3** za pogrešnu uporabu i za putanju koja nije repozitorij, **0** za `--help`/`--version` | **privremeni repo** (`tests/common/mod.rs`) |
 
 **Test-prvo** (CLAUDE.md #7): fixture → očekivano → implementacija. Rub koji prepoznaš odmah dobiva test.
+
+**Snapshot-testova nema** i `insta` nije ovisnost: snimka oblika `Report`-a ima smisla kad se JSON
+zaključa kao ugovor prema Tauriju (M2) — do tada bi zamrznula oblik koji se još mijenja.
+Parkirano u [`../records/BACKLOG.md`](../records/BACKLOG.md).
 
 ## 2 · Fixture-politika
 
@@ -36,8 +40,12 @@ razlika sati (ispravak S-007).
    commita, a metrike filtriraju `commit_date >= 2026-08-29`):
 
    ```
-   git log main --since=2026-08-02 --reverse --date=format:%Y-%m-%d --format=@@%h|%at|%ct|%ad|%cd|%s --numstat > tests/fixtures/sokratstudy-2026-09-17.log
+   git log main --since="2026-08-02 00:00" --reverse --date=format:%Y-%m-%d --format=@@%h|%at|%ct|%ad|%cd|%s --numstat > tests/fixtures/sokratstudy-2026-09-17.log
    ```
+
+   ⚠️ ` 00:00` je obavezan (S-011): bez sata `git log --since` uzima trenutno doba dana, pa bi
+   ponovna snimka pomaknula lijevi rub i prvu zatvorenu fazu. Zašto je snimka takva kakva je i što se
+   promijenilo prema staroj: `crates/sokratis-core/tests/fixtures/sokratstudy-2026-09-17.README.md`.
 
    plus `git show main:docs/records/PROGRESS.md` i `git show main:docs/plan/RASPORED.md` s istog commita
    (SHA u `.sha` datoteci). Točan postupak: plan M1, cigla T2.
@@ -59,7 +67,9 @@ cargo test
 ```
 
 Crveno ne ide u commit. **Izlazni kod 1 nije dokaz da je pao test koji testiraš** — čita se poruka
-(pouka iz Sokrat Studyja). CI (GitHub Actions) dolazi s M3, kad postoji remote.
+(pouka iz Sokrat Studyja). CI (GitHub Actions) dolazi s M3, kad postoji remote. Koliko testova ima
+danas piše [`../records/CHANGELOG.md`](../records/CHANGELOG.md) (0.1.0) — brojka prepisana ovamo bi
+ostarila.
 
 ## 5 · Što se NE testira testom
 
