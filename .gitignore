@@ -1,0 +1,17 @@
+# Rust
+/target
+**/target
+
+# Node (apps/desktop, M2)
+**/node_modules
+**/dist
+
+# Tauri generirano
+/apps/desktop/src-tauri/gen/
+
+# lokalno
+.env
+.jank/
+*.log
+.DS_Store
+Thumbs.db
