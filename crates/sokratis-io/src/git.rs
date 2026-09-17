@@ -14,6 +14,11 @@ use sokratis_core::BranchInfo;
 use std::path::PathBuf;
 use std::process::Command;
 pub trait GitSource {
+    /// `since` je goli datum `YYYY-MM-DD`. Implementacija MORA dodati sat `00:00:00`: git-ov
+    /// parser datuma bez sata uzima TRENUTNO DOBA DANA (sat kad se naredba pokreće), ne ponoć —
+    /// izmjereno nad Sokrat Studyjem (`--since=2026-08-29` u 17:15 → 183 commita,
+    /// `--since='2026-08-29 00:00'` → 190). Bez fiksnog sata bi tablica ovisila o tome KADA se
+    /// izvještaj generira, ne samo o datumu.
     fn log(&self, branch: &str, since: &str) -> Result<String, IoError>;
     fn branches(&self, default_branch: &str) -> Result<Vec<BranchInfo>, IoError>;
     fn worktrees(&self) -> Result<Vec<PathBuf>, IoError>;
@@ -72,7 +77,8 @@ impl GitCli {
 }
 impl GitSource for GitCli {
     fn log(&self, branch: &str, since: &str) -> Result<String, IoError> {
-        let since_arg = format!("--since={since}");
+        // ` 00:00:00` fiksira sat na ponoć — vidi doc-komentar `GitSource::log` (trait) za razlog.
+        let since_arg = format!("--since={since} 00:00:00");
         self.run(&[
             "log",
             branch,
