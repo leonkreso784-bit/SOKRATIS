@@ -1,0 +1,4301 @@
+@@e1a8fde|1785698107|1785698107|2026-08-02|2026-08-02|docs: CREATE_BACKEND_SPEC v3 (osobni UGC-graditelj) + CLAUDE.md skraćen
+
+28	38	CLAUDE.md
+122	0	docs/CREATE_BACKEND_SPEC.md
+11	0	docs/PROGRESS.md
+1	0	docs/README.md
+@@63f898f|1785707415|1785707415|2026-08-02|2026-08-02|F1: nodes+node_content+audit+owner-RLS+7 RPC-ova (staging, gate 51/51)
+
+3	1	CLAUDE.md
+44	4	docs/CREATE_BACKEND_SPEC.md
+36	0	docs/DECISIONS.md
+13	0	docs/PROGRESS.md
+1	1	docs/README.md
+395	0	supabase/f1-nodes.sql
+@@f5a1bad|1785715155|1785715155|2026-08-03|2026-08-03|F2: „Moji materijali" — osobno stablo gradiva na profilu (CRUD + drag)
+
+1	1	CLAUDE.md
+5	5	contact.html
+358	0	css/my-materials.css
+35	3	docs/CREATE_BACKEND_SPEC.md
+13	0	docs/PROGRESS.md
+1	0	docs/TESTING.md
+5	5	faq.html
+52	50	index.html
+1	1	js/content-loader.js
+41	0	js/i18n.js
+768	0	js/my-materials.js
+10	0	js/profile.js
+3	3	manifest.json
+1	1	package.json
+5	5	privacy.html
+360	0	styles.bundle.css
+32	29	styles.css
+1	1	sw.js
+5	5	terms.html
+262	0	tests/my-materials.authed.spec.js
+194	0	tests/unit/my-materials.test.js
+@@fa1f5fa|1785715776|1785715776|2026-08-03|2026-08-03|docs(F2): zabiljezen test:responsive 261/0/15skip
+
+1	1	docs/CREATE_BACKEND_SPEC.md
+1	1	docs/PROGRESS.md
+@@03cabe2|1785717023|1785717023|2026-08-03|2026-08-03|docs(audit): pred-compact prolaz kroz sve .md (pravilo #6)
+
+1	1	docs/BACKLOG.md
+2	0	docs/CHANGELOG.md
+4	3	docs/CREATE_BACKEND_SPEC.md
+7	2	docs/EDITOR_PLAN.md
+4	0	docs/HISTORY.md
+2	0	docs/MONETIZATION.md
+1	1	docs/README.md
+@@50ae3ce|1785718480|1785718480|2026-08-03|2026-08-03|fix: sirovi i18n kljucevi (profil/auth, bilo zivo na produ) + iskrena poruka greske
+
+2	0	CLAUDE.md
+5	5	contact.html
+4	0	docs/CHANGELOG.md
+15	0	docs/PROGRESS.md
+5	5	faq.html
+51	51	index.html
+7	1	js/auth.js
+1	1	js/content-loader.js
+2	0	js/i18n.js
+16	2	js/my-materials.js
+7	1	js/profile.js
+3	3	manifest.json
+5	5	privacy.html
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+11	2	tests/unit/my-materials.test.js
+@@9912ef9|1785795483|1785795483|2026-08-04|2026-08-04|fix(sokrat-modal): oznacavanje teksta preko ruba kartice vise ne zatvara modal
+
+5	5	contact.html
+5	5	faq.html
+51	51	index.html
+16	2	js/components/sokrat-modal.js
+1	1	js/content-loader.js
+3	3	manifest.json
+5	5	privacy.html
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+36	0	tests/components.spec.js
+@@8c0207e|1785796844|1785796844|2026-08-04|2026-08-04|test(my-materials): gate vise ne ovisi o praznom racunu + 6 rubnih slucajeva
+
+180	25	tests/my-materials.authed.spec.js
+@@49167cd|1785797591|1785797591|2026-08-04|2026-08-04|F3 K1: studioBridge node-mod — citaj node_content, objavi kroz publish_node
+
+5	5	contact.html
+5	5	faq.html
+51	51	index.html
+79	0	js/admin.js
+1	1	js/content-loader.js
+3	3	manifest.json
+5	5	privacy.html
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+142	0	tests/node-editor.authed.spec.js
+@@03c7c78|1785798654|1785798654|2026-08-04|2026-08-04|F3 K2-K4: otvori study-cvor u Studiju + "Nova sekcija" za prazan cvor
+
+1	1	CLAUDE.md
+5	5	contact.html
+13	0	css/studio.css
+2	0	docs/CHANGELOG.md
+41	5	docs/CREATE_BACKEND_SPEC.md
+28	0	docs/PROGRESS.md
+5	5	faq.html
+51	51	index.html
+1	1	js/content-loader.js
+10	0	js/i18n.js
+28	1	js/my-materials.js
+126	15	js/studio.js
+3	3	manifest.json
+5	5	privacy.html
+13	0	styles.bundle.css
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+124	1	tests/node-editor.authed.spec.js
+@@27ae9f0|1785799316|1785799316|2026-08-04|2026-08-04|docs(F3): zabiljezen test:responsive 279/0/15skip
+
+1	1	docs/CREATE_BACKEND_SPEC.md
+1	1	docs/PROGRESS.md
+@@6c54e7e|1785800585|1785800585|2026-08-04|2026-08-04|docs(audit): pred-compact prolaz kroz sve .md (pravilo #6)
+
+18	0	docs/CREATE_BACKEND_SPEC.md
+2	0	docs/FOUNDATION_PLAN.md
+1	0	docs/HISTORY.md
+10	1	docs/PROGRESS.md
+1	1	docs/README.md
+2	1	docs/TESTING.md
+@@73e196b|1785813917|1785813917|2026-08-04|2026-08-04|F4-S: privatne slike osobnog gradiva — blokatori S1+S2 rijeseni
+
+2	1	CLAUDE.md
+5	5	contact.html
+1	0	docs/CHANGELOG.md
+62	8	docs/CREATE_BACKEND_SPEC.md
+37	0	docs/PROGRESS.md
+2	0	docs/TESTING.md
+5	5	faq.html
+53	51	index.html
+5	1	js/admin.js
+27	0	js/block-editor-media.js
+7	1	js/block-editor.js
+1	1	js/content-loader.js
+154	0	js/node-images.js
+14	1	js/studio.js
+3	3	manifest.json
+2	1	package.json
+5	5	privacy.html
+183	0	scripts/storage-check.js
+30	30	styles.css
+106	0	supabase/f4-node-images.sql
+1	1	sw.js
+5	5	terms.html
+180	0	tests/node-images.authed.spec.js
+178	0	tests/unit/node-images.test.js
+@@34e6374|1785814677|1785814677|2026-08-04|2026-08-04|F4 dovrsen: "obrisi sekciju" u Studiju + puni E2E osobnog gradiva
+
+1	1	CLAUDE.md
+5	5	contact.html
+10	0	css/studio.css
+1	0	docs/CHANGELOG.md
+39	9	docs/CREATE_BACKEND_SPEC.md
+1	0	docs/HISTORY.md
+11	2	docs/PROGRESS.md
+1	1	docs/README.md
+1	0	docs/TESTING.md
+5	5	faq.html
+52	52	index.html
+1	1	js/content-loader.js
+8	0	js/i18n.js
+40	1	js/studio.js
+3	3	manifest.json
+5	5	privacy.html
+10	0	styles.bundle.css
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+155	0	tests/f4-e2e.authed.spec.js
+@@d090a9d|1785815082|1785815082|2026-08-04|2026-08-04|docs: test:responsive 285/0/15skip (finalni broj nakon f4-e2e specka)
+
+1	1	CLAUDE.md
+1	1	docs/HISTORY.md
+@@004cf21|1785815826|1785815826|2026-08-04|2026-08-04|docs(audit): pred-compact prolaz kroz sve .md + F5 RUNBOOK (pravilo #6)
+
+10	1	CLAUDE.md
+22	1	docs/BACKEND.md
+47	2	docs/CREATE_BACKEND_SPEC.md
+6	1	docs/CRUD_PLAN.md
+1	1	docs/EDITOR_PLAN.md
+2	2	docs/README.md
+13	0	docs/ROADMAP.md
+@@6d49b86|1785815932|1785815932|2026-08-04|2026-08-04|docs(F5): siroce u Storageu potvrdjeno u praksi (spec 14.4)
+
+15	0	docs/CREATE_BACKEND_SPEC.md
+@@a9bf52b|1786050213|1786050213|2026-08-06|2026-08-06|Merge F5: osobni UGC-graditelj na produkciju (F1-F4)
+@@ef4b651|1786052084|1786052084|2026-08-06|2026-08-06|docs(F5): osobni UGC-graditelj na produkciji — spec 15 + PROGRESS/CHANGELOG/HISTORY/CLAUDE
+
+8	6	CLAUDE.md
+1	0	docs/CHANGELOG.md
+49	3	docs/CREATE_BACKEND_SPEC.md
+1	0	docs/HISTORY.md
+24	0	docs/PROGRESS.md
+1	1	docs/README.md
+@@39e5d09|1786053086|1786053086|2026-08-06|2026-08-06|fix(studio): KaTeX formule se tipografiraju u Studio-canvasu (bile sirovi LaTeX)
+
+5	5	contact.html
+5	5	faq.html
+52	52	index.html
+1	1	js/content-loader.js
+9	0	js/studio.js
+3	3	manifest.json
+5	5	privacy.html
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+117	0	tests/studio-math.authed.spec.js
+@@187c646|1786059874|1786059874|2026-08-07|2026-08-07|feat(editor): INLINE matematika u recenici (run math:true) + shema 8 boja
+
+1	0	CLAUDE.md
+5	5	contact.html
+3	0	css/block-editor.css
+15	0	css/learn-blocks.css
+9	0	docs/BUGS.md
+2	0	docs/CHANGELOG.md
+19	0	docs/PROGRESS.md
+1	0	docs/TESTING.md
+5	5	faq.html
+52	52	index.html
+65	4	js/block-editor.js
+6	0	js/blocks-renderer.js
+1	1	js/content-loader.js
+3	3	manifest.json
+5	5	privacy.html
+3	2	schema/subject-content.schema.json
+18	0	styles.bundle.css
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+78	0	tests/studio-math.authed.spec.js
+47	0	tests/unit/block-editor.test.js
+27	0	tests/unit/blocks-renderer.test.js
+@@ad8dabc|1786062128|1786062128|2026-08-07|2026-08-07|docs(R): reorganizacija dokumentacije po ULOZI + gate check:docs
+
+1	1	.github/workflows/ci.yml
+29	21	CLAUDE.md
+4	4	README.md
+5	5	contact.html
+1	1	data/_template/lesson.template.js
+1	1	data/academic-writing/exercises.js
+2	2	data/accounting/exercises.js
+1	1	data/accounting/midterm-1.js
+1	1	data/accounting/midterm-2.js
+1	1	data/business-informatics-hr/midterm-1.js
+1	1	data/business-informatics-hr/midterm-2.js
+1	1	data/business-informatics/midterm-1.js
+1	1	data/business-informatics/midterm-2.js
+3	3	data/catalog.js
+1	1	data/ebusiness/midterm-1.js
+1	1	data/ebusiness/midterm-2.js
+1	1	data/macroeconomics/exercises.js
+1	1	data/macroeconomics/midterm-1.js
+1	1	data/macroeconomics/midterm-2.js
+1	1	data/math/exercises.js
+1	1	data/math/midterm-1.js
+1	1	data/microeconomics/midterm-1.js
+1	1	data/microeconomics/midterm-2.js
+1	1	data/statistics/exercises.js
+1	1	data/statistics/midterm-1.js
+1	1	data/statistics/stat-lib.js
+1	1	data/te2/midterm-1.js
+1	1	data/te2/midterm-2.js
+1	1	data/traffic-hr/midterm-1.js
+1	1	data/traffic-hr/midterm-2.js
+0	58	docs/PRD.md
+104	70	docs/README.md
+3	3	docs/{ => architecture}/ARCHITECTURE.md
+2	2	docs/{ => architecture}/BACKEND.md
+0	0	docs/{ => architecture}/CATALOG_ARCHITECTURE.md
+1	1	docs/{content => architecture}/CONTENT_SCHEMA.md
+2	2	docs/{content => architecture}/EXERCISES_ENGINE.md
+4	0	docs/{ => archive}/CREATE_BACKEND_SPEC.md
+5	1	docs/{ => archive}/CRUD_PLAN.md
+4	0	docs/{ => archive}/EDITOR_F7_SPEC.md
+4	0	docs/{ => archive}/EDITOR_FEEDBACK.md
+12	8	docs/{ => archive}/EDITOR_PLAN.md
+6	2	docs/{ => archive}/EDITOR_UX.md
+2	2	docs/archive/EXERCISES_DB_FIX_PLAN.md
+12	8	docs/{ => archive}/FOUNDATION_PLAN.md
+8	4	docs/{ => archive}/HRV_PLAN.md
+1	1	docs/archive/SONNET_REVIEW_2026-06.md
+20	20	docs/{ => plan}/ROADMAP.md
+3	3	docs/{ => product}/MONETIZATION.md
+68	0	docs/product/PRD.md
+19	10	docs/{ => product}/VISION.md
+6	6	docs/{ => records}/BACKLOG.md
+2	2	docs/{ => records}/BUGS.md
+17	17	docs/{ => records}/CHANGELOG.md
+16	16	docs/{ => records}/DECISIONS.md
+2	2	docs/{ => records}/HISTORY.md
+36	36	docs/{ => records}/PROGRESS.md
+3	3	docs/sokrat-ai/DATA.md
+1	1	docs/sokrat-ai/DEAN_PITCH.md
+1	1	docs/sokrat-ai/LEGAL_GDPR.md
+6	6	docs/sokrat-ai/README.md
+1	1	docs/sokrat-ai/RESEARCH.md
+2	2	docs/sokrat-ai/VISION.md
+1	1	docs/subjects/ACCOUNTING_PLAN.md
+2	2	docs/subjects/MATH_PLAN.md
+11	11	docs/subjects/README.md
+2	2	docs/subjects/STATISTICS_PLAN.md
+1	1	docs/{content => workflow}/CONTENT_GENERATOR.md
+3	3	docs/{content => workflow}/CONTENT_GUIDE.md
+3	3	docs/{content => workflow}/CONTENT_INTAKE.md
+5	5	docs/{ => workflow}/TEAM.md
+1	1	docs/{ => workflow}/TESTING.md
+5	5	faq.html
+52	52	index.html
+1	1	js/content-loader.js
+1	1	js/exercises-core.js
+1	1	js/i18n.js
+1	1	js/math.js
+1	1	js/my-materials.js
+1	1	js/navigation.js
+3	3	manifest.json
+2	1	package.json
+1	1	playwright.config.js
+5	5	privacy.html
+1	1	schema/subject-content.schema.json
+107	0	scripts/check-docs.js
+1	1	scripts/scaffold-subject.js
+2	2	scripts/translate-subject.js
+1	1	scripts/validate-content.js
+2	2	scripts/verify-catalog.js
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+1	1	tests/unit/exercises-core.test.js
+@@c38a39b|1786065102|1786065132|2026-08-07|2026-08-07|docs(A1): ARCHITECTURE prepisan po IZMJERENOM stanju + cirilica-gate
+
+197	128	docs/architecture/ARCHITECTURE.md
+1	1	docs/archive/CRUD_PLAN.md
+1	1	docs/archive/EDITOR_PLAN.md
+1	1	docs/records/BUGS.md
+1	1	docs/records/CHANGELOG.md
+1	1	docs/records/DECISIONS.md
+1	1	docs/records/PROGRESS.md
+17	0	scripts/check-docs.js
+@@1af28df|1786065538|1786065538|2026-08-07|2026-08-07|docs(A1+): ADR-025 — osam Leonovih presuda o dosegu osobnog gradiva
+
+32	0	docs/records/DECISIONS.md
+@@a017025|1786067222|1786067222|2026-08-07|2026-08-07|docs(A2+ADR-026): shema runs na istinu + gate protiv drifta; odluke o nazivu i mobilnom autorstvu
+
+18	1	docs/architecture/CONTENT_SCHEMA.md
+52	0	docs/records/DECISIONS.md
+37	0	scripts/check-docs.js
+@@5eb172b|1786069224|1786069224|2026-08-07|2026-08-07|feat(i18n): rjecnik osobnog prostora — "materijal" i "polica" (HR), EN ostaje folder
+
+5	5	contact.html
+22	0	docs/records/DECISIONS.md
+5	5	faq.html
+52	52	index.html
+1	1	js/content-loader.js
+15	15	js/i18n.js
+2	2	js/studio.js
+3	3	manifest.json
+5	5	privacy.html
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+@@055a5c2|1786069315|1786069315|2026-08-07|2026-08-07|docs(A3): definicija osobnog materijala s kriterijima prihvacanja
+
+1	0	docs/README.md
+92	0	docs/product/UGC_SPEC.md
+@@74d460a|1786070228|1786070228|2026-08-07|2026-08-07|feat(M1): svi modovi dostupni u praznom materijalu — prva kartica se moze napraviti
+
+5	5	contact.html
+3	1	docs/README.md
+108	0	docs/plan/MATERIJAL_FAZA.md
+5	5	faq.html
+52	52	index.html
+1	1	js/content-loader.js
+19	2	js/studio.js
+3	3	manifest.json
+5	5	privacy.html
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+142	0	tests/material-authoring.authed.spec.js
+@@42d0fa1|1786072653|1786072653|2026-08-07|2026-08-07|feat(M2+M4): ucenje iz vlastitog materijala + sucelje prestaje obecavati
+
+5	5	contact.html
+17	3	docs/plan/MATERIJAL_FAZA.md
+5	5	faq.html
+52	52	index.html
+5	1	js/cloud-sync.js
+1	1	js/content-loader.js
+8	0	js/i18n.js
+91	1	js/my-materials.js
+15	1	js/navigation.js
+8	3	js/studio.js
+3	3	manifest.json
+5	5	privacy.html
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+119	0	tests/material-authoring.authed.spec.js
+@@5298781|1786073301|1786073301|2026-08-07|2026-08-07|feat(M3a): boja BLOKA kao akcent — shema, prikazivac, CSS, editor
+
+5	5	contact.html
+25	0	css/block-editor.css
+25	0	css/learn-blocks.css
+20	3	docs/plan/MATERIJAL_FAZA.md
+5	5	faq.html
+52	52	index.html
+38	0	js/block-editor.js
+24	1	js/blocks-renderer.js
+1	1	js/content-loader.js
+3	3	manifest.json
+5	5	privacy.html
+19	0	schema/subject-content.schema.json
+50	0	styles.bundle.css
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+52	0	tests/material-authoring.authed.spec.js
+53	0	tests/unit/blocks-renderer.test.js
+@@2f25b40|1786073526|1786073526|2026-08-07|2026-08-07|docs(pred-compact): CLAUDE.md vise ne tvrdi krivi sljedeci rad + ADR-025/026 u popisu
+
+10	4	CLAUDE.md
+1	1	docs/README.md
+@@68ccbfb|1786118401|1786118401|2026-08-07|2026-08-07|docs(M5): izmjerena duljina kartica prije odluke o ogranicenju
+
+29	0	docs/plan/MATERIJAL_FAZA.md
+@@4bf7029|1786118588|1786118588|2026-08-07|2026-08-07|docs(M5): odluka — tvrdi strop 500 znakova, ali u DVA koraka
+
+20	5	docs/plan/MATERIJAL_FAZA.md
+@@d1983fe|1786119215|1786119215|2026-08-07|2026-08-07|docs: nadoknadjen PROGRESS + CHANGELOG + BUG-022 za cijelu fazu (pravilo #3)
+
+9	0	docs/records/BUGS.md
+9	0	docs/records/CHANGELOG.md
+39	0	docs/records/PROGRESS.md
+@@12fd36e|1786124677|1786124677|2026-08-07|2026-08-07|docs(A4): dokumentacija prestala lagati — 4 neistine ispravljene
+
+4	3	CLAUDE.md
+1	1	docs/README.md
+11	8	docs/plan/ROADMAP.md
+41	21	docs/product/PRD.md
+1	0	docs/records/CHANGELOG.md
+31	0	docs/records/PROGRESS.md
+1	1	docs/workflow/TEAM.md
+@@6d0c438|1786145111|1786145111|2026-08-08|2026-08-08|feat(M3b): boja kartice, pitanja i dopune — kriterij 4 zatvoren
+
+2	2	CLAUDE.md
+5	5	contact.html
+7	1	css/fill-blanks-section.css
+10	1	css/flashcards-section.css
+7	0	css/learn.css
+7	1	css/quiz-section.css
+11	0	css/studio.css
+29	6	docs/plan/MATERIJAL_FAZA.md
+1	0	docs/records/CHANGELOG.md
+28	0	docs/records/PROGRESS.md
+5	5	faq.html
+52	52	index.html
+33	0	js/blocks-renderer.js
+1	1	js/content-loader.js
+8	2	js/fill-blanks.js
+18	1	js/flashcards.js
+5	0	js/i18n.js
+9	0	js/learn.js
+9	2	js/quiz.js
+55	5	js/studio.js
+3	3	manifest.json
+5	5	privacy.html
+6	3	schema/subject-content.schema.json
+42	3	styles.bundle.css
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+158	0	tests/material-authoring.authed.spec.js
+73	0	tests/unit/blocks-renderer.test.js
+@@ee91ef7|1786148465|1786148465|2026-08-08|2026-08-08|docs(backlog): Leonovo ocekivanje — akcent = CIJELA kartica, ne samo rub
+
+17	0	docs/records/BACKLOG.md
+@@77b3fe4|1786148830|1786148830|2026-08-08|2026-08-08|docs: faza isporucena — plan u arhivu, M5 u backlog, stanje na ee91ef7
+
+8	7	CLAUDE.md
+6	4	docs/README.md
+12	4	docs/{plan => archive}/MATERIJAL_FAZA.md
+7	3	docs/plan/ROADMAP.md
+24	0	docs/records/BACKLOG.md
+2	1	docs/records/CHANGELOG.md
+@@7f8bc49|1786150329|1786150329|2026-08-08|2026-08-08|docs(pred-compact): revizija po pravilu #6 — 11 zastarjelih tvrdnji
+
+1	1	docs/product/PRD.md
+15	8	docs/records/CHANGELOG.md
+5	0	docs/workflow/CONTENT_INTAKE.md
+@@9080240|1786153421|1786153421|2026-08-08|2026-08-08|fix(BUG-023): povratak u vlastiti materijal vise ne otvara puknutu stranicu
+
+36	47	CLAUDE.md
+5	5	contact.html
+16	0	docs/README.md
+13	0	docs/records/BUGS.md
+52	0	docs/records/DECISIONS.md
+5	5	faq.html
+52	52	index.html
+9	4	js/analytics.js
+27	0	js/config.js
+1	1	js/content-loader.js
+27	0	js/my-materials.js
+26	1	js/navigation.js
+3	2	js/progress.js
+7	4	js/storage.js
+3	3	manifest.json
+5	5	privacy.html
+23	0	scripts/check-docs.js
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+71	0	tests/restore-position.spec.js
+@@8e4de93|1786155447|1786155447|2026-08-08|2026-08-08|docs: zapis BUG-023 + ADR-027 deploya i pred-compact revizija
+
+1	1	CLAUDE.md
+1	1	docs/plan/ROADMAP.md
+1	0	docs/records/CHANGELOG.md
+29	2	docs/records/PROGRESS.md
+@@b418f8b|1786159593|1786159593|2026-08-08|2026-08-08|feat(mjera-i-zaborav): strop duljine kartice + self-service brisanje racuna
+
+3	1	CLAUDE.md
+5	5	contact.html
+46	0	css/profile.css
+1	0	css/variables.css
+4	4	docs/README.md
+162	0	docs/plan/MJERA_I_ZABORAV.md
+8	8	docs/plan/ROADMAP.md
+16	4	docs/records/BACKLOG.md
+18	0	docs/records/CHANGELOG.md
+34	0	docs/records/PROGRESS.md
+5	5	faq.html
+53	52	index.html
+59	2	js/admin-editors.js
+50	0	js/card-limits.js
+1	1	js/content-loader.js
+23	2	js/i18n.js
+106	3	js/profile.js
+3	3	manifest.json
+2	1	package.json
+13	7	privacy.html
+218	0	scripts/delete-account-check.js
+54	2	scripts/validate-content.js
+47	0	styles.bundle.css
+30	30	styles.css
+124	0	supabase/functions/delete-account/index.ts
+1	1	sw.js
+5	5	terms.html
+184	0	tests/card-limits.authed.spec.js
+117	0	tests/unit/card-limits.test.js
+1	0	tsconfig.json
+@@eee6f14|1786161039|1786161039|2026-08-08|2026-08-08|fix(delete-account): admin se ne moze obrisati sam + pravi razlog greske u UI
+
+5	5	contact.html
+5	5	faq.html
+53	53	index.html
+1	1	js/content-loader.js
+6	0	js/i18n.js
+28	1	js/profile.js
+3	3	manifest.json
+5	5	privacy.html
+49	0	scripts/delete-account-check.js
+30	30	styles.css
+24	6	supabase/functions/delete-account/index.ts
+1	1	sw.js
+5	5	terms.html
+@@c26e62d|1786203466|1786203466|2026-08-08|2026-08-08|docs: faza „Mjera i zaborav" isporucena — plan u arhivu, stanje na eee6f14
+
+1	1	CLAUDE.md
+5	4	docs/README.md
+11	2	docs/{plan => archive}/MJERA_I_ZABORAV.md
+6	5	docs/plan/ROADMAP.md
+2	2	docs/records/BACKLOG.md
+2	1	docs/records/CHANGELOG.md
+14	2	docs/records/PROGRESS.md
+@@a42c6b8|1786234004|1786234004|2026-08-09|2026-08-09|fix(landing): broj predmeta je 22, ne 17 — broji se cijela platforma
+
+5	5	contact.html
+5	5	faq.html
+56	56	index.html
+1	1	js/content-loader.js
+27	1	js/navigation.js
+3	3	manifest.json
+5	5	privacy.html
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+20	7	tests/landing.spec.js
+@@a7f1a64|1786292545|1786292545|2026-08-09|2026-08-09|docs: zapis popravka broja predmeta (17 -> 22) + otvoreno pitanje broja pitanja
+
+14	0	docs/records/BACKLOG.md
+1	0	docs/records/CHANGELOG.md
+@@5e31c31|1786309713|1786309713|2026-08-09|2026-08-09|fix(cirilica): cirilicno C u gradivu + gate prosiren na kod i sadrzaj
+
+5	5	contact.html
+1	1	data/json/macroeconomics/macroeconomicsFinal.json
+1	1	data/json/macroeconomics/macroeconomicsM1.json
+1	1	data/macroeconomics/midterm-1.js
+23	6	docs/records/BACKLOG.md
+0	18	docs/records/CHANGELOG.md
+5	5	faq.html
+53	53	index.html
+1	1	js/components/sokrat-modal.js
+1	1	js/content-loader.js
+3	3	manifest.json
+5	5	privacy.html
+30	0	scripts/check-docs.js
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+1	1	tests/components.spec.js
+1	1	tests/unit/node-images.test.js
+@@00e134b|1786312034|1786312034|2026-08-09|2026-08-09|docs: zapis deploya 5e31c31 (cirilica + brana za kod i sadrzaj)
+
+1	0	docs/records/CHANGELOG.md
+@@4db3a35|1786313366|1786313366|2026-08-10|2026-08-10|docs(frontend-redizajn): otvoren spec + ADR-028 (Tailwind preko CLI-ja)
+
+3	2	CLAUDE.md
+6	6	docs/README.md
+97	0	docs/plan/FRONTEND_REDIZAJN.md
+5	5	docs/plan/ROADMAP.md
+42	0	docs/records/DECISIONS.md
+@@8e7215d|1786313953|1786313953|2026-08-10|2026-08-10|docs(ADR-029): UGC je glavni proizvod; katalog je jedan izvor gradiva
+
+2	1	CLAUDE.md
+22	9	docs/plan/FRONTEND_REDIZAJN.md
+16	12	docs/product/PRD.md
+45	0	docs/records/DECISIONS.md
+@@d238a72|1786315630|1786315630|2026-08-10|2026-08-10|feat(C0): ulaz u vlastiti materijal je ravnopravno odrediste (ADR-029)
+
+4	0	.gitignore
+1	1	CLAUDE.md
+5	5	contact.html
+37	2	css/landing.css
+26	0	css/profile.css
+2	0	css/variables.css
+13	7	docs/plan/FRONTEND_REDIZAJN.md
+3	3	docs/product/PRD.md
+4	0	docs/records/CHANGELOG.md
+1	1	docs/records/DECISIONS.md
+55	0	docs/records/PROGRESS.md
+5	5	faq.html
+109	54	index.html
+1	1	js/content-loader.js
+10	0	js/i18n.js
+1	0	js/init.js
+20	1	js/my-materials.js
+83	3	js/navigation.js
+8	5	js/profile.js
+3	3	manifest.json
+5	5	privacy.html
+65	2	styles.bundle.css
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+16	0	tests/a11y.spec.js
+111	0	tests/materials-entry.spec.js
+@@fc8b0ac|1786316024|1786316024|2026-08-10|2026-08-10|docs(C0): grana ceka -- zapis da NIJE deployano i da suita nije docekana
+
+1	1	CLAUDE.md
+7	1	docs/plan/FRONTEND_REDIZAJN.md
+5	1	docs/records/CHANGELOG.md
+@@8b8e1e6|1786319485|1786319485|2026-08-09|2026-08-09|fix(C0): landing nav je curio kroz 861-1190px, ne samo na 320px
+
+5	5	contact.html
+40	18	css/landing.css
+32	0	docs/records/PROGRESS.md
+5	5	faq.html
+53	53	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+5	5	privacy.html
+40	18	styles.bundle.css
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+5	1	tests/layout-guard.spec.js
+@@da0db80|1786363392|1786363392|2026-08-10|2026-08-10|fix(C0): tri regresije koje je puna suita otkrila (35 palo -> 0)
+
+5	5	contact.html
+40	4	css/landing.css
+5	5	faq.html
+53	53	index.html
+1	1	js/content-loader.js
+7	1	js/studio.js
+3	3	manifest.json
+5	5	privacy.html
+40	4	styles.bundle.css
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+3	3	tests/card-limits.authed.spec.js
+4	4	tests/f4-e2e.authed.spec.js
+6	1	tests/layout-guard.spec.js
+10	10	tests/material-authoring.authed.spec.js
+14	14	tests/my-materials.authed.spec.js
+13	12	tests/node-editor.authed.spec.js
+5	5	tests/studio-math.authed.spec.js
+@@c62fb93|1786364777|1786364777|2026-08-10|2026-08-10|docs(C0): puna suita docekana -- 332/0/18 + zapis triju regresija
+
+1	1	CLAUDE.md
+17	5	docs/plan/FRONTEND_REDIZAJN.md
+8	4	docs/records/CHANGELOG.md
+56	0	docs/records/PROGRESS.md
+@@e07b8c3|1786366760|1786366760|2026-08-10|2026-08-10|merge: spoj paralelnog popravka nav-a (8b8e1e6) s ovom granom
+@@26c3868|1786367067|1786367067|2026-08-10|2026-08-10|fix(nav): jedan prag za ulaz umjesto dva; labela se vraca od 561px
+
+5	5	contact.html
+9	22	css/landing.css
+5	5	faq.html
+53	53	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+5	5	privacy.html
+9	22	styles.bundle.css
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+@@0500ade|1786368592|1786368592|2026-08-10|2026-08-10|docs(BUG-024): slika iz osobnog materijala nevidljiva u Learnu
+
+16	0	docs/records/BACKLOG.md
+24	1	docs/records/BUGS.md
+@@0e2843a|1786368771|1786368771|2026-08-10|2026-08-10|docs(BUG-024): prefetch i resolve nisu upareni -- popravak Learna treba OBA
+
+1	1	CLAUDE.md
+4	0	docs/records/BUGS.md
+@@ec3ed58|1786370362|1786370362|2026-08-10|2026-08-10|docs: C0 je na produkciji (0e2843a) + pouke za C1-C7
+
+1	1	CLAUDE.md
+13	17	docs/plan/FRONTEND_REDIZAJN.md
+10	7	docs/records/CHANGELOG.md
+18	1	docs/records/PROGRESS.md
+@@d995735|1786375454|1786375454|2026-08-10|2026-08-10|docs(PROGRESS): ukloni proturjecje unutar upisa 2026-08-10
+
+1	1	docs/records/PROGRESS.md
+@@5843f7e|1786375605|1786375605|2026-08-10|2026-08-10|docs(BUG-024): razradjeno rjesenje -- prefetch na savu, resolve kroz jednu funkciju, test
+
+17	1	docs/records/BUGS.md
+@@dc67c24|1786380123|1786380123|2026-08-10|2026-08-10|docs(pravilo #2): svaki push na main trazi Leonov izricit OK, i docs-only
+
+1	1	CLAUDE.md
+@@5f77a88|1786387685|1786387685|2026-08-10|2026-08-10|fix(BUG-024): slika iz osobnog materijala se vidi u Learnu
+
+5	5	contact.html
+5	5	faq.html
+53	53	index.html
+3	4	js/admin.js
+3	6	js/block-editor.js
+41	0	js/blocks-renderer.js
+1	1	js/content-loader.js
+6	4	js/learn.js
+10	1	js/my-materials.js
+4	7	js/studio.js
+3	3	manifest.json
+5	5	privacy.html
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+70	0	tests/node-images.authed.spec.js
+92	0	tests/unit/blocks-renderer.test.js
+@@779f26b|1786388526|1786388526|2026-08-10|2026-08-10|fix(BUG-025): sadrzaj s znakom < vise se ne gubi u kvizu, learnu i dopunama
+
+5	5	contact.html
+5	5	faq.html
+53	53	index.html
+11	0	js/admin.js
+2	0	js/blocks-renderer.js
+1	1	js/content-loader.js
+5	1	js/fill-blanks.js
+25	3	js/learn.js
+20	4	js/quiz.js
+3	3	manifest.json
+5	5	privacy.html
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+121	0	tests/escaping.spec.js
+@@6b02354|1786389199|1786389199|2026-08-10|2026-08-10|fix(BUG-025): jos tri mjesta iste klase -- napredak i profil
+
+1	1	CLAUDE.md
+5	5	contact.html
+6	12	docs/records/BACKLOG.md
+27	15	docs/records/BUGS.md
+3	0	docs/records/CHANGELOG.md
+43	0	docs/records/PROGRESS.md
+5	5	faq.html
+53	53	index.html
+12	0	js/blocks-renderer.js
+1	1	js/content-loader.js
+6	6	js/learn.js
+9	1	js/profile.js
+21	5	js/progress.js
+3	3	manifest.json
+5	5	privacy.html
+30	30	styles.css
+1	1	sw.js
+5	5	terms.html
+29	0	tests/escaping.spec.js
+30	0	tests/unit/blocks-renderer.test.js
+@@5997232|1786390318|1786390318|2026-08-10|2026-08-10|docs: BUG-024 i BUG-025 zapisani (uzrok, mjerenje, pouke, gate 337 zelenih)
+
+2	1	docs/plan/FRONTEND_REDIZAJN.md
+3	2	docs/records/BUGS.md
+3	2	docs/records/CHANGELOG.md
+16	3	docs/records/PROGRESS.md
+@@913967f|1786394143|1786394143|2026-08-10|2026-08-10|docs: BUG-024 i BUG-025 su na produkciji (5997232) -- pravilo #7
+
+1	1	CLAUDE.md
+6	2	docs/records/CHANGELOG.md
+5	2	docs/records/PROGRESS.md
+@@51b8703|1786395166|1786395166|2026-08-10|2026-08-10|chore: dva alata koja pretvaraju rucne poslove u provjerljivo stanje
+
+2	0	CLAUDE.md
+38	14	docs/records/BACKLOG.md
+2	0	package.json
+91	0	scripts/check-edge-functions.js
+184	0	scripts/diff-db-vs-files.js
+@@c9413a0|1786408685|1786408685|2026-08-11|2026-08-11|docs(pred-compact): revizija po pravilu #6 + stanje na 2026-08-10
+
+4	3	CLAUDE.md
+38	0	docs/records/PROGRESS.md
+@@2ae8447|1786482862|1786482862|2026-08-11|2026-08-11|C1: Tailwind temelj (nula vizualne promjene, dokazano mjerenjem)
+
+5	3	CLAUDE.md
+5	5	contact.html
+129	0	css/app.css
+8	2	css/responsive/03-modes-a11y-print.css
+120	0	css/tokens.css
+122	4	docs/plan/FRONTEND_REDIZAJN.md
+13	0	docs/records/CHANGELOG.md
+79	0	docs/records/PROGRESS.md
+3	1	docs/workflow/TESTING.md
+5	5	faq.html
+53	53	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+1155	1	package-lock.json
+5	1	package.json
+5	5	privacy.html
+105	41	scripts/build-css.js
+336	0	scripts/check-tailwind.js
+276	0	scripts/css-diff.js
+8872	8900	styles.bundle.css
+0	84	styles.css
+1	1	sw.js
+5	5	terms.html
+@@b857834|1786483361|1786483361|2026-08-11|2026-08-11|docs: revizija po pravilu #6 -- styles.css vise ne postoji, paleta izabrana
+
+1	1	CLAUDE.md
+3	3	docs/architecture/EXERCISES_ENGINE.md
+@@e2418d4|1786486111|1786486111|2026-08-12|2026-08-12|C2/1: paleta "Ponoc i menta" + most na tokene (78% platforme jednim editom)
+
+5	5	contact.html
+19	6	css/legal.css
+113	50	css/tokens.css
+65	38	css/variables.css
+5	5	faq.html
+53	53	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+2	1	package.json
+5	5	privacy.html
+160	0	scripts/check-palette.js
+23	0	scripts/palette-baseline.json
+57	48	styles.bundle.css
+1	1	sw.js
+5	5	terms.html
+@@36b119d|1786487339|1786487339|2026-08-12|2026-08-12|C2: prototip landinga -- "landing nije opis proizvoda, landing JEST proizvod"
+
+324	0	prototypes/landing-v2.html
+@@9d77e85|1786487840|1786487840|2026-08-12|2026-08-12|C2: prekidac paleta u prototipu -- odluka se donosi gledanjem, ne iz tablice
+
+105	8	prototypes/landing-v2.html
+@@ed22b25|1786492787|1786492787|2026-08-12|2026-08-12|C2/2: cetiri teme kao arhitektura + check:contrast; zadana postaje "Kreda i tabla"
+
+5	5	contact.html
+139	48	css/tokens.css
+5	5	faq.html
+53	53	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+3	2	package.json
+5	5	privacy.html
+168	0	scripts/check-contrast.js
+28	5	scripts/check-palette.js
+24	19	scripts/palette-baseline.json
+88	17	styles.bundle.css
+1	1	sw.js
+5	5	terms.html
+@@7367808|1786493463|1786493463|2026-08-12|2026-08-12|docs(C2): paleta pala, cetiri teme, dva nova gatea -- zapisano prije compacta
+
+3	1	CLAUDE.md
+97	5	docs/plan/FRONTEND_REDIZAJN.md
+45	0	docs/records/PROGRESS.md
+@@d4c7914|1786495107|1786495107|2026-08-12|2026-08-12|docs(TEAM): Sasin stop-nalog — dovrsi dvije grane, javi na Instagram, pa stani do kraja frontenda
+
+2	2	CLAUDE.md
+25	0	docs/workflow/TEAM.md
+@@f7ff533|1786496120|1786496120|2026-08-12|2026-08-12|docs: C1 je na produkciji (d4c7914) — verificirano na zivoj stranici, ne u CI-u
+
+1	1	CLAUDE.md
+7	1	docs/records/CHANGELOG.md
+@@66537f3|1786496248|1786496248|2026-08-12|2026-08-12|merge main + spec §7.6: smjer izgleda je APPLE (serif u naslovima nadglasen)
+@@8c7d122|1786497020|1786497020|2026-08-12|2026-08-12|fix(ci): lock i package.json se raziduju sami od sebe -> gate check:lockfile
+
+2	1	CLAUDE.md
+6	0	docs/records/CHANGELOG.md
+11	0	package-lock.json
+2	1	package.json
+89	0	scripts/check-lockfile.js
+@@5cce5fc|1786497119|1786497119|2026-08-12|2026-08-12|merge: main (hotfix check:lockfile) u granu C2 -- preflight sad ima 12 brana
+@@ed6c94a|1786497425|1786497425|2026-08-12|2026-08-12|fix(ci): gate mora vrtjeti CI-jev npm, inace daje laznu sigurnost
+
+24	3	package-lock.json
+111	69	scripts/check-lockfile.js
+@@9637f4a|1786497490|1786497490|2026-08-12|2026-08-12|fix(ci): gate mora vrtjeti CI-jev npm, inace daje laznu sigurnost
+
+1	1	CLAUDE.md
+1	0	docs/records/CHANGELOG.md
+24	3	package-lock.json
+111	69	scripts/check-lockfile.js
+@@d1a0163|1786498142|1786498142|2026-08-12|2026-08-12|C2/3: paleta prestaje zivjeti na dva mjesta -- tokens.static.css za pravne stranice
+@@2bc9692|1786498159|1786498159|2026-08-12|2026-08-12|chore: .playwright-mcp/ je artefakt MCP-preglednika, ne repozitorij
+
+1	0	.gitignore
+0	141	.playwright-mcp/page-2026-08-12T01-27-46-067Z.yml
+@@e350b81|1786498325|1786498325|2026-08-12|2026-08-12|docs: sesija 2026-08-12b -- C1 na prod, Apple smjer, dva CI pada, ispravak plana za logo
+
+14	2	docs/plan/FRONTEND_REDIZAJN.md
+49	0	docs/records/PROGRESS.md
+@@214e99c|1786501182|1786501182|2026-08-12|2026-08-12|chore(deps): sve ovisnosti pinane TOCNO -- `^` je zabranjen
+
+12	0	.npmrc
+1	0	.nvmrc
+2	1	CLAUDE.md
+3	3	docs/plan/FRONTEND_REDIZAJN.md
+11	8	package-lock.json
+11	8	package.json
+@@9059626|1786501234|1786501234|2026-08-12|2026-08-12|docs: revizija pred compact (pravilo #6) -- build:css ima dva izlaza, ovisnosti pinane
+
+1	1	CLAUDE.md
+@@67b7047|1786505024|1786505024|2026-08-12|2026-08-12|fix(a11y): tekst na ispuni marke je token, ne bijela -- 35 pravila + tvrda brana
+
+1	1	CLAUDE.md
+6	6	contact.html
+3	3	css/blind-map.css
+1	1	css/browse.css
+1	1	css/components.css
+3	3	css/exercises.css
+3	3	css/fill-blanks-section.css
+4	4	css/flashcards-section.css
+2	2	css/home-section.css
+3	3	css/landing.css
+9	10	css/learn.css
+7	7	css/pages.css
+1	1	css/progress-section.css
+3	3	css/quiz-section.css
+5	5	css/subject-selector.css
+1	1	css/variables.css
+39	0	docs/plan/FRONTEND_REDIZAJN.md
+6	6	faq.html
+53	53	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+39	0	scripts/check-palette.js
+3	4	scripts/palette-baseline.json
+35	35	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@5cf06ea|1786584302|1786584302|2026-08-13|2026-08-13|C2: landing POKAZUJE umjesto da tvrdi + zadana tema postala svijetla
+
+5	2	CLAUDE.md
+6	6	contact.html
+5	5	css/auth.css
+1	1	css/block-editor.css
+1	1	css/browse.css
+2	4	css/components.css
+27	18	css/consent.css
+4	2	css/fill-blanks-section.css
+17	4	css/flashcards-section.css
+402	903	css/landing.css
+1	1	css/learn-blocks.css
+2	45	css/learn.css
+4	4	css/legal.css
+2	2	css/my-materials.css
+8	8	css/profile.css
+5	33	css/responsive/01-up-and-phone-breakpoints.css
+9	45	css/responsive/02-mobile-core.css
+1	3	css/responsive/03-modes-a11y-print.css
+6	38	css/responsive/04-mobile-extra.css
+11	85	css/responsive/05-device-sizes.css
+4	4	css/studio.css
+0	21	css/subject-selector.css
+106	52	css/tokens.css
+54	23	css/tokens.static.css
+4	1	css/variables.css
+181	11	docs/plan/FRONTEND_REDIZAJN.md
+8	2	docs/plan/ROADMAP.md
+2	1	docs/product/PRD.md
+12	0	docs/records/CHANGELOG.md
+36	0	docs/records/DECISIONS.md
+71	0	docs/records/PROGRESS.md
+6	6	faq.html
+224	277	index.html
+1	1	js/content-loader.js
+85	44	js/i18n.js
+40	10	js/init.js
+88	0	js/navigation.js
+5	5	manifest.json
+1	0	package.json
+6	6	privacy.html
+0	421	prototypes/landing-v2.html
+37	0	scripts/check-palette.js
+3	6	scripts/palette-baseline.json
+110	0	scripts/palette-breakdown.js
+613	1083	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+26	1	tests/a11y.spec.js
+2	2	tests/browse.spec.js
+91	35	tests/landing.spec.js
+7	3	tests/layout-guard.spec.js
+17	10	tests/materials-entry.spec.js
+@@5fb6a37|1786641032|1786641032|2026-08-13|2026-08-13|docs: ispravak mjere -- landing.css je 578, ne 460
+
+1	1	CLAUDE.md
+2	2	docs/plan/FRONTEND_REDIZAJN.md
+2	1	docs/records/CHANGELOG.md
+1	1	docs/records/PROGRESS.md
+@@c4555bd|1786653676|1786653676|2026-08-13|2026-08-13|docs: brisanje `bright-function` odgodjeno do C6 -- uz uvjet i uz provjeru prije radnje
+
+22	0	docs/records/BACKLOG.md
+@@3fc5ec8|1786664613|1786664613|2026-08-14|2026-08-14|popravak C2: prebacivanje teme slomilo je PRIJAVLJENE povrsine
+
+2	1	CLAUDE.md
+6	6	contact.html
+3	3	css/auth.css
+82	77	css/block-editor.css
+5	1	css/fill-blanks-section.css
+18	15	css/my-materials.css
+1	1	css/pages.css
+5	5	css/profile.css
+12	9	css/responsive/03-modes-a11y-print.css
+7	3	css/responsive/05-device-sizes.css
+17	9	css/sokrat-confirm.css
+90	70	css/studio.css
+1	0	css/tokens.static.css
+8	0	css/variables.css
+88	1	docs/plan/FRONTEND_REDIZAJN.md
+27	0	docs/records/BACKLOG.md
+6	0	docs/records/CHANGELOG.md
+48	0	docs/records/PROGRESS.md
+6	6	faq.html
+53	53	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+128	1	scripts/check-palette.js
+6	9	scripts/palette-baseline.json
+438	234	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+20	2	tests/auth.setup.js
+@@b53e606|1786668441|1786668441|2026-08-14|2026-08-14|C3 prva cigla: gate PRIJE migracije -- 4 kvara na prijavljenim povrsinama
+
+1	0	CLAUDE.md
+6	6	contact.html
+8	1	css/studio.css
+68	0	docs/plan/FRONTEND_REDIZAJN.md
+52	1	docs/records/BACKLOG.md
+3	0	docs/records/CHANGELOG.md
+42	0	docs/records/PROGRESS.md
+6	6	faq.html
+53	53	index.html
+1	1	js/content-loader.js
+14	1	js/my-materials.js
+5	1	js/studio.js
+3	3	manifest.json
+6	6	privacy.html
+1	1	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+99	0	tests/a11y.authed.spec.js
+6	27	tests/a11y.spec.js
+86	0	tests/helpers/axe-gate.js
+@@dd4c61b|1786674742|1786674742|2026-08-14|2026-08-14|lanac opskrbe: 7 vanjskih podresursa pod SRI + check:cdn u preflight
+
+3	2	CLAUDE.md
+6	6	contact.html
+69	0	docs/records/BACKLOG.md
+6	0	docs/records/CHANGELOG.md
+47	0	docs/records/PROGRESS.md
+6	6	faq.html
+65	59	index.html
+11	2	js/auth.js
+12	1	js/block-editor-media.js
+1	1	js/content-loader.js
+3	3	manifest.json
+3	1	package.json
+6	6	privacy.html
+227	0	scripts/check-cdn.js
+1	1	sw.js
+6	6	terms.html
+@@471921b|1786677021|1786677021|2026-08-14|2026-08-14|C3 druga cigla: sirina kao gate -- i kvar u RENDERERU koji je pogadjao studente
+
+1	0	CLAUDE.md
+6	6	contact.html
+88	0	docs/plan/FRONTEND_REDIZAJN.md
+20	0	docs/records/BACKLOG.md
+7	0	docs/records/CHANGELOG.md
+42	0	docs/records/PROGRESS.md
+6	6	faq.html
+53	53	index.html
+39	0	js/blocks-renderer.js
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+100	0	supabase/c3-rls-initplan.sql
+1	1	sw.js
+6	6	terms.html
+153	0	tests/layout.authed.spec.js
+@@4c4f26b|1786679123|1786679123|2026-08-14|2026-08-14|C3 treca cigla: pet `!important` bila su dva puta isti kvar
+
+6	6	contact.html
+10	5	css/studio.css
+48	0	docs/plan/FRONTEND_REDIZAJN.md
+5	0	docs/records/CHANGELOG.md
+34	0	docs/records/PROGRESS.md
+6	6	faq.html
+53	53	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+9	11	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+119	0	tests/cascade.authed.spec.js
+@@5875a2b|1786725765|1786725765|2026-08-14|2026-08-14|docs: Studio na telefonu -- dva gumba izvan ekrana + rupa u vlastitoj brani
+
+38	0	docs/records/BACKLOG.md
+@@88a634f|1786755733|1786755733|2026-08-15|2026-08-15|docs: landing pao na Leonovu ekranu -- druga revizija, znak i MCP presudjeni
+
+87	0	docs/plan/FRONTEND_REDIZAJN.md
+43	0	docs/records/BACKLOG.md
+41	0	docs/records/PROGRESS.md
+@@fc2c467|1786756004|1786756004|2026-08-15|2026-08-15|docs: revizija pred compact (pravilo #6) -- tri zive netocnosti ispravljene
+
+4	2	CLAUDE.md
+1	1	docs/plan/FRONTEND_REDIZAJN.md
+22	0	docs/records/DECISIONS.md
+@@e8f6c59|1786759443|1786759443|2026-08-15|2026-08-15|Merge PR #6: content(entrepreneurship-hr) — Poduzetnički menadžment i inovacije (HR)
+@@1cbc82b|1786759667|1786759667|2026-08-15|2026-08-15|Merge PR #7: content(ebusiness-hr) — E-poslovanje (HR)
+@@58ecec5|1786760652|1786760652|2026-08-15|2026-08-15|chore(bump) + docs: 24 predmeta — Sašine dvije HR grane spojene, tokeni regenerirani
+
+2	2	CLAUDE.md
+5	5	contact.html
+2	0	docs/records/CHANGELOG.md
+41	0	docs/records/PROGRESS.md
+5	3	docs/subjects/README.md
+5	5	faq.html
+53	53	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+5	5	privacy.html
+1	1	sw.js
+5	5	terms.html
+@@3e67b15|1786762319|1786762319|2026-08-15|2026-08-15|docs: 24 predmeta je NA PRODUKCIJI — verificirano posluženim sadržajem, ne zelenim deployem
+
+1	1	CLAUDE.md
+2	0	docs/records/CHANGELOG.md
+13	4	docs/records/PROGRESS.md
+@@ef3a63a|1786763026|1786763026|2026-08-15|2026-08-15|merge: main (24 predmeta) u C3 — i nalaz da spec landinga zakucava broj predmeta
+@@4eeda13|1786764533|1786764533|2026-08-15|2026-08-15|C3/landing cigla A: živi prikaz je obrisan + brana za jedini ručno pisan broj
+
+6	6	contact.html
+1	204	css/landing.css
+13	2	docs/plan/FRONTEND_REDIZAJN.md
+8	0	docs/records/BACKLOG.md
+6	6	faq.html
+74	118	index.html
+1	1	js/content-loader.js
+7	36	js/i18n.js
+0	1	js/init.js
+9	85	js/navigation.js
+3	3	manifest.json
+6	6	privacy.html
+49	0	scripts/verify-catalog.js
+1	217	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+24	47	tests/landing.spec.js
+@@fc94498|1786766095|1786766095|2026-08-15|2026-08-15|C3/landing cigla B: glif na pločici predmeta bio je nečitljiv na 10 od 24 predmeta
+
+6	6	contact.html
+8	0	css/browse.css
+6	1	css/landing.css
+8	1	css/sidebar.css
+15	0	css/tokens.css
+2	0	css/tokens.static.css
+53	0	docs/plan/FRONTEND_REDIZAJN.md
+6	6	faq.html
+53	53	index.html
+1	1	js/content-loader.js
+37	3	js/navigation.js
+3	3	manifest.json
+6	6	privacy.html
+71	0	scripts/check-contrast.js
+16	2	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+104	0	tests/tint-ink.spec.js
+@@82e384f|1786806459|1786806459|2026-08-15|2026-08-15|test(a11y): axe je mjerio toast USRED fade-a — 3.59 koji ne postoji na mirnoj stranici
+
+8	0	tests/a11y.authed.spec.js
+24	1	tests/helpers/axe-gate.js
+@@0c0164c|1786807418|1786807418|2026-08-15|2026-08-15|docs: revizija pred compact (pravilo #6) — 24 predmeta u ŽIVIM dokumentima, ne u dnevnicima
+
+2	1	CLAUDE.md
+1	1	docs/architecture/ARCHITECTURE.md
+1	1	docs/architecture/BACKEND.md
+6	4	docs/plan/FRONTEND_REDIZAJN.md
+2	2	docs/product/PRD.md
+1	1	docs/product/UGC_SPEC.md
+37	0	docs/records/BACKLOG.md
+3	0	docs/records/CHANGELOG.md
+66	4	docs/records/PROGRESS.md
+8	0	docs/workflow/TEAM.md
+@@2a5e276|1786905241|1786905241|2026-08-16|2026-08-16|docs: a11y.authed je ZELEN na odmornom stroju -- 46,2 s umjesto 300+, hipoteza dokazana
+
+25	1	docs/records/BACKLOG.md
+@@2e9fff9|1786905282|1786905282|2026-08-16|2026-08-16|merge: C3 -- Tailwind-temelj u pogonu, svijetla tema, prepravljen landing, 3 nova gatea
+@@938f6df|1786906089|1786906089|2026-08-16|2026-08-16|C3/landing: boja predmeta vise ne smije biti boja ZNAKA -- 9 predmeta + brana
+
+18	18	data/catalog.js
+9	3	index.html
+43	0	scripts/check-contrast.js
+@@9e151c2|1786906880|1786906880|2026-08-16|2026-08-16|C3/landing cigla C (1/4): katalog pokazuje SVE predmete + trazilica + filtar + plocica
+
+115	0	css/landing.css
+33	3	index.html
+10	0	js/i18n.js
+2	1	js/init.js
+110	9	js/navigation.js
+21	1	scripts/check-docs.js
+@@7ea463b|1786907345|1786907345|2026-08-16|2026-08-16|C3/landing cigla C (2/4): predmeti grupirani po programu -- nalaz koji se vidio tek na ekranu
+
+6	6	contact.html
+20	3	css/landing.css
+6	6	faq.html
+53	53	index.html
+1	1	js/content-loader.js
+93	45	js/navigation.js
+3	3	manifest.json
+6	6	privacy.html
+125	5	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+29	5	tests/landing.spec.js
+@@49bd46a|1787005763|1787005763|2026-08-18|2026-08-18|C3/landing cigla C (3/4): "svoje gradivo" je puna sekcija, s primjerima IZVAN fakulteta
+
+6	6	contact.html
+94	0	css/landing.css
+6	6	faq.html
+103	53	index.html
+1	1	js/content-loader.js
+31	0	js/i18n.js
+3	3	manifest.json
+6	6	privacy.html
+100	0	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@d8c7eaf|1787006005|1787006005|2026-08-18|2026-08-18|C3/landing cigla C (4/4): cetiri nacina + MCP oznacen kao USKORO
+
+6	6	contact.html
+54	0	css/landing.css
+1	0	css/tokens.static.css
+6	6	faq.html
+112	53	index.html
+1	1	js/content-loader.js
+26	0	js/i18n.js
+3	3	manifest.json
+6	6	privacy.html
+56	0	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@8fb5a7e|1787006589|1787006589|2026-08-18|2026-08-18|C3/landing cigla D: podloga (papir + odsjaj + zrno) i prostor za znak
+
+6	6	contact.html
+57	4	css/landing.css
+11	8	css/responsive/06-component-improvements.css
+6	6	faq.html
+53	53	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+20	10	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@c2ea504|1787007123|1787007123|2026-08-18|2026-08-18|check:contrast mjeri i --color-mark -- token koji nije bio mjeren NI U JEDNOJ temi
+
+6	6	contact.html
+6	6	faq.html
+53	53	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+48	0	scripts/check-contrast.js
+1	1	sw.js
+6	6	terms.html
+3	0	types/globals.d.ts
+@@b87a3d6|1787008667|1787008667|2026-08-18|2026-08-18|popravak: + plocica je obarala tint-branu (16 testova) + sova van iz Studija
+
+6	6	contact.html
+2	4	css/studio.css
+6	6	faq.html
+53	53	index.html
+1	1	js/content-loader.js
+3	1	js/studio.js
+3	3	manifest.json
+6	6	privacy.html
+0	10	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+14	1	tests/tint-ink.spec.js
+@@73ac84d|1787009597|1787009597|2026-08-18|2026-08-18|docs: revizija pred compact -- C3 je na produkciji, N i A specificirani, incident zapisan
+
+13	1	CLAUDE.md
+118	1	docs/plan/FRONTEND_REDIZAJN.md
+94	0	docs/records/BACKLOG.md
+3	1	docs/records/CHANGELOG.md
+@@239099c|1787009822|1787009822|2026-08-18|2026-08-18|docs: broj commita grane se ne pise rukom -- pisao 8 kad ih je bilo 9
+
+4	2	CLAUDE.md
+@@c4617fe|1787011120|1787011120|2026-08-18|2026-08-18|brana: check:state -- tvrdnju o stanju provjerava git, ne autor
+
+18	16	CLAUDE.md
+1	1	docs/plan/FRONTEND_REDIZAJN.md
+2	1	package.json
+161	0	scripts/check-state.js
+@@f79ac5e|1787011573|1787011573|2026-08-18|2026-08-18|docs: stanje se vise ne prepisuje u prozu + faza KOSTUR zapisana (spec par. 8)
+
+98	4	docs/plan/FRONTEND_REDIZAJN.md
+7	0	docs/records/BACKLOG.md
+2	0	docs/records/BUGS.md
+6	0	docs/records/CHANGELOG.md
+3	1	scripts/check-state.js
+@@c9d7577|1787013511|1787013511|2026-08-18|2026-08-18|K1: devet stranica dobiva devet adresa (faza KOSTUR, spec par. 8)
+
+6	6	contact.html
+6	6	faq.html
+53	53	index.html
+1	1	js/content-loader.js
+2	1	js/init.js
+187	23	js/navigation.js
+3	3	manifest.json
+6	6	privacy.html
+1	1	sw.js
+6	6	terms.html
+138	0	tests/routes.spec.js
+@@81b837b|1787014165|1787014214|2026-08-18|2026-08-18|docs(K1): zapisan u spec par. 8.6 + CHANGELOG; jedan zatecen test promijenio tvrdnju
+
+78	1	docs/plan/FRONTEND_REDIZAJN.md
+8	0	docs/records/CHANGELOG.md
+7	1	tests/materials-entry.spec.js
+7	0	tests/routes.spec.js
+@@c24ebeb|1787014276|1787014276|2026-08-18|2026-08-18|brana: cirilica u PORUCI COMMITA (.githooks/commit-msg)
+
+37	0	.githooks/commit-msg
+@@cde7224|1787015057|1787015057|2026-08-18|2026-08-18|docs: revizija pred compact (pravilo #6) -- zive tvrdnje poravnate s isporucenim K1
+
+7	5	CLAUDE.md
+40	0	docs/architecture/ARCHITECTURE.md
+1	1	docs/records/BACKLOG.md
+2	1	docs/records/BUGS.md
+104	0	docs/records/PROGRESS.md
+@@6c5078e|1787086897|1787086897|2026-08-18|2026-08-18|K2a: jedan model vracanja -- gasi BUG-026 i BUG-027 s Leonova ekrana
+
+12	4	CLAUDE.md
+6	6	contact.html
+51	1	docs/plan/FRONTEND_REDIZAJN.md
+48	0	docs/records/BUGS.md
+8	0	docs/records/CHANGELOG.md
+67	0	docs/records/PROGRESS.md
+6	6	faq.html
+53	53	index.html
+2	1	js/admin.js
+1	1	js/content-loader.js
+11	7	js/init.js
+117	22	js/navigation.js
+2	6	js/profile.js
+4	1	js/studio.js
+3	3	manifest.json
+6	6	privacy.html
+1	1	sw.js
+6	6	terms.html
+132	0	tests/back-model.spec.js
+@@508b2ff|1787097147|1787097147|2026-08-19|2026-08-19|K2b: jedna gornja traka -- SPAJANJEM, ne slaganjem
+
+19	10	CLAUDE.md
+6	6	contact.html
+12	0	css/app.css
+6	64	css/landing.css
+10	13	css/studio.css
+7	0	css/tokens.static.css
+340	0	css/topbar.css
+125	1	docs/plan/FRONTEND_REDIZAJN.md
+13	4	docs/records/BACKLOG.md
+8	0	docs/records/CHANGELOG.md
+65	0	docs/records/PROGRESS.md
+6	6	faq.html
+109	126	index.html
+8	1	js/block-editor.js
+19	0	js/consent.js
+1	1	js/content-loader.js
+14	0	js/i18n.js
+1	0	js/init.js
+184	2	js/navigation.js
+31	17	js/studio.js
+3	3	manifest.json
+6	6	privacy.html
+232	111	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+2	2	tests/admin.spec.js
+12	0	tests/auth.setup.js
+1	1	tests/auth.spec.js
+13	9	tests/back-model.spec.js
+1	1	tests/browse.spec.js
+3	3	tests/landing.spec.js
+2	2	tests/layout-guard.spec.js
+34	8	tests/materials-entry.spec.js
+3	2	tests/node-editor.authed.spec.js
+100	0	tests/studio-chrome.authed.spec.js
+4	0	types/globals.d.ts
+@@dbba189|1787097921|1787097921|2026-08-19|2026-08-19|docs: revizija pred compact (pravilo #6) -- sedam brojki bilo je zastarjelo
+
+4	4	CLAUDE.md
+1	1	docs/README.md
+8	4	docs/plan/FRONTEND_REDIZAJN.md
+7	0	docs/records/BACKLOG.md
+28	0	docs/records/BUGS.md
+6	5	docs/workflow/TESTING.md
+@@3e9c70a|1787108520|1787108520|2026-08-19|2026-08-19|K3: brana dohvatljivosti -- mjeri POGODAK, ne postojanje
+
+9	3	CLAUDE.md
+6	6	contact.html
+32	1	css/topbar.css
+114	1	docs/plan/FRONTEND_REDIZAJN.md
+54	0	docs/records/BUGS.md
+12	0	docs/records/CHANGELOG.md
+99	0	docs/records/PROGRESS.md
+3	1	docs/workflow/TESTING.md
+6	6	faq.html
+52	52	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+8	1	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+182	0	tests/helpers/reach-gate.js
+36	10	tests/layout-guard.spec.js
+91	0	tests/reachability.authed.spec.js
+171	0	tests/reachability.spec.js
+27	3	tests/studio.authed.spec.js
+@@7a4e14a|1787110350|1787110350|2026-08-19|2026-08-19|Traka: "Predmeti" maknuti (Leonova odluka) + zapisane dvije odluke s ekrana
+
+15	6	CLAUDE.md
+6	6	contact.html
+2	1	css/topbar.css
+1	1	docs/README.md
+12	1	docs/plan/FRONTEND_REDIZAJN.md
+46	0	docs/records/BACKLOG.md
+5	0	docs/records/BUGS.md
+1	0	docs/records/CHANGELOG.md
+1	1	docs/workflow/TESTING.md
+6	6	faq.html
+57	56	index.html
+1	1	js/content-loader.js
+3	5	js/navigation.js
+3	3	manifest.json
+6	6	privacy.html
+1	1	sw.js
+6	6	terms.html
+@@e54025b|1787112448|1787112448|2026-08-19|2026-08-19|K4a: Studio na telefonu -- rez ide po MODU, ne po sirini
+
+11	7	CLAUDE.md
+6	6	contact.html
+61	2	css/studio.css
+57	0	docs/plan/FRONTEND_REDIZAJN.md
+11	1	docs/records/BACKLOG.md
+5	0	docs/records/CHANGELOG.md
+52	0	docs/records/PROGRESS.md
+1	0	docs/workflow/TESTING.md
+6	6	faq.html
+52	52	index.html
+1	1	js/content-loader.js
+30	1	js/studio.js
+3	3	manifest.json
+6	6	privacy.html
+29	3	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+130	0	tests/studio-mobile.authed.spec.js
+@@8cfb5f4|1787112645|1787112645|2026-08-19|2026-08-19|docs: upisana brojka pune suite koja je pri K4a-commitu jos tekla
+
+3	2	docs/plan/FRONTEND_REDIZAJN.md
+1	1	docs/records/CHANGELOG.md
+3	1	docs/records/PROGRESS.md
+@@d120b58|1787263742|1787263742|2026-08-21|2026-08-21|docs: CRVENI ALARM telefon -- izmjereno, presudjeno, zapisano (nula redaka koda)
+
+49	6	CLAUDE.md
+189	0	docs/plan/FRONTEND_REDIZAJN.md
+67	1	docs/records/BACKLOG.md
+62	1	docs/records/BUGS.md
+9	0	docs/records/CHANGELOG.md
+76	0	docs/records/PROGRESS.md
+@@84aa832|1787269753|1787269753|2026-08-21|2026-08-21|T0: telefon je od danas mjerena povrsina (faza TELEFON, spec 9.7)
+
+27	5	CLAUDE.md
+160	0	docs/plan/FRONTEND_REDIZAJN.md
+38	7	docs/records/BUGS.md
+9	0	docs/records/CHANGELOG.md
+93	0	docs/records/PROGRESS.md
+8	1	docs/workflow/TESTING.md
+491	0	tests/helpers/phone-gate.js
+70	0	tests/phone-baseline.json
+109	0	tests/phone.authed.spec.js
+167	0	tests/phone.spec.js
+@@46de361|1787270102|1787270102|2026-08-21|2026-08-21|docs: revizija pred compact -- zastarjela zapovijed 'sljedeca cigla = K4' oznacena kao nadidjena
+
+4	3	CLAUDE.md
+@@9c41bb2|1787314765|1787314765|2026-08-21|2026-08-21|T1: sigurna zona je pravilo, a ne navika (faza TELEFON, spec 9.8)
+
+39	6	CLAUDE.md
+6	6	contact.html
+6	0	css/browse.css
+26	1	css/consent.css
+2	2	css/learn.css
+2	2	css/pages.css
+32	26	css/responsive/03-modes-a11y-print.css
+6	6	css/responsive/04-mobile-extra.css
+1	1	css/responsive/06-component-improvements.css
+24	0	css/studio.css
+27	0	css/variables.css
+153	5	docs/plan/FRONTEND_REDIZAJN.md
+45	14	docs/records/BUGS.md
+10	0	docs/records/CHANGELOG.md
+46	0	docs/records/PROGRESS.md
+6	5	docs/workflow/TESTING.md
+6	6	faq.html
+52	52	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+3	2	package.json
+6	6	privacy.html
+116	0	scripts/check-safe-area.js
+42	30	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+205	28	tests/helpers/phone-gate.js
+41	17	tests/phone-baseline.json
+28	6	tests/phone.authed.spec.js
+43	10	tests/phone.spec.js
+@@a59ace1|1787321498|1787321498|2026-08-21|2026-08-21|T2: jedan naslov po ekranu (faza TELEFON, spec 9.9)
+
+34	6	CLAUDE.md
+6	6	contact.html
+12	29	css/browse.css
+7	53	css/pages.css
+36	22	css/topbar.css
+7	0	data/catalog.js
+131	0	docs/plan/FRONTEND_REDIZAJN.md
+30	12	docs/records/BUGS.md
+12	0	docs/records/CHANGELOG.md
+57	0	docs/records/PROGRESS.md
+2	1	docs/workflow/TESTING.md
+6	6	faq.html
+83	82	index.html
+1	1	js/content-loader.js
+0	2	js/i18n.js
+109	53	js/navigation.js
+3	3	manifest.json
+6	6	privacy.html
+11	87	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+13	1	tests/helpers/phone-gate.js
+38	24	tests/materials-entry.spec.js
+24	53	tests/phone-baseline.json
+@@c8cd92c|1787331347|1787331347|2026-08-21|2026-08-21|docs: macroeconomics re-syncan (Leonova ruka) + revizija stanja projekta
+
+2	1	CLAUDE.md
+23	10	docs/records/BACKLOG.md
+5	0	docs/records/CHANGELOG.md
+35	0	docs/records/PROGRESS.md
+@@447059e|1787332312|1787332312|2026-08-21|2026-08-21|docs: leaked-password je BESPLATNO rjesiv + self-host Supabase odlucen za poslije
+
+3	1	CLAUDE.md
+73	0	docs/records/BACKLOG.md
+@@ea4e001|1787337562|1787337562|2026-08-21|2026-08-21|T3: budzet kroma <= 20 % -- DVA pravila, jer je oskudica suprotna (spec 9.10)
+
+29	6	CLAUDE.md
+6	6	contact.html
+9	0	css/app.css
+145	6	css/topbar.css
+124	0	docs/plan/FRONTEND_REDIZAJN.md
+10	5	docs/records/BACKLOG.md
+8	0	docs/records/CHANGELOG.md
+52	0	docs/records/PROGRESS.md
+3	1	docs/workflow/TESTING.md
+6	6	faq.html
+60	52	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+58	4	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+9	37	tests/phone-baseline.json
+@@8de0348|1787352774|1787352774|2026-08-22|2026-08-22|T4: cookie-traka nije bila previsoka nego je POKRIVALA navigaciju (spec 9.11)
+
+38	5	CLAUDE.md
+6	6	contact.html
+9	0	css/app.css
+37	17	css/consent.css
+11	1	css/profile.css
+1	0	css/tokens.static.css
+7	0	css/topbar.css
+173	2	docs/plan/FRONTEND_REDIZAJN.md
+2	0	docs/records/BACKLOG.md
+41	1	docs/records/BUGS.md
+11	1	docs/records/CHANGELOG.md
+72	0	docs/records/PROGRESS.md
+7	3	docs/workflow/TESTING.md
+6	6	faq.html
+52	52	index.html
+172	17	js/consent.js
+1	1	js/content-loader.js
+10	0	js/i18n.js
+3	3	manifest.json
+6	6	privacy.html
+3	0	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+71	0	tests/helpers/phone-gate.js
+12	13	tests/phone-baseline.json
+8	1	tests/phone.authed.spec.js
+11	1	tests/phone.spec.js
+@@4560081|1787357054|1787357054|2026-08-22|2026-08-22|docs: revizija pred compact (pravilo #6) -- brana ima OSAM tvrdnji, i puna suita je zapisana
+
+1	1	CLAUDE.md
+1	1	docs/plan/FRONTEND_REDIZAJN.md
+1	1	docs/records/CHANGELOG.md
+2	1	docs/records/PROGRESS.md
+1	1	docs/workflow/TESTING.md
+@@d0ed45b|1787399327|1787399327|2026-08-22|2026-08-22|docs: dvije parkirane ideje -- simulacija hotela + matura ide kroz RECEPTE
+
+1	1	CLAUDE.md
+11	0	docs/README.md
+97	0	docs/ideas/HOTEL_SIM.md
+43	0	docs/records/BACKLOG.md
+@@5f12f1c|1787402588|1787402588|2026-08-22|2026-08-22|T5: hero nije bio prevelik nego KONSTANTAN -- 444 px na svakom telefonu (spec 9.12)
+
+415	382	CLAUDE.md
+6	6	contact.html
+100	6	css/landing.css
+139	1	docs/plan/FRONTEND_REDIZAJN.md
+32	0	docs/records/BACKLOG.md
+8	0	docs/records/CHANGELOG.md
+64	0	docs/records/PROGRESS.md
+3	2	docs/workflow/TESTING.md
+6	6	faq.html
+56	57	index.html
+1	1	js/content-loader.js
+8	2	js/i18n.js
+3	3	manifest.json
+6	6	privacy.html
+49	29	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+61	0	tests/landing.spec.js
+0	2	tests/phone-baseline.json
+@@fe17407|1787408475|1787408475|2026-08-22|2026-08-22|docs: revizija pred compact (pravilo #6) -- cetiri zastarjele tvrdnje i jedan pravi nalaz
+
+8	3	CLAUDE.md
+19	1	docs/plan/FRONTEND_REDIZAJN.md
+5	2	docs/records/BACKLOG.md
+1	0	docs/records/CHANGELOG.md
+@@1837ba2|1787411396|1787411396|2026-08-22|2026-08-22|T6/A: admin.js se nije dao preseliti cijel -- rez ide KROZ njega (spec 9.13)
+
+6	6	contact.html
+6	6	faq.html
+54	52	index.html
+71	0	js/admin-reveal.js
+21	70	js/admin.js
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+1	1	sw.js
+6	6	terms.html
+@@1a0d028|1787442890|1787442890|2026-08-23|2026-08-23|T6/B: editor je dobio adresu -- pa i problem koji je K1 izbjegavao (spec 9.13)
+
+6	6	contact.html
+3	0	css/app.css
+15	0	css/studio.css
+166	0	editor.html
+6	6	faq.html
+55	53	index.html
+1	1	js/content-loader.js
+194	0	js/editor-page.js
+12	0	js/i18n.js
+0	35	js/init.js
+48	0	js/theme.js
+3	3	manifest.json
+6	6	privacy.html
+10	2	scripts/check-cdn.js
+14	3	scripts/check-tailwind.js
+22	0	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+80	0	tests/editor-page.authed.spec.js
+64	0	tests/editor-page.spec.js
+@@50e1586|1787517351|1787517351|2026-08-23|2026-08-23|T6/C: sedam padova nije bilo u proizvodu nego u testnoj instalaciji (spec 9.13)
+
+53	10	CLAUDE.md
+6	6	contact.html
+140	1	docs/plan/FRONTEND_REDIZAJN.md
+22	1	docs/records/BACKLOG.md
+10	0	docs/records/CHANGELOG.md
+92	0	docs/records/PROGRESS.md
+19	0	docs/workflow/TESTING.md
+33	33	editor.html
+6	6	faq.html
+47	69	index.html
+1	1	js/content-loader.js
+38	16	js/editor-page.js
+5	5	js/my-materials.js
+8	25	js/navigation.js
+5	2	js/profile.js
+3	3	manifest.json
+3	2	package.json
+6	6	privacy.html
+113	0	scripts/check-budget.js
+7	1	sw.js
+6	6	terms.html
+3	6	tests/a11y.authed.spec.js
+4	12	tests/admin-detect.authed.spec.js
+28	203	tests/admin.spec.js
+8	6	tests/card-limits.authed.spec.js
+3	6	tests/cascade.authed.spec.js
+3	6	tests/category-ops.authed.spec.js
+22	7	tests/f4-e2e.authed.spec.js
+29	1	tests/helpers/phone-gate.js
+13	0	tests/helpers/reach-gate.js
+52	0	tests/helpers/studio-entry.js
+3	6	tests/item-ops.authed.spec.js
+3	6	tests/layout.authed.spec.js
+11	3	tests/material-authoring.authed.spec.js
+18	3	tests/node-editor.authed.spec.js
+27	5	tests/node-images.authed.spec.js
+3	6	tests/publish-rpc.authed.spec.js
+9	9	tests/reachability.authed.spec.js
+6	9	tests/studio-chrome.authed.spec.js
+17	4	tests/studio-math.authed.spec.js
+8	9	tests/studio-mobile.authed.spec.js
+3	6	tests/studio.authed.spec.js
+@@0234d20|1787532348|1787532348|2026-08-24|2026-08-24|BUG-032: katalog je bio nedostupan svakome tko ne koristi mis
+
+18	5	CLAUDE.md
+6	6	contact.html
+21	0	css/pages.css
+85	0	docs/records/BACKLOG.md
+48	7	docs/records/BUGS.md
+11	0	docs/records/CHANGELOG.md
+63	0	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+47	47	index.html
+1	1	js/content-loader.js
+1	0	js/i18n.js
+52	15	js/navigation.js
+3	3	manifest.json
+6	6	privacy.html
+13	0	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+138	0	tests/lesson-card.spec.js
+1	5	tests/phone-baseline.json
+@@f1284e8|1787536943|1787536943|2026-08-24|2026-08-24|fix(ci): tri zelena lokalno, tri crvena na Linuxu -- i nijedan nije bio u proizvodu
+
+6	6	contact.html
+13	0	css/landing.css
+33	33	editor.html
+6	6	faq.html
+66	48	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+1	0	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+28	3	tests/helpers/phone-gate.js
+@@c868a36|1787540779|1787540779|2026-08-24|2026-08-24|chore(ci): pad koji se ne da procitati bez kljuca kosta jednu rundu po pokusaju
+
+7	1	playwright.config.js
+@@0b4074a|1787542593|1787542593|2026-08-24|2026-08-24|fix(landing): tvrdnja koja prolazi s 3,7 % rezerve ne mjeri ispravnost nego srecu
+
+6	6	contact.html
+33	0	css/landing.css
+33	33	editor.html
+6	6	faq.html
+47	47	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+19	0	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@286a050|1787543696|1787543696|2026-08-24|2026-08-24|fix(test): setup koji obori 92 testa zbog sub-sekundne utrke nije brana
+
+115	92	tests/auth.setup.js
+@@110f5ef|1787545074|1787545074|2026-08-24|2026-08-24|docs: tri kvara u MJERI, nijedan u proizvodu -- i pouka koja vrijedi dalje
+
+16	2	CLAUDE.md
+29	0	docs/records/CHANGELOG.md
+@@82f8560|1787570622|1787570622|2026-08-24|2026-08-24|merge: TELEFON (T0-T6) + BUG-032 -- produkcija je bila neupotrebljiva na mobitelu
+@@d999711|1787571476|1787571476|2026-08-24|2026-08-24|docs: zapis uz deploy + revizija pred compact (pravilo #6)
+
+52	13	CLAUDE.md
+12	1	docs/plan/FRONTEND_REDIZAJN.md
+39	0	docs/records/CHANGELOG.md
+89	0	docs/records/PROGRESS.md
+@@a582b05|1787611348|1787611348|2026-08-25|2026-08-25|about: stranica bez izlaza -- i jezik koji cijela aplikacija nije deklarirala (spec 9.14)
+
+577	529	CLAUDE.md
+6	6	contact.html
+82	25	css/pages.css
+4	3	css/responsive/03-modes-a11y-print.css
+132	1	docs/plan/FRONTEND_REDIZAJN.md
+40	0	docs/records/BACKLOG.md
+47	1	docs/records/BUGS.md
+41	0	docs/records/CHANGELOG.md
+61	1	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+84	63	index.html
+1	1	js/content-loader.js
+37	2	js/i18n.js
+3	3	manifest.json
+6	6	privacy.html
+1	1	scripts/palette-baseline.json
+48	27	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+181	0	tests/about.spec.js
+29	0	tests/i18n.spec.js
+2	7	tests/phone-baseline.json
+@@c10dc88|1787614428|1787614428|2026-08-25|2026-08-25|predstavljanje: jedna prica na cetiri mjesta, i ono sto Google zapravo cita (spec 9.15)
+
+17	1	CLAUDE.md
+6	6	contact.html
+106	0	docs/plan/FRONTEND_REDIZAJN.md
+47	0	docs/records/BACKLOG.md
+37	0	docs/records/CHANGELOG.md
+30	0	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+102	57	index.html
+1	1	js/content-loader.js
+13	4	js/i18n.js
+3	3	manifest.json
+-	-	og-cover.png
+4	2	package.json
+6	6	privacy.html
+17	0	robots.txt
+119	0	scripts/build-og-image.js
+205	0	scripts/check-seo.js
+23	0	sitemap.xml
+1	1	sw.js
+6	6	terms.html
+@@eb9f599|1787616803|1787616803|2026-08-25|2026-08-25|docs: revizija pred compact (pravilo #6) -- BUG-034: brana s rucnim popisom je propustala 23 datoteke
+
+5	7	CLAUDE.md
+6	6	contact.html
+4	2	docs/plan/FRONTEND_REDIZAJN.md
+26	1	docs/records/BACKLOG.md
+53	1	docs/records/BUGS.md
+39	0	docs/records/CHANGELOG.md
+22	0	docs/records/PROGRESS.md
+8	1	docs/workflow/TESTING.md
+33	33	editor.html
+6	6	faq.html
+47	47	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+19	1	scripts/check-docs.js
+2	2	sw.js
+6	6	terms.html
+@@0107917|1787626811|1787626811|2026-08-25|2026-08-25|docs: CLAUDE.md -64 % -- povijest cigli izlazi, obrazlozenja brana idu u skripte
+
+222	492	CLAUDE.md
+33	0	docs/records/CHANGELOG.md
+31	0	docs/records/PROGRESS.md
+31	0	docs/workflow/TESTING.md
+20	0	scripts/check-docs.js
+@@29a28c8|1787628959|1787628959|2026-08-25|2026-08-25|docs: TESTING.md prestaje biti inventar (-68 %) + 7. provjera: duh-datoteka
+
+16	1	docs/records/BACKLOG.md
+24	0	docs/records/CHANGELOG.md
+17	0	docs/records/PROGRESS.md
+81	119	docs/workflow/TESTING.md
+42	0	scripts/check-docs.js
+@@42490dc|1787629203|1787629203|2026-08-25|2026-08-25|docs: plan spreman za C4-C7 -- brojke se MJERE (npm run css:debt) + spec 9.16
+
+1	0	CLAUDE.md
+66	2	docs/plan/FRONTEND_REDIZAJN.md
+25	0	docs/records/CHANGELOG.md
+17	0	docs/records/PROGRESS.md
+1	0	package.json
+104	0	scripts/css-debt.js
+@@af408bd|1787629409|1787629409|2026-08-25|2026-08-25|docs: status-revizija BACKLOG-a -- i jedna ZASTARJELA ODLUKA, ne samo cinjenica
+
+21	4	docs/records/BACKLOG.md
+15	0	docs/records/PROGRESS.md
+@@7d3adf2|1787630156|1787630156|2026-08-25|2026-08-25|docs: sljedeci posao je odabran -- editor (2), dopune; (1) ostaje C5a
+
+7	3	docs/records/BACKLOG.md
+@@d6d437a|1787631056|1787631056|2026-08-25|2026-08-25|D1: praznina se UBACUJE gumbom -- a "jedna podvlaka" bi slomila mikroekonomiju
+
+6	6	contact.html
+4	0	css/profile.css
+7	0	docs/records/BACKLOG.md
+18	0	docs/records/CHANGELOG.md
+22	0	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+47	47	index.html
+74	3	js/admin-editors.js
+1	1	js/content-loader.js
+5	2	js/i18n.js
+3	3	manifest.json
+1	1	package.json
+6	6	privacy.html
+15	0	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+102	0	tests/unit/fill-blank-format.test.js
+@@48565ae|1787632050|1787632050|2026-08-25|2026-08-25|D2: recenica smije imati VISE praznina -- polje se seli U recenicu, ocjena ide PO praznini
+
+6	6	contact.html
+22	0	css/fill-blanks-section.css
+10	0	docs/architecture/CONTENT_SCHEMA.md
+5	2	docs/records/BACKLOG.md
+21	0	docs/records/CHANGELOG.md
+21	0	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+47	47	index.html
+54	9	js/admin-editors.js
+1	1	js/content-loader.js
+97	9	js/fill-blanks.js
+2	1	js/i18n.js
+5	1	js/studio.js
+3	3	manifest.json
+6	6	privacy.html
+1	0	schema/subject-content.schema.json
+24	0	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+90	0	tests/fill-multi.spec.js
+75	5	tests/unit/fill-blank-format.test.js
+@@72b8ac5|1787668452|1787668620|2026-08-25|2026-08-25|docs: revizija pred compact (pravilo #6) -- zastarjelo SADASNJE vrijeme, ne brojke
+
+5	2	CLAUDE.md
+1	0	docs/README.md
+233	0	docs/ideas/MODULI.md
+8	0	docs/plan/FRONTEND_REDIZAJN.md
+4	1	docs/records/BACKLOG.md
+5	0	docs/records/BUGS.md
+1	0	docs/workflow/CONTENT_GENERATOR.md
+@@2c150cb|1787707495|1787707495|2026-08-26|2026-08-26|docs: recenzija MODULI.md -- dva troska nisu bila proknjizena, a najveca korist ne treba seobu
+
+55	15	docs/ideas/MODULI.md
+@@cfc96a0|1787711707|1787711707|2026-08-26|2026-08-26|P1: predmet se skida na uredaj -- a landing je offline obecavao od C2 (spec 9.17)
+
+3	2	CLAUDE.md
+6	6	contact.html
+2	0	css/app.css
+59	0	css/offline.css
+50	0	docs/plan/FRONTEND_REDIZAJN.md
+38	0	docs/records/CHANGELOG.md
+49	0	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+55	47	index.html
+1	1	js/content-loader.js
+9	0	js/i18n.js
+5	0	js/navigation.js
+337	0	js/offline-store.js
+3	3	manifest.json
+1	1	package.json
+6	6	privacy.html
+8	1	scripts/static-server.js
+50	0	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+28	0	tests/a11y.spec.js
+115	0	tests/offline-download.spec.js
+270	0	tests/unit/offline-store.test.js
+@@8642328|1787765495|1787765495|2026-08-26|2026-08-26|P2: polica ima dva izvora -- a jedan od njih nije bio ni ciji je mislio (spec 9.18)
+
+6	6	contact.html
+74	0	css/offline.css
+39	0	docs/plan/FRONTEND_REDIZAJN.md
+7	1	docs/product/VISION.md
+18	0	docs/records/CHANGELOG.md
+18	0	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+55	48	index.html
+1	1	js/content-loader.js
+5	0	js/i18n.js
+3	0	js/navigation.js
+119	0	js/offline-store.js
+3	3	manifest.json
+6	6	privacy.html
+62	0	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+110	0	tests/shelf.spec.js
+26	0	tests/unit/offline-store.test.js
+@@d7dd69d|1787765767|1787765767|2026-08-26|2026-08-26|docs: revizija BACKLOG-a poslije P2 -- i jedan pokazivac koji je visio u prazno
+
+25	5	docs/records/BACKLOG.md
+@@dcd25d8|1787766156|1787766156|2026-08-26|2026-08-26|docs: ISPRAVAK istog dana -- N2 nije isporucen nego POLA
+
+15	5	docs/records/BACKLOG.md
+@@29c677a|1787936345|1787936345|2026-08-28|2026-08-28|docs: priprema za sljedecu sesiju -- tri zastarjele tvrdnje i P3 specificiran PRIJE gradnje
+
+32	19	CLAUDE.md
+68	0	docs/plan/FRONTEND_REDIZAJN.md
+-	-	iw-desktop-hero.png
+-	-	iw-events.png
+-	-	iw-phone.png
+-	-	iw-top.png
+@@e4e1924|1787945702|1787945702|2026-08-28|2026-08-28|docs: tri stavke "za Leonovu ruku" su odradjene -- i jedna je otvorila novi rub
+
+10	13	CLAUDE.md
+25	0	docs/records/BACKLOG.md
+@@afe8fd3|1787946058|1787946058|2026-08-28|2026-08-28|docs: revizija pred compact (pravilo #6) -- cetiri zatvorene stavke i jedno upozorenje koje se obistinilo
+
+1	1	docs/plan/FRONTEND_REDIZAJN.md
+29	10	docs/records/BACKLOG.md
+@@a497f10|1787947904|1787947904|2026-08-28|2026-08-28|AUTH-1: poruka o lozinci govori korisnikov jezik -- a zadatak koji ju je narucio bio je kriv
+
+7	5	CLAUDE.md
+6	6	contact.html
+48	18	docs/records/BACKLOG.md
+26	0	docs/records/CHANGELOG.md
+26	0	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+48	48	index.html
+60	11	js/auth.js
+1	1	js/content-loader.js
+8	0	js/i18n.js
+3	3	manifest.json
+1	1	package.json
+6	6	privacy.html
+1	1	sw.js
+6	6	terms.html
+172	0	tests/unit/auth-error.test.js
+@@406beef|1787949352|1787949352|2026-08-28|2026-08-28|P3: skinut predmet prezivi deploy -- a prvi dokaz koji sam napisao nije mjerio nista
+
+1	1	CLAUDE.md
+6	6	contact.html
+54	3	css/offline.css
+51	0	docs/plan/FRONTEND_REDIZAJN.md
+22	0	docs/records/CHANGELOG.md
+23	0	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+48	48	index.html
+1	1	js/content-loader.js
+5	0	js/i18n.js
+109	9	js/offline-store.js
+3	3	manifest.json
+6	6	privacy.html
+40	3	styles.bundle.css
+71	18	sw.js
+6	6	terms.html
+299	0	tests/offline-study.spec.js
+96	0	tests/unit/offline-store.test.js
+@@97c2680|1787950811|1787950811|2026-08-28|2026-08-28|P4: napredak prezivi povratak mreze -- faza POLICA je ZATVORENA
+
+4	3	CLAUDE.md
+6	6	contact.html
+56	0	docs/plan/FRONTEND_REDIZAJN.md
+22	0	docs/records/CHANGELOG.md
+23	0	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+48	48	index.html
+5	1	js/cloud-sync.js
+1	1	js/content-loader.js
+3	3	manifest.json
+1	1	package.json
+6	6	privacy.html
+1	1	sw.js
+6	6	terms.html
+70	1	tests/offline-study.spec.js
+244	0	tests/unit/cloud-sync.test.js
+@@81665d2|1787961420|1787961420|2026-08-29|2026-08-29|ALAT-1: css:diff prestaje lagati o seobi markup -> CSS (dug placen PRIJE C4)
+
+3	4	CLAUDE.md
+26	0	docs/records/CHANGELOG.md
+28	0	docs/records/PROGRESS.md
+143	28	scripts/css-diff.js
+4	1	scripts/static-server.js
+@@26b1cd1|1787961690|1787961690|2026-08-29|2026-08-29|docs: revizija pred compact (pravilo #6) -- jedan NALOG koji je vec izvrsen i jedna nosiva tvrdnja
+
+11	1	docs/plan/FRONTEND_REDIZAJN.md
+4	2	docs/records/BACKLOG.md
+3	1	docs/workflow/TESTING.md
+@@80fc83c|1788000587|1788000587|2026-08-29|2026-08-29|C4a: mrtva povrsina odlazi -- i vodila je pravu ikonu u nevidljivost (spec 10.1)
+
+17	20	CLAUDE.md
+6	6	contact.html
+6	2	css/app.css
+4	37	css/browse.css
+2	7	css/components.css
+3	47	css/pages.css
+0	15	css/responsive/01-up-and-phone-breakpoints.css
+0	75	css/responsive/02-mobile-core.css
+0	4	css/responsive/03-modes-a11y-print.css
+0	21	css/responsive/05-device-sizes.css
+0	494	css/subject-selector.css
+145	1	docs/plan/FRONTEND_REDIZAJN.md
+14	2	docs/records/BACKLOG.md
+69	0	docs/records/CHANGELOG.md
+39	1	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+48	48	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+2	1	package.json
+6	6	privacy.html
+173	0	scripts/check-orphan-css.js
+3	1	scripts/css-debt.js
+10	2	scripts/css-diff.js
+111	0	scripts/orphan-css-baseline.json
+1	2	scripts/palette-baseline.json
+1	703	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@e1ace64|1788003604|1788003604|2026-08-29|2026-08-29|Potraga za kvarovima koji se ne vide: 9 mjesta, 2 nove brane (spec 10.2)
+
+18	21	CLAUDE.md
+6	6	contact.html
+4	2	css/home-section.css
+5	3	css/learn.css
+6	1	css/pages.css
+3	1	css/quiz-section.css
+87	0	docs/plan/FRONTEND_REDIZAJN.md
+46	0	docs/records/BACKLOG.md
+57	0	docs/records/CHANGELOG.md
+30	0	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+48	48	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+1	0	package.json
+6	6	privacy.html
+213	0	scripts/check-contrast-live.js
+67	0	scripts/check-palette.js
+8	0	scripts/contrast-live-allow.json
+7	7	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@8117624|1788012707|1788012707|2026-08-29|2026-08-29|docs: revizija pred compact (pravilo #6) -- pet nalaza, od toga jedan NALOG i tri brojke
+
+2	2	CLAUDE.md
+23	7	docs/plan/FRONTEND_REDIZAJN.md
+5	3	docs/records/BACKLOG.md
+43	1	docs/records/BUGS.md
+1	1	docs/records/CHANGELOG.md
+8	1	docs/workflow/TESTING.md
+@@df1d6e2|1788014937|1788014937|2026-08-29|2026-08-29|C4b/1: browse prelazi na utilityje -- i rez ide po ELEMENTU, ne po datoteci
+
+6	6	contact.html
+8	2	css/app.css
+55	141	css/browse.css
+33	33	editor.html
+6	6	faq.html
+60	53	index.html
+1	1	js/content-loader.js
+20	7	js/navigation.js
+3	3	manifest.json
+6	6	privacy.html
+33	1	scripts/check-tailwind.js
+26	3	scripts/css-diff.js
+160	98	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@a4dfc22|1788016354|1788016354|2026-08-29|2026-08-29|C4b/2: lekcije -- dvije ljestve pragova su se tukle, tri pravila bila mrtva (spec 10.3)
+
+6	6	contact.html
+5	1	css/app.css
+113	0	css/lessons.css
+5	113	css/pages.css
+8	45	css/responsive/05-device-sizes.css
+3	22	css/responsive/06-component-improvements.css
+176	2	docs/plan/FRONTEND_REDIZAJN.md
+66	0	docs/records/CHANGELOG.md
+33	33	editor.html
+6	6	faq.html
+62	53	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+7	2	scripts/css-debt.js
+44	92	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@9e39f7c|1788017218|1788017218|2026-08-29|2026-08-29|docs: zapis uz C4b -- PROGRESS + CLAUDE.md, i jedan inventar manje
+
+20	23	CLAUDE.md
+32	0	docs/records/PROGRESS.md
+@@369adad|1788018461|1788018461|2026-08-29|2026-08-29|docs: puna suita potvrdjena -- 529/0, i nalog izlazi iz zapisa dok je svjez
+
+4	3	docs/records/PROGRESS.md
+@@0375fa7|1788021581|1788021581|2026-08-29|2026-08-29|docs: revizija pred compact (pravilo #6) -- jedna NEISTINA, dva zastarjela naloga, sest brojki
+
+1	1	CLAUDE.md
+1	1	docs/README.md
+3	1	docs/architecture/BACKEND.md
+2	1	docs/architecture/CONTENT_SCHEMA.md
+14	5	docs/plan/FRONTEND_REDIZAJN.md
+42	16	docs/records/BACKLOG.md
+1	1	docs/records/CHANGELOG.md
+6	3	docs/records/DECISIONS.md
+3	2	docs/subjects/README.md
+4	0	docs/workflow/TESTING.md
+4	2	scripts/check-tailwind.js
+@@46e7b45|1788090051|1788090051|2026-08-30|2026-08-30|C5a/1: kromo ucenja -- i tri pravila koja su lagala o sebi (spec 11.1)
+
+11	9	CLAUDE.md
+6	6	contact.html
+19	1	css/app.css
+4	190	css/pages.css
+0	8	css/responsive/01-up-and-phone-breakpoints.css
+0	23	css/responsive/02-mobile-core.css
+0	9	css/responsive/03-modes-a11y-print.css
+0	43	css/responsive/04-mobile-extra.css
+0	16	css/responsive/06-component-improvements.css
+291	0	css/study-chrome.css
+135	1	docs/plan/FRONTEND_REDIZAJN.md
+46	1	docs/records/BUGS.md
+54	0	docs/records/CHANGELOG.md
+44	0	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+68	52	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+7	3	scripts/css-debt.js
+22	0	scripts/css-diff.js
+227	232	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@1620c56|1788098343|1788098343|2026-08-30|2026-08-30|C5a/2: kartice i dopune -- a prvi kvar je bio u MJERACU (spec 11.2)
+
+7	6	CLAUDE.md
+6	6	contact.html
+57	4	css/fill-blanks-section.css
+143	19	css/flashcards-section.css
+0	51	css/responsive/01-up-and-phone-breakpoints.css
+0	83	css/responsive/02-mobile-core.css
+0	13	css/responsive/03-modes-a11y-print.css
+0	166	css/responsive/04-mobile-extra.css
+0	86	css/responsive/05-device-sizes.css
+0	129	css/responsive/06-component-improvements.css
+151	1	docs/plan/FRONTEND_REDIZAJN.md
+70	1	docs/records/BUGS.md
+44	0	docs/records/CHANGELOG.md
+43	0	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+60	60	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+85	7	scripts/css-diff.js
+0	14	scripts/orphan-css-baseline.json
+1	1	scripts/palette-baseline.json
+256	413	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@0ce25af|1788104529|1788104529|2026-08-30|2026-08-30|docs: ADR-031 (MCP je cjevovod) + seoba se suzila na SAMO Supabase
+
+40	40	CLAUDE.md
+1	1	docs/README.md
+11	3	docs/plan/FRONTEND_REDIZAJN.md
+8	2	docs/plan/ROADMAP.md
+1	1	docs/product/PRD.md
+122	4	docs/records/BACKLOG.md
+10	0	docs/records/BUGS.md
+81	0	docs/records/DECISIONS.md
+44	0	docs/records/PROGRESS.md
+7	1	scripts/css-debt.js
+@@396f178|1788110946|1788110946|2026-08-30|2026-08-30|C5a/3: kviz -- ljestva koja se nikad nije iscrtala (spec 11.3)
+
+3	3	CLAUDE.md
+6	6	contact.html
+142	33	css/quiz-section.css
+0	45	css/responsive/01-up-and-phone-breakpoints.css
+0	91	css/responsive/02-mobile-core.css
+0	15	css/responsive/03-modes-a11y-print.css
+0	95	css/responsive/04-mobile-extra.css
+1	41	css/responsive/05-device-sizes.css
+0	61	css/responsive/06-component-improvements.css
+106	1	docs/plan/FRONTEND_REDIZAJN.md
+44	0	docs/records/BUGS.md
+51	0	docs/records/CHANGELOG.md
+44	0	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+58	58	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+0	10	scripts/orphan-css-baseline.json
+207	291	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@e3767ac|1788112894|1788112894|2026-08-30|2026-08-30|docs: revizija pred compact (pravilo #6) -- jedan STVARAN nalog i cetiri ostarjele tvrdnje
+
+16	15	CLAUDE.md
+20	4	docs/plan/FRONTEND_REDIZAJN.md
+14	3	docs/records/BACKLOG.md
+3	2	docs/records/PROGRESS.md
+@@cea250e|1788116714|1788116714|2026-08-30|2026-08-30|C5a/4a: napredak -- 12 od 32 pravila nije radilo nista (spec 11.4)
+
+6	6	contact.html
+149	38	css/progress-section.css
+0	23	css/responsive/01-up-and-phone-breakpoints.css
+0	38	css/responsive/02-mobile-core.css
+0	55	css/responsive/04-mobile-extra.css
+0	44	css/responsive/06-component-improvements.css
+127	1	docs/plan/FRONTEND_REDIZAJN.md
+27	0	docs/records/BACKLOG.md
+13	0	docs/records/BUGS.md
+53	0	docs/records/CHANGELOG.md
+42	0	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+61	61	index.html
+1	1	js/content-loader.js
+3	3	js/progress.js
+3	3	manifest.json
+6	6	privacy.html
+0	11	scripts/orphan-css-baseline.json
+100	151	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@54ffb69|1788119671|1788119671|2026-08-30|2026-08-30|C5a/4b: kontrast, mjera na telefonu -- i 7 od 11 na jednoj odluci (spec 11.4)
+
+17	18	CLAUDE.md
+6	6	contact.html
+31	4	css/progress-section.css
+79	1	docs/plan/FRONTEND_REDIZAJN.md
+59	1	docs/records/BACKLOG.md
+6	2	docs/records/BUGS.md
+40	0	docs/records/CHANGELOG.md
+41	0	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+48	48	index.html
+1	1	js/content-loader.js
+12	1	js/progress.js
+3	3	manifest.json
+6	6	privacy.html
+1	8	scripts/contrast-live-allow.json
+17	4	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+4	1	tests/helpers/phone-gate.js
+@@9275c21|1788121470|1788121470|2026-08-30|2026-08-30|docs: revizija pred compact (pravilo #6) + MJERA za C5b (spec 12)
+
+12	13	CLAUDE.md
+159	3	docs/plan/FRONTEND_REDIZAJN.md
+18	14	docs/records/BACKLOG.md
+35	0	docs/records/PROGRESS.md
+@@6cbef10|1788123536|1788123536|2026-08-30|2026-08-30|docs: obrnuti rizik C5b-a nije "dva pravila" nego NULA (spec 12.2)
+
+45	14	docs/plan/FRONTEND_REDIZAJN.md
+@@ff1b87e|1788127362|1788127362|2026-08-31|2026-08-31|docs: cetiri Leonove odluke -- ADR-032 (ispune), OAuth NE, history plitak, VPS otvoren
+
+27	27	CLAUDE.md
+79	21	docs/records/BACKLOG.md
+58	0	docs/records/DECISIONS.md
+@@4a769e5|1788128163|1788128163|2026-08-31|2026-08-31|docs: seoba ODGODJENA za ~mjesec dana -- zapovijed povucena sa svih mjesta
+
+22	21	CLAUDE.md
+19	1	docs/records/BACKLOG.md
+38	0	docs/records/PROGRESS.md
+@@cf53287|1788132886|1788132886|2026-08-31|2026-08-31|C5b/0: boje gradiva bile su nevidljive na zadanoj temi (spec 12.7)
+
+17	19	CLAUDE.md
+6	6	contact.html
+8	1	css/blind-map.css
+5	2	css/exercises.css
+38	17	css/learn-blocks.css
+5	3	css/math.css
+50	15	css/tokens.css
+40	0	css/tokens.static.css
+101	0	docs/plan/FRONTEND_REDIZAJN.md
+51	0	docs/records/BUGS.md
+38	0	docs/records/CHANGELOG.md
+58	0	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+48	48	index.html
+10	4	js/block-editor.js
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+9	1	scripts/check-contrast-live.js
+10	1	scripts/check-contrast.js
+1	1	scripts/palette-baseline.json
+58	18	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+120	0	tests/learn-blocks-contrast.spec.js
+@@e889825|1788134202|1788134202|2026-08-31|2026-08-31|docs: revizija pred compact (pravilo #6) -- sest tvrdnji koje je C5b/0 ostario
+
+2	2	CLAUDE.md
+9	8	docs/plan/FRONTEND_REDIZAJN.md
+5	0	docs/records/BACKLOG.md
+34	2	docs/workflow/TESTING.md
+@@8a9479f|1788137867|1788137867|2026-08-31|2026-08-31|BUG-042: pouka je bila zapisana u datoteci koju pali spec nije zvao
+
+36	0	docs/records/BUGS.md
+32	0	docs/records/CHANGELOG.md
+52	0	docs/records/PROGRESS.md
+31	0	docs/workflow/TESTING.md
+1	1	package.json
+16	35	tests/a11y.spec.js
+18	4	tests/helpers/axe-gate.js
+121	0	tests/unit/axe-gate-usage.test.js
+@@9237006|1788166634|1788166634|2026-08-31|2026-08-31|C5b/1a: exercises.css migriran -- ali mjera je prvo oborila redoslijed cigli
+
+2	2	CLAUDE.md
+6	6	contact.html
+11	5	css/app.css
+10	53	css/exercises.css
+136	0	docs/plan/FRONTEND_REDIZAJN.md
+39	0	docs/records/CHANGELOG.md
+46	0	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+51	51	index.html
+1	1	js/content-loader.js
+12	12	js/exercises.js
+3	3	manifest.json
+6	6	privacy.html
+28	1	scripts/css-diff.js
+1	1	scripts/palette-baseline.json
+39	53	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@8c3e854|1788168048|1788168048|2026-08-31|2026-08-31|ci: job je OTKAZAN a nijedan test nije pao -- budzet je pojela suita
+
+9	1	.github/workflows/ci.yml
+9	0	docs/workflow/TESTING.md
+@@5b269ce|1788170462|1788170462|2026-08-31|2026-08-31|C5b/1b: learn-blocks.css migriran; math.css izasao iz opsega MJEROM
+
+2	2	CLAUDE.md
+6	6	contact.html
+15	21	css/learn-blocks.css
+1	0	css/tokens.static.css
+72	0	docs/plan/FRONTEND_REDIZAJN.md
+36	0	docs/records/CHANGELOG.md
+51	0	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+48	48	index.html
+9	9	js/blocks-renderer.js
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+0	1	scripts/orphan-css-baseline.json
+26	30	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+4	2	tests/unit/blocks-renderer.test.js
+@@b505ebd|1788172122|1788172122|2026-08-31|2026-08-31|alat: tri rupe iz C5b/1 zatvorene -- prva je bila propust, ne odgoda
+
+5	6	CLAUDE.md
+30	0	docs/plan/FRONTEND_REDIZAJN.md
+1	0	package.json
+212	0	scripts/blocks-diff.js
+34	0	scripts/css-diff.js
+@@ceb994c|1788176628|1788176628|2026-08-31|2026-08-31|faza MREZA: sanacija dobiva svoj spec -- i brana je morala naucit trece stanje
+
+2	1	docs/README.md
+9	1	docs/plan/FRONTEND_REDIZAJN.md
+283	0	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+22	4	scripts/check-docs.js
+@@0cc945e|1788177025|1788177025|2026-08-31|2026-08-31|docs: cold-start pokazuje na MREZU -- i rez je uzet iz duplikata, ne iz praga
+
+19	19	CLAUDE.md
+10	0	docs/records/BACKLOG.md
+27	0	docs/records/CHANGELOG.md
+48	0	docs/records/PROGRESS.md
+@@6e3ab20|1788179177|1788179177|2026-08-31|2026-08-31|MREZA A1: baza popravljena na stagingu -- a plan je bio kriv na dva mjesta
+
+41	1	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+22	0	docs/records/CHANGELOG.md
+36	0	docs/records/PROGRESS.md
+69	0	supabase/a1-grants-indexes.sql
+10	5	supabase/c3-rls-initplan.sql
+@@0521f5b|1788179761|1788179761|2026-08-31|2026-08-31|MREZA A1 na PRODUKCIJI: performance 14 WARN -> 0, security 15 -> 11
+
+8	2	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+8	2	docs/records/CHANGELOG.md
+11	1	docs/records/PROGRESS.md
+4	0	supabase/a1-grants-indexes.sql
+4	0	supabase/c3-rls-initplan.sql
+@@ce526f5|1788180623|1788180623|2026-08-31|2026-08-31|MREZA A2: check:node napisan i dokazan -- ali namjerno jos ne stoji na vratima
+
+1	0	docs/README.md
+118	0	docs/archive/MODEL_KARTICA_DEMO.md
+57	1	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+24	0	docs/records/CHANGELOG.md
+34	0	docs/records/PROGRESS.md
+3	3	package-lock.json
+5	1	package.json
+127	0	scripts/check-node.js
+78	0	tests/unit/check-node-gate.test.js
+@@c7a296b|1788183989|1788183989|2026-08-31|2026-08-31|MREZA A2 zatvoren: npm audit 15 -> 0, cijeli projekt na Node 24
+
+2	23	.github/workflows/ci.yml
+0	27	.lighthouserc.json
+1	1	.nvmrc
+1	1	CLAUDE.md
+39	25	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+18	0	docs/records/CHANGELOG.md
+36	0	docs/records/PROGRESS.md
+441	4433	package-lock.json
+2	3	package.json
+8	0	scripts/check-lockfile.js
+89	0	tests/web-vitals.spec.js
+@@bda5dd4|1788186214|1788186214|2026-08-31|2026-08-31|docs: revizija pred compact -- cetiri tvrdnje koje je blok A oborio
+
+10	16	CLAUDE.md
+9	5	docs/records/BACKLOG.md
+@@3419e2c|1788190390|1788190390|2026-08-31|2026-08-31|MREZA B1: check:tokens -- var() bez definicije je zakucana vrijednost s ukrasom
+
+6	6	contact.html
+1	1	css/learn-blocks.css
+10	10	css/profile.css
+33	33	editor.html
+6	6	faq.html
+48	48	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+204	0	scripts/check-tokens.js
+11	0	scripts/tokens-baseline.json
+11	11	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+110	0	tests/unit/check-tokens-gate.test.js
+@@15e896d|1788190403|1788190403|2026-08-31|2026-08-31|MREZA B2: check:final imenuje preskocene -- tiho preskakanje nije legitimno
+
+3	2	CLAUDE.md
+40	1	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+28	0	docs/records/CHANGELOG.md
+43	0	docs/records/PROGRESS.md
+3	2	package.json
+59	6	scripts/check-final-drift.js
+10	0	scripts/final-skip-baseline.json
+134	0	tests/unit/check-final-skips.test.js
+@@cdacd8c|1788190913|1788190913|2026-08-31|2026-08-31|MREZA B3a: a11y dug izmjeren po WCAG razini -- i mjerenje je oborilo premisu cigle
+
+32	0	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+12	0	docs/records/CHANGELOG.md
+18	0	docs/records/PROGRESS.md
+1	1	package.json
+30	2	tests/helpers/axe-gate.js
+38	0	tests/unit/wcag-razina.test.js
+@@22b26d6|1788195691|1788195691|2026-08-31|2026-08-31|docs: revizija pred compact (pravilo #6) -- cetiri tvrdnje koje su B1/B3a oborili
+
+6	4	docs/plan/FRONTEND_REDIZAJN.md
+1	1	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+5	0	docs/records/BACKLOG.md
+4	3	docs/records/BUGS.md
+@@95e4178|1788197079|1788197079|2026-08-31|2026-08-31|MREZA B3b: a11y brana sudi po WCAG razini (uniji s tezinom) -- macro ulazi u povrsine, osnovica imenuje
+
+14	0	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+14	0	docs/records/CHANGELOG.md
+11	0	docs/records/PROGRESS.md
+1	1	package.json
+6	0	tests/a11y-baseline.json
+26	0	tests/a11y.spec.js
+80	17	tests/helpers/axe-gate.js
+96	0	tests/unit/a11y-gate.test.js
+@@dba26de|1788198845|1788198845|2026-08-31|2026-08-31|MREZA B3c: skrolabilne formule i tablice dohvatljive tipkovnicom -- 9 na 0, osnovica opet prazna
+
+6	6	contact.html
+14	1	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+12	2	docs/records/BACKLOG.md
+11	0	docs/records/CHANGELOG.md
+13	0	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+48	48	index.html
+16	1	js/blocks-renderer.js
+1	1	js/content-loader.js
+4	0	js/i18n.js
+26	0	js/math.js
+3	3	manifest.json
+6	6	privacy.html
+1	1	sw.js
+6	6	terms.html
+1	3	tests/a11y-baseline.json
+@@9e1517d|1788199310|1788199310|2026-08-31|2026-08-31|MREZA B4: check:cascade -- tko koga gasi u responsive/* postaje izmjeren popis (23 imenovana)
+
+3	2	CLAUDE.md
+17	0	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+3	0	docs/records/BUGS.md
+9	0	docs/records/CHANGELOG.md
+13	0	docs/records/PROGRESS.md
+3	2	package.json
+28	0	scripts/cascade-baseline.json
+298	0	scripts/check-cascade.js
+173	0	tests/unit/check-cascade-gate.test.js
+@@573e0a4|1788199553|1788199553|2026-08-31|2026-08-31|docs: revizija pred compact (pravilo #6) -- ljestvica brane u prozi dovedena na B3b stanje
+
+9	6	docs/plan/FRONTEND_REDIZAJN.md
+1	1	tests/a11y.authed.spec.js
+4	2	tests/a11y.spec.js
+@@8673cc4|1788203492|1788203492|2026-08-31|2026-08-31|MREZA B5: check:i18n -- zakucani tekst postaje izmjeren razred (421 u 23 datoteke)
+
+7	6	CLAUDE.md
+25	1	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+16	2	docs/records/BACKLOG.md
+12	0	docs/records/CHANGELOG.md
+16	0	docs/records/PROGRESS.md
+3	2	package.json
+527	0	scripts/check-i18n.js
+28	0	scripts/i18n-baseline.json
+177	0	tests/unit/check-i18n-gate.test.js
+@@afb5049|1788214020|1788214020|2026-09-01|2026-09-01|docs: revizija pred compact (pravilo #6) -- backlog-stavka za check:i18n vise ne ceka
+
+2	1	docs/plan/FRONTEND_REDIZAJN.md
+@@b2e04ba|1788214742|1788214742|2026-09-01|2026-09-01|docs: ADR-033 -- dvojezicnost se PREVODI, ne gasi; jezik sucelja nikad ne dira predmete (Leon, 2026-09-01)
+
+1	1	CLAUDE.md
+2	2	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+21	2	docs/records/BACKLOG.md
+33	0	docs/records/DECISIONS.md
+@@630d134|1788214750|1788214750|2026-09-01|2026-09-01|MREZA B6: CI shardanje -- 533 testa vise ne zivi u jednom procesu
+
+45	13	.github/workflows/ci.yml
+@@f8068b0|1788215260|1788215260|2026-09-01|2026-09-01|fix: emnapi bomba se opet naoruzala -- i gate koji ju je trebao vidjeti je gledao u krivi minor (Kvar 3)
+
+23	1	package-lock.json
+15	11	scripts/check-lockfile.js
+@@674031f|1788216235|1788216235|2026-09-01|2026-09-01|docs: B6 ISHOD -- blok B zatvoren; CI zid 11.8 min umjesto 19.4, brze brane 24 s
+
+16	1	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+21	0	docs/records/CHANGELOG.md
+17	0	docs/records/PROGRESS.md
+4	0	docs/workflow/TESTING.md
+@@af465be|1788219380|1788219380|2026-09-01|2026-09-01|MREZA C1: fatalno 10 -> 0 -- tinta po temi, ne ispuna (ADR-032); tri pravila presudjena mjerom
+
+6	6	contact.html
+1	1	css/blind-map.css
+7	3	css/home-section.css
+4	2	css/learn.css
+2	2	css/profile.css
+1	1	css/progress-section.css
+2	2	css/quiz-section.css
+1	1	css/sidebar.css
+11	0	css/tokens.css
+12	0	css/tokens.static.css
+5	0	css/variables.css
+14	0	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+14	0	docs/records/CHANGELOG.md
+15	0	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+48	48	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+4	4	scripts/palette-baseline.json
+0	3	scripts/tokens-baseline.json
+28	16	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@88b0d4f|1788221035|1788221035|2026-09-01|2026-09-01|MREZA C2: boja kartice = CIJELA kartica -- tri moda poravnata, inkForTint seli u renderer (EDITOR 1)
+
+6	6	contact.html
+22	0	css/fill-blanks-section.css
+19	0	css/flashcards-section.css
+11	0	css/quiz-section.css
+13	0	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+5	1	docs/records/BACKLOG.md
+12	0	docs/records/CHANGELOG.md
+14	0	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+48	48	index.html
+39	0	js/blocks-renderer.js
+1	1	js/content-loader.js
+5	33	js/navigation.js
+3	3	manifest.json
+6	6	privacy.html
+5	4	scripts/check-contrast.js
+56	0	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+27	0	tests/unit/blocks-renderer.test.js
+@@ef8bc0a|1788225489|1788225489|2026-09-01|2026-09-01|MREZA C3+C4: paleta 93 -> 0 -- blago i stara ugaseni; medjunalaz iz palog suita: par tinti nije dosezao AA na vlastitom sjecistu
+
+6	6	contact.html
+13	11	css/auth.css
+2	2	css/blind-map.css
+241	241	css/components.css
+1	1	css/exercises.css
+8	1	css/flashcards-section.css
+1	1	css/home-section.css
+7	6	css/learn-blocks.css
+23	20	css/learn.css
+1	1	css/pages.css
+18	17	css/profile.css
+5	4	css/quiz-section.css
+1	1	css/responsive/03-modes-a11y-print.css
+1	1	css/responsive/05-device-sizes.css
+2	2	css/sidebar.css
+4	4	css/sokrat-confirm.css
+1	1	css/sokrat-modal.css
+1	1	css/studio.css
+20	5	css/tokens.css
+6	1	css/tokens.static.css
+39	0	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+34	0	docs/records/CHANGELOG.md
+29	0	docs/records/PROGRESS.md
+33	33	editor.html
+6	6	faq.html
+48	48	index.html
+5	2	js/blocks-renderer.js
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+1	19	scripts/palette-baseline.json
+219	79	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@dd8b8d4|1788226050|1788226050|2026-09-01|2026-09-01|docs: revizija pred compact (pravilo #6) -- dvije tvrdnje koje je OVA sesija ucinila zastarjelima
+
+6	6	contact.html
+5	6	css/tokens.css
+3	2	docs/records/DECISIONS.md
+33	33	editor.html
+6	6	faq.html
+48	48	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+1	1	sw.js
+6	6	terms.html
+@@0f6cb68|1788228743|1788228743|2026-09-01|2026-09-01|MREZA D1: inline van -- a krivi zakljucak je srusio klik, ne grep
+
+8	17	contact.html
+17	0	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+12	0	docs/records/CHANGELOG.md
+11	0	docs/records/PROGRESS.md
+36	44	editor.html
+8	17	faq.html
+74	88	index.html
+30	0	js/boot.js
+20	1	js/consent.js
+1	1	js/content-loader.js
+9	0	js/i18n.js
+26	0	js/navigation.js
+3	3	manifest.json
+8	17	privacy.html
+1	1	sw.js
+8	17	terms.html
+@@20828ec|1788228855|1788228855|2026-09-01|2026-09-01|MREZA D2 (1/2): CSP Report-Only na sve rute -- policy iz izmjerene karte izvora
+
+4	0	vercel.json
+@@e60df39|1788229240|1788229240|2026-09-01|2026-09-01|MREZA D2 (2/2): report procitan na svim rutama -- nula nasih povreda
+
+11	0	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+9	0	docs/records/CHANGELOG.md
+10	0	docs/records/PROGRESS.md
+@@ac741c2|1788229385|1788229385|2026-09-01|2026-09-01|MREZA D3: CSP enforce + check:csp na vratima -- prva iduca inline skripta pada kod nas, ne kod korisnika
+
+2	1	package.json
+107	0	scripts/check-csp.js
+1	1	vercel.json
+@@6cd9220|1788229695|1788229695|2026-09-01|2026-09-01|docs: D3 ISHOD -- enforce ziv, setnja cista; check:csp u preflight tablicama
+
+3	4	CLAUDE.md
+14	1	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+10	0	docs/records/CHANGELOG.md
+12	0	docs/records/PROGRESS.md
+@@f62ef4c|1788229902|1788229902|2026-09-01|2026-09-01|MREZA D4: procurjela lozinka pada u pregledniku -- 0 EUR umjesto Pro plana
+
+6	6	contact.html
+34	34	editor.html
+6	6	faq.html
+49	49	index.html
+45	0	js/auth.js
+1	1	js/content-loader.js
+7	0	js/profile.js
+3	3	manifest.json
+6	6	privacy.html
+1	1	sw.js
+6	6	terms.html
+1	1	vercel.json
+@@8f767df|1788230003|1788230003|2026-09-01|2026-09-01|docs: D4 ISHOD -- vrijednost cigle nije u danasnjem stanju nego u seobi
+
+13	1	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+10	0	docs/records/CHANGELOG.md
+10	0	docs/records/PROGRESS.md
+@@3a1f374|1788231834|1788231834|2026-09-01|2026-09-01|docs: revizija pred compact (pravilo #6) -- dvije tvrdnje koje je blok D ucinio zastarjelima
+
+4	4	CLAUDE.md
+@@bf4aa82|1788233298|1788233298|2026-09-01|2026-09-01|MREZA-E1: analiza je pojela ciglu -- dopune isporucene jos 2026-08-25, spec je prepisao zadatak bez statusa
+
+10	1	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+10	0	docs/records/PROGRESS.md
+@@cd5fe1f|1788235398|1788235398|2026-09-01|2026-09-01|MREZA-E2: nijedna kartica preko 500 -- selidba je vecinom bila brisanje duplikata learna, a strop sada zivi i u shemi
+
+6	6	contact.html
+4	4	data-food-nutrition-m2.js
+6	3	data/ebusiness/midterm-2.js
+7	4	data/entrepreneurship/final.js
+27	7	data/entrepreneurship/midterm-1.js
+41	8	data/entrepreneurship/midterm-2.js
+2	2	data/json/ebusiness/ebusinessFinal.json
+2	2	data/json/ebusiness/ebusinessM2.json
+23	23	data/json/entrepreneurship/entrepreneurshipFinal.json
+9	9	data/json/entrepreneurship/entrepreneurshipM1.json
+11	11	data/json/entrepreneurship/entrepreneurshipM2.json
+4	4	data/json/food-nutrition/foodNutritionFinalData.json
+4	4	data/json/food-nutrition/foodNutritionM2Data.json
+1	1	data/json/math/mathFinal.json
+1	1	data/json/math/mathM2.json
+3	3	data/json/sit/sitFinal.json
+3	3	data/json/sit/sitM2.json
+2	2	data/json/te2/te2Final.json
+2	2	data/json/te2/te2M2.json
+5	5	data/json/traffic/trafficFinal.json
+5	5	data/json/traffic/trafficM2.json
+1	1	data/math/midterm-2.js
+8	4	data/sit/midterm-2.js
+2	2	data/te2/midterm-2.js
+9	6	data/traffic/midterm-2.js
+14	1	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+1	1	docs/records/BACKLOG.md
+11	0	docs/records/CHANGELOG.md
+12	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+49	49	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+2	2	schema/subject-content.schema.json
+1	1	sw.js
+6	6	terms.html
+9	0	tests/unit/card-limits.test.js
+@@6f4b00c|1788235642|1788235642|2026-09-01|2026-09-01|MREZA-E3: 'odluka o 8' se raspala -- jedan je bio zrtva resolvera i sad se PROVJERAVA, sedam zakljucano s obrazlozenjem u brani
+
+1	1	CLAUDE.md
+14	2	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+10	0	docs/records/CHANGELOG.md
+13	0	docs/records/PROGRESS.md
+19	2	scripts/check-final-drift.js
+1	2	scripts/final-skip-baseline.json
+@@45747c4|1788235729|1788235729|2026-09-01|2026-09-01|docs: paleta-kucica izlaznog uvjeta -- C4 ju je ispunio (0-0-0, potvrdjeno uzivo) a nikad oznacio
+
+1	1	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+@@b1bfc76|1788236159|1788236159|2026-09-01|2026-09-01|MREZA-E4: vjezbe i slijepa karta usle u telefon-mjeru (44->52) -- 'cine se ok' postao broj, i broj je nula nalaza
+
+2	2	CLAUDE.md
+11	1	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+10	0	docs/records/CHANGELOG.md
+12	0	docs/records/PROGRESS.md
+32	8	tests/helpers/phone-gate.js
+13	1	tests/phone.spec.js
+@@539ab5d|1788236591|1788236591|2026-09-01|2026-09-01|docs: tracnice na redizajn -- MREZA ⏸️ s deploy-gated izlazom, FRONTEND_REDIZAJN opet aktivan od C5b/2 (Leonova rijec)
+
+10	13	CLAUDE.md
+8	2	docs/plan/FRONTEND_REDIZAJN.md
+5	3	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+9	0	docs/records/PROGRESS.md
+@@9a7cf57|1788245249|1788245249|2026-09-01|2026-09-01|C5b/2: blind-map skela u utilityje -- i 4 mrtva pravila koja su cekala igraca kojeg nema (spec 12.12)
+
+3	2	CLAUDE.md
+6	6	contact.html
+7	108	css/blind-map.css
+39	1	docs/plan/FRONTEND_REDIZAJN.md
+20	0	docs/records/CHANGELOG.md
+13	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+62	62	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+3	2	scripts/check-palette.js
+0	9	scripts/orphan-css-baseline.json
+21	114	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@8eba0fa|1788245615|1788245615|2026-09-01|2026-09-01|C5b/3a: #learn razoruzan -- :where() cuva doseg, a utility prvi put prolazi (spec 12.13)
+
+6	6	contact.html
+158	154	css/learn.css
+25	0	docs/plan/FRONTEND_REDIZAJN.md
+13	0	docs/records/CHANGELOG.md
+11	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+49	49	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+101	101	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@0f84e86|1788246008|1788246008|2026-09-01|2026-09-01|C5b/3b: learn skela u utilityje -- mjera srezala opseg, C5b time CIJELI zatvoren (spec 12.14)
+
+7	6	CLAUDE.md
+6	6	contact.html
+7	18	css/learn.css
+29	0	docs/plan/FRONTEND_REDIZAJN.md
+14	0	docs/records/CHANGELOG.md
+12	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+53	53	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+9	17	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@9e7d517|1788247440|1788247440|2026-09-01|2026-09-01|C6 mjera + C6/1: home-ljestva iz pet datoteka skupljena -- pola je bilo mrtvo (spec 13, 13.6)
+
+3	3	CLAUDE.md
+6	6	contact.html
+128	7	css/home-section.css
+0	96	css/responsive/01-up-and-phone-breakpoints.css
+0	60	css/responsive/02-mobile-core.css
+0	7	css/responsive/03-modes-a11y-print.css
+0	16	css/responsive/04-mobile-extra.css
+1	37	css/responsive/06-component-improvements.css
+125	0	docs/plan/FRONTEND_REDIZAJN.md
+15	0	docs/records/CHANGELOG.md
+14	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+49	49	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+91	176	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@e060b60|1788247915|1788247915|2026-09-01|2026-09-01|C6/2: sidebar-ljestva skupljena -- i nalaz da sidebar NITKO ne moze otvoriti (spec 13.7)
+
+3	2	CLAUDE.md
+6	6	contact.html
+0	37	css/responsive/04-mobile-extra.css
+0	38	css/responsive/06-component-improvements.css
+57	13	css/sidebar.css
+30	0	docs/plan/FRONTEND_REDIZAJN.md
+8	0	docs/records/BACKLOG.md
+18	0	docs/records/CHANGELOG.md
+11	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+49	49	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+39	69	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@1f74143|1788247990|1788247990|2026-09-01|2026-09-01|docs: CLAUDE.md pod budzet -- pipeline mi je maskirao exit check:docs brane pa je prosli commit otisao crven
+
+8	10	CLAUDE.md
+@@0dc1521|1788248269|1788248269|2026-09-01|2026-09-01|C6/3: about -- mobilna pravila kuci, skela u utilityje (spec 13.8)
+
+2	2	CLAUDE.md
+6	6	contact.html
+28	37	css/pages.css
+0	15	css/responsive/02-mobile-core.css
+22	0	docs/plan/FRONTEND_REDIZAJN.md
+12	0	docs/records/CHANGELOG.md
+11	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+55	55	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+27	45	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@c6a787a|1788275878|1788275878|2026-09-01|2026-09-01|C6/4: profil + auth -- dokaz koji css:diff ne moze dati; C6 ZATVOREN (spec 13.9)
+
+3	3	CLAUDE.md
+6	6	contact.html
+1	34	css/auth.css
+3	41	css/profile.css
+31	0	docs/plan/FRONTEND_REDIZAJN.md
+16	0	docs/records/CHANGELOG.md
+13	0	docs/records/PROGRESS.md
+35	35	editor.html
+6	6	faq.html
+51	51	index.html
+1	1	js/content-loader.js
+3	3	js/profile.js
+3	3	manifest.json
+6	6	privacy.html
+0	6	scripts/orphan-css-baseline.json
+3	84	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@707a892|1788277262|1788277262|2026-09-01|2026-09-01|C7/1: selektorski mrtvo van -- pola mrtvih gate nije ni vidio (spec 14.1)
+
+1	1	CLAUDE.md
+6	6	contact.html
+8	131	css/components.css
+0	30	css/responsive/01-up-and-phone-breakpoints.css
+0	6	css/responsive/02-mobile-core.css
+5	72	css/responsive/03-modes-a11y-print.css
+1	91	css/responsive/04-mobile-extra.css
+1	111	css/responsive/05-device-sizes.css
+49	0	docs/plan/FRONTEND_REDIZAJN.md
+15	0	docs/records/CHANGELOG.md
+13	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+49	49	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+0	38	scripts/orphan-css-baseline.json
+3	340	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@5bdfdd9|1788278041|1788278041|2026-09-01|2026-09-01|C7/2: cta-ljestva dosla kuci i zatekla da kuce NEMA -- C2 obrisao zivu bazu (spec 14.2)
+
+2	1	CLAUDE.md
+6	6	contact.html
+75	0	css/components.css
+0	14	css/responsive/02-mobile-core.css
+0	20	css/responsive/05-device-sizes.css
+25	0	docs/plan/FRONTEND_REDIZAJN.md
+13	0	docs/records/CHANGELOG.md
+12	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+49	49	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+60	16	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@c71acd7|1788279185|1788279185|2026-09-01|2026-09-01|C7/3: css/responsive/* NE POSTOJI -- zive ljestve doseljene bazama, s njima umirovljen i check:cascade (spec 14.3)
+
+4	4	CLAUDE.md
+6	6	contact.html
+5	8	css/app.css
+16	0	css/components.css
+20	2	css/home-section.css
+9	0	css/landing.css
+7	0	css/offline.css
+64	0	css/pages.css
+95	0	css/policies.css
+0	34	css/responsive/01-up-and-phone-breakpoints.css
+0	28	css/responsive/02-mobile-core.css
+0	124	css/responsive/03-modes-a11y-print.css
+0	48	css/responsive/04-mobile-extra.css
+0	47	css/responsive/05-device-sizes.css
+0	96	css/responsive/06-component-improvements.css
+23	0	css/sidebar.css
+41	2	docs/plan/FRONTEND_REDIZAJN.md
+1	1	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+3	1	docs/records/BUGS.md
+17	0	docs/records/CHANGELOG.md
+13	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+49	49	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+2	3	package.json
+6	6	privacy.html
+0	28	scripts/cascade-baseline.json
+0	298	scripts/check-cascade.js
+115	161	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+0	173	tests/unit/check-cascade-gate.test.js
+@@c224b7d|1788280549|1788280549|2026-09-01|2026-09-01|C7/4: components raspusten -- mobile-nav je stilizirao samo NEVIDLJIVO (spec 14.4)
+
+2	2	CLAUDE.md
+6	6	contact.html
+6	95	css/components.css
+9	11	css/study-chrome.css
+22	15	css/variables.css
+32	0	docs/plan/FRONTEND_REDIZAJN.md
+15	0	docs/records/CHANGELOG.md
+13	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+53	53	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+21	83	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@0509d19|1788281358|1788281358|2026-09-01|2026-09-01|C7/5: paleta-most mrtav (990 poziva na tokene); gradivo cuva 2 imena kao UGOVOR -- C7 ZATVOREN (spec 14.5)
+
+2	2	CLAUDE.md
+6	6	contact.html
+1	1	css/app.css
+24	24	css/auth.css
+29	29	css/blind-map.css
+91	91	css/block-editor.css
+9	9	css/components.css
+121	121	css/exercises.css
+31	31	css/fill-blanks-section.css
+29	29	css/flashcards-section.css
+32	32	css/home-section.css
+19	19	css/learn-blocks.css
+48	48	css/learn.css
+8	8	css/legal.css
+47	47	css/my-materials.css
+24	24	css/offline.css
+35	35	css/pages.css
+4	4	css/policies.css
+76	76	css/profile.css
+18	18	css/progress-section.css
+59	59	css/quiz-section.css
+15	15	css/sidebar.css
+15	15	css/sokrat-confirm.css
+97	97	css/studio.css
+1	22	css/tokens.static.css
+23	23	css/topbar.css
+28	68	css/variables.css
+37	0	docs/plan/FRONTEND_REDIZAJN.md
+16	0	docs/records/CHANGELOG.md
+13	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+49	49	index.html
+1	1	js/content-loader.js
+1	1	js/fill-blanks.js
+3	3	manifest.json
+6	6	privacy.html
+1040	1061	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@6790bee|1788284713|1788284713|2026-09-01|2026-09-01|docs: seoba OTKAZANA (Leon: Nastavlja Supabase do daljnjeg) + RACUN blok u BACKLOG -- pala jedina blokada OAutha
+
+14	16	CLAUDE.md
+5	4	docs/plan/FRONTEND_REDIZAJN.md
+5	7	docs/plan/RJESAVANJE-PROBLEMA-9MJ.md
+2	2	docs/plan/ROADMAP.md
+1	1	docs/product/PRD.md
+20	1	docs/records/BACKLOG.md
+12	0	docs/records/PROGRESS.md
+@@2e21615|1788288532|1788288532|2026-09-01|2026-09-01|Dorada iz pregleda: learn u bojama sekcija -- boja je vec bila na kartici, trosio ju je samo rub (spec 15.1)
+
+6	6	contact.html
+36	0	css/learn.css
+26	0	docs/plan/FRONTEND_REDIZAJN.md
+13	0	docs/records/CHANGELOG.md
+12	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+49	49	index.html
+1	1	js/content-loader.js
+9	1	js/learn.js
+3	3	manifest.json
+6	6	privacy.html
+34	0	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@f8bc5cb|1788294501|1788294501|2026-09-01|2026-09-01|Popravak CI-ja: h3 mix 55->45% -- amber je na 4.41, a SE je bio glasnik, ne uzrok (spec 15.1)
+
+6	6	contact.html
+2	2	css/learn.css
+12	0	docs/plan/FRONTEND_REDIZAJN.md
+5	0	docs/records/CHANGELOG.md
+12	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+49	49	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+2	2	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@a2d28af|1788298214|1788298214|2026-09-01|2026-09-01|docs: deploy-zapis -- 🚀 CHANGELOG, kucice §9 MREZE zatvorene, oba speca u arhivu, RACUN.md preuzima 'sto sada'
+
+18	29	CLAUDE.md
+3	2	docs/README.md
+2	2	docs/{plan => archive}/FRONTEND_REDIZAJN.md
+1	1	docs/archive/MODEL_KARTICA_DEMO.md
+8	9	docs/{plan => archive}/RJESAVANJE-PROBLEMA-9MJ.md
+40	0	docs/plan/RACUN.md
+1	1	docs/plan/ROADMAP.md
+9	9	docs/records/BACKLOG.md
+2	2	docs/records/BUGS.md
+17	3	docs/records/CHANGELOG.md
+2	2	docs/records/DECISIONS.md
+13	2	docs/records/PROGRESS.md
+1	1	docs/workflow/TEAM.md
+@@6bdd75f|1788299563|1788299563|2026-09-01|2026-09-01|Birac tema u profilu -- mehanizam je postojao cijelo vrijeme, falio je samo UI
+
+6	6	contact.html
+51	0	css/profile.css
+10	0	css/tokens.css
+8	0	css/tokens.static.css
+10	5	docs/records/BACKLOG.md
+13	0	docs/records/CHANGELOG.md
+14	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+49	49	index.html
+1	1	js/content-loader.js
+6	0	js/i18n.js
+52	1	js/profile.js
+3	3	manifest.json
+6	6	privacy.html
+7	1	scripts/check-palette.js
+60	0	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@6c5a5d8|1788299866|1788299866|2026-09-01|2026-09-01|Tema paper VAN (Leon uz pregled biraca) -- 10 mjesta, a stari localStorage pada na academic besplatno
+
+1	1	CLAUDE.md
+6	6	contact.html
+0	1	css/profile.css
+0	24	css/tokens.css
+0	37	css/tokens.static.css
+14	0	docs/records/CHANGELOG.md
+11	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+49	49	index.html
+1	1	js/content-loader.js
+0	1	js/i18n.js
+1	3	js/profile.js
+2	1	js/theme.js
+3	3	manifest.json
+6	6	privacy.html
+1	1	scripts/check-contrast-live.js
+0	40	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+1	1	tests/learn-blocks-contrast.spec.js
+1	1	tests/tint-ink.spec.js
+@@8f303c1|1788300190|1788300190|2026-09-02|2026-09-02|docs: 🚀 birac tema na produkciji (6c5a5d8, Leonov OK)
+
+5	0	docs/records/CHANGELOG.md
+7	0	docs/records/PROGRESS.md
+@@1e50d11|1788307530|1788307530|2026-09-02|2026-09-02|R1/A: dijalog pregradjen u JEDNOM zahvatu -- OAuth ulazi + dvokoracni upitnik (spec RACUN)
+
+6	5	CLAUDE.md
+6	6	contact.html
+56	0	css/auth.css
+13	4	docs/plan/RACUN.md
+25	0	docs/records/CHANGELOG.md
+17	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+49	49	index.html
+210	20	js/auth.js
+1	1	js/content-loader.js
+21	2	js/i18n.js
+3	3	manifest.json
+6	6	privacy.html
+101	0	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+84	0	tests/auth.spec.js
+@@555007f|1788309914|1788309914|2026-09-02|2026-09-02|R1/docs: Google OAuth potvrdjen UZIVO (Leonov krug) -- FB jos ceka Metine kljuceve
+
+4	4	docs/plan/RACUN.md
+5	2	docs/records/CHANGELOG.md
+11	0	docs/records/PROGRESS.md
+@@b23c15f|1788310933|1788310933|2026-09-02|2026-09-02|R1/docs: cetiri Leonova UX-nalaza (brisanje povijesti je dizajnerski samoporazno; studio sekcije; mail redirect; SMTP posiljatelj)
+
+26	0	docs/records/BACKLOG.md
+@@921ef08|1788311330|1788311330|2026-09-02|2026-09-02|R1/U1+U2: brisanje povijesti STVARNO brise (cloud+lokalno+snapshot, bez odjave) + Nova sekcija na dnu panea
+
+6	6	contact.html
+17	0	css/studio.css
+34	34	editor.html
+6	6	faq.html
+49	49	index.html
+48	0	js/cloud-sync.js
+1	1	js/content-loader.js
+6	5	js/i18n.js
+10	7	js/profile.js
+13	1	js/studio.js
+3	3	manifest.json
+6	6	privacy.html
+34	0	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+17	0	tests/material-authoring.authed.spec.js
+64	0	tests/wipe-history.authed.spec.js
+@@4cd20ea|1788312156|1788312156|2026-09-02|2026-09-02|docs: 🚀 RACUN R1 na produkciji (921ef08, Leonov OK)
+
+12	0	docs/records/CHANGELOG.md
+12	0	docs/records/PROGRESS.md
+@@2de0456|1788313635|1788313635|2026-09-02|2026-09-02|R1/U5: Google prijava bez supabase-domene -- implicit id_token izravno s nase stranice
+
+6	6	contact.html
+19	0	docs/records/CHANGELOG.md
+12	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+49	49	index.html
+59	1	js/auth.js
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+1	1	sw.js
+6	6	terms.html
+@@3c6c995|1788313789|1788313789|2026-09-02|2026-09-02|docs/compact-prep: R1-UX statusi (U1+U2 deployani, U5 na grani, U3/U4 Leonove konzole) + RACUN/CLAUDE poravnati
+
+1	1	CLAUDE.md
+6	4	docs/plan/RACUN.md
+9	1	docs/records/BACKLOG.md
+@@b248107|1788316569|1788316569|2026-09-02|2026-09-02|docs: 🚀 U5 na produkciji (2de0456, Leonov OK)
+
+1	1	docs/plan/RACUN.md
+1	1	docs/records/BACKLOG.md
+6	0	docs/records/CHANGELOG.md
+8	0	docs/records/PROGRESS.md
+@@9f2977c|1788317896|1788317896|2026-09-02|2026-09-02|R1: Facebook gumb maknut iz dijaloga (FB_LOGIN=false; ceka Metine kljuceve)
+
+6	6	contact.html
+7	0	docs/records/CHANGELOG.md
+7	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+49	49	index.html
+5	2	js/auth.js
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+1	1	sw.js
+6	6	terms.html
+2	1	tests/auth.spec.js
+@@0656511|1788331317|1788331317|2026-09-02|2026-09-02|docs: 🚀 FB gumb maknut — na produkciji (9f2977c, Leonov OK)
+
+6	0	docs/records/CHANGELOG.md
+6	0	docs/records/PROGRESS.md
+@@8e6b452|1788365996|1788365996|2026-09-02|2026-09-02|docs: U3+U4 zatvoreni (Leonove konzole) + FB odgoda u RACUN/BACKLOG
+
+9	6	docs/plan/RACUN.md
+5	3	docs/records/BACKLOG.md
+11	0	docs/records/PROGRESS.md
+@@5539861|1788388705|1788388705|2026-09-03|2026-09-03|fix: 5xx bez tijela vise ne ispisuje '{}' u auth statusu (+ regresijski test)
+
+6	6	contact.html
+34	34	editor.html
+6	6	faq.html
+49	49	index.html
+9	2	js/auth.js
+1	1	js/content-loader.js
+1	0	js/i18n.js
+3	3	manifest.json
+6	6	privacy.html
+1	1	sw.js
+6	6	terms.html
+27	0	tests/auth.spec.js
+@@4e4192c|1788452090|1788452090|2026-09-03|2026-09-03|R2/mail: brendirani Supabase predlosci (potvrda+dobrodoslica, reset, promjena adrese) + scripts/mail-preview.js
+
+57	0	scripts/mail-preview.js
+37	0	supabase/email-templates/README.md
+123	0	supabase/email-templates/change-email.html
+140	0	supabase/email-templates/confirm-signup.html
+123	0	supabase/email-templates/reset-password.html
+@@13669f3|1788526206|1788526206|2026-09-04|2026-09-04|R2/mail: potpis u podnozju predlozaka (znak u kvadratu + ime + tagline + link)
+
+29	7	supabase/email-templates/change-email.html
+29	7	supabase/email-templates/confirm-signup.html
+29	7	supabase/email-templates/reset-password.html
+@@123192e|1788529075|1788529075|2026-09-04|2026-09-04|docs/compact-prep: mail-identitet zatvoren + Leonova dva zadatka za sljedecu sesiju (FOUC teme, tema=izgled maila)
+
+5	5	CLAUDE.md
+4	1	docs/plan/RACUN.md
+22	0	docs/records/BACKLOG.md
+18	0	docs/records/CHANGELOG.md
+24	0	docs/records/PROGRESS.md
+@@e4b0eaf|1788529219|1788529219|2026-09-04|2026-09-04|docs: brzina kao treci zadatak za sljedecu sesiju (izmjereno: 38 skripti / 192.8 KiB od 200 KB budzeta)
+
+17	1	docs/records/BACKLOG.md
+@@891a1ce|1788530507|1788530507|2026-09-04|2026-09-04|FOUC: tema se odlucuje u boot.js, prije prvog crtanja (izmjereno 0 ms bljeska)
+
+3	0	.gitignore
+6	6	contact.html
+34	34	editor.html
+6	6	faq.html
+49	49	index.html
+34	0	js/boot.js
+1	1	js/content-loader.js
+18	18	js/theme.js
+3	3	manifest.json
+1	1	package.json
+6	6	privacy.html
+144	0	scripts/fouc-probe.js
+114	0	scripts/perf-probe.js
+1	1	sw.js
+6	6	terms.html
+66	0	tests/theme-fouc.spec.js
+78	0	tests/unit/theme-boot-order.test.js
+@@6db1c2f|1788531232|1788531232|2026-09-04|2026-09-04|brzina: znakovi providera su ugradjeni SVG — brands-font (106 KB) vise se ne skida
+
+6	6	contact.html
+4	0	css/auth.css
+34	34	editor.html
+6	6	faq.html
+49	49	index.html
+23	2	js/auth.js
+1	1	js/content-loader.js
+3	3	manifest.json
+1	1	package.json
+6	6	privacy.html
+67	4	scripts/perf-probe.js
+4	0	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+67	0	tests/unit/no-brand-font.test.js
+@@d0d5543|1788531517|1788531517|2026-09-04|2026-09-04|docs: prava dijagnoza sva tri problema (obje ranije bile krive) + zapis dviju zatvorenih cigli
+
+20	18	CLAUDE.md
+54	30	docs/records/BACKLOG.md
+20	0	docs/records/CHANGELOG.md
+38	0	docs/records/PROGRESS.md
+@@69cd297|1788533112|1788533112|2026-09-04|2026-09-04|docs/compact-prep: izmjerene brojke za dizajn-ciglu + doc-audit (pravilo #6)
+
+4	0	docs/plan/RACUN.md
+3	3	docs/plan/ROADMAP.md
+44	8	docs/records/BACKLOG.md
+@@e42cd90|1788544326|1788544326|2026-09-04|2026-09-04|ucitavanje po ruti: prvi kadar s 41 skripte na 22
+
+22	20	CLAUDE.md
+6	6	contact.html
+1	1	css/tokens.css
+4	4	docs/plan/RACUN.md
+100	11	docs/records/BACKLOG.md
+45	0	docs/records/CHANGELOG.md
+5	3	docs/records/DECISIONS.md
+49	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+53	79	index.html
+8	1	js/admin-reveal.js
+5	2	js/analytics.js
+7	0	js/auth.js
+12	43	js/blocks-renderer.js
+6	0	js/cloud-sync.js
+1	1	js/content-loader.js
+3	1	js/init.js
+199	0	js/loader.js
+5	4	js/math.js
+49	15	js/navigation.js
+24	0	js/offline-store.js
+12	3	js/profile.js
+11	5	js/progress.js
+4	1	js/storage.js
+63	0	js/utils.js
+3	3	manifest.json
+1	1	package.json
+6	6	privacy.html
+5	0	scripts/blocks-diff.js
+43	5	scripts/check-budget.js
+53	0	scripts/check-cdn.js
+11	0	scripts/check-contrast-live.js
+8	6	scripts/check-contrast.js
+1	1	sw.js
+6	6	terms.html
+2	0	tests/a11y.authed.spec.js
+2	0	tests/admin-detect.authed.spec.js
+9	0	tests/admin.spec.js
+4	0	tests/auth.spec.js
+2	0	tests/card-limits.authed.spec.js
+7	1	tests/components.spec.js
+2	0	tests/editor-page.authed.spec.js
+4	0	tests/escaping.spec.js
+2	0	tests/f4-e2e.authed.spec.js
+21	0	tests/helpers/paketi.js
+12	1	tests/helpers/studio-entry.js
+4	0	tests/katex.spec.js
+2	0	tests/layout.authed.spec.js
+4	1	tests/learn-parity.spec.js
+2	0	tests/material-authoring.authed.spec.js
+2	0	tests/my-materials.authed.spec.js
+2	0	tests/node-editor.authed.spec.js
+2	0	tests/node-images.authed.spec.js
+2	0	tests/phone.authed.spec.js
+2	0	tests/quiz-reset.spec.js
+2	0	tests/reachability.authed.spec.js
+4	2	tests/studio-math.authed.spec.js
+6	0	tests/unit/blocks-renderer.test.js
+210	0	tests/unit/loader-packages.test.js
+@@e8f1651|1788550570|1788550570|2026-09-04|2026-09-04|docs: suradnik otkazan · RASPORED postaje tekuci spec
+
+18	27	CLAUDE.md
+3	2	docs/README.md
+1	1	docs/archive/EDITOR_PLAN.md
+1	1	docs/archive/FOUNDATION_PLAN.md
+2	1	docs/archive/HRV_PLAN.md
+9	1	docs/{plan => archive}/RACUN.md
+26	6	docs/{workflow => archive}/TEAM.md
+235	0	docs/plan/RASPORED.md
+2	2	docs/plan/ROADMAP.md
+29	0	docs/records/CHANGELOG.md
+12	2	docs/records/DECISIONS.md
+40	0	docs/records/PROGRESS.md
+21	6	docs/subjects/README.md
+@@18e5c3e|1788551745|1788551745|2026-09-04|2026-09-04|F1/1: stranica je dobila boju vlastitog znaka
+
+2	2	CLAUDE.md
+6	6	contact.html
+17	9	css/tokens.css
+7	7	css/tokens.static.css
+1	1	docs/plan/RASPORED.md
+17	0	docs/records/BACKLOG.md
+35	0	docs/records/CHANGELOG.md
+38	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+33	33	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+-	-	og-cover.png
+6	6	privacy.html
+85	85	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@11a366c|1788553272|1788553272|2026-09-04|2026-09-04|docs: crna tema — mail ima DVIJE palete, a izmjerio sam jednu
+
+27	10	docs/plan/RASPORED.md
+62	0	docs/records/BACKLOG.md
+32	0	docs/records/CHANGELOG.md
+41	0	docs/records/PROGRESS.md
+@@22c556b|1788556268|1788556268|2026-09-04|2026-09-04|F1/2: tema `carbon` — tamna polovica maila, na stranici
+
+1	1	CLAUDE.md
+6	6	contact.html
+1	0	css/profile.css
+45	0	css/tokens.css
+37	0	css/tokens.static.css
+1	1	docs/plan/RASPORED.md
+22	0	docs/records/BACKLOG.md
+32	0	docs/records/CHANGELOG.md
+28	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+33	33	index.html
+2	2	js/boot.js
+1	1	js/content-loader.js
+1	0	js/i18n.js
+4	2	js/profile.js
+3	3	manifest.json
+6	6	privacy.html
+1	1	scripts/check-contrast-live.js
+40	0	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@551df3a|1788557880|1788557880|2026-09-04|2026-09-04|docs/compact-prep: doc-audit (pravilo #6) — sto je danas ostarjelo
+
+3	3	CLAUDE.md
+1	1	docs/README.md
+1	1	docs/architecture/CATALOG_ARCHITECTURE.md
+3	0	docs/records/HISTORY.md
+@@9307a2b|1788561720|1788561720|2026-09-05|2026-09-05|F1/3: prvi kadar prati uredjaj -- crno bez klika, kao mail
+
+1	1	CLAUDE.md
+6	6	contact.html
+9	0	css/profile.css
+5	2	docs/plan/RASPORED.md
+19	0	docs/records/BACKLOG.md
+47	0	docs/records/CHANGELOG.md
+36	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+36	35	index.html
+40	8	js/boot.js
+1	1	js/content-loader.js
+2	1	js/i18n.js
+16	4	js/profile.js
+41	5	js/theme.js
+3	3	manifest.json
+1	1	package.json
+6	6	privacy.html
+23	6	scripts/fouc-probe.js
+3	0	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+65	0	tests/theme-fouc.spec.js
+12	0	tests/unit/theme-boot-order.test.js
+159	0	tests/unit/theme-device.test.js
+@@10607f0|1788561746|1788561746|2026-09-05|2026-09-05|test: kaskada cita `--color-warn-ink` -- `--warning-text` vise ne postoji
+
+6	4	tests/cascade.authed.spec.js
+@@cbbfd34|1788563333|1788563333|2026-09-05|2026-09-05|docs: Leonova dva nova -- ljepljivi hover (izmjeren) · Tinder-spil kartica (zapisan)
+
+2	2	CLAUDE.md
+5	2	docs/plan/RASPORED.md
+45	0	docs/records/BACKLOG.md
+26	0	docs/records/PROGRESS.md
+@@a45796d|1788564527|1788564527|2026-09-05|2026-09-05|Analiza rada: docs/records/RAD.xlsx + generator scripts/rad-xlsx.py
+
+3	1	CLAUDE.md
+1	0	docs/README.md
+16	0	docs/records/CHANGELOG.md
+1	0	docs/records/HISTORY.md
+31	0	docs/records/PROGRESS.md
+-	-	docs/records/RAD.xlsx
+540	0	scripts/rad-xlsx.py
+1	0	scripts/requirements-rad.txt
+@@8b70c15|1788568736|1788568736|2026-09-05|2026-09-05|F1/6: sonda za trzanje (jank-probe) + ljepljivi hover izmjeren na WebKitu -- mjerenja, bez popravaka
+
+1	0	.gitignore
+10	16	CLAUDE.md
+4	4	docs/plan/RASPORED.md
+67	0	docs/records/BACKLOG.md
+23	0	docs/records/CHANGELOG.md
+1	1	docs/records/HISTORY.md
+30	0	docs/records/PROGRESS.md
+216	0	scripts/jank-probe.js
+@@e5a93c5|1788601144|1788601144|2026-09-05|2026-09-05|docs: 🚀 deploy 8b70c15 zapisan (F1/1–F1/3 + F1/6 na produkciji, Leonov OK)
+
+11	0	docs/records/CHANGELOG.md
+1	1	docs/records/HISTORY.md
+3	1	docs/records/PROGRESS.md
+@@a27b1b8|1788609051|1788609051|2026-09-05|2026-09-05|docs: Leonov treci nalaz -- zoom na dodir izmjeren (F1/10), nista popravljano
+
+2	2	CLAUDE.md
+2	1	docs/plan/RASPORED.md
+26	0	docs/records/BACKLOG.md
+12	0	docs/records/PROGRESS.md
+@@a31a418|1788610280|1788610280|2026-09-05|2026-09-05|docs/compact-prep: cetiri "na grani" tvrdnje → na produkciji · Leonova odluka za sljedecu sesiju (zoom + hover do kraja)
+
+6	6	docs/records/BACKLOG.md
+1	1	docs/records/HISTORY.md
+6	0	docs/records/PROGRESS.md
+@@831d905|1788614940|1788614940|2026-09-05|2026-09-05|F1/10: zoom na dodir -- (pointer: coarse) umjesto nemjerljivog @supports-njuskanja, touch-action u resetu, brana ⑨
+
+2	2	CLAUDE.md
+6	6	contact.html
+0	2	css/blind-map.css
+0	1	css/flashcards-section.css
+4	1	css/legal.css
+20	4	css/variables.css
+1	1	docs/plan/RASPORED.md
+6	0	docs/records/BACKLOG.md
+36	0	docs/records/BUGS.md
+33	0	docs/records/CHANGELOG.md
+1	1	docs/records/HISTORY.md
+16	0	docs/records/PROGRESS.md
+5	0	docs/workflow/TESTING.md
+34	34	editor.html
+6	6	faq.html
+33	33	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+1	1	package.json
+6	6	privacy.html
+4	5	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+22	0	tests/helpers/phone-gate.js
+16	1	tests/phone.authed.spec.js
+10	1	tests/phone.spec.js
+95	0	tests/unit/touch-zoom.test.js
+@@92269c2|1788620114|1788620114|2026-09-05|2026-09-05|F1/8 ①: `:hover` samo gdje hover postoji -- build-prolaz (lightningcss cita, tekst se prepisuje), check:hover, hover-probe
+
+6	5	CLAUDE.md
+6	6	contact.html
+8	2	css/consent.css
+8	2	css/legal.css
+1	1	docs/plan/RASPORED.md
+6	0	docs/records/BACKLOG.md
+17	0	docs/records/BUGS.md
+28	0	docs/records/CHANGELOG.md
+15	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+33	33	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+1	0	package-lock.json
+3	1	package.json
+6	6	privacy.html
+15	4	scripts/build-css.js
+65	0	scripts/check-hover.js
+216	0	scripts/hover-css.js
+156	0	scripts/hover-probe.js
+733	413	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+@@11d8729|1788621878|1788621878|2026-09-05|2026-09-05|docs: Leon na iPhoneu potvrdio F1/8 ① ("Ne svijetli, odlicno") · compact-priprema (pravilo #6)
+
+1	1	docs/plan/RASPORED.md
+2	1	docs/records/BUGS.md
+1	1	docs/records/HISTORY.md
+4	0	docs/records/PROGRESS.md
+@@c53c28c|1788623609|1788623609|2026-09-05|2026-09-05|F1/8 ②: hover na misu se naoruza tek prvim pomakom -- pauzirajHover() (navigateTo + browseNaRazinu), prefiks :where(:root:not([data-hover-paused])) u hover-css, sonda prelaz, 28 tvrdnji
+
+3	3	CLAUDE.md
+6	6	contact.html
+4	3	css/consent.css
+1	1	docs/plan/RASPORED.md
+8	2	docs/records/BACKLOG.md
+28	18	docs/records/BUGS.md
+29	0	docs/records/CHANGELOG.md
+1	1	docs/records/HISTORY.md
+15	0	docs/records/PROGRESS.md
+5	0	docs/workflow/TESTING.md
+34	34	editor.html
+6	6	faq.html
+33	33	index.html
+1	1	js/content-loader.js
+7	0	js/navigation.js
+32	0	js/utils.js
+3	3	manifest.json
+1	1	package.json
+6	6	privacy.html
+7	2	scripts/build-css.js
+33	7	scripts/check-hover.js
+94	16	scripts/hover-css.js
+81	19	scripts/hover-probe.js
+134	134	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+155	0	tests/unit/hover-arm.test.js
+@@00584f8|1788626123|1788626123|2026-09-05|2026-09-05|docs: 🚀 deploy c53c28c zapisan (F1/10 + F1/8 ①+② na produkciji, Leonov uvjetni OK, suita 571/0/117)
+
+12	0	docs/records/CHANGELOG.md
+1	1	docs/records/HISTORY.md
+9	0	docs/records/PROGRESS.md
+@@d82ba1c|1788637019|1788637019|2026-09-05|2026-09-05|docs: ADR-034 -- stranica se NE zumira (Leon) → cigla F1/11; compact-priprema
+
+7	7	CLAUDE.md
+1	1	docs/README.md
+3	2	docs/plan/RASPORED.md
+6	0	docs/records/BACKLOG.md
+33	0	docs/records/DECISIONS.md
+1	1	docs/records/HISTORY.md
+9	0	docs/records/PROGRESS.md
+@@d1bb543|1788640683|1788640683|2026-09-05|2026-09-05|F1/11: nista ne zumira -- meta min/max-scale=1 + user-scalable=no na 6 stranica, reset touch-action: pan-x pan-y, ISKLJUCENO_ODLUKOM u axe-gate (ADR-034)
+
+2	2	CLAUDE.md
+7	7	contact.html
+3	3	css/legal.css
+11	8	css/variables.css
+2	2	docs/plan/RASPORED.md
+10	1	docs/records/BACKLOG.md
+18	0	docs/records/CHANGELOG.md
+1	1	docs/records/DECISIONS.md
+1	1	docs/records/HISTORY.md
+14	0	docs/records/PROGRESS.md
+35	35	editor.html
+7	7	faq.html
+34	34	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+7	7	privacy.html
+1	1	styles.bundle.css
+1	1	sw.js
+7	7	terms.html
+25	1	tests/helpers/axe-gate.js
+30	2	tests/unit/a11y-gate.test.js
+81	20	tests/unit/touch-zoom.test.js
+@@9139d6f|1788641547|1788641547|2026-09-05|2026-09-05|F1/7 ①: landing bez `background-attachment: fixed` -- 240 paintova/533 Mpx po prolazu → 0/0, brana no-fixed-background
+
+6	6	contact.html
+9	1	css/landing.css
+34	34	editor.html
+6	6	faq.html
+33	33	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+1	1	package.json
+6	6	privacy.html
+1	1	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+53	0	tests/unit/no-fixed-background.test.js
+@@07f4ab2|1788641989|1788641989|2026-09-05|2026-09-05|F1/7 ②: `?bez=` prekidac za A/B na iPhoneu -- css/bez.css + boot.js (data-bez prije crtanja), jank-probe cita modul umjesto vlastite tablice
+
+1	1	CLAUDE.md
+6	6	contact.html
+4	0	css/app.css
+44	0	css/bez.css
+18	0	css/tokens.static.css
+1	1	docs/plan/RASPORED.md
+6	0	docs/records/BACKLOG.md
+19	0	docs/records/CHANGELOG.md
+1	1	docs/records/HISTORY.md
+14	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+33	33	index.html
+17	0	js/boot.js
+1	1	js/content-loader.js
+3	3	manifest.json
+1	1	package.json
+6	6	privacy.html
+17	15	scripts/jank-probe.js
+14	0	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+112	0	tests/unit/bez-switch.test.js
+@@4d3962a|1788644266|1788644266|2026-09-05|2026-09-05|docs/compact-prep: BUG-043 nosi biljesku da je F1/11 zamijenio manipulation s pan-x pan-y (ADR-034)
+
+3	0	docs/records/BUGS.md
+@@a9689e6|1788645182|1788645182|2026-09-05|2026-09-05|F1/11 ②: js/no-zoom.js -- stipanje s dva prsta gasi JS (gesturestart + touchmove scale), jer Safari metu i touch-action ne slusa
+
+8	6	contact.html
+2	2	docs/plan/RASPORED.md
+5	0	docs/records/BACKLOG.md
+2	0	docs/records/BUGS.md
+11	0	docs/records/CHANGELOG.md
+1	1	docs/records/DECISIONS.md
+1	1	docs/records/HISTORY.md
+10	0	docs/records/PROGRESS.md
+36	34	editor.html
+8	6	faq.html
+35	33	index.html
+1	1	js/content-loader.js
+34	0	js/no-zoom.js
+3	3	manifest.json
+8	6	privacy.html
+1	1	sw.js
+8	6	terms.html
+43	0	tests/unit/touch-zoom.test.js
+@@eb5b061|1788645339|1788645339|2026-09-05|2026-09-05|docs: matura = VIZIJA, ne projekt -- VISION.md §8 (Leon: "mature ne diramo, to je vizija")
+
+1	1	docs/plan/RASPORED.md
+27	0	docs/product/VISION.md
+@@cbaf4d2|1788645427|1788645427|2026-09-05|2026-09-05|rad: dnevni zapis 2026-09-05 (automatski, scripts/rad-dnevno.ps1)
+
+-	-	docs/records/RAD.xlsx
+@@26e4965|1788645487|1788645487|2026-09-05|2026-09-05|rad: RAD.xlsx se puni AUTOMATSKI svaki dan 23:45 -- scripts/rad-dnevno.ps1 + Windows Task Scheduler (Leon: "to treba biti automatski")
+
+3	3	CLAUDE.md
+11	0	docs/records/CHANGELOG.md
+56	0	scripts/rad-dnevno.ps1
+2	1	scripts/rad-xlsx.py
+@@93b4897|1788648600|1788648600|2026-09-06|2026-09-06|docs: Leonov odgovor §6/1 -- odjava brise lokalni izbor teme (F2/1); iPhone-nalaz o stipanju opisuje PRODUKCIJU (instalirana app), ne F1/11
+
+1	1	CLAUDE.md
+5	6	docs/plan/RASPORED.md
+10	0	docs/records/PROGRESS.md
+@@4d8f19b|1788652133|1788652133|2026-09-06|2026-09-06|F1/4: popis tema ima JEDNO mjesto -- scripts/teme.js cita tokens.css za sve cetiri brane; a11y-brana prvi put skenira carbon
+
+1	1	docs/plan/RASPORED.md
+6	2	docs/records/BACKLOG.md
+13	0	docs/records/CHANGELOG.md
+1	1	docs/records/HISTORY.md
+11	0	docs/records/PROGRESS.md
+1	1	package.json
+7	3	scripts/check-contrast-live.js
+9	6	scripts/check-contrast.js
+51	0	scripts/teme.js
+5	2	tests/helpers/axe-gate.js
+3	2	tests/unit/theme-boot-order.test.js
+85	0	tests/unit/theme-list.test.js
+@@0785952|1788652462|1788652462|2026-09-06|2026-09-06|F1/5: pravne stranice prate uredjaj -- boot.js (sinkron) + data-theme na contact/faq/privacy/terms; legal.spec mjeri iscrtano dark→carbon / light→academic
+
+13	8	contact.html
+1	1	docs/plan/RASPORED.md
+12	0	docs/records/CHANGELOG.md
+1	1	docs/records/HISTORY.md
+11	0	docs/records/PROGRESS.md
+35	35	editor.html
+13	8	faq.html
+34	34	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+13	8	privacy.html
+4	1	scripts/check-contrast-live.js
+1	1	sw.js
+13	8	terms.html
+27	0	tests/legal.spec.js
+6	4	tests/unit/theme-boot-order.test.js
+@@2d45182|1788653376|1788653376|2026-09-06|2026-09-06|docs: Leonove stavke 06.09. SAMO ZAPISANE -- FAQ/About/kontakt sokrat@sokratstudy.com (F3/1 dopuna, prije prijevoda) · "uvijek bijela" = produkcija bez F1/5 · "Automatic · Carbon" u biracu = pitanje §6/7
+
+1	1	CLAUDE.md
+5	4	docs/plan/RASPORED.md
+6	0	docs/records/BACKLOG.md
+10	0	docs/records/PROGRESS.md
+@@a354960|1788655083|1788655083|2026-09-06|2026-09-06|docs/compact-prep: HISTORY dobiva redak 2026-09-06 (F1/4 + F1/5 bili zalijepljeni na 05.09.) · CLAUDE.md: F1 gotov osim F1/9
+
+1	1	CLAUDE.md
+2	1	docs/records/HISTORY.md
+@@4cce27b|1788655131|1788655131|2026-09-06|2026-09-06|docs: CLAUDE.md natrag pod budzet -- dva retka stanja F1 sazeta u jedan (prethodni commit je prosao jer je `| tail` progutao pad check:docs)
+
+1	2	CLAUDE.md
+@@57e2158|1788658094|1788658094|2026-09-06|2026-09-06|F1/9: kartice kao Tinder-spil na dodiru -- palac desno = znam, lijevo = ne znam, spil od tri (samo `pointer: coarse`), strelice kao stolni pandan; jedini put upisa ostaju markKnown/markUnknown
+
+2	2	CLAUDE.md
+8	8	contact.html
+88	0	css/flashcards-section.css
+3	3	docs/plan/RASPORED.md
+14	0	docs/records/BACKLOG.md
+18	0	docs/records/CHANGELOG.md
+19	0	docs/records/PROGRESS.md
+35	35	editor.html
+8	8	faq.html
+43	34	index.html
+1	1	js/content-loader.js
+227	1	js/flashcards.js
+3	3	manifest.json
+1	1	package.json
+8	8	privacy.html
+90	0	styles.bundle.css
+1	1	sw.js
+8	8	terms.html
+219	0	tests/flashcard-swipe.spec.js
+405	0	tests/unit/flashcard-swipe.test.js
+@@d1743a8|1788658125|1788658125|2026-09-06|2026-09-06|docs: HISTORY -- F1 uredjaj: sve cigle isporucene (F1/9 Tinder-spil 57e2158)
+
+1	1	docs/records/HISTORY.md
+@@95e3ba1|1788659101|1788659101|2026-09-06|2026-09-06|docs: Tinder-KADAR -- mjerenje (BACKLOG §E) + plan F1/12 kadar · F1/13 listanje (RASPORED) · §6/8 kraj spila; bez koda
+
+2	2	CLAUDE.md
+5	2	docs/plan/RASPORED.md
+23	0	docs/records/BACKLOG.md
+11	0	docs/records/PROGRESS.md
+@@182bac3|1788661195|1788661195|2026-09-06|2026-09-06|docs: Leonovi odgovori za Tinder-kadar -- izbornik na kraju spila · ✕ lijevo / strelica desno i na kompu · sve tipkama (X/Z) · F1/14 tutorial (kasnije, ali predvidjen tablicom akcija)
+
+2	2	CLAUDE.md
+6	4	docs/plan/RASPORED.md
+7	0	docs/records/PROGRESS.md
+@@900f142|1788662448|1788662448|2026-09-06|2026-09-06|docs: anketa -- Leonovih pet odgovora zatvara §6 (sidebar obrisati · vjezbe samo tokeni · Facebook otpao · HR predmeti cekaju F5 recepte · birac samo "Automatski")
+
+2	2	CLAUDE.md
+11	11	docs/plan/RASPORED.md
+4	0	docs/records/PROGRESS.md
+@@fe1af72|1788663351|1788663351|2026-09-06|2026-09-06|docs: HR autor-bot zapisan kao KASNIJE (Leon 06.09.) -- sto postoji, sto fali, redoslijed kad dodje na red
+
+7	0	docs/subjects/README.md
+@@2d07d00|1788663498|1788663498|2026-09-06|2026-09-06|docs: HR autor-bot bez API kljuca -- graditelji su Claude Code subagenti, ne Sonnet API (Leon 06.09.)
+
+1	1	docs/subjects/README.md
+@@8ec0e18|1788663828|1788663828|2026-09-06|2026-09-06|docs: HR materijali 1. godine postoje na Driveu (Leon 06.09.) -- izvor za autor-bota, jos nepregledano
+
+1	1	docs/subjects/README.md
+@@3bfe40a|1788664600|1788664600|2026-09-06|2026-09-06|fix(check:docs): gitignoriran artefakt nije duh-datoteka -- brana je padala u svakom svjezem klonu
+
+15	0	docs/records/CHANGELOG.md
+1	1	package.json
+25	2	scripts/check-docs.js
+86	0	tests/unit/check-docs-gate.test.js
+@@4c9e4f1|1788664825|1788664825|2026-09-06|2026-09-06|F2/1 (6/7): birac tema -- natpis je samo "Automatski", sufiks s temom uredjaja otpada
+
+8	8	contact.html
+2	2	docs/plan/RASPORED.md
+16	0	docs/records/CHANGELOG.md
+35	35	editor.html
+8	8	faq.html
+34	34	index.html
+1	1	js/content-loader.js
+14	6	js/profile.js
+3	3	manifest.json
+1	1	package.json
+8	8	privacy.html
+1	1	sw.js
+8	8	terms.html
+206	0	tests/unit/theme-picker-label.test.js
+@@e6ed07d|1788731112|1788731112|2026-09-06|2026-09-06|rad: dnevni zapis 2026-09-06 (automatski, scripts/rad-dnevno.ps1)
+
+-	-	docs/records/RAD.xlsx
+@@27d495a|1788736589|1788736589|2026-09-07|2026-09-07|docs: model monetizacije -- organizacija je najam, firme placaju prve (ADR-036)
+
+234	61	docs/product/MONETIZATION.md
+11	3	docs/product/PRD.md
+102	0	docs/records/DECISIONS.md
+@@1384f6b|1788782702|1788782702|2026-09-07|2026-09-07|docs(progress): sesija 07.09. -- model monetizacije zakljucan, cinjenice o inkubatoru provjerene
+
+64	0	docs/records/PROGRESS.md
+@@a341880|1788805000|1788805000|2026-09-07|2026-09-07|Mjerenje aktivacije i povratka: SokratMetrika u consent.js + kuka u switchSection()
+
+8	8	contact.html
+9	0	docs/plan/RASPORED.md
+13	0	docs/records/CHANGELOG.md
+28	0	docs/records/PROGRESS.md
+35	35	editor.html
+8	8	faq.html
+34	34	index.html
+85	0	js/consent.js
+1	1	js/content-loader.js
+7	0	js/navigation.js
+3	3	manifest.json
+1	1	package.json
+8	8	privacy.html
+1	1	sw.js
+8	8	terms.html
+220	0	tests/unit/metrika.test.js
+@@d5377ff|1788817514|1788817514|2026-09-07|2026-09-07|rad: dnevni zapis 2026-09-07 (automatski, scripts/rad-dnevno.ps1)
+
+-	-	docs/records/RAD.xlsx
+@@5233a0a|1788664600|1788895183|2026-09-06|2026-09-08|fix(check:docs): gitignoriran artefakt nije duh-datoteka -- brana je padala u svakom svjezem klonu
+
+1	1	package.json
+25	2	scripts/check-docs.js
+86	0	tests/unit/check-docs-gate.test.js
+@@74eb8ae|1788903684|1788903684|2026-09-08|2026-09-08|F2/0: traka dobiva dva odredista -- "Pocni uciti" obrisan, gore su UGC i profil
+
+6	6	contact.html
+19	46	css/topbar.css
+42	7	docs/plan/RASPORED.md
+31	0	docs/records/CHANGELOG.md
+33	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+62	46	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+3	29	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+58	38	tests/layout-guard.spec.js
+@@49101f0|1788903911|1788903911|2026-09-08|2026-09-08|rad: dnevni zapis 2026-09-08 (automatski, scripts/rad-dnevno.ps1)
+
+-	-	docs/records/RAD.xlsx
+@@cc01a1b|1788908134|1788908134|2026-09-09|2026-09-09|F2/0 ②: materials-entry okrenut -- CI je nasao spec koji je moja pretraga promasila
+
+8	0	docs/records/CHANGELOG.md
+12	0	docs/records/PROGRESS.md
+26	12	tests/materials-entry.spec.js
+@@6f51b7c|1788908208|1788908208|2026-09-09|2026-09-09|docs(TESTING): pouka F2/0 -- element sucelja se ne trazi po imenu nego po svemu cime se gada
+
+27	0	docs/workflow/TESTING.md
+@@8b79790|1788908233|1788908233|2026-09-09|2026-09-09|docs(PROGRESS): dnevnik pokazuje na pouku umjesto da je ponavlja (ADR-027)
+
+2	3	docs/records/PROGRESS.md
+@@1e2d157|1788827223|1788910347|2026-09-08|2026-09-09|check:docs: budzet CLAUDE.md se mjeri BEZ znaka povratka -- ista datoteka, ista presuda
+
+5	1	scripts/check-docs.js
+@@4a2b260|1788910464|1788910464|2026-09-09|2026-09-09|docs(CLAUDE.md): stanje govori danasnji dan -- F1 parkiran u karticama, F2 poceo
+
+6	4	CLAUDE.md
+@@e6b6515|1788925401|1788925401|2026-09-09|2026-09-09|F2/3a: profil postaje ZID -- identitet gore, administracija ispod
+
+6	6	contact.html
+113	7	css/profile.css
+1	1	docs/plan/RASPORED.md
+28	0	docs/records/CHANGELOG.md
+45	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+40	37	index.html
+1	1	js/content-loader.js
+11	0	js/i18n.js
+114	16	js/profile.js
+3	3	manifest.json
+6	6	privacy.html
+111	8	styles.bundle.css
+1	1	sw.js
+6	6	terms.html
+143	0	tests/profile-wall.authed.spec.js
+@@5950c86|1788927015|1788927015|2026-09-09|2026-09-09|F2/3b: ime i opis dobivaju svoju tablicu -- `role` ostaje zatvoren
+
+6	6	contact.html
+2	2	docs/plan/RASPORED.md
+22	0	docs/records/CHANGELOG.md
+48	0	docs/records/PROGRESS.md
+34	34	editor.html
+6	6	faq.html
+33	33	index.html
+1	1	js/content-loader.js
+97	16	js/profile.js
+3	3	manifest.json
+6	6	privacy.html
+129	0	supabase/f2-profile-identity.sql
+1	1	sw.js
+6	6	terms.html
+167	0	tests/profile-identity.authed.spec.js
+@@f670767|1788964874|1788964874|2026-09-09|2026-09-09|docs: pred-compact revizija -- odluka o bucketu, nova tablica u BACKEND-u, stanje govori danasnji dan
+
+3	3	CLAUDE.md
+1	0	docs/architecture/BACKEND.md
+1	1	docs/plan/RASPORED.md
+@@d9c1f4d|1789215426|1789215426|2026-09-12|2026-09-12|docs: matura seli u archive/ -- VISION.md §8 je jedino mjesto gdje matura zivi (Leon 12.09.)
+
+1	0	docs/README.md
+272	0	docs/archive/MATURA-PILOT.md
+1	1	docs/product/VISION.md
+14	0	docs/records/BACKLOG.md
+38	0	docs/records/PROGRESS.md
+@@d54d015|1789235258|1789235258|2026-09-12|2026-09-12|N5: odbijeni paket se zaboravlja -- drugi poziv paket() ponovno skida, ne vraca staru gresku (BUG-051)
+
+9	2	js/loader.js
+1	1	package.json
+91	0	tests/unit/loader-retry.test.js
+@@5e7e3e3|1789235342|1789235342|2026-09-12|2026-09-12|N3: snapshot tek nakon uspjelog upisa u pullu -- pali prvi push ceka sljedeci interval, bez laznog "sinkronizirano" (BUG-049)
+
+13	4	js/cloud-sync.js
+44	0	tests/unit/cloud-sync.test.js
+@@c7dea8e|1789235424|1789235424|2026-09-12|2026-09-12|N2: spajanje nizova koji nisu stringovi = multiskup-maksimum -- [80]+[90] daje oba, ne "dulje polje" (BUG-048)
+
+25	2	js/cloud-sync.js
+21	3	tests/unit/cloud-sync.test.js
+@@6bfb61b|1789235520|1789235520|2026-09-12|2026-09-12|N4: lokalni napredak ima VLASNIKA -- drugi racun na istom pregledniku ga ne nasljedjuje (BUG-050)
+
+24	0	js/cloud-sync.js
+66	0	tests/unit/cloud-sync.test.js
+@@86113e7|1789235757|1789235757|2026-09-12|2026-09-12|N1: naucena kartica se pamti po IDENTITETU, ne po poziciji u promijesanom spilu (BUG-047)
+
+30	1	js/flashcards.js
+3	1	js/profile.js
+6	2	js/progress.js
+7	0	js/storage.js
+1	1	package.json
+164	0	tests/unit/flashcard-identity.test.js
+@@fdcb2b3|1789235885|1789235885|2026-09-12|2026-09-12|bump: cache tokeni + CONTENT_VERSION/SW_VERSION nakon N1-N5 (js/loader, cloud-sync, flashcards, storage, progress, profile)
+
+6	6	contact.html
+34	34	editor.html
+6	6	faq.html
+33	33	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+6	6	privacy.html
+1	1	sw.js
+6	6	terms.html
+@@a68f154|1789235954|1789235954|2026-09-12|2026-09-12|docs: BUG-047..051 (pet nalaza vanjske recenzije, svi rijeseni) + CHANGELOG + PROGRESS 12.09.
+
+78	0	docs/records/BUGS.md
+28	0	docs/records/CHANGELOG.md
+13	0	docs/records/PROGRESS.md
+@@5da7119|1788664600|1789235994|2026-09-06|2026-09-12|fix(check:docs): gitignoriran artefakt nije duh-datoteka -- brana je padala u svakom svjezem klonu
+
+15	0	docs/records/CHANGELOG.md
+1	1	package.json
+25	2	scripts/check-docs.js
+86	0	tests/unit/check-docs-gate.test.js
+@@5273ea0|1789237321|1789237321|2026-09-12|2026-09-12|test(app-state): tvrdnja o naucenim karticama okrenuta na identitete -- includes(0)&&includes(1) je kodirala BUG-047
+
+4	1	docs/records/PROGRESS.md
+9	3	tests/app-state.spec.js
+@@bfb3a50|1789238822|1789238822|2026-09-12|2026-09-12|docs: BUGS.md razdvojen (BUG-001..038 u BUGS_ARCHIVE.md) + RASPORED §0 SPAJANJE -- karta grana i redoslijed za sljedecu sesiju (Leon 12.09.)
+
+1	2	CLAUDE.md
+2	1	docs/README.md
+32	0	docs/plan/RASPORED.md
+3	936	docs/records/BUGS.md
+949	0	docs/records/BUGS_ARCHIVE.md
+6	1	docs/records/PROGRESS.md
+@@d8e61be|1789240206|1789240206|2026-09-12|2026-09-12|merge: NAPREDAK POUZDAN (BUG-047…051) -- identitet kartice, merge = multiskup-max, snapshot tek nakon upserta, vlasnik lokalnog napretka, odbijeni paket se zaboravlja; + check:docs gitignore-fix (3bfe40a)
+@@d2aa6b3|1789240610|1789293924|2026-09-12|2026-09-13|merge: ostatak F1 (F1/4, F1/5, F1/7, F1/9, F1/11) + metrika ucenje/povratak + docs 05.-12.09. (ADR-035/036, matura u archive/) -- feat/mjerenje-aktivacije
+@@3dc6624|1789293978|1789293978|2026-09-13|2026-09-13|merge: F2/1 (6/7) birac tema -- natpis samo 'Automatski' (feat/nocna-b)
+@@1d54700|1789294029|1789294029|2026-09-13|2026-09-13|merge: F2/0 traka s dva odredista + F2/3a profil = zid + F2/3b identitet (profile_identity + RPC) -- feat/profil-zid
+@@a34ebf0|1789294092|1789294092|2026-09-13|2026-09-13|BUG-046: pilula kategorije na obojenoj kartici pada AA -- mijesa se SUPROTNA tinta (cherry-pick 2641834 s parkirane feat/tinder-kadar)
+
+8	8	contact.html
+25	0	css/flashcards-section.css
+45	0	docs/records/BUGS.md
+26	0	docs/records/CHANGELOG.md
+44	0	docs/records/PROGRESS.md
+35	35	editor.html
+8	8	faq.html
+34	34	index.html
+1	1	js/content-loader.js
+3	3	manifest.json
+1	1	package.json
+8	8	privacy.html
+12	0	styles.bundle.css
+1	1	sw.js
+8	8	terms.html
+138	0	tests/unit/card-tint-contrast.test.js
+@@c64a156|1789294096|1789294096|2026-09-13|2026-09-13|BUG-045: Service Worker nikad nije spremao runtime assete -- res.clone() sinkrono PRIJE caches.open (cherry-pick 3708e2d s parkirane feat/tinder-kadar)
+
+8	8	contact.html
+11	0	docs/records/BACKLOG.md
+52	0	docs/records/BUGS.md
+6	0	docs/records/CHANGELOG.md
+4	0	docs/records/PROGRESS.md
+35	35	editor.html
+8	8	faq.html
+34	34	index.html
+1	1	js/content-loader.js
+43	7	js/offline-store.js
+3	3	manifest.json
+8	8	privacy.html
+19	4	sw.js
+8	8	terms.html
+53	0	tests/offline-study.spec.js
+30	0	tests/sw.spec.js
+44	0	tests/unit/offline-store.test.js
+@@d943a84|1789294096|1789304234|2026-09-13|2026-09-13|docs(progress, raspored §0): sesija SPAJANJE 12.09. -- svih sest koraka pripremljeno i izmjereno lokalno, nista pushano na main, svaki korak ceka Leonov OK
+
+6	0	docs/plan/RASPORED.md
+23	0	docs/records/CHANGELOG.md
+44	0	docs/records/PROGRESS.md
+@@2ae9051|1789304442|1789304442|2026-09-13|2026-09-13|docs(progress, raspored §0): spajanje IZVEDENO 13.09. -- pet koraka na produkciji, §0 ispunjen, F2/2 ide u novom stablu od main-a
+
+5	5	docs/plan/RASPORED.md
+7	4	docs/records/PROGRESS.md
+@@3ddf5f2|1789322926|1789322926|2026-09-13|2026-09-13|F2/2 cigla 1: bucket profile-images (javan, upis samo vlasniku) + RPC set_profile_image + delete-account cisti oba bucketa (STAGING)
+
+2	2	CLAUDE.md
+2	1	docs/architecture/BACKEND.md
+1	1	docs/plan/RASPORED.md
+18	0	docs/records/CHANGELOG.md
+22	0	docs/records/PROGRESS.md
+2	1	docs/workflow/TESTING.md
+17	1	scripts/delete-account-check.js
+173	0	supabase/f2-profile-images.sql
+22	10	supabase/functions/delete-account/index.ts
+169	0	tests/profile-images.authed.spec.js
+@@90dca49|1789323956|1789323956|2026-09-13|2026-09-13|F2/2 cigla 2: js/profile-images.js — smanjivanje u pregledniku (WebP), upload u vlastiti prefiks, RPC, brisanje stare
+
+8	8	contact.html
+1	1	docs/plan/RASPORED.md
+18	0	docs/records/CHANGELOG.md
+8	2	docs/records/PROGRESS.md
+35	35	editor.html
+8	8	faq.html
+34	34	index.html
+1	1	js/content-loader.js
+1	1	js/loader.js
+236	0	js/profile-images.js
+3	3	manifest.json
+1	1	package.json
+8	8	privacy.html
+1	1	sw.js
+8	8	terms.html
+58	0	tests/profile-images.authed.spec.js
+196	0	tests/unit/profile-images.test.js
+@@61c39dd|1789324415|1789324415|2026-09-13|2026-09-13|F2/2 cigla 3: zid crta profilnu i naslovnu; Promijeni/Ukloni u „Uredi profil" (i18n, CSS, spec ⑤ klik-put)
+
+8	8	contact.html
+32	0	css/profile.css
+1	1	docs/plan/RASPORED.md
+16	0	docs/records/CHANGELOG.md
+8	2	docs/records/PROGRESS.md
+35	35	editor.html
+8	8	faq.html
+34	34	index.html
+1	1	js/content-loader.js
+11	0	js/i18n.js
+100	6	js/profile.js
+3	3	manifest.json
+8	8	privacy.html
+29	0	styles.bundle.css
+1	1	sw.js
+8	8	terms.html
+57	0	tests/profile-images.authed.spec.js
+@@090bd0c|1789326372|1789326372|2026-09-13|2026-09-13|docs: 🚀 F2/2 slike profila na produkciji (main 61c39dd, token 20260913203047) — SQL, Edge Function, push; odluke iz ankete; stabla počišćena
+
+1	1	CLAUDE.md
+1	1	docs/architecture/BACKEND.md
+1	1	docs/plan/RASPORED.md
+10	0	docs/records/CHANGELOG.md
+8	3	docs/records/PROGRESS.md
