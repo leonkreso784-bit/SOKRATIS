@@ -1,0 +1,21 @@
+[package]
+name = "sokratis-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "sokratis"
+path = "src/main.rs"
+
+[dependencies]
+sokratis-core = { path = "../sokratis-core" }
+sokratis-io = { path = "../sokratis-io" }
+serde_json.workspace = true
+anyhow.workspace = true
+clap.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+insta.workspace = true
