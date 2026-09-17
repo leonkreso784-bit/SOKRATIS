@@ -67,6 +67,13 @@ Test za pravilo: **Leon može pročitati datoteku i reći što radi.** Ako ne mo
 | `mod` i `pub` | M1 (workspace) | moduli su datoteke/mape; ništa nije javno dok ne kažeš |
 | `#[cfg(test)]` | M1 (prvi test) | kod koji postoji samo pri `cargo test` |
 | workspace | M0 | više crateova, jedan `Cargo.lock`, jedan `target/` |
+| `[workspace.dependencies]` + `polje.workspace = true` | M1 (T1, korijenski `Cargo.toml`) | verzija ovisnosti piše se jednom za sav workspace; svaki crate je nasljeđuje s `polje.workspace = true` umjesto da je ponavlja |
+| `#[serde(rename_all = "snake_case")]` | M1 (T1, `model.rs`) | enum-varijanta se (de)serializira kao `snake_case` string (`Debugging` → `"debugging"`), ne kao Rustov `PascalCase` naziv (S-008) |
+| `#[serde(default, deny_unknown_fields)]` | M1 (T1, `profile.rs`) | polje koje nedostaje u JSON-u uzima `Default`; polje koje profil ne poznaje je greška deserializacije, ne tiho ignoriranje |
+| `thiserror` derive s `#[source]`/`#[from]` | M1 (T1, `core`/`io` `error.rs`) | enum grešaka postaje pravi `std::error::Error`; `#[from]` daje automatsku `?`-pretvorbu tuđe greške (npr. `regex::Error`) u našu |
+| `todo!()` kao stub-konvencija | M1 (T1, svi stubovi) | makro koji panicira porukom pri pozivu; potpis funkcije postoji prije tijela, pa cigla koja nedostaje puca jasnom porukom umjesto da tiho vrati krivu vrijednost |
+| `impl Into<PathBuf>` | M1 (T1, `io/git.rs`) | argument prima bilo što pretvorivo u `PathBuf` (`&str`, `String`, `PathBuf`); pozivatelj ne mora sam zvati `.into()` |
+| `collect::<Result<_, _>>()` | M1 (T1, `profile.rs:214,223`) | iterator stavki `Result<T, E>` se "okreće" u jedan `Result<Vec<T>, E>` — prvi `Err` prekida i vraća se, inače se skupe sve `Ok` vrijednosti |
 | lifetime (`'a`) | *kad se pojavi* | koliko dugo posudba vrijedi; u `core` ih izbjegavamo vlasništvom |
 
 Redak se dodaje **u cigli u kojoj se pojam prvi put pojavi**, s referencom na datoteku.

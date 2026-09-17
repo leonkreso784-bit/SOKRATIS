@@ -56,21 +56,26 @@ sati zbog cherry-pickova — se u Sokratisu **ispravlja, ne prenosi** (S-007).
    Paritet s `RAD.xlsx` je **test**, ne tvrdnja (`docs/workflow/TESTING.md`).
 8. **PRIJE SVAKOG COMPACTA:** proći sve `.md` (root + `docs/**`) i ispraviti zastarjelo.
 
-## Komande (vrijede od M0)
-`cargo build` · `cargo test` · `cargo clippy --all-targets -- -D warnings` · `cargo fmt` ·
+## Komande
+`cargo build` · `cargo test` · `cargo clippy --all-targets -- -D warnings` · `cargo fmt` rade od M0
+(workspace se gradi i testira zeleno). CLI podnaredbe su ugovor iz T1, sam CLI je stub do T18–T19:
 `cargo run -p sokratis-cli -- report <putanja> [--since YYYY-MM-DD] [--json|--table]` ·
 `… docs <putanja>` · `… signals <putanja>` (izlazni kod 0 nema · 1 Warn · 2 Alert).
 Testovi i brane: `docs/workflow/TESTING.md`.
 
-## Stanje — TRENUTNO (2026-09-17, večer)
-- **Spec odobren** (Leon: „super je"). **Plan M1 napisan:** `docs/superpowers/plans/2026-09-17-m1-jezgra-i-cli.md`
-  — 22 cigle u 8 tokova, svaki tok = svoja grana + radno stablo `sokratis.<tok>`, vlasništvo datoteka bez preklapanja.
+## Stanje — TRENUTNO (2026-09-17, nakon compacta)
+- **M0 gotovo, uz Leonov OK:** Visual Studio Build Tools (MSVC) + rustup stable
+  (`stable-x86_64-pc-windows-msvc`) na stroju; `cargo`/`rustfmt`/`clippy` rade.
+- **T1 (kostur) i T2 (fixture) spojeni u `main`:** Cargo workspace triju crateova, ugovor tipova
+  jezgre, zadani profil (Sokrat Study, S-005), stubovi svih preostalih cigli, fixture pariteta sa
+  Sokrat Studyja za testiranje parsera i metrika. `cargo test` zeleno. Brojke: `CHANGELOG.md`.
+- **Paralelni tokovi u tijeku u radnim stablima:** `sokratis.parse` · `sokratis.metrics` ·
+  `sokratis.rules` · `sokratis.io` grade cigle prema `docs/superpowers/plans/2026-09-17-m1-jezgra-i-cli.md`;
+  `sokratis.cli` čeka slobodno mjesto (limit 4 graditelja istodobno).
 - **Agenti definirani:** `.claude/agents/{graditelj,recenzent,cuvar-dokumentacije}.md`; protokol nadzora
   `docs/workflow/AGENTI.md` (orkestrator = ova sesija, jedini spaja u `main`).
-- **M0 NIJE napravljen.** Na stroju nema Rusta ni MSVC build-toolsa (Node 24, Python 3.11, git 2.52, WebView2 da,
-  `cargo` ne). **M0 mijenja sustav (~4 GB) → traži Leonov OK prije pokretanja** (plan T1, korak 1).
-- **Nema koda.** Redoslijed poslije compacta: M0 (uz OK) → T1 kostur na `main` (orkestrator) → grane i stabla →
-  paralelno T2 · T3–T6 · T7–T11 · T12–T14 · T15–T17 · T18–T19 → spajanje → T20–T22 → zastanak.
+- Sljedeće: spajanje tokova u `main` čim recenzent kaže SPOJIVO → kad su svi spojeni, integracija
+  (T20–T22) → zastanak na kraju M1 (Leonov OK).
 - Što je isporučeno i kada zna `CHANGELOG.md`; tijek sesija `PROGRESS.md`. Ovaj odjeljak to ne ponavlja.
 
 ## Ključne odluke — samo žive
