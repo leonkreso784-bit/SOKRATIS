@@ -1,8 +1,12 @@
 //! ZAŠTO RUST OVAKO (cigla M1/17 — projekt)
-//! `Project` POSJEDUJE `GitCli` i `Profile`; metode posuđuju `&self`. `fs::read_to_string(..).ok()`
-//! pretvara „nema datoteke" u `None` — a JSON koji POSTOJI, a ne valja, je greška s putanjom
-//! (`map_err` + `IoError::Manual { path, source }`), jer tiho ignoriranje krivog JSON-a je laž.
-//! Rekurzivni `walk` je obična funkcija koja puni `&mut Vec` — bez rekurzivnih zatvaranja.
+//! `Project` POSJEDUJE `GitCli` i `Profile`; metode posuđuju `&self`. Za ručne JSON-datoteke
+//! (`profile.json`, `overrides.json`, `visions.json`) `Err(e) if e.kind() == NotFound` je JEDINO
+//! opravdanje za fallback — svaka DRUGA greška čitanja (npr. putanja je direktorij, nema dozvole)
+//! postaje `IoError::Io`/`IoError::Profile`/`IoError::Manual`, jer tiho gutanje bilo koje greške,
+//! ne samo „nema datoteke", je laž (nalaz recenzenta, krug popravka 1). Za obični tekst
+//! (dnevnik/plan u `input()`) `fs::read_to_string(..).ok()` ostaje dovoljan — ondje „ima ili nema"
+//! jest cijela semantika. Rekurzivni `walk` je obična funkcija koja puni `&mut Vec` — bez
+//! rekurzivnih zatvaranja.
 use crate::{GitCli, GitSource, IoError};
 use sokratis_core::{DocFile, Profile, ReportInput, Vision, WorkKind};
 use std::collections::HashMap;
@@ -29,7 +33,10 @@ fn read_overrides_or_empty(path: &Path) -> Result<HashMap<String, WorkKind>, IoE
             path: path.to_path_buf(),
             source,
         }),
-        Err(_) => Ok(HashMap::new()),
+        // `NotFound` je jedino „legitimno" opravdanje za prazan rezultat — svaka DRUGA greška
+        // čitanja (npr. putanja je direktorij, nema dozvole) mora biti vidljiva, ne progutana.
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(HashMap::new()),
+        Err(e) => Err(IoError::Io(e)),
     }
 }
 
@@ -40,7 +47,8 @@ fn read_visions_or_empty(path: &Path) -> Result<Vec<Vision>, IoError> {
             path: path.to_path_buf(),
             source,
         }),
-        Err(_) => Ok(Vec::new()),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(Vec::new()),
+        Err(e) => Err(IoError::Io(e)),
     }
 }
 
@@ -68,16 +76,20 @@ impl Project {
     pub fn open(path: &Path) -> Result<Project, IoError> {
         let probe = GitCli::new(path);
         let root = probe.toplevel()?;
-        let common_dir = probe.common_dir()?;
+        // `common_dir` se čita iz `root`, ne iz `probe` (korisnikova putanja): git bi za
+        // podmapu vratio `common_dir` relativan na TU podmapu (npr. `docs/records/../../.git`),
+        // pa bi usporedba identiteta projekta (isti `common_dir`) lagala kad se otvori iz podmape.
+        let git = GitCli::new(&root);
+        let common_dir = git.common_dir()?;
         let profile_path = root.join(".sokratis").join("profile.json");
         let profile = match std::fs::read_to_string(&profile_path) {
             Ok(s) => serde_json::from_str(&s).map_err(|source| IoError::Profile {
                 path: profile_path.clone(),
                 source,
             })?,
-            Err(_) => Profile::default(),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Profile::default(),
+            Err(e) => return Err(IoError::Io(e)),
         };
-        let git = GitCli::new(&root);
         Ok(Project {
             root,
             common_dir,

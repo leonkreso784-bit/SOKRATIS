@@ -82,6 +82,46 @@ fn open_reads_profile_manual_data_and_docs() {
 }
 
 #[test]
+fn common_dir_is_the_same_from_root_and_from_a_subdirectory() {
+    let r = Repo::init();
+    r.commit(
+        "docs/records/PROGRESS.md",
+        "1",
+        "prvi",
+        "2026-09-01T10:00:00+02:00",
+        "2026-09-01T10:00:00+02:00",
+    );
+    let from_root = Project::open(r.path()).unwrap().common_dir;
+    let from_subdir = Project::open(&r.path().join("docs").join("records"))
+        .unwrap()
+        .common_dir;
+    assert_eq!(
+        from_root.canonicalize().unwrap(),
+        from_subdir.canonicalize().unwrap(),
+        "isti projekt bez obzira odakle se otvara"
+    );
+}
+
+#[test]
+fn profile_that_cannot_be_read_is_an_error_not_a_default() {
+    let r = Repo::init();
+    r.commit(
+        "a.txt",
+        "1",
+        "prvi",
+        "2026-09-01T10:00:00+02:00",
+        "2026-09-01T10:00:00+02:00",
+    );
+    // `.sokratis/profile.json` je DIREKTORIJ, ne datoteka — čitanje puca s PermissionDenied
+    // (Windows) odn. IsADirectory (Unix), NIKAD NotFound; to NIJE „nema datoteke".
+    std::fs::create_dir_all(r.path().join(".sokratis").join("profile.json")).unwrap();
+    assert!(
+        Project::open(r.path()).is_err(),
+        "kriva greška se ne smije pretvoriti u Profile::default()"
+    );
+}
+
+#[test]
 fn unknown_profile_field_is_an_error_and_missing_files_default() {
     let r = Repo::init();
     r.commit(
