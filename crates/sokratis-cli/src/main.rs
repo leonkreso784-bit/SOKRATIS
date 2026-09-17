@@ -54,7 +54,17 @@ fn report_for(path: Option<PathBuf>, since: Option<&str>) -> anyhow::Result<Repo
 }
 
 fn run() -> anyhow::Result<i32> {
-    match Cli::parse().cmd {
+    // `try_parse` umjesto `parse`: `parse` bi sam izašao s kodom **2**, a 2 je naš kod za ALERT
+    // (nalaz I4). `clap` i `--help`/`--version` vraća kao `Err`, pa razliku presuđuje
+    // `use_stderr()`: greška uporabe ide na stderr → 3, pomoć/verzija na stdout → 0.
+    let cli = match Cli::try_parse() {
+        Ok(cli) => cli,
+        Err(e) => {
+            let _ = e.print();
+            return Ok(if e.use_stderr() { 3 } else { 0 });
+        }
+    };
+    match cli.cmd {
         Cmd::Report {
             path,
             since,
