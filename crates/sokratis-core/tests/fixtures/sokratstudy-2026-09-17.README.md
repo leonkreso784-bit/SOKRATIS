@@ -40,3 +40,42 @@ raspona isto nosio bare-datum kvar.
 Ovo je **drugi kvar tablice** koji Sokratis ispravlja (prvi je S-007, negativni sati zbog
 cherry-pickova): oba dijele isti uzrok — Python skripta šalje git-u ulaz koji ovisi o kontekstu
 pokretanja (redoslijed/vrijeme), a ne samo o stanju repozitorija.
+
+## `hours_fixed` (M1/2c) — referenca za paritet sati (S-007)
+
+`hours_legacy` je Python-proxy **s kvarom**: `sati_po_danu()` u `rad-xlsx.py` prolazi commite u
+redoslijedu `git log --reverse` (commit-datum), ne autorovom datumu. Cherry-pick nosi stari autorov
+datum, ali nov commit-datum — u tom redoslijedu razmak između "prethodnog" i "trenutnog" commita
+ispadne negativan pa se cijeli razmak (satima, ne minutama) oduzme od dana. To je vidljivo u
+`hours_legacy` za 2026-09-06 (**−195,3 h**) i 2026-09-08 (**−21,9 h**).
+
+Sokratis (T8) sortira commite za satni proxy po `author_time` (S-007), pa se u referenci treba
+vidjeti "što bi Python dao da je sortiranje ispravljeno" — ne tvrdnja "≥ 0", nego brojka za pravi
+paritet. Dobiveno je u scratch-kopiji `rad-xlsx-fixture-sorted.py`
+(`C:\Users\leonk\AppData\Local\Temp\sokratis-fixture\`, izvedena iz T2b-kopije
+`rad-xlsx-fixture.py`), gdje je **jedina** izmjena: `commiti_od()` dodatno čita `%at` (autorov
+unix-timestamp; skripta je prije čuvala samo formatirani `%ad` bez sekunde/unix-vremena), a
+`sati_po_danu()` prolazi commite `sorted(commiti, key=lambda z: z['ts_autor'])` umjesto izvornog
+redoslijeda. Ništa drugo u skripti nije mijenjano (izlazna datoteka je preusmjerena na
+`RAD-fixture-sorted.xlsx` da se ne pregazi T2b-fixtura). Rezultat pokretanja: isti brojevi commita
+(190), isporuka (105), faza (11) i vizija (21) kao T2b — mijenjaju se samo sati.
+
+`days.<dan>.hours_fixed` i `indicators.hours_fixed` / `indicators.commits_per_hour_fixed` su upisani
+iz sortirane knjige (list Sažetak → „TEMPO PO DANU" stupac „sati" i „KVALITETA I BRZINA" retci
+„sati rada (git-hours proxy)" / „commita po satu (proxy)"). Provjereno: nijedan `hours_fixed` po
+danu nije negativan; zbroj po danima (85,0) == `indicators.hours_fixed` (85); JSON je i dalje
+bajt-za-bajt isti osim dodanih ključeva.
+
+Od 14 dana u ovoj fixturi **10 se poklapa** s `hours_legacy` (razmak između commita tog dana nije
+bio pogođen krivim redoslijedom), a **4 se razlikuju**:
+
+| dan | hours_legacy | hours_fixed | razlog |
+|---|---|---|---|
+| 2026-09-06 | −195,3 | 5,9 | cherry-pick — commit-redoslijed obrnuo razmak u negativan |
+| 2026-09-08 | −21,9 | 1,1 | isto |
+| 2026-09-09 | 3,2 | 3,3 | susjedni dan — sesija koja prelazi ponoć drukčije zatvara razmak kad je 06.09. ispravljen |
+| 2026-09-12 | 2,6 | 2,5 | isto, posljedica susjednog popravka (zaokruživanje po danu) |
+
+Ovo je manji uzorak (14 dana od 2026-08-29) nego pun log koji su vidjeli graditelj T8 i recenzent
+(33 od 37 dana poklapanje) — omjer poklapanja ovdje (10/14) nije izravno usporediv s tom brojkom,
+razlika je očekivana zbog kraćeg prozora i različitog skupa dana.
