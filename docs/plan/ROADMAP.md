@@ -6,12 +6,12 @@
 
 ## Gdje smo (2026-09-17)
 
-**M0 gotovo.** Plan M1 u izvedbi: u `main`-u su KOSTUR (T1), FIXTURE (T2), PARSE (T3–T6),
+**M0 gotovo.** Plan M1 u izvedbi: u `main`-u su KOSTUR (T1), FIXTURE (T2, T2b), PARSE (T3–T6),
 DOCS+PRAVILA (T12–T14) i IO (T15–T17); `cargo test --workspace` = 30 passed. METRIKE (T7–T10) su gotove
 na grani `feat/core-metrics`, T11 slijedi; CLI (T18–T19) čeka slobodno mjesto. Usput izmjeren i
-ispravljen drugi kvar tablice: `git log --since` bez sata (S-011). Detalji i brojke:
-`records/CHANGELOG.md`, tijek sesije: `records/PROGRESS.md`. Zatim: METRIKE → CLI → spajanje →
-integracija (T20–T22) → zastanak na kraju M1.
+ispravljen drugi kvar tablice: `git log --since` bez sata (S-011) — fixture T2b je već regeneriran s
+punim danom. Detalji i brojke: `records/CHANGELOG.md`, tijek sesije: `records/PROGRESS.md`. Zatim:
+METRIKE → CLI → spajanje → integracija (T20–T22) → zastanak na kraju M1.
 
 ## Milestonei
 

@@ -39,3 +39,5 @@ Prva verzija s kodom bit će 0.1.0 (M1). Isporuka = ono što je u `main`-u; sesi
 - 2026-09-17 — **METRIKE (T7–T10) na grani `feat/core-metrics`, još ne u `main`-u** — sati po
   `author_time` (S-007): 0 negativnih dana na fixtureu, 33/37 dana identično `RAD.xlsx`-u, razlika samo
   oko tri poznata cherry-picka.
+- 2026-09-17 — **FIXTURE T2b u `main`-u** — `expected.json` regeneriran za S-011 (`--since` s punim
+  danom); dodan `README.md` fixturea koji objašnjava razliku prema staroj snimci.

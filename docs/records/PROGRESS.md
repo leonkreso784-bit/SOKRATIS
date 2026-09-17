@@ -101,15 +101,15 @@ Namjerno **ne** postoje još: `architecture/`, `BUGS.md`, `HISTORY.md`, `archive
   zatvorenih faza (MREŽA 20→25 commita, RAČUN R1 0→6 commita kad se doda puni dan). Zapisano kao
   **S-011** u `DECISIONS.md`: `io` šalje `--since=<datum> 00:00:00`, jezgra filtrira po
   `commit_date >= since`; referentni `expected.json` regeneriran Python-kopijom s dodanim `' 00:00'`
-  (tok FIXTURE, T2b, na grani `feat/fixtures`, spaja se uskoro). Kvar se ispravlja, ne prenosi (kao
-  S-007). U `BACKLOG.md`: stavka da Leon razmotri isti dodatak u `rad-xlsx.py` (tuđi repo, Leon
-  odlučuje).
+  (tok FIXTURE, **T2b spojen u `main` merge-om 5e79d91**, uz `README.md` fixturea koji objašnjava
+  razliku). Kvar se ispravlja, ne prenosi (kao S-007). U `BACKLOG.md`: stavka da Leon razmotri isti
+  dodatak u `rad-xlsx.py` (tuđi repo, Leon odlučuje).
 - **Testovi na `main`-u:** `cargo test --workspace` = 30 passed.
 - **Praksa koja se pokazala:** brifovi nisu bili savršeni (kriva unix-vremena, generička
   `read_json_or` zamijenjena dvjema konkretnim funkcijama jer `serde` nije izravna ovisnost `io`-a),
   ali protokol graditelj → recenzent → orkestrator to hvata bez Leona.
 
 ### Što slijedi
-METRIKE T11 (na grani `feat/core-metrics`) → CLI T18–T19 (`feat/cli`, čeka slobodno mjesto) → FIXTURE
-T2b (`feat/fixtures`, regeneracija `expected.json` za S-011) → spajanje svakog toka u `main` čim
-recenzent kaže SPOJIVO → INTEGRACIJA (T20–T22) u svom stablu → zastanak na kraju M1 (Leonov OK).
+METRIKE T11 (na grani `feat/core-metrics`) → CLI T18–T19 (`feat/cli`, čeka slobodno mjesto) →
+spajanje svakog toka u `main` čim recenzent kaže SPOJIVO → INTEGRACIJA (T20–T22) u svom stablu →
+zastanak na kraju M1 (Leonov OK). FIXTURE T2b je spojen (merge 5e79d91, uz ovaj unos).
