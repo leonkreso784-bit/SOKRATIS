@@ -237,3 +237,7 @@ jednim retkom); svaki dodatak koji mijenja oblik (`until`, `vision_totals`, `com
 snimku **namjerno** (`cargo insta review`) s obrazloženjem u commitu.
 **Posljedice:** ugovor CLI ↔ sučelje ima jedan test; recenzent vidi promjenu oblika u diffu snimke,
 ne u pogađanju; `RUST.md` §2 dobiva `insta` natrag kao dev-ovisnost `core`-a.
+
+**Dopuna (2026-09-18, pri pisanju plana):** „prva cigla" znači **prva cigla toka JEZGRA (T2)**. Prije nje
+ide kostur T1 (orkestrator), koji nova polja `Report`-a dodaje **prazna** — pa snimka nastaje nad kosturom
+i od tada čuva svako punjenje (T3–T5 mijenjaju snimku namjerno, s rečenicom u commitu).

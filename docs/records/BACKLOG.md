@@ -15,6 +15,7 @@
 | HR/EN natpisi u **CLI tablici** | M3 | jezgra je već engleska (S-008); tablica je pomoć za terminal |
 | README na engleskom · LICENCA (MIT kao Sokrat Study — potvrditi) · GitHub Actions | M3 | prije objave |
 | Instalater (Tauri bundler, MSI/NSIS) | M3 | |
+| `sokratis docs .` mjeri samo korijen i `docs_dir`; `.md` pod `apps/desktop` (npr. budući README sučelja) nitko ne provjerava | M3 (profil: više `docs_dir`-ova ili `extra_docs_dirs`) | nalaz čuvara 2026-09-18 |
 
 ## Iz završne recenzije M1 (nalazi koji nisu popravljeni u M1)
 
