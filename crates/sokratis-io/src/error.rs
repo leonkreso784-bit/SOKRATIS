@@ -3,6 +3,10 @@
 //! NE smije ponavljati uzrok: `main` ispisuje `{e:#}`, što lanac ionako doda — inače se ista
 //! serde-poruka (popis svih 38 polja profila) ispiše dvaput. `#[error(transparent)]` je obrnut
 //! slučaj: varijanta bez vlastite rečenice prepušta cijeli `Display` uzroku.
+//!
+//! Cigla M2/10 (pisanje ručnih podataka): `write_override`/`write_visions` serijaliziraju kroz
+//! `serde_json::to_string_pretty`, čiji `Result` ide kroz `?` — `#[from]` na novoj varijanti
+//! `Encode` pretvara `serde_json::Error` u `IoError` bez ručnog mapiranja na svakom pozivu.
 use std::path::PathBuf;
 use thiserror::Error;
 #[derive(Debug, Error)]
@@ -29,4 +33,6 @@ pub enum IoError {
     },
     #[error(transparent)]
     Io(#[from] std::io::Error),
+    #[error("zapis ručnih podataka")]
+    Encode(#[from] serde_json::Error),
 }

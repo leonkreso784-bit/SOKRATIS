@@ -3,9 +3,15 @@
 //! `Err(e) if e.kind() == NotFound` JEDINO opravdanje za pad na zadano — svaka druga greška
 //! čitanja (putanja je direktorij, nema dozvole) mora biti vidljiva, jer tiho gutanje je laž.
 //! Za obični tekst `fs::read_to_string(..).ok()` je dovoljan; rekurzivni `walk` puni `&mut Vec`.
+//!
+//! Cigla M2/10 (pisanje ručnih podataka, S-015): `write_atomic` piše `.tmp` pored ciljne datoteke
+//! pa zove `rename` — `rename` je atoman na razini datotečnog sustava, pa pad usred pisanja nikad
+//! ne ostavi pola JSON-a na mjestu datoteke koju git prati. `BTreeMap` u `write_override` (umjesto
+//! `HashMap` kojim se čita) daje deterministički redoslijed ključeva — stabilan tekst, `git diff`
+//! od jednog retka.
 use crate::{GitCli, GitSource, IoError};
 use sokratis_core::{DocFile, Profile, ReportInput, Vision, WorkKind};
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -55,6 +61,19 @@ fn normalized(path: PathBuf) -> PathBuf {
     path.components().collect()
 }
 
+/// Piše `text` u `path` atomarno: prvo `.tmp` pored, pa `rename` (na Windowsu zamjenjuje
+/// postojeću). Pad usred pisanja tako nikad ne ostavi pola JSON-a na mjestu datoteke koju git
+/// prati.
+fn write_atomic(path: &Path, text: &str) -> Result<(), IoError> {
+    if let Some(dir) = path.parent() {
+        std::fs::create_dir_all(dir)?;
+    }
+    let tmp = path.with_extension("json.tmp");
+    std::fs::write(&tmp, text)?;
+    std::fs::rename(&tmp, path)?;
+    Ok(())
+}
+
 /// Rekurzivno skuplja `*.md` pod `dir` u `out`, preskačući `SKIP_DIRS`.
 fn walk(dir: &Path, out: &mut Vec<PathBuf>) -> Result<(), IoError> {
     for entry in std::fs::read_dir(dir)? {
@@ -101,18 +120,56 @@ impl Project {
         })
     }
 
+    /// Glavno stablo repoa: roditelj zajedničkog `.git` direktorija. Sva radna stabla ga dijele,
+    /// pa je to JEDINO mjesto za ručne podatke (S-015) — Sokratis piše samo ovdje, nikad u
+    /// sporedno radno stablo iz kojeg je možda otvoren, i pritom ništa ne commita.
+    pub fn main_root(&self) -> PathBuf {
+        self.common_dir
+            .parent()
+            .map(Path::to_path_buf)
+            .unwrap_or_else(|| self.root.clone())
+    }
+
+    /// Putanja ručne datoteke (`overrides.json`, `visions.json`) u `.sokratis/` GLAVNOG stabla —
+    /// jedno mjesto koje i čita i piše (za razliku od `profile.json`, koji ostaje uz `root`, jer
+    /// deklaraciju konvencija ne mijenja sučelje).
+    fn manual_path(&self, name: &str) -> PathBuf {
+        normalized(self.main_root().join(".sokratis").join(name))
+    }
+
     /// Ručni overridi klasifikacije po SHA-i commita (`.sokratis/overrides.json`).
     pub fn overrides(&self) -> Result<HashMap<String, WorkKind>, IoError> {
-        read_overrides_or_empty(&normalized(
-            self.root.join(".sokratis").join("overrides.json"),
-        ))
+        read_overrides_or_empty(&self.manual_path("overrides.json"))
     }
 
     /// Ručno upisane vizije (`.sokratis/visions.json`).
     pub fn visions(&self) -> Result<Vec<Vision>, IoError> {
-        read_visions_or_empty(&normalized(
-            self.root.join(".sokratis").join("visions.json"),
-        ))
+        read_visions_or_empty(&self.manual_path("visions.json"))
+    }
+
+    /// Upisuje/uklanja override klasifikacije za commit `sha` (`None` uklanja) i vraća putanju
+    /// upisane datoteke — DESKTOP je potiskuje u watcheru (S-016), da vlastiti zapis ne pročita
+    /// kao vanjsku promjenu.
+    pub fn write_override(&self, sha: &str, kind: Option<WorkKind>) -> Result<PathBuf, IoError> {
+        let mut all: BTreeMap<String, WorkKind> = self.overrides()?.into_iter().collect();
+        match kind {
+            Some(k) => {
+                all.insert(sha.to_string(), k);
+            }
+            None => {
+                all.remove(sha);
+            }
+        }
+        let path = self.manual_path("overrides.json");
+        write_atomic(&path, &serde_json::to_string_pretty(&all)?)?;
+        Ok(path)
+    }
+
+    /// Upisuje cijeli popis vizija (zamjena, ne spajanje) i vraća putanju upisane datoteke.
+    pub fn write_visions(&self, visions: &[Vision]) -> Result<PathBuf, IoError> {
+        let path = self.manual_path("visions.json");
+        write_atomic(&path, &serde_json::to_string_pretty(visions)?)?;
+        Ok(path)
     }
 
     /// Svi `*.md` u korijenu i pod `profile.docs_dir`, sa sadržajem i zadnjom promjenom iz gita.
