@@ -3,6 +3,10 @@
 //! prvi neuspjeli `parse` vraća `None` i gotovo. Cijeli brojevi (`i64`) jer je danima mjesto u
 //! cijelim brojevima, a prijestupne godine rješava formula, ne tablica. `is_ymd` i `prev_day` su
 //! ČISTE funkcije nad `&str` (bez sata i bez zone) — zato ih smiju zvati i jezgra i `io`.
+//!
+//! ZAŠTO RUST OVAKO (cigla M2/3 — `next_day` za gornju granicu `until`)
+//! `next_day` je zrcalo `prev_day`-a: ista `Option<...>` kroz `?`, isti kalendar (`days_in_month`),
+//! samo smjer unaprijed. Nema nove logike za prijestupnu godinu — ista formula koja već postoji.
 
 /// Rastavlja `YYYY-MM-DD` u `(godina, mjesec, dan)`; `None` ako format ne valja.
 fn ymd(s: &str) -> Option<(i64, i64, i64)> {
@@ -77,6 +81,28 @@ pub fn prev_day(date: &str) -> Option<String> {
     Some(format!("{year:04}-{month:02}-{day:02}"))
 }
 
+/// Sljedeći kalendarski dan (`YYYY-MM-DD`); `None` ako `date` nije valjan datum.
+/// Zrcalo `prev_day`-a, u drugom smjeru: `io` (T14) njime gradi `--until=<dan+1> 00:00:00`, pa git
+/// dovuče cijeli `until` dan uz rezervu zone, a jezgra presudi `commit_date <= until`
+/// (isti obrazac kao I2/S-011 dopuna 2, samo za gornju granicu razdoblja).
+pub fn next_day(date: &str) -> Option<String> {
+    if !is_ymd(date) {
+        return None;
+    }
+    let (mut year, mut month, day) = ymd(date)?;
+    let day = if day < days_in_month(year, month) {
+        day + 1
+    } else {
+        month += 1;
+        if month == 13 {
+            month = 1;
+            year += 1;
+        }
+        1
+    };
+    Some(format!("{year:04}-{month:02}-{day:02}"))
+}
+
 /// Dani od `from` do `to` (`to − from`); negativno ako je `to` prije `from`.
 /// `None` ako bilo koji datum nije u formatu `YYYY-MM-DD`.
 pub fn days_between(from: &str, to: &str) -> Option<i64> {
@@ -135,5 +161,16 @@ mod tests {
         assert_eq!(prev_day("2026-05-01").as_deref(), Some("2026-04-30"));
         assert_eq!(prev_day("banana"), None);
         assert_eq!(prev_day("2026-02-30"), None);
+    }
+
+    /// M2/3: zrcalo `prev_day`-a za gornju granicu `until` — ista rezerva prijestupne godine,
+    /// samo u drugom smjeru (prijelaz mjeseca i godine unaprijed).
+    #[test]
+    fn next_day_crosses_month_and_year() {
+        assert_eq!(next_day("2026-09-17").as_deref(), Some("2026-09-18"));
+        assert_eq!(next_day("2026-09-30").as_deref(), Some("2026-10-01"));
+        assert_eq!(next_day("2026-12-31").as_deref(), Some("2027-01-01"));
+        assert_eq!(next_day("2028-02-28").as_deref(), Some("2028-02-29"));
+        assert_eq!(next_day("nije-datum"), None);
     }
 }

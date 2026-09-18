@@ -18,3 +18,4 @@ pub use error::ParseError;
 pub use model::*;
 pub use profile::{Patterns, Profile};
 pub use report::build_report;
+pub use snapshot::{alerts_raised, diff, worst_severity};

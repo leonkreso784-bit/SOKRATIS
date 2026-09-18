@@ -316,3 +316,94 @@ crate natrag u `members` → `cargo build -p sokratis-desktop` → commit `M2/1b
 graditelja (JEZGRA T2, PROFIL T8, IO T10, SUČELJE T20). Ledger: `.superpowers/sdd/2026-09-18-m2-desktop/progress.md`
 (odjeljak „STANJE ZA NOVU SESIJU" na dnu) + `NOVA-SESIJA-PROMPT.md` pored njega. Push/remote i dalje samo uz
 izričit OK.
+
+---
+
+## 2026-09-18 (FABLE) — Kostur M2 dovršen (`M2/1b`), stabla tokova otvorena, prvi val graditelja
+
+**Nova sesija, večer.** Nastavak zastanka s kraja prošle sesije: korak 13 cigle T1 uz Leonov OK.
+
+- **Leon je dao izričit OK za `npm install`** u `apps/desktop` (isti OK pokriva `npm ci` u stablima
+  `sokratis.ui`/`sokratis.desktop`). Instalirano 80 paketa, verzije točno pinane, 0 ranjivosti →
+  `apps/desktop/package-lock.json`.
+- **Ikone:** `npm run tauri icon` iz Leonova loga → `apps/desktop/src-tauri/icons/` (desktop + Windows
+  set). Mape `android/` i `ios/` koje alat usput generira **nisu commitane** (aplikacija je
+  desktop-only; odluka orkestratora, vraćaju se istom naredbom ako zatrebaju).
+- **Odstupanje od teksta plana, s razlogom (pravilo #6):** `apps/desktop/vite.config.ts` uvozi
+  `defineConfig` iz `vitest/config` (taj tip poznaje ključ `test`) i koristi putanje relativne prema
+  Vite korijenu umjesto `node:url` — `svelte-check` je padao bez `@types/node`, a nova ovisnost samo
+  radi config-datoteke nije opravdana.
+- **`apps/desktop/src-tauri` (crate `sokratis-desktop`) je natrag u `[workspace] members`**; prvi
+  `cargo build -p sokratis-desktop` je trajao 3 min. Brane na `main`-u: `cargo fmt --check` ·
+  `cargo clippy --all-targets -- -D warnings` (`--workspace`) · `cargo test --workspace` **65
+  testova** · `npm run check` zelen (svelte-check 0 grešaka + 1 vitest) · `npm run build` daje
+  `dist/` s `index.html` i `splash.html` · `sokratis signals .` = nema signala. Koraci 13 i 14 cigle
+  T1 su u planu označeni `[x]` u istom commitu (`cb963e8`, poruka `M2/1b: kostur M2 dovršen`).
+  **Time je T1 (kostur M2) cijel u `main`-u** (`M2/1a` + `M2/1b`).
+- **Otvorena su četiri radna stabla tokova**, sva na `cb963e8` (`git worktree list`):
+  `sokratis.jezgra` (`feat/core-m2`) · `sokratis.profil` (`feat/core-profile`) · `sokratis.io`
+  (`feat/io-m2`) · `sokratis.ui` (`feat/ui`). **Prvi val graditelja je poslan:** JEZGRA T2 · PROFIL
+  T8 · IO T10 · SUČELJE T20. Stabla STORE/CLI/DESKTOP/INTEGRACIJA otvaraju se kasnije po ovisnostima
+  iz plana.
+- **Odluka orkestratora za izvedbu:** brane Rust-tokova u njihovim stablima idu **bez** desktop
+  cratea (`--workspace --exclude sokratis-desktop`), jer bi inače svako stablo kompiliralo Tauri i
+  tražilo `dist/`, koji ta stabla ne grade; pune brane s desktopom vrti orkestrator na `main`-u
+  nakon svakog spajanja. Zapisano u `docs/workflow/AGENTI.md` §5 (jedno mjesto).
+- GitHub: remote i dalje **ne postoji** (`git remote -v` prazno). Push/remote/objava i dalje čekaju
+  Leonov izričit OK.
+- **Čuvar dokumentacije (način A):** `PROGRESS.md` (ovaj unos), `CHANGELOG.md` (`M2/1b` pod
+  `[Unreleased]`), `ROADMAP.md` („Gdje smo" i status M2), `CLAUDE.md` („Stanje — TRENUTNO": T1 cijel,
+  desktop crate u workspaceu, stabla otvorena, „na Leona čeka" dobio izvor tray-ikone T33 i brisanje
+  grana/stabala na kraju), `docs/workflow/AGENTI.md` §2/§5 (stabla postoje, exclude-flag),
+  `docs/workflow/TESTING.md` §4 (`npm run check` više ne čeka `node_modules`),
+  `docs/architecture/ARCHITECTURE.md` (desktop crate u workspaceu, §11 builda se), `docs/README.md`
+  (plan/ uvod). Audit grepom potvrdio da nijedna preostala `.md` tvrdnja ne kaže „izvan `members`"
+  ili „čeka Leonov OK za `npm install`".
+
+**Nastavak iste večeri — PROFIL gotov, JEZGRA prva polovica spojena.**
+
+- **PROFIL (T8–T9) spojen, tok gotov** (merge `a2e9265`): `inside_root(rel: &str) -> bool` u
+  `crates/sokratis-core/src/profile.rs` razlaže putanju kroz `std::path::Component` i s `matches!`
+  odbija sve osim `Normal`/`CurDir` (dakle `..`, apsolutnu, `C:\…`, `\\server\share`) bez ijednog
+  diranja diska (S-002); `Profile::validate_paths()` je bio stub iz T1, sad provjerava svih osam
+  polja putanja i vraća `ParseError::PathOutsideRoot { field, value }` na prvi pogodak — jezgreni dio
+  duga I9 (BACKLOG). Io-dio (ograda pri `Project::open`) dolazi u IO T14, pa I9 ostaje **djelomično**
+  riješen, ne zatvoren. `test_path_exclude` dobio ponašanje u `is_test_path` (stražarska klauzula,
+  rani `return false` prije uključivih pravila); zadano `[]` čuva paritet (S-005) — Sokratisov
+  vlastiti profil dobiva `["/fixtures/"]` tek u T35. Obje cigle recenzirane: SPOJIVO.
+- **JEZGRA prva polovica (T2–T3) spojena, tok nastavlja na istoj grani** (merge `7d23c76`): snapshot
+  ugovora `Report`-a (`crates/sokratis-core/tests/snapshot.rs`, `insta::assert_json_snapshot!`, 467
+  redaka, 15 ključeva na vrhu) zaključava oblik JSON-a kao test od sada — svaka buduća promjena
+  (novo polje, preimenovanje, drugi redoslijed) pada dok se snimka namjerno ne ažurira uz obrazloženje
+  u commitu (S-022); time je BACKLOG-stavka I7 riješena. `until` postao stvarna gornja granica
+  razdoblja (cijeli dan uključivo, S-011): jezgra provjerava oblik (`ParseError::BadDate`, isti
+  ugovor kao `since`) i filtrira commite i isporuke tako da ostane samo `commit_date`/`date <= until`;
+  `civil::next_day` je zrcalo `prev_day`-a za rezervu zone u `io` (potrošač dolazi u T14). **Odstupanje
+  od brifa, potvrđeno na kodu:** umjesto dopisivanja četvrtog commita u dijeljeni modulski `LOG` u
+  `report.rs` (što bi promijenilo `touched.commits` i srušilo postojeći test
+  `assembles_everything_and_filters_by_since`), graditelj je dodao lokalni `const
+  LOG_WITH_LATER_COMMIT` samo unutar novog testa — isti obrazac kao već postojeći test
+  `closed_phases_in_range_follows_input_since_not_profile_since`; recenzent je na kodu potvrdio da je
+  time duh napomene ispunjen bez diranja zelenih testova.
+- **Brane na `main`-u nakon oba spajanja:** `cargo fmt --check` OK · `cargo clippy --workspace -- -D
+  warnings` OK · **72 testa** · `sokratis signals .` = nema signala.
+- **Ostali tokovi, izvan `main`-a (stanje za drugi val, ne još isporučeno):** IO — M2/10 (atomarno
+  pisanje ručnih podataka u glavno stablo) recenzirano SPOJIVO, M2/11 (performanse gita) u izradi;
+  STORE — M2/15 (registar projekata) SPOJIVO, M2/16 (postavke) na recenziji, peto stablo
+  `sokratis.store` (`feat/store`) otvoreno; SUČELJE — M2/20 (`tokens.css` + brana kontrasta) na
+  recenziji; JEZGRA — M2/4 (zbroj vizija) u izradi. Remote i dalje ne postoji; push/objava i dalje
+  čekaju Leonov izričit OK.
+- **Čuvar dokumentacije (način A), ovaj zapis:** `PROGRESS.md` (ova dopuna), `CHANGELOG.md` (retci
+  M2/2, M2/3, M2/8, M2/9 pod `[Unreleased]`), `RUST.md` §4 (`matches!`, `Option::is_none_or`,
+  let-chain, stražarska klauzula; dopuna postojećih redaka za `std::path::Component` i
+  struct-update) i §2 (`insta` red ažuriran — prvi snapshot-test više nije najava nego činjenica),
+  `ARCHITECTURE.md` (§2/§3/§4/§10/§11: `until` filtrira i validira, `validate_paths` i
+  `test_path_exclude` više nisu stub/deklaracija), `TESTING.md` (naredba za namjernu promjenu
+  snimke), `BACKLOG.md` (I7 riješen, I9 djelomično), `ROADMAP.md` i `CLAUDE.md` (PROFIL gotov, JEZGRA
+  napola, peto stablo).
+
+### Što slijedi
+Drugi val graditelja nastavlja: JEZGRA T4–T7 na `feat/core-m2`, IO T10–T14 (uključujući ogradu pri
+`Project::open`, tek nakon što JEZGRA T3 i PROFIL T8 stoje u `main`-u — oba sad stoje), STORE T15–T18
+na petom stablu, SUČELJE T20+. INTEGRACIJA kad su svi tokovi u `main`-u. Push/remote i objava i dalje
+čekaju Leonov izričit OK; isto brisanje grana/stabala tokova na kraju M2.

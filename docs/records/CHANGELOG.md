@@ -19,6 +19,40 @@ Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek sesije:
   oblik JSON-a mijenja samo namjerno**, uz snapshot-test i rečenicu u commitu (S-022). Što točno
   stoji u kodu a ne radi: [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §11.
   Brane: `cargo test --workspace` **65 testova**, `sokratis docs .` 100/100, `signals .` 0.
+- **`M2/1b` — kostur M2 dovršen (2026-09-18).** I dalje **ništa novo za korisnika CLI-ja**:
+  `report`/`docs`/`signals` nepromijenjeni. Ispod: `npm install` (80 paketa, verzije pinane, 0
+  ranjivosti) i `npm run tauri icon` iz Leonova loga popunili su `apps/desktop/src-tauri/icons/`
+  (desktop + Windows set; `android/`/`ios/` nisu commitani — aplikacija je desktop-only); crate
+  `sokratis-desktop` je natrag u `[workspace] members` i **builda se** (prvi `cargo build -p
+  sokratis-desktop` ~3 min). Odstupanje od plana, s razlogom (pravilo #6): `vite.config.ts` uvozi
+  `defineConfig` iz `vitest/config` umjesto `node:url`, jer bi nova ovisnost samo radi
+  config-datoteke bila neopravdana. Brane: `cargo test --workspace` **65 testova**, `npm run check`
+  zelen (svelte-check 0 grešaka + 1 vitest), `npm run build` daje `dist/` s `index.html` i
+  `splash.html`, `sokratis signals .` 0. Time je **T1 (kostur) cijel u `main`-u**; otvorena su
+  četiri radna stabla tokova (JEZGRA · PROFIL · IO · SUČELJE) i poslan prvi val graditelja.
+- **`M2/2` — snapshot ugovora `Report`-a (2026-09-18).** Korisnik CLI-ja **ne vidi ništa novo**.
+  Ispod: `crates/sokratis-core/tests/snapshot.rs` zaključava oblik JSON-a `Report`-a nad fixtureom
+  pariteta (`insta::assert_json_snapshot!`, 467 redaka, 15 ključeva na vrhu) — od sada svaka promjena
+  oblika (novo polje, preimenovanje, drugi redoslijed) pada dok se snimka namjerno ne ažurira uz
+  rečenicu u commitu (S-022). BACKLOG-stavka I7 je time riješena.
+- **`M2/3` — `until` kao gornja granica razdoblja (2026-09-18).** Korisnik CLI-ja i dalje ne vidi
+  novu zastavicu (`--until` dolazi u T19, birač raspona u sučelju kasnije) — ono što se promijenilo
+  je jezgra: `until` u `ReportInput`/`Report` sad stvarno filtrira (cijeli dan uključivo, S-011:
+  commiti i isporuke s datumom poslije `until` ispadnu) i validira oblik (`ParseError::BadDate {
+  field: "until" }`, isti ugovor kao `since`). `civil::next_day` je zrcalo `prev_day`-a, priprema za
+  rezervu zone koju IO T14 treba za `--until` prema gitu.
+- **`M2/8` — ograda putanja iz profila (2026-09-18).** Nijedna promjena za korisnika CLI-ja danas
+  (ograda još nije spojena na otvaranje projekta, IO T14) — jezgra sad zna reći: `inside_root(rel)`
+  i `Profile::validate_paths()` odbiju profil čije bilo koje od osam polja putanja pokazuje izvan
+  korijena repoa (`..`, apsolutna putanja, `C:\…`, `\\server\share`); greška imenuje polje
+  (`ParseError::PathOutsideRoot`). Jezgreni dio duga I9; io-dio (provjera pri `Project::open`) dolazi
+  u T14 — I9 je zato **djelomično**, ne potpuno riješen.
+- **`M2/9` — `test_path_exclude` u profilu (2026-09-18).** Zadani profil se ne mijenja (S-005: zadano
+  `[]`, paritet netaknut) — polje sad radi: putanja koja sadrži unos s popisa se više ne broji kao
+  test, iako je pod testnom putanjom (npr. `tests/fixtures/…`). Sokratisov vlastiti profil dobiva
+  `["/fixtures/"]` tek u T35.
+  Brane na `main`-u nakon PROFIL (T8–T9) i JEZGRA 1/2 (T2–T3): `cargo fmt --check` OK · `cargo clippy
+  --workspace -- -D warnings` OK · **72 testa** · `sokratis signals .` = nema signala.
 
 ## [0.1.0] — 2026-09-17 — Jezgra i CLI (Milestone 1)
 

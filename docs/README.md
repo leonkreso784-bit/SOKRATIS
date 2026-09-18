@@ -58,7 +58,7 @@ redak u backlogu.
 
 Spec Milestonea 1 je **ispunjen i arhiviran** ([archive/ARHITEKTURA_M1.md](./archive/ARHITEKTURA_M1.md));
 **jedini aktivni spec je M2** (desktop) — napisan i odobren 2026-09-18, plan cigli iz njega je u
-`superpowers/plans/`, izvedba je počela (kostur `M2/1a` u `main`-u).
+`superpowers/plans/`, kostur (T1) je cijel u `main`-u i četiri toka su u izvedbi u svojim stablima.
 
 | Dokument | Svrha |
 |---|---|

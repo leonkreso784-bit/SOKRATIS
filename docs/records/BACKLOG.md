@@ -26,7 +26,13 @@ opisuje [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §1
 **Sedam od devet stavki preuzeo je spec M2** — [`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md)
 §8 ih nabraja s mjestom u specu i testom koji ih dokazuje: snapshot `Report`-a (I7) · performanse
 (M11) · ograda putanja (I9) · zbroj vizija (I6) · `phase_tag` (I3 + M14) · detached HEAD · testni redak
-koji fixture prevlada (odgođena 8). Ovdje ostaju samo dvije koje M2 **ne** uzima:
+koji fixture prevlada (odgođena 8). **I7 je riješena ciglom M2/2** (2026-09-18): snapshot-test postoji
+i pada na svaku nenamjernu promjenu oblika. **I9 je djelomično riješena ciglom M2/8**: jezgra
+(`Profile::validate_paths`/`inside_root`) odbija putanju izvan repoa; io-dio (provjera pri
+`io::Project::open`, prije nego se profil pročita s diska) čeka T14 — I9 ostaje otvorena dok taj dio
+ne uđe. Testni redak koji fixture prevlada (odgođena 8) je riješen ciglom M2/9 (`test_path_exclude`).
+Stanje koda za sve troje: [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §11.
+Ovdje ostaju samo dvije stavke koje M2 **ne** uzima:
 
 | stavka | za | bilješka |
 |---|---|---|

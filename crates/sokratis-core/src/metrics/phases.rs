@@ -2,6 +2,14 @@
 //! Zatvorene faze se BROJE iz commita (mjera), ne prepisuju (procjena). `plan_phases: Vec<Phase>`
 //! se uzima u VLASNIŠTVO i mutira u mjestu (`for ph in &mut plan_phases`) — pozivatelju ionako ne
 //! treba stara verzija, pa nema kloniranja.
+//!
+//! ZAŠTO RUST OVAKO (cigla M2/6 — aktivne faze preko `phase_tag` iz profila)
+//! `Option::is_some_and` presuđuje `classify::phase_tag(...)` u jednom izrazu bez ugnježđenog
+//! `match`-a: `None` (commit nema oznaku faze) ne prolazi filtar, `Some(tag)` se provjerava protiv
+//! `ph.id` ili djeteta `"{id}/"`. Time vezanje commita na fazu prestaje ovisiti o tvrdom
+//! `starts_with(prefix)` i umjesto toga čita regex iz profila — polje `phase_tag` i
+//! `classify::phase_tag` prestaju biti mrtvi (I3, M14), a tuđi projekt s drukčijom konvencijom
+//! (npr. `[M1.3]`) veže se istim putem kao Sokrat Study (`F2/3`).
 use crate::civil::days_between;
 use crate::{Commit, Patterns, Phase, PhaseState};
 
@@ -34,12 +42,20 @@ pub fn closed_phases(all_commits: &[Commit], p: &Patterns) -> Vec<Phase> {
         .collect()
 }
 
-pub fn active_phases(mut plan_phases: Vec<Phase>, commits: &[Commit], today: &str) -> Vec<Phase> {
+pub fn active_phases(
+    mut plan_phases: Vec<Phase>,
+    commits: &[Commit],
+    today: &str,
+    p: &Patterns,
+) -> Vec<Phase> {
     for ph in &mut plan_phases {
-        let prefix = format!("{}/", ph.id);
+        let child = format!("{}/", ph.id);
         let mut tagged: Vec<&Commit> = commits
             .iter()
-            .filter(|c| c.subject.starts_with(&prefix))
+            .filter(|c| {
+                crate::classify::phase_tag(&c.subject, p)
+                    .is_some_and(|tag| tag == ph.id || tag.starts_with(&child))
+            })
             .collect();
         tagged.sort_by_key(|c| c.author_time);
         if let Some(first) = tagged.first() {
@@ -127,6 +143,7 @@ mod tests {
 
     #[test]
     fn active_phase_gets_start_from_first_tagged_commit() {
+        let p = Patterns::compile(&Profile::default()).unwrap();
         let plan = vec![
             Phase {
                 id: "F1".into(),
@@ -156,7 +173,7 @@ mod tests {
             c("y", 10, "2026-09-04", "F1/1 prva"),
             c("z", 30, "2026-09-06", "docs: ne"),
         ];
-        let ph = active_phases(plan, &commits, "2026-09-06");
+        let ph = active_phases(plan, &commits, "2026-09-06", &p);
         assert_eq!(
             (ph[0].from.as_deref(), ph[0].days, ph[0].commits),
             (Some("2026-09-04"), Some(3), 2)
@@ -168,5 +185,64 @@ mod tests {
             (ph[1].from.as_deref(), ph[1].days, ph[1].commits),
             (None, None, 0)
         );
+    }
+
+    #[test]
+    fn active_phase_binds_commits_through_profile_phase_tag_not_hard_prefix() {
+        // Struct-update sintaksa umjesto `let mut prof = Profile::default(); prof.polje = …`:
+        // potonje puni SVA polja pa ih odmah prepisuje jedno, što clippy prijavljuje kao
+        // `field_reassign_with_default` (M2/9).
+        let prof = Profile {
+            phase_tag: r"^\[(M\d)\.\d+\]".into(),
+            ..Profile::default()
+        };
+        let p = Patterns::compile(&prof).unwrap();
+        let plan = vec![Phase {
+            id: "M1".into(),
+            name: "Jezgra".into(),
+            state: PhaseState::Running,
+            total_bricks: 3,
+            done_bricks: 1,
+            from: None,
+            to: None,
+            days: None,
+            commits: 0,
+        }];
+        let commits = vec![
+            c("a", 1, "2026-09-01", "[M1.1] kostur"),
+            c("b", 2, "2026-09-02", "[M1.2] parser"),
+            c("x", 3, "2026-09-03", "M1/3 tudji oblik"),
+        ];
+        let out = active_phases(plan, &commits, "2026-09-05", &p);
+        assert_eq!(
+            (out[0].commits, out[0].from.as_deref(), out[0].days),
+            (2, Some("2026-09-01"), Some(5))
+        );
+    }
+
+    #[test]
+    fn sokrat_study_default_still_binds_f2_slash_3_to_phase_f2() {
+        let p = Patterns::compile(&Profile::default()).unwrap();
+        let plan = vec![Phase {
+            id: "F2".into(),
+            name: "R".into(),
+            state: PhaseState::Running,
+            total_bricks: 1,
+            done_bricks: 0,
+            from: None,
+            to: None,
+            days: None,
+            commits: 0,
+        }];
+        let out = active_phases(
+            plan,
+            &[
+                c("a", 1, "2026-09-01", "F2/3 nesto"),
+                c("b", 2, "2026-09-01", "F3/1 drugo"),
+            ],
+            "2026-09-01",
+            &p,
+        );
+        assert_eq!(out[0].commits, 1);
     }
 }
