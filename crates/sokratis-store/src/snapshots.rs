@@ -1,9 +1,8 @@
 //! ZAŠTO RUST OVAKO (cigla M2/17 — snimke brojki, profil kao kanonski JSON, trend)
-//! `canonical_json` ide preko `serde_json::Value`: bez feature `preserve_order` je `Value::Object`
-//! `BTreeMap`, pa ponovna serijalizacija SORTIRA ključeve — dva profila s istim sadržajem u drugom
-//! poretku daju isti string pa isti `profile_seen_id` (provjereno: `preserve_order` nije uključen
-//! nigdje u `Cargo.lock`). `ON CONFLICT … DO UPDATE` je upsert u jednom SQL-u bez utrke; jedna
-//! `unchecked_transaction` drži cijelu snimku (redak po metrici) kao jednu cjelinu — S-014.
+//! `canonical_json` sortira ključeve preko `serde_json::Value`/`BTreeMap` (bez `preserve_order`,
+//! provjereno u `Cargo.lock`) — isti sadržaj u drugom poretku daje isti `profile_seen_id`.
+//! `save_snapshot` je CJELOVITA ZAMJENA dana: `DELETE` pa `INSERT` u JEDNOJ `unchecked_transaction`
+//! (S-014) — druga snimka s manje metrika ne smije ostaviti stare retke (recenzija, krug 1).
 use crate::{Store, StoreError};
 use rusqlite::{OptionalExtension, params};
 use serde::Serialize;
@@ -77,10 +76,15 @@ impl Store {
             .is_some())
     }
 
-    /// Upisuje jednu dnevnu snimku: jedan redak po pokazatelju + `docs_score` (ako postoji) +
-    /// tri `signals_*` retka, sve u JEDNOJ transakciji (pola snimke je gore nego nijedna).
-    /// Nekonačna vrijednost (`NaN`/beskonačnost) se PRESKAČE — SQLite `NaN` pretvara u NULL pri
-    /// vezanju parametra, a stupac `value` je `NOT NULL`, pa bi inače pukla cijela transakcija.
+    /// Upisuje jednu dnevnu snimku KAO CJELOVITU ZAMJENU dana: prvo `DELETE` svih redaka tog
+    /// (projekt, dan) para, pa `INSERT` svih (konačnih) metrika — sve u JEDNOJ transakciji, pa se
+    /// dogodi ili obje polovice ili nijedna. Bez ovoga bi druga snimka ISTOG dana s MANJE metrika
+    /// (npr. `docs_score` ode iz `Some` u `None`, ili pokazatelj koji je jutro bio konačan navečer
+    /// postane `NaN`) ostavila jutrošnje retke — `latest_snapshot`/`trend` bi vraćali mješavinu
+    /// dviju snimki (Important nalaz recenzije M2/17, krug 1). Nekonačna vrijednost (`NaN`/
+    /// beskonačnost) se PRESKAČE — SQLite je pretvara u NULL pri vezanju, a stupac `value` je
+    /// `NOT NULL`, pa bi inače pukla cijela transakcija (i `DELETE` bi se vratio, jer `Drop` bez
+    /// `commit()` znači rollback).
     pub fn save_snapshot(
         &self,
         id: i64,
@@ -90,8 +94,12 @@ impl Store {
     ) -> Result<(), StoreError> {
         self.project(id)?;
         let tx = self.conn.unchecked_transaction()?;
+        tx.execute(
+            "DELETE FROM snapshot WHERE project_id = ?1 AND taken_on = ?2",
+            params![id, taken_on],
+        )?;
         for indicator in &m.indicators {
-            upsert_metric(
+            insert_metric(
                 &tx,
                 id,
                 taken_on,
@@ -102,7 +110,7 @@ impl Store {
             )?;
         }
         if let Some(docs) = m.docs_score {
-            upsert_metric(
+            insert_metric(
                 &tx,
                 id,
                 taken_on,
@@ -112,7 +120,7 @@ impl Store {
                 IndicatorKind::Measure,
             )?;
         }
-        upsert_metric(
+        insert_metric(
             &tx,
             id,
             taken_on,
@@ -121,7 +129,7 @@ impl Store {
             f64::from(m.signals.info),
             IndicatorKind::Measure,
         )?;
-        upsert_metric(
+        insert_metric(
             &tx,
             id,
             taken_on,
@@ -130,7 +138,7 @@ impl Store {
             f64::from(m.signals.warn),
             IndicatorKind::Measure,
         )?;
-        upsert_metric(
+        insert_metric(
             &tx,
             id,
             taken_on,
@@ -180,8 +188,10 @@ impl Store {
     }
 
     /// Zadnji dan koji ima snimku i njegove brojke, ponovno sastavljene u `SnapshotMetrics`.
-    /// Redoslijed `indicators` prati redoslijed UMETANJA (stupac `rowid`, koji `ON CONFLICT DO
-    /// UPDATE` ne mijenja) — brif šuti o poretku, a jednakost `SnapshotMetrics` u testu ovisi o njemu.
+    /// Redoslijed `indicators` prati redoslijed UMETANJA (stupac `rowid`): `save_snapshot` prvo
+    /// BRIŠE pa PONOVNO UMEĆE cijeli dan, pa su `rowid`-ovi uvijek NOVI i rastu točno redom kojim
+    /// su metrike umetnute u POSLJEDNJEM pozivu — brif šuti o poretku, a jednakost `SnapshotMetrics`
+    /// u testu ovisi o njemu.
     pub fn latest_snapshot(
         &self,
         id: i64,
@@ -233,8 +243,10 @@ impl Store {
     }
 }
 
-/// Upisuje/mijenja jedan redak snimke; preskače nekonačne vrijednosti (vidi `save_snapshot`).
-fn upsert_metric(
+/// Upisuje jedan redak snimke za dan koji je `save_snapshot` UPRAVO OBRISAO — zato je ovo čist
+/// `INSERT` bez `ON CONFLICT`: isti (projekt, dan, metrika) par ne može već postojati unutar iste
+/// transakcije. Preskače nekonačne vrijednosti (vidi `save_snapshot`).
+fn insert_metric(
     tx: &rusqlite::Transaction<'_>,
     project_id: i64,
     taken_on: &str,
@@ -248,11 +260,7 @@ fn upsert_metric(
     }
     tx.execute(
         "INSERT INTO snapshot (project_id, taken_on, profile_seen_id, metric, value, kind)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6)
-         ON CONFLICT(project_id, taken_on, metric) DO UPDATE SET
-             value = excluded.value,
-             profile_seen_id = excluded.profile_seen_id,
-             kind = excluded.kind",
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
         params![
             project_id,
             taken_on,

@@ -171,6 +171,183 @@ fn save_snapshot_for_unknown_project_is_no_such_project() {
     ));
 }
 
+/// Recenzija M2/17, krug 1 (Important): upsert „po (project, dan, metrika)" iz brifa NE briše
+/// retke tog dana kojih u novom pozivu nema, pa bi `latest_snapshot`/`trend` vraćali MJEŠAVINU
+/// jutrošnje i večernje snimke. `save_snapshot` mora dan zamijeniti CIJELOG: manje pokazatelja
+/// navečer (npr. `docs_score` ode iz `Some` u `None`) ne smije ostaviti jutrošnji redak.
+#[test]
+fn second_snapshot_of_the_day_replaces_the_whole_day_not_row_by_row() {
+    let s = Store::open_in_memory().unwrap();
+    let p = s
+        .add_project("SS", Path::new(r"C:\ss"), Path::new(r"C:\ss\.git"), 1)
+        .unwrap();
+    let prof = s.record_profile(p.id, r#"{"a":1}"#, 1).unwrap();
+
+    let morning = SnapshotMetrics {
+        indicators: vec![
+            MetricValue {
+                id: "commits".into(),
+                value: 10.0,
+                kind: IndicatorKind::Measure,
+            },
+            MetricValue {
+                id: "hours".into(),
+                value: 2.0,
+                kind: IndicatorKind::Proxy,
+            },
+            MetricValue {
+                id: "lines".into(),
+                value: 100.0,
+                kind: IndicatorKind::Measure,
+            },
+        ],
+        docs_score: Some(90),
+        signals: SignalCounts {
+            info: 1,
+            warn: 0,
+            alert: 0,
+        },
+    };
+    // navečer: "lines" izostaje, docs_score prelazi u None
+    let evening = SnapshotMetrics {
+        indicators: vec![
+            MetricValue {
+                id: "commits".into(),
+                value: 12.0,
+                kind: IndicatorKind::Measure,
+            },
+            MetricValue {
+                id: "hours".into(),
+                value: 2.5,
+                kind: IndicatorKind::Proxy,
+            },
+        ],
+        docs_score: None,
+        signals: SignalCounts {
+            info: 0,
+            warn: 0,
+            alert: 0,
+        },
+    };
+
+    s.save_snapshot(p.id, "2026-09-16", prof, &morning).unwrap();
+    s.save_snapshot(p.id, "2026-09-16", prof, &evening).unwrap();
+
+    let (day, latest) = s.latest_snapshot(p.id).unwrap().unwrap();
+    assert_eq!(day, "2026-09-16");
+    assert_eq!(
+        latest, evening,
+        "večernja snimka je CIJELA zamjena, ne mješavina s jutarnjom"
+    );
+    assert!(
+        s.trend(p.id, "lines", "2026-09-01", "2026-09-30")
+            .unwrap()
+            .is_empty(),
+        "pokazatelj koji navečer izostaje ne smije preživjeti iz jutra"
+    );
+    assert!(
+        s.trend(p.id, "docs_score", "2026-09-01", "2026-09-30")
+            .unwrap()
+            .is_empty(),
+        "docs_score koji navečer postane None ne smije preživjeti iz jutra"
+    );
+}
+
+/// Isti nalaz kao gore, ali izostanak je posljedica `NaN`-a (metrika koja je jutro bila konačna,
+/// navečer nije) — jutrošnji konačan redak ne smije preživjeti samo zato što je večernji preskočen.
+#[test]
+fn second_snapshot_of_the_day_with_nan_metric_does_not_resurrect_the_morning_row() {
+    let s = Store::open_in_memory().unwrap();
+    let p = s
+        .add_project("SS", Path::new(r"C:\ss"), Path::new(r"C:\ss\.git"), 1)
+        .unwrap();
+    let prof = s.record_profile(p.id, r#"{"a":1}"#, 1).unwrap();
+
+    let morning = SnapshotMetrics {
+        indicators: vec![
+            MetricValue {
+                id: "commits".into(),
+                value: 10.0,
+                kind: IndicatorKind::Measure,
+            },
+            MetricValue {
+                id: "lines".into(),
+                value: 100.0,
+                kind: IndicatorKind::Measure,
+            },
+        ],
+        docs_score: Some(80),
+        signals: SignalCounts::default(),
+    };
+    let evening = SnapshotMetrics {
+        indicators: vec![
+            MetricValue {
+                id: "commits".into(),
+                value: 11.0,
+                kind: IndicatorKind::Measure,
+            },
+            MetricValue {
+                id: "lines".into(),
+                value: f64::NAN,
+                kind: IndicatorKind::Measure,
+            },
+        ],
+        docs_score: Some(80),
+        signals: SignalCounts::default(),
+    };
+
+    s.save_snapshot(p.id, "2026-09-16", prof, &morning).unwrap();
+    s.save_snapshot(p.id, "2026-09-16", prof, &evening).unwrap();
+
+    assert!(
+        s.trend(p.id, "lines", "2026-09-01", "2026-09-30")
+            .unwrap()
+            .is_empty(),
+        "NaN navečer ne smije ostaviti jutrošnju konačnu vrijednost"
+    );
+    let (_, latest) = s.latest_snapshot(p.id).unwrap().unwrap();
+    assert_eq!(
+        latest.indicators.len(),
+        1,
+        "samo commits ostaje; lines je preskočen zbog NaN, ne pregažen jutrošnjim brojem"
+    );
+}
+
+/// Profil se vrati na stari sadržaj (A → B → A): treći dan mora dobiti ISTI `profile_seen_id` kao
+/// prvi (kanonski JSON je isti), a `trend` mora označiti promjenu na OBA prijelaza (16.→17., 17.→18.).
+#[test]
+fn profile_seen_id_is_reused_when_profile_reverts_and_trend_marks_each_change() {
+    let s = Store::open_in_memory().unwrap();
+    let p = s
+        .add_project("SS", Path::new(r"C:\ss"), Path::new(r"C:\ss\.git"), 1)
+        .unwrap();
+    let a = s.record_profile(p.id, r#"{"a":1}"#, 1).unwrap();
+    let b = s.record_profile(p.id, r#"{"a":2}"#, 2).unwrap();
+    let a_again = s.record_profile(p.id, r#"{"a":1}"#, 3).unwrap();
+    assert_eq!(
+        a, a_again,
+        "povratak na stari sadržaj vraća STARI profile_seen_id"
+    );
+    assert_ne!(a, b);
+
+    s.save_snapshot(p.id, "2026-09-16", a, &m(1.0, None))
+        .unwrap();
+    s.save_snapshot(p.id, "2026-09-17", b, &m(2.0, None))
+        .unwrap();
+    s.save_snapshot(p.id, "2026-09-18", a_again, &m(3.0, None))
+        .unwrap();
+
+    let t = s
+        .trend(p.id, "commits", "2026-09-01", "2026-09-30")
+        .unwrap();
+    let changed: Vec<bool> = t.iter().map(|x| x.profile_changed).collect();
+    assert_eq!(
+        changed,
+        vec![false, true, true],
+        "16. je prva točka (nikad promjena), 17. i 18. su oba prijelaza"
+    );
+}
+
 /// `ON DELETE CASCADE` u shemi (M2/1) mora odnijeti i snimke i viđene profile — provjereno kroz
 /// javni API (čitanje nakon brisanja), ne izravnim upitom nad `conn` (`pub(crate)`, nedostupno tests/).
 /// Drugi projekt ostaje netaknut (cascade gađa samo obrisani `project_id`).
