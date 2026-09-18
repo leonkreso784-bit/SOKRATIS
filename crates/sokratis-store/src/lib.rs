@@ -15,6 +15,12 @@
 //! ZAŠTO RUST OVAKO (cigla M2/17 — snimke brojki)
 //! `snapshots.rs` uvodi jedan javni tip (`TrendPoint`) i jednu slobodnu funkciju (`canonical_json`)
 //! uz `impl Store` — oboje re-eksportirano istim obrascem kao registar.
+//!
+//! ZAŠTO RUST OVAKO (cigla M2/18 — keš sirovih commita po SHA)
+//! `cache.rs` ne uvodi vlastite tipove (samo `impl Store` nad `Commit`/`FileChange` iz
+//! `sokratis-core`) — isti „modul je organizacija, ne API" princip kao `settings.rs`, pa nema
+//! novog re-exporta.
+pub mod cache;
 pub mod error;
 pub mod registry;
 pub mod settings;
