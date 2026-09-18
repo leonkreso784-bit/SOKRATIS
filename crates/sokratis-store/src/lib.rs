@@ -11,12 +11,18 @@
 //! `settings.rs` nema vlastite tipove (samo `String` ključ→vrijednost) pa nema što re-eksportirati —
 //! `impl Store` u njemu je vidljiv kroz `pub use store::Store` iznad, isti modul-je-organizacija
 //! princip kao kod registra.
+//!
+//! ZAŠTO RUST OVAKO (cigla M2/17 — snimke brojki)
+//! `snapshots.rs` uvodi jedan javni tip (`TrendPoint`) i jednu slobodnu funkciju (`canonical_json`)
+//! uz `impl Store` — oboje re-eksportirano istim obrascem kao registar.
 pub mod error;
 pub mod registry;
 pub mod settings;
+pub mod snapshots;
 pub mod store;
 pub use error::StoreError;
 pub use registry::{ProjectRecord, WorktreeRecord};
+pub use snapshots::{TrendPoint, canonical_json};
 pub use store::Store;
 
 #[cfg(test)]
