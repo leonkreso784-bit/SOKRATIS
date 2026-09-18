@@ -342,6 +342,7 @@ mod tests {
             parse_plan(plan_text, &p),
             &commits,
             "2026-09-17",
+            &p,
         ));
 
         let overrides: HashMap<String, WorkKind> = HashMap::new();

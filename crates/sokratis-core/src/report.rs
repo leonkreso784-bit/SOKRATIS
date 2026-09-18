@@ -99,7 +99,7 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
     // Zatvorene faze se broje iz SVIH commita loga (mogu prethoditi `since`); aktivne samo iz
     // filtriranih, jer prate napredak od danas unatrag.
     let mut phases = closed_phases(&all, &p);
-    phases.extend(active_phases(plan_phases, &commits, &input.today));
+    phases.extend(active_phases(plan_phases, &commits, &input.today, &p));
     let indicators = indicators(
         &IndicatorInput {
             commits: &commits,
