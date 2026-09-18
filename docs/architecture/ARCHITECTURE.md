@@ -1,8 +1,9 @@
 # ARCHITECTURE — što je izgrađeno
 
 **Status:** ✅ opisuje kod koji je u `main`-u — Milestone 1 (verzija 0.1.0, uključujući krug popravaka
-nakon završne recenzije) **plus kostur M2** (`M2/1a`: ugovor tipova, crate `sokratis-store`,
-`apps/desktop`; deklarirano, ponašanje tek dolazi — §11) · **Zadnja provjera:** 2026-09-18
+nakon završne recenzije) **plus kostur M2, cijel** (`M2/1a`+`M2/1b`: ugovor tipova, crate
+`sokratis-store`, `apps/desktop` s ikonama i `npm install`, desktop crate u workspaceu; deklarirano,
+ponašanje tek dolazi — §11) · **Zadnja provjera:** 2026-09-18
 
 > **Što ovaj dokument JEST:** opis sustava kakav stoji u `crates/` i `apps/` — granice između crateova, tok
 > podataka, formati koje čita i ugovori prema korisniku CLI-ja. **Što NIJE:** kronologija (to su
@@ -44,10 +45,11 @@ Nijedan redak se još ne piše ni čita: registar projekata, postavke i snimke d
 M2/15–M2/17, keš tek ako ga mjerenje zatraži (S-014). Baza će živjeti u `%LOCALAPPDATA%\sokratis\`;
 0.1.0 je ne stvara — CLI `store` ne koristi.
 
-**`sokratis-desktop` je crate na disku, ali privremeno izvan `[workspace] members`** (razlog stoji u
-komentaru korijenskog `Cargo.toml`): `tauri-build` traži ikone koje generira `npm run tauri icon`, a
-to traži `npm install` koji čeka Leonov OK. Do tada `cargo test --workspace` desktop crate ne
-dodiruje, a `apps/desktop` nema `node_modules`.
+**`sokratis-desktop` je u `[workspace] members` i builda se** (`M2/1b`, 2026-09-18): `npm install`
+uz Leonov OK (80 paketa, 0 ranjivosti) i `npm run tauri icon` iz Leonova loga popunili su
+`src-tauri/icons/`, pa `tauri-build` ima što tražiti. Prvi `cargo build -p sokratis-desktop` je
+trajao ~3 min. `cargo test --workspace` dotiče crate; `apps/desktop` ima `node_modules` i `npm run
+check`/`npm run build` rade (`dist/` s `index.html` i `splash.html`).
 
 **Granica S-002:** jezgra ne zna odakle su podaci došli. Sve što joj treba dolazi u jednoj strukturi
 (`ReportInput`: `git_log` kao tekst, dnevnik i plan kao tekst, docs, grane, ručni podaci, `now`,
@@ -379,7 +381,7 @@ preuzeo M2 u [`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md) §8 i plan
 - **SQLite snimke, watcher i popis projekata** su M2 (S-009); 0.1.x sve računa na zahtjev i ne piše
   ništa osim onoga što korisnik sam stavi u `.sokratis/`.
 
-**Kostur M2 (`M2/1a`) — deklarirano, bez ponašanja.** Cigla je namjerno unijela ugovor prije
+**Kostur M2 (`M2/1a`+`M2/1b`) — deklarirano, bez ponašanja.** Cigla je namjerno unijela ugovor prije
 potrošača (jedna zajednička točka, pa se tokovi poslije ne sudaraju); dok cigla koja ga puni ne uđe,
 ovo stoji u kodu i ne radi ništa:
 
@@ -394,5 +396,6 @@ ovo stoji u kodu i ne radi ništa:
 - **ovisnosti bez potrošača:** `notify` u `io` (watcher M2/13) i `insta` kao dev-ovisnost `core`-a
   (snapshot ugovora M2/2, S-022). Namjerne, jer su pinane u jednoj cigli s obrazloženjem
   ([`../workflow/RUST.md`](../workflow/RUST.md) §2), a ne nuspojava;
-- **`apps/desktop` se ne builda:** crate `sokratis-desktop` je izvan workspacea, a `node_modules`
-  ne postoji dok `npm install` ne dobije Leonov OK (korak 13 cigle M2/1) — §1.
+- **`apps/desktop` se builda, ali ne radi ništa:** crate `sokratis-desktop` je u workspaceu i pokreće
+  praznu Tauri ljusku (splash + glavni prozor bez sadržaja) — nijedna naredba prema jezgri ili
+  `sokratis-store` još ne postoji, te dolaze s ciglama STORE/SUČELJE/DESKTOP — §1.

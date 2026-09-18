@@ -19,6 +19,17 @@ Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek sesije:
   oblik JSON-a mijenja samo namjerno**, uz snapshot-test i rečenicu u commitu (S-022). Što točno
   stoji u kodu a ne radi: [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §11.
   Brane: `cargo test --workspace` **65 testova**, `sokratis docs .` 100/100, `signals .` 0.
+- **`M2/1b` — kostur M2 dovršen (2026-09-18).** I dalje **ništa novo za korisnika CLI-ja**:
+  `report`/`docs`/`signals` nepromijenjeni. Ispod: `npm install` (80 paketa, verzije pinane, 0
+  ranjivosti) i `npm run tauri icon` iz Leonova loga popunili su `apps/desktop/src-tauri/icons/`
+  (desktop + Windows set; `android/`/`ios/` nisu commitani — aplikacija je desktop-only); crate
+  `sokratis-desktop` je natrag u `[workspace] members` i **builda se** (prvi `cargo build -p
+  sokratis-desktop` ~3 min). Odstupanje od plana, s razlogom (pravilo #6): `vite.config.ts` uvozi
+  `defineConfig` iz `vitest/config` umjesto `node:url`, jer bi nova ovisnost samo radi
+  config-datoteke bila neopravdana. Brane: `cargo test --workspace` **65 testova**, `npm run check`
+  zelen (svelte-check 0 grešaka + 1 vitest), `npm run build` daje `dist/` s `index.html` i
+  `splash.html`, `sokratis signals .` 0. Time je **T1 (kostur) cijel u `main`-u**; otvorena su
+  četiri radna stabla tokova (JEZGRA · PROFIL · IO · SUČELJE) i poslan prvi val graditelja.
 
 ## [0.1.0] — 2026-09-17 — Jezgra i CLI (Milestone 1)
 

@@ -71,8 +71,9 @@ cargo test
 ```
 
 Cigla koja dira `apps/desktop` (tokovi SUČELJE i DESKTOP) uz to vrti **`npm run check`** u
-`apps/desktop` — dok `npm install` čeka Leonov OK, tamo nema `node_modules` i ta brana se ne može
-pokrenuti (stanje: [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §11).
+`apps/desktop` — `npm install` je odrađen 2026-09-18 (`M2/1b`), `node_modules` postoji i brana je
+zelena (svelte-check 0 grešaka + vitest). Rust-tokovi u svojim stablima vrte brane **bez** desktop
+cratea; razlog i naredba: [`AGENTI.md`](./AGENTI.md) §5.
 
 Crveno ne ide u commit. **Izlazni kod 1 nije dokaz da je pao test koji testiraš** — čita se poruka
 (pouka iz Sokrat Studyja). CI (GitHub Actions) dolazi s M3, kad postoji remote. Koliko testova ima

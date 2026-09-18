@@ -316,3 +316,51 @@ crate natrag u `members` → `cargo build -p sokratis-desktop` → commit `M2/1b
 graditelja (JEZGRA T2, PROFIL T8, IO T10, SUČELJE T20). Ledger: `.superpowers/sdd/2026-09-18-m2-desktop/progress.md`
 (odjeljak „STANJE ZA NOVU SESIJU" na dnu) + `NOVA-SESIJA-PROMPT.md` pored njega. Push/remote i dalje samo uz
 izričit OK.
+
+---
+
+## 2026-09-18 (FABLE) — Kostur M2 dovršen (`M2/1b`), stabla tokova otvorena, prvi val graditelja
+
+**Nova sesija, večer.** Nastavak zastanka s kraja prošle sesije: korak 13 cigle T1 uz Leonov OK.
+
+- **Leon je dao izričit OK za `npm install`** u `apps/desktop` (isti OK pokriva `npm ci` u stablima
+  `sokratis.ui`/`sokratis.desktop`). Instalirano 80 paketa, verzije točno pinane, 0 ranjivosti →
+  `apps/desktop/package-lock.json`.
+- **Ikone:** `npm run tauri icon` iz Leonova loga → `apps/desktop/src-tauri/icons/` (desktop + Windows
+  set). Mape `android/` i `ios/` koje alat usput generira **nisu commitane** (aplikacija je
+  desktop-only; odluka orkestratora, vraćaju se istom naredbom ako zatrebaju).
+- **Odstupanje od teksta plana, s razlogom (pravilo #6):** `apps/desktop/vite.config.ts` uvozi
+  `defineConfig` iz `vitest/config` (taj tip poznaje ključ `test`) i koristi putanje relativne prema
+  Vite korijenu umjesto `node:url` — `svelte-check` je padao bez `@types/node`, a nova ovisnost samo
+  radi config-datoteke nije opravdana.
+- **`apps/desktop/src-tauri` (crate `sokratis-desktop`) je natrag u `[workspace] members`**; prvi
+  `cargo build -p sokratis-desktop` je trajao 3 min. Brane na `main`-u: `cargo fmt --check` ·
+  `cargo clippy --all-targets -- -D warnings` (`--workspace`) · `cargo test --workspace` **65
+  testova** · `npm run check` zelen (svelte-check 0 grešaka + 1 vitest) · `npm run build` daje
+  `dist/` s `index.html` i `splash.html` · `sokratis signals .` = nema signala. Koraci 13 i 14 cigle
+  T1 su u planu označeni `[x]` u istom commitu (`cb963e8`, poruka `M2/1b: kostur M2 dovršen`).
+  **Time je T1 (kostur M2) cijel u `main`-u** (`M2/1a` + `M2/1b`).
+- **Otvorena su četiri radna stabla tokova**, sva na `cb963e8` (`git worktree list`):
+  `sokratis.jezgra` (`feat/core-m2`) · `sokratis.profil` (`feat/core-profile`) · `sokratis.io`
+  (`feat/io-m2`) · `sokratis.ui` (`feat/ui`). **Prvi val graditelja je poslan:** JEZGRA T2 · PROFIL
+  T8 · IO T10 · SUČELJE T20. Stabla STORE/CLI/DESKTOP/INTEGRACIJA otvaraju se kasnije po ovisnostima
+  iz plana.
+- **Odluka orkestratora za izvedbu:** brane Rust-tokova u njihovim stablima idu **bez** desktop
+  cratea (`--workspace --exclude sokratis-desktop`), jer bi inače svako stablo kompiliralo Tauri i
+  tražilo `dist/`, koji ta stabla ne grade; pune brane s desktopom vrti orkestrator na `main`-u
+  nakon svakog spajanja. Zapisano u `docs/workflow/AGENTI.md` §5 (jedno mjesto).
+- GitHub: remote i dalje **ne postoji** (`git remote -v` prazno). Push/remote/objava i dalje čekaju
+  Leonov izričit OK.
+- **Čuvar dokumentacije (način A):** `PROGRESS.md` (ovaj unos), `CHANGELOG.md` (`M2/1b` pod
+  `[Unreleased]`), `ROADMAP.md` („Gdje smo" i status M2), `CLAUDE.md` („Stanje — TRENUTNO": T1 cijel,
+  desktop crate u workspaceu, stabla otvorena, „na Leona čeka" dobio izvor tray-ikone T33 i brisanje
+  grana/stabala na kraju), `docs/workflow/AGENTI.md` §2/§5 (stabla postoje, exclude-flag),
+  `docs/workflow/TESTING.md` §4 (`npm run check` više ne čeka `node_modules`),
+  `docs/architecture/ARCHITECTURE.md` (desktop crate u workspaceu, §11 builda se), `docs/README.md`
+  (plan/ uvod). Audit grepom potvrdio da nijedna preostala `.md` tvrdnja ne kaže „izvan `members`"
+  ili „čeka Leonov OK za `npm install`".
+
+### Što slijedi
+Drugi val graditelja (STORE nakon što IO/JEZGRA daju ono što treba; CLI i DESKTOP po ovisnostima iz
+plana), pa INTEGRACIJA kad su svi tokovi u `main`-u. Push/remote i objava i dalje čekaju Leonov
+izričit OK; isto brisanje grana/stabala tokova na kraju M2.

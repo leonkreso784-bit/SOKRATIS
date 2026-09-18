@@ -31,11 +31,14 @@ bez njegova OK-a): push i objava na GitHub (remote još ne postoji).
 9 tokova, vlasništvo datoteka i ovisnosti među tokovima). Izvedba ide agentima kao u M1. M0 za M2 je
 izmjeren (spec §10): jedina instalacija je `npm install` u `apps/desktop` (cigla T1), i ona čeka OK.
 
-**Izvedba M2 je počela: T1 (kostur) je napola u `main`-u kao `M2/1a`** — koraci 1–12 (ugovor tipova,
-crate `sokratis-store`, datoteke `apps/desktop`, pinane ovisnosti); **korak 13 čeka Leonov OK za
-`npm install`** i radi se u novoj sesiji, pa je desktop crate dotad izvan workspacea. Što je time
-ušlo u kod: `records/CHANGELOG.md` (Unreleased) i `architecture/ARCHITECTURE.md` §11. Stabla tokova
-još ne postoje — otvaraju se nakon `M2/1b`.
+**Izvedba M2 je krenula: T1 (kostur) je cijel u `main`-u** (`M2/1a`+`M2/1b`) — ugovor tipova, crate
+`sokratis-store`, `apps/desktop` s ikonama iz Leonova loga, `npm install` uz Leonov OK i desktop
+crate natrag u `[workspace] members` (builda se, prvi put ~3 min). Brane: `cargo test --workspace`
+65 testova, `npm run check` zelen, `sokratis signals .` 0. Što je time ušlo u kod:
+`records/CHANGELOG.md` (Unreleased) i `architecture/ARCHITECTURE.md` §11. **Otvorena su četiri
+radna stabla tokova** (`sokratis.jezgra` · `.profil` · `.io` · `.ui`) i poslan prvi val graditelja
+(JEZGRA T2 · PROFIL T8 · IO T10 · SUČELJE T20); stabla STORE/CLI/DESKTOP/INTEGRACIJA otvaraju se
+kasnije po ovisnostima iz plana.
 
 ## Milestonei
 
@@ -43,7 +46,7 @@ još ne postoje — otvaraju se nakon `M2/1b`.
 |---|---|---|---|---|
 | **M0** | **Toolchain** | Visual Studio Build Tools (workload „Desktop development with C++") · rustup s MSVC targetom · `cargo --version` · workspace koji se builda | …pokrenuti `cargo test` u ovom folderu i dobiti zeleno na praznom testu | ✅ gotovo (2026-09-17) |
 | **M1** | **Jezgra + CLI** | `core` · `io` (git-proces, profil, ručni podaci) · `cli` · paritet s `RAD.xlsx` · ispravak sati · docs-ocjena · signali `unmerged-branches` i `docs-lag` | …nad Sokrat Studyjem iz terminala dobiti iste brojke kao u tablici, ispravne sate, ocjenu docs-a i dva signala s dokazom; staviti `sokratis signals` u preflight | ✅ **zatvoren 2026-09-18** (0.1.0, T1–T22 + krug popravaka u `main`; grane i stabla tokova obrisani uz Leonov OK) |
-| **M2** | **Desktop** | Tauri 2 · Svelte 5 · tokeni Sokrat Studyja (sve 4 teme, `brand-*` iz loga) · `sokratis-store` (SQLite: registar · snimke · keš) · watcher · tray · autostart · obavijesti · svih 8 pogleda s uređivanjem · HR/EN · **znak Sokratisa** = ikona aplikacije + animacija pri pokretanju u kojoj logo stoji na mjestu slova „o" (Leonove datoteke od 2026-09-18, spec §5.2–5.4) · 7 od 9 stavki duga M1 — sve u [ARHITEKTURA_M2.md](./ARHITEKTURA_M2.md) | …spec §11: pokrenuti Sokratis, vidjeti animaciju, Pregled sa Sokrat Studyjem kao jednim projektom od pet stabala, svih 8 pogleda s brojkama istim kao CLI, osvježenje bez klika nakon commita, obavijest na Alert iz traya | 🟨 **u izvedbi od 2026-09-18** — spec odobren, plan napisan (35 cigli), kostur T1 napola u `main`-u (`M2/1a`) |
+| **M2** | **Desktop** | Tauri 2 · Svelte 5 · tokeni Sokrat Studyja (sve 4 teme, `brand-*` iz loga) · `sokratis-store` (SQLite: registar · snimke · keš) · watcher · tray · autostart · obavijesti · svih 8 pogleda s uređivanjem · HR/EN · **znak Sokratisa** = ikona aplikacije + animacija pri pokretanju u kojoj logo stoji na mjestu slova „o" (Leonove datoteke od 2026-09-18, spec §5.2–5.4) · 7 od 9 stavki duga M1 — sve u [ARHITEKTURA_M2.md](./ARHITEKTURA_M2.md) | …spec §11: pokrenuti Sokratis, vidjeti animaciju, Pregled sa Sokrat Studyjem kao jednim projektom od pet stabala, svih 8 pogleda s brojkama istim kao CLI, osvježenje bez klika nakon commita, obavijest na Alert iz traya | 🟨 **u izvedbi od 2026-09-18** — kostur T1 cijel u `main`-u (`M2/1a`+`M2/1b`), četiri toka otvorena (JEZGRA · PROFIL · IO · SUČELJE) |
 | **M3** | **Objava** | ostala pravila · profil za tuđe projekte · HR/EN · instalater · znak · README EN · licenca · GitHub | …instalirati Sokratis s GitHuba na čist stroj i priključiti tuđi repo | 📋 planirano |
 
 ## Pravila vožnje (Leonova, ne mijenjaju se između milestonea)
