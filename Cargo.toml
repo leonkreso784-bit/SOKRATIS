@@ -5,8 +5,7 @@ members = [
   "crates/sokratis-io",
   "crates/sokratis-store",
   "crates/sokratis-cli",
-  # "apps/desktop/src-tauri" ulazi u M2/1 koraku 13: crate traži ikone koje generira `npm run tauri icon`,
-  # a to traži `npm install` (Leonov OK). Do tada je izvan workspacea da `cargo test --workspace` bude zelen.
+  "apps/desktop/src-tauri",
 ]
 
 [workspace.package]
