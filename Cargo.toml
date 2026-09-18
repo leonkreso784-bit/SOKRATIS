@@ -1,6 +1,13 @@
 [workspace]
 resolver = "3"
-members = ["crates/sokratis-core", "crates/sokratis-io", "crates/sokratis-cli"]
+members = [
+  "crates/sokratis-core",
+  "crates/sokratis-io",
+  "crates/sokratis-store",
+  "crates/sokratis-cli",
+  # "apps/desktop/src-tauri" ulazi u M2/1 koraku 13: crate traži ikone koje generira `npm run tauri icon`,
+  # a to traži `npm install` (Leonov OK). Do tada je izvan workspacea da `cargo test --workspace` bude zelen.
+]
 
 [workspace.package]
 version = "0.1.0"
@@ -17,3 +24,14 @@ anyhow = "1"
 clap = { version = "4", features = ["derive"] }
 chrono = "0.4"
 tempfile = "3"
+# M2 (spec ARHITEKTURA_M2.md §7) — verzije su `max_stable_version` s crates.io 2026-09-18 (Tauri 3 je
+# alpha i ne uzima se); svaka dobiva redak u docs/workflow/RUST.md §2 kad je cigla prvi put upotrijebi.
+rusqlite = { version = "0.40.2", features = ["bundled"] }
+notify = "8.2.0"
+insta = { version = "1.48.0", features = ["json"] }
+tauri = { version = "2.11.5", features = ["tray-icon", "image-png"] }
+tauri-build = "2.6.3"
+tauri-plugin-dialog = "2.7.3"
+tauri-plugin-notification = "2.4.0"
+tauri-plugin-autostart = "2.5.1"
+tauri-plugin-single-instance = "2.4.4"

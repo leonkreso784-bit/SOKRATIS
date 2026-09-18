@@ -107,6 +107,58 @@ pub struct Vision {
     pub note: String,
 }
 
+/// Zbroj vizija po stanju — mjerenje, ne prikaz (S-012); puni ga `metrics::visions` (M2/4).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct VisionTotal {
+    pub state: String,
+    pub count: u32,
+}
+
+/// Jedan redak Dnevnika: commit s vrstom i podvrstom, klasificiran JEDNOM po izvještaju (M2/5).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct CommitRow {
+    pub sha: String,
+    /// `YYYY-MM-DD` autora (kao tablica)
+    pub date: String,
+    pub subject: String,
+    pub kind: WorkKind,
+    pub sub: SubKind,
+    /// vrsta dolazi iz `.sokratis/overrides.json`, ne iz klasifikatora
+    pub overridden: bool,
+}
+
+/// Broj signala po težini — ono što Pregled i snimka trebaju umjesto cijelog popisa.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+pub struct SignalCounts {
+    pub info: u32,
+    pub warn: u32,
+    pub alert: u32,
+}
+
+/// Jedna brojka snimke: `id` pokazatelja, vrijednost i je li mjera ili proxy (stupac `kind` u bazi).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct MetricValue {
+    pub id: String,
+    pub value: f64,
+    pub kind: IndicatorKind,
+}
+
+/// Što snimka drži (S-014): 18 pokazatelja, docs-ocjena, broj signala — NE cijeli `Report`.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SnapshotMetrics {
+    pub indicators: Vec<MetricValue>,
+    pub docs_score: Option<u8>,
+    pub signals: SignalCounts,
+}
+
+/// Razlika jedne brojke između dviju snimki (M2/7 `snapshot::diff`).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct MetricDelta {
+    pub id: String,
+    pub before: f64,
+    pub after: f64,
+}
+
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct Touched {
     pub commits: usize,
@@ -202,13 +254,20 @@ pub struct DocFile {
 pub struct Report {
     pub generated_at: i64,
     pub since: String,
+    /// gornja granica razdoblja (`YYYY-MM-DD`, cijeli dan), `None` = do danas (M2/3)
+    pub until: Option<String>,
     pub branch: String,
     pub touched: Touched,
     pub days: Vec<DayStats>,
     pub kinds: Vec<KindStats>,
+    /// commiti razdoblja s vrstom i podvrstom — ulaz za Dnevnik (M2/5)
+    pub commits: Vec<CommitRow>,
+    /// isporuke iz dnevnika u razdoblju — ulaz za pogled Isporuke (M2/5); M1 ih je samo zbrajao po danu
+    pub deliveries: Vec<Delivery>,
     pub indicators: Vec<Indicator>,
     pub phases: Vec<Phase>,
     pub visions: Vec<Vision>,
+    pub vision_totals: Vec<VisionTotal>,
     pub docs: Option<DocsHealth>,
     pub signals: Vec<Signal>,
 }
@@ -227,6 +286,8 @@ pub struct ReportInput {
     /// današnji lokalni datum `YYYY-MM-DD`
     pub today: String,
     pub since: String,
+    /// gornja granica, `YYYY-MM-DD`, uključivo cijeli dan; `None` = bez gornje granice
+    pub until: Option<String>,
     pub branch: String,
 }
 

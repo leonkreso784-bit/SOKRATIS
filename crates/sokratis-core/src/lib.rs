@@ -12,6 +12,7 @@ pub mod parse;
 pub mod profile;
 pub mod report;
 pub mod rules;
+pub mod snapshot;
 
 pub use error::ParseError;
 pub use model::*;

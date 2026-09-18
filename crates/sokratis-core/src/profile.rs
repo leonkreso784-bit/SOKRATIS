@@ -78,6 +78,9 @@ pub struct Profile {
     pub test_path_prefixes: Vec<String>,
     pub test_path_contains: Vec<String>,
     pub test_path_suffixes: Vec<String>,
+    /// Podputanje koje se NE broje kao test iako su pod testnom putanjom (npr. `fixtures/`).
+    /// Zadano prazno: tablica broji sve pod `tests/` (S-005). Ponašanje: M2/9.
+    pub test_path_exclude: Vec<String>,
     pub code_exclude_prefixes: Vec<String>,
     pub code_exclude_suffixes: Vec<String>,
     pub session_gap_hours: f64,
@@ -126,6 +129,7 @@ impl Default for Profile {
             test_path_prefixes: vec!["tests/".into()],
             test_path_contains: vec!["/check-".into()],
             test_path_suffixes: vec![".test.js".into(), ".spec.js".into()],
+            test_path_exclude: vec![],
             code_exclude_prefixes: vec!["docs/".into()],
             code_exclude_suffixes: vec![".md".into()],
             session_gap_hours: 2.0,
@@ -179,6 +183,12 @@ impl Profile {
                 return Err(bad(format!("profil.closed_phases[{i}].to"), &phase.to));
             }
         }
+        Ok(())
+    }
+
+    /// Sve putanje iz profila moraju ostati unutar korijena repoa (nalaz I9). Stub do M2/8:
+    /// `build_report` i `Project::open` ga već zovu, pa ograda ulazi bez promjene potpisa.
+    pub fn validate_paths(&self) -> Result<(), ParseError> {
         Ok(())
     }
 

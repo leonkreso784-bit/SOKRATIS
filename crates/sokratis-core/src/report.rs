@@ -32,6 +32,7 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
         });
     }
     profile.validate_dates()?;
+    profile.validate_paths()?;
     let p = Patterns::compile(profile)?;
     let parsed = parse_git_log(&input.git_log)?;
     let all = parsed.commits;
@@ -96,6 +97,7 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
     Ok(Report {
         generated_at: input.now,
         since: input.since.clone(),
+        until: input.until.clone(),
         branch: input.branch.clone(),
         touched: Touched {
             commits: commits.len(),
@@ -109,9 +111,13 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
         },
         days,
         kinds,
+        // M2/1 kostur: prazna polja ugovora; pune ih M2/5 (commits, deliveries) i M2/4 (vision_totals).
+        commits: vec![],
+        deliveries: vec![],
         indicators,
         phases,
         visions: input.visions.clone(),
+        vision_totals: vec![],
         docs,
         signals,
     })
@@ -146,6 +152,7 @@ mod tests {
             now: 1788854400 + 86_400,
             today: "2026-09-05".into(),
             since: "2026-08-29".into(),
+            until: None,
             branch: "main".into(),
         }
     }

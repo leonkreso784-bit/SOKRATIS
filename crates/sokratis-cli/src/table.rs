@@ -158,6 +158,7 @@ mod tests {
         let r = Report {
             generated_at: 0,
             since: "2026-08-29".into(),
+            until: None,
             branch: "main".into(),
             touched: Touched {
                 commits: 3,
@@ -176,6 +177,8 @@ mod tests {
                 test_lines: 2,
             }],
             kinds: vec![],
+            commits: vec![],
+            deliveries: vec![],
             indicators: vec![Indicator {
                 id: "commits".into(),
                 value: 3.0,
@@ -184,6 +187,7 @@ mod tests {
             }],
             phases: vec![],
             visions: vec![],
+            vision_totals: vec![],
             docs: None,
             signals: vec![],
         };
@@ -227,6 +231,7 @@ mod tests {
         let r = Report {
             generated_at: 0,
             since: "2026-08-29".into(),
+            until: None,
             branch: "main".into(),
             touched: Touched {
                 commits: 0,
@@ -236,6 +241,8 @@ mod tests {
             },
             days: vec![],
             kinds: vec![],
+            commits: vec![],
+            deliveries: vec![],
             indicators: vec![],
             phases: vec![
                 phase("TUĐA POVIJEST", PhaseState::Closed, 0),
@@ -243,6 +250,7 @@ mod tests {
                 phase("PLANIRANA", PhaseState::Planned, 0),
             ],
             visions: vec![],
+            vision_totals: vec![],
             docs: None,
             signals: vec![],
         };

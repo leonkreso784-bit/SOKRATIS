@@ -19,4 +19,8 @@ pub enum ParseError {
     },
     #[error("{field}: datum mora biti oblika YYYY-MM-DD, a nije: `{text}`")]
     BadDate { field: String, text: String },
+    #[error(
+        "{field}: putanja mora ostati unutar repoa, a `{value}` izlazi iz njega (`..` ili apsolutna)"
+    )]
+    PathOutsideRoot { field: String, value: String },
 }

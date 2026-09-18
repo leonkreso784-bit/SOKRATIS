@@ -182,6 +182,8 @@ impl Project {
                 .unwrap_or(0),
             today: chrono::Local::now().format("%Y-%m-%d").to_string(),
             since,
+            // M2/1 kostur: gornju granicu uvodi M2/14 (`input_between`).
+            until: None,
             branch,
         })
     }

@@ -14,3 +14,6 @@ thiserror.workspace = true
 # provjere serijalizacije). Pravilo #6: svaka ovisnost je namjerna i na svom mjestu.
 [dev-dependencies]
 serde_json.workspace = true
+# `insta` se vraća (M1 ga je uklonio kao neiskorišten): snapshot `Report`-a je od M2 ugovor prema
+# sučelju (S-022) — dev-ovisnost, jezgra ga u radu ne koristi.
+insta.workspace = true

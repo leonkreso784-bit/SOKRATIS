@@ -35,6 +35,7 @@ fn matches_rad_xlsx_except_fixed_hours() {
         now: 1_789_660_685, // 2026-09-17 (provjereno: date -d @1789660685)
         today: "2026-09-17".into(),
         since: "2026-08-29".into(),
+        until: None,
         branch: "main".into(),
     };
     let r =
