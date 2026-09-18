@@ -44,7 +44,9 @@ grane, stabla, cigle, vlasništvo datoteka i **ovisnosti među tokovima** (koji 
 na **jednom mjestu**: `docs/superpowers/plans/2026-09-18-m2-desktop.md`, odjeljak „Struktura datoteka i
 vlasništvo po tokovima" (S-010 — ovdje se ne prepisuju). Novo u M2: tok SUČELJE gradi TypeScript/Svelte,
 pa su mu brane `npm run check` umjesto `cargo`; tokovi SUČELJE i DESKTOP nakon `git worktree add` pokreću
-`npm ci` u svom stablu (`node_modules` je git-ignoriran). Stabla se otvaraju tek nakon T1 na `main`-u.
+`npm ci` u svom stablu (`node_modules` je git-ignoriran). **Stabla se otvaraju tek kad je T1 cijel u
+`main`-u:** koraci 1–12 su ušli kao `M2/1a`, korak 13 (`npm install` → ikone → desktop crate u `members`)
+čeka Leonov OK i ide kao `M2/1b`. Dotad postoji samo `main` (`git worktree list`).
 
 ## 3 · Protokol po cigli
 
@@ -76,7 +78,9 @@ INTEGRACIJA (T20–T22) u svom stablu od svježeg `main`-a.
 - Istodobno najviše **4 graditelja** (jedan po stablu) — Playwright suite Sokrat Studyja i Rust build dijele isti stroj.
 - Recenzent ide odmah nakon svakog izvještaja; ne čeka se kraj toka.
 - Orkestrator ne piše kod tokova; ako graditelj tri puta zapne na istoj cigli, orkestrator je preuzima sam i **zapiše zašto** u PROGRESS.
-- **Leon se ne pita usred cigle.** Pita se: prije M0 (sustav), na kraju M1 (zastanak), prije pusha/objave.
+- **Leon se ne pita usred cigle** — osim kad cigla traži **instalaciju** ili **njegov materijal**: u M2 su
+  to `npm install` (T1, korak 13) i izvor tray-ikone (T33), oboje imenovano u planu unaprijed. Inače se
+  pita: prije M0, na kraju milestonea (zastanak), prije pusha/objave.
 
 ## 6 · Compact
 

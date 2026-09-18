@@ -1,7 +1,9 @@
 # ARHITEKTURA + MILESTONE 2 — desktop Sokratisa
 
-**Status:** 🟩 AKTIVAN SPEC — napisan 2026-09-18 iz brainstorminga s Leonom · **čeka Leonov OK** prije
-plana cigli · jedini aktivni spec u `plan/`
+**Status:** 🟩 AKTIVAN SPEC — napisan 2026-09-18 iz brainstorminga s Leonom i **isti dan odobren**
+(„Imaš moj OK", bez izmjena) · plan cigli iz njega:
+[superpowers/plans/2026-09-18-m2-desktop.md](../superpowers/plans/2026-09-18-m2-desktop.md) ·
+jedini aktivni spec u `plan/`
 
 Što je od M1 stvarno izgrađeno opisuje [architecture/ARCHITECTURE.md](../architecture/ARCHITECTURE.md);
 ispunjeni spec M1 je [archive/ARHITEKTURA_M1.md](../archive/ARHITEKTURA_M1.md); status milestonea

@@ -1,40 +1,58 @@
 # ARCHITECTURE — što je izgrađeno
 
-**Status:** ✅ opisuje kod koji je u `main`-u (Milestone 1, verzija 0.1.0, uključujući krug popravaka
-nakon završne recenzije) · **Zadnja provjera:** 2026-09-17
+**Status:** ✅ opisuje kod koji je u `main`-u — Milestone 1 (verzija 0.1.0, uključujući krug popravaka
+nakon završne recenzije) **plus kostur M2** (`M2/1a`: ugovor tipova, crate `sokratis-store`,
+`apps/desktop`; deklarirano, ponašanje tek dolazi — §11) · **Zadnja provjera:** 2026-09-18
 
-> **Što ovaj dokument JEST:** opis sustava kakav stoji u `crates/` — granice između crateova, tok
+> **Što ovaj dokument JEST:** opis sustava kakav stoji u `crates/` i `apps/` — granice između crateova, tok
 > podataka, formati koje čita i ugovori prema korisniku CLI-ja. **Što NIJE:** kronologija (to su
 > [records/CHANGELOG.md](../records/CHANGELOG.md) i [records/PROGRESS.md](../records/PROGRESS.md)),
 > plan ([plan/ROADMAP.md](../plan/ROADMAP.md)) ni dom odluka
-> ([records/DECISIONS.md](../records/DECISIONS.md), S-001…S-011). Spec po kojem je M1 građen je
-> arhiviran: [archive/ARHITEKTURA_M1.md](../archive/ARHITEKTURA_M1.md).
+> ([records/DECISIONS.md](../records/DECISIONS.md), S-001…S-022). Spec po kojem je M1 građen je
+> arhiviran: [archive/ARHITEKTURA_M1.md](../archive/ARHITEKTURA_M1.md); aktivan spec M2 (što se tek
+> gradi) je [plan/ARHITEKTURA_M2.md](../plan/ARHITEKTURA_M2.md).
 >
 > **Izvor istine je kod.** Gdje se dokument i kod razilaze, kod je u pravu, a dokument je propust.
 > Zato uz svaku tvrdnju stoji datoteka u kojoj se provjerava.
 
 ---
 
-## 1 · Tri cratea i granica među njima
+## 1 · Četiri cratea i granica među njima
 
 ```
 Cargo.toml                  # workspace; verzije ovisnosti na jednom mjestu
 crates/
   sokratis-core/            # čisti Rust: model · parseri · metrike · docs-ocjena · pravila
   sokratis-io/              # git kroz proces · datoteke · profil · ručni podaci
+  sokratis-store/           # SQLite (rusqlite) — od M2/1a: otvaranje baze i migracije, ništa više
   sokratis-cli/             # binarna `sokratis`: report · docs · signals
+apps/desktop/               # ljuska M2: Svelte/Vite datoteke + crate `sokratis-desktop` (src-tauri)
 ```
 
 | crate | smije | ne smije | ulaz u kod |
 |---|---|---|---|
 | `sokratis-core` | računati nad tekstom i strukturama | otvoriti datoteku, pokrenuti proces, pitati koliko je sati | `src/lib.rs` |
 | `sokratis-io` | `std::process::Command` za `git`, `std::fs`, `chrono::Local` za današnji datum | računati metrike | `src/git.rs`, `src/project.rs` |
+| `sokratis-store` | otvoriti SQLite bazu i primijeniti migracije; ovisi o `core` (tipovi), **ne o `io`** (S-013) | računati metrike, dirati git | `src/lib.rs`, `src/store.rs` |
 | `sokratis-cli` | ispisati JSON ili tablicu i vratiti izlazni kod | računati bilo što | `src/main.rs`, `src/table.rs` |
+| `sokratis-desktop` (`apps/desktop/src-tauri`) | pokrenuti Tauri ljusku: prozori, plugini, kasnije naredbe | držati išta što bi se htjelo testirati (S-013) | `src/main.rs`, `src/lib.rs` |
+
+**Što `store` danas radi:** `Store::open(path)` / `Store::open_in_memory()` otvore vezu, primijene
+migraciju `src/migrations/0001_init.sql` (sedam tablica: `project` · `project_worktree` · `setting` ·
+`project_setting` · `profile_seen` · `snapshot` · `commit_cache`) i javljaju `schema_version()`.
+Nijedan redak se još ne piše ni čita: registar projekata, postavke i snimke dolaze s ciglama
+M2/15–M2/17, keš tek ako ga mjerenje zatraži (S-014). Baza će živjeti u `%LOCALAPPDATA%\sokratis\`;
+0.1.0 je ne stvara — CLI `store` ne koristi.
+
+**`sokratis-desktop` je crate na disku, ali privremeno izvan `[workspace] members`** (razlog stoji u
+komentaru korijenskog `Cargo.toml`): `tauri-build` traži ikone koje generira `npm run tauri icon`, a
+to traži `npm install` koji čeka Leonov OK. Do tada `cargo test --workspace` desktop crate ne
+dodiruje, a `apps/desktop` nema `node_modules`.
 
 **Granica S-002:** jezgra ne zna odakle su podaci došli. Sve što joj treba dolazi u jednoj strukturi
 (`ReportInput`: `git_log` kao tekst, dnevnik i plan kao tekst, docs, grane, ručni podaci, `now`,
-`today`, `since`, `branch`) i vraća se jedna struktura (`Report`). Zato se jezgra testira bez gita, i
-zato će je Tauri u M2 koristiti bez ijedne izmjene.
+`today`, `since`, `until`, `branch`) i vraća se jedna struktura (`Report`). Zato se jezgra testira bez
+gita, i zato će je Tauri u M2 koristiti bez ijedne izmjene (S-012).
 
 **Granica S-003:** git se čita **kroz proces**, ne kroz biblioteku. Poziv se gradi bez shella
 (`Command::new("git").arg("-C")…`), pa nema escapinga. Iza traita `GitSource` (osam metoda, jedna
@@ -57,6 +75,9 @@ Korak po korak, redoslijed je u `core/src/report.rs` (`build_report`) i nigdje d
    `phase_tag` 1) → `ParseError::BadPattern`; `Profile::validate_dates` i provjera `input.since`
    traže oblik `YYYY-MM-DD` → `ParseError::BadDate { field, text }`. Valjan JSON s regexom bez grupe
    ili s tipfelerom u datumu je **greška s imenom polja** (izlaz 3), ne panika i ne tiha kriva brojka.
+   Uz njih se od `M2/1a` zove i `Profile::validate_paths` (ograda putanja iz profila na korijen
+   repoa, `ParseError::PathOutsideRoot { field, value }`) — danas je to **stub koji uvijek vraća
+   `Ok`**; ponašanje puni M2/8, poziv postoji da ograda uđe bez promjene potpisa (§11).
 2. `parse_git_log` — tekst loga → `Vec<Commit>` + broj preskočenih redaka.
 3. filtar `since`: ostaju commiti s `commit_date >= since` (S-011 — isti kriterij kao `git log --since`).
 4. `parse_diary` — naslovi dnevnika → `Vec<Delivery>`; `parse_plan` — redovi plana → faze.
@@ -78,9 +99,24 @@ postoji kao referenca (repo nakon `git init`, bez commita), `io` vraća `IoError
 
 ## 3 · Što `Report` nosi
 
-`core/src/model.rs`. Polja: `generated_at` · `since` · `branch` · `touched` · `days` · `kinds` ·
-`indicators` · `phases` · `visions` · `docs` (`null` kad projekt nema mapu s dokumentacijom — nula
-bi bila laž) · `signals`.
+`core/src/model.rs`. Petnaest polja: `generated_at` · `since` · `until` · `branch` · `touched` ·
+`days` · `kinds` · `commits` · `deliveries` · `indicators` · `phases` · `visions` · `vision_totals` ·
+`docs` (`null` kad projekt nema mapu s dokumentacijom — nula bi bila laž) · `signals`.
+
+**Četiri polja su od `M2/1a` u ugovoru, ali ih jezgra još ne puni** — deklarirana su prije potrošača
+da sučelje i snapshot ugovora (S-022) ne mijenjaju oblik svakom ciglom:
+
+| polje | danas | puni ga |
+|---|---|---|
+| `until` | uvijek `null` (`io` ga tako šalje); prozor je i dalje samo `since` | M2/3 |
+| `commits` | uvijek `[]`; redak commita s vrstom i podvrstom za pogled Dnevnik | M2/5 |
+| `deliveries` | uvijek `[]`; M1 je isporuke iz dnevnika samo zbrajao po danu | M2/5 |
+| `vision_totals` | uvijek `[]`; zbroj vizija po stanju (dug I6) | M2/4 |
+
+`ReportInput` uz postojeća polja nosi i `until: Option<String>` (gornja granica, cijeli dan) — jezgra
+ga u 0.1.x **ne čita**, isto do M2/3. U `model.rs` stoje i tipovi koje pišu tek kasnije cigle:
+`VisionTotal`, `CommitRow`, `SignalCounts`, `MetricValue { id, value, kind }`, `SnapshotMetrics`,
+`MetricDelta` (snimke, M2/7 + M2/17), a `core/src/snapshot.rs` je prazan modul koji čeka M2/7.
 
 **`touched` je mjerač mjerača** — koliko je izvještaj stvarno dotaknuo (`core/src/report.rs`):
 
@@ -94,7 +130,7 @@ bi bila laž) · `signals`.
 ## 4 · Profil projekta — sva polja i zadane vrijednosti
 
 **Izvor je `crates/sokratis-core/src/profile.rs`** (`impl Default for Profile`); ova tablica prati
-njega i ima jednako redaka koliko struktura ima polja (**38**). Zadane vrijednosti **jesu**
+njega i ima jednako redaka koliko struktura ima polja (**39** od `M2/1a`). Zadane vrijednosti **jesu**
 konvencije Sokrat Studyja (S-005): prvi korisnik radi bez ijedne postavke. Profil je
 `#[serde(default, deny_unknown_fields)]` — polje koje nedostaje uzima zadano, polje s tipfelerom je
 greška, ne tiho ignoriranje (i to jedna poruka s putanjom, ne dvije). Ovo je jedina tablica profila
@@ -128,6 +164,7 @@ u dokumentaciji.
 | `test_path_prefixes` | `["tests/"]` | testna putanja: počinje s… |
 | `test_path_contains` | `["/check-"]` | …ili sadrži… |
 | `test_path_suffixes` | `[".test.js", ".spec.js"]` | …ili se završava na |
+| `test_path_exclude` | `[]` | podputanje koje se **ne** broje kao test iako su pod testnom putanjom (npr. `fixtures/`); **deklarirano, jezgra ga u 0.1.x ne čita — ponašanje M2/9** (§11) |
 | `code_exclude_prefixes` | `["docs/"]` | putanja koja se NE smatra kodom (počinje s) |
 | `code_exclude_suffixes` | `[".md"]` | putanja koja se NE smatra kodom (završava na) |
 | `session_gap_hours` | `2.0` | razmak manji od toga = neprekinut rad |
@@ -291,15 +328,18 @@ ugovor prema preflightu, a ne nuspojava.
    `test_path_contains: ["/tests/"]`: njegovi testovi žive u `crates/*/tests/`, što zadani prefiks
    `tests/` ne hvata. Posljedica koju treba znati pri čitanju **Sokratisova vlastitog** udjela
    testnih redaka: pod tom putanjom leže i fixture datoteke (snimka `PROGRESS.md` Sokrat Studyja ima
-   767 kB), pa je većina njegovih „testnih redaka" fixture, ne kod testa.
+   767 kB), pa je većina njegovih „testnih redaka" fixture, ne kod testa. Polje koje to rješava
+   (`test_path_exclude`) je deklarirano, ali još ne radi — M2/9, §11.
 2. **`touched.files` je broj izmjena datoteka, ne broj različitih datoteka** (§3). Ista datoteka
    dirnuta u deset commita doda deset. Brojka odgovara na „koliko je izmjena pročitano", ne na
    „koliko datoteka projekt ima".
 
-## 11 · Što stoji u kodu, a još ne izlazi ili ne radi (0.1.0)
+## 11 · Što stoji u kodu, a još ne izlazi ili ne radi (0.1.x)
 
 Uredno zapisani propusti, ne skrivene rupe (CLAUDE.md #4). Ovo je **stanje koda**; što se od toga
-planira uzeti i kada je u [`../records/BACKLOG.md`](../records/BACKLOG.md).
+planira uzeti i kada je u [`../records/BACKLOG.md`](../records/BACKLOG.md), a za stavke koje je
+preuzeo M2 u [`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md) §8 i planu cigli
+[`../superpowers/plans/2026-09-18-m2-desktop.md`](../superpowers/plans/2026-09-18-m2-desktop.md).
 
 **Rezervirana polja profila** (deklarirana, jezgra ih ne čita):
 
@@ -336,5 +376,23 @@ planira uzeti i kada je u [`../records/BACKLOG.md`](../records/BACKLOG.md).
 - **Cijena su procesi, ne parsiranje:** izvještaj nad Sokrat Studyjem traje ~3,2 s jer se zove
   `git log -1` za **svaku** `.md` datoteku (56) i `rev-list --count` za **svaku** granu (31); jezgra
   uz to klasificira svaki commit više puta. Nad Sokratisom je to 0,7 s. Mjerljivo, ne pogađano.
-- **SQLite snimke, watcher i popis projekata** su M2 (S-009); 0.1.0 sve računa na zahtjev i ne piše
+- **SQLite snimke, watcher i popis projekata** su M2 (S-009); 0.1.x sve računa na zahtjev i ne piše
   ništa osim onoga što korisnik sam stavi u `.sokratis/`.
+
+**Kostur M2 (`M2/1a`) — deklarirano, bez ponašanja.** Cigla je namjerno unijela ugovor prije
+potrošača (jedna zajednička točka, pa se tokovi poslije ne sudaraju); dok cigla koja ga puni ne uđe,
+ovo stoji u kodu i ne radi ništa:
+
+- **četiri polja `Report`-a su prazna** (`until` `null`, `commits`/`deliveries`/`vision_totals` `[]`)
+  i `ReportInput.until` se ne čita — §3;
+- **`Profile::validate_paths` je stub** koji uvijek vraća `Ok`, iako ga `build_report` već zove
+  (ograda putanja, M2/8) — §2; **`test_path_exclude`** je deklariran i prazan (M2/9) — §4;
+- **`core/src/snapshot.rs` je prazan modul**, a tipovi `SnapshotMetrics`, `MetricValue`,
+  `MetricDelta`, `SignalCounts`, `CommitRow`, `VisionTotal` nemaju nijednog potrošača (M2/7);
+- **`sokratis-store` zna otvoriti bazu i migrirati shemu, ali ga nitko ne zove**: ni CLI ni desktop
+  nemaju tu ovisnost, pa baza nastaje samo u testu (registar M2/15, postavke M2/16, snimke M2/17) — §1;
+- **ovisnosti bez potrošača:** `notify` u `io` (watcher M2/13) i `insta` kao dev-ovisnost `core`-a
+  (snapshot ugovora M2/2, S-022). Namjerne, jer su pinane u jednoj cigli s obrazloženjem
+  ([`../workflow/RUST.md`](../workflow/RUST.md) §2), a ne nuspojava;
+- **`apps/desktop` se ne builda:** crate `sokratis-desktop` je izvan workspacea, a `node_modules`
+  ne postoji dok `npm install` ne dobije Leonov OK (korak 13 cigle M2/1) — §1.

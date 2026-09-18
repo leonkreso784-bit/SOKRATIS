@@ -1,21 +1,25 @@
 # TESTING — kako dokazujemo da radi
 
-> Preuzeto iz Sokrat Studyja ono što vrijedi za Rust CLI bez ekrana. Playwright i vizualne brane
-> dolaze tek s M2 i dobit će svoj odjeljak tada.
+> Preuzeto iz Sokrat Studyja ono što vrijedi za Rust CLI bez ekrana. Sučelje M2 se testira `vitest`-om
+> i `svelte-check`-om (**ne** Playwrightom — spec [ARHITEKTURA_M2.md](../plan/ARHITEKTURA_M2.md) §9);
+> što se od toga danas može pokrenuti piše u tablici ispod.
 
-## 1 · Tri vrste testova
+## 1 · Vrste testova
 
 | vrsta | gdje | što tvrdi | ulaz |
 |---|---|---|---|
 | **jedinični (core)** | `crates/sokratis-core/src/**` uz kod (`#[cfg(test)]`) i `tests/` | parser vraća točno ove strukture; metrika daje točno ovu brojku; pravilo daje točno ovaj signal s dokazom | **tekst fixture** — nikad živi git |
 | **integracijski (io)** | `crates/sokratis-io/tests/` | git-proces, radna stabla, profil, ručni podaci | **privremeni repo** stvoren u testu |
 | **izlazni kodovi (cli)** | `crates/sokratis-cli/tests/cli.rs` | ugovor prema preflightu: **0** (nema signala) i **2** (Alert) nad repoom s poznatom poviješću, **3** za pogrešnu uporabu i za putanju koja nije repozitorij, **0** za `--help`/`--version` | **privremeni repo** (`tests/common/mod.rs`) |
+| **pohrana (store)** — *od M2* | `crates/sokratis-store/src/**` (`#[cfg(test)]`) | migracije se primijene od prazne baze; kasnije registar, postavke i snimke (M2/15–17) | **`:memory:` baza** (`Store::open_in_memory`) — bez gita i bez datoteka |
+| **sučelje (TS/Svelte)** — *od M2* | `apps/desktop/tests/**`, uz komponente | oblikovanje brojki, i18n ključevi, kontrast tokena, grafovi s praznim ulazom | `npm run check` u `apps/desktop`: danas `svelte-check` + `vitest`; brane za i18n i kontrast dolaze s ciglama M2/20–21 |
 
 **Test-prvo** (CLAUDE.md #7): fixture → očekivano → implementacija. Rub koji prepoznaš odmah dobiva test.
 
-**Snapshot-testova nema** i `insta` nije ovisnost: snimka oblika `Report`-a ima smisla kad se JSON
-zaključa kao ugovor prema Tauriju (M2) — do tada bi zamrznula oblik koji se još mijenja.
-Parkirano u [`../records/BACKLOG.md`](../records/BACKLOG.md).
+**Snapshot `Report`-a** je ugovor prema sučelju (S-022): `insta` je **dev-ovisnost `core`-a od
+`M2/1a`**, a sam test (`crates/sokratis-core/tests/snapshot.rs`, snimka nad fixtureom pariteta)
+dolazi s ciglom M2/2. Od tada svaka promjena oblika JSON-a mora biti **namjerna** — `cargo insta
+review` i rečenica u commitu koja kaže koje se polje promijenilo i zašto.
 
 ## 2 · Fixture-politika
 
@@ -66,12 +70,18 @@ cargo clippy --all-targets -- -D warnings
 cargo test
 ```
 
+Cigla koja dira `apps/desktop` (tokovi SUČELJE i DESKTOP) uz to vrti **`npm run check`** u
+`apps/desktop` — dok `npm install` čeka Leonov OK, tamo nema `node_modules` i ta brana se ne može
+pokrenuti (stanje: [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §11).
+
 Crveno ne ide u commit. **Izlazni kod 1 nije dokaz da je pao test koji testiraš** — čita se poruka
 (pouka iz Sokrat Studyja). CI (GitHub Actions) dolazi s M3, kad postoji remote. Koliko testova ima
-danas piše [`../records/CHANGELOG.md`](../records/CHANGELOG.md) (0.1.0) — brojka prepisana ovamo bi
-ostarila.
+danas piše [`../records/CHANGELOG.md`](../records/CHANGELOG.md) — brojka prepisana ovamo bi ostarila.
 
 ## 5 · Što se NE testira testom
 
-- Izgled i sučelje — M2, Playwright, vlastiti odjeljak.
-- Performanse — tek kad postoji mjerenje koje kaže da je sporo; `gix` je odgovor koji čeka pitanje.
+- **Ljuska i izgled** — `sokratis-desktop` po S-013 nema logike, pa nema ni jediničnih testova: splash
+  do kraja i preskočen, `prefers-reduced-motion`, tray, autostart, druga instanca i obavijest na Alert
+  idu kao **ručna lista provjere sa snimkama** u izvještaju cigle (spec M2 §9).
+- **Performanse** — danas se ne testiraju; M2/11 prvo **mjeri** (brojač git-procesa po izvještaju) i
+  tek to mjerenje nosi brojku u test; `gix` je odgovor koji i dalje čeka pitanje.

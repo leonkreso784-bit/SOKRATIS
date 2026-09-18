@@ -19,8 +19,10 @@ Model je preuzet iz Sokrat Studyja; uzeto je samo ono što ovom projektu treba.
 | **`archive/`** | **ISPUNJENI SPECOVI** — referenca, **nikad izvor istine** | kad milestone završi |
 | **`superpowers/plans/`** | planovi implementacije (cigla po cigla) za aktivni spec | po milestoneu |
 
-**Što još NE postoji i kad nastaje:** `records/BUGS.md` s prvim bugom · `records/HISTORY.md` s prvim
-zatvorenim milestoneom · `ideas/` s prvom idejom koja je prevelika za redak u backlogu.
+**Što još NE postoji i kad nastaje:** `records/BUGS.md` s prvim bugom · `records/HISTORY.md` kad
+zatvorenih milestonea bude toliko da ih `CHANGELOG.md` više ne drži pregledno (M1 je zasad cijeli u
+0.1.0, pa bi drugi dokument bio duplikat — S-010) · `ideas/` s prvom idejom koja je prevelika za
+redak u backlogu.
 
 ### Gdje što ide — **jedna činjenica, jedno mjesto** (S-010)
 
@@ -55,7 +57,8 @@ zatvorenim milestoneom · `ideas/` s prvom idejom koja je prevelika za redak u b
 ## `plan/` — što sada
 
 Spec Milestonea 1 je **ispunjen i arhiviran** ([archive/ARHITEKTURA_M1.md](./archive/ARHITEKTURA_M1.md));
-**jedini aktivni spec je M2** (desktop), napisan 2026-09-18 i čeka Leonov OK prije plana cigli.
+**jedini aktivni spec je M2** (desktop) — napisan i odobren 2026-09-18, plan cigli iz njega je u
+`superpowers/plans/`, izvedba je počela (kostur `M2/1a` u `main`-u).
 
 | Dokument | Svrha |
 |---|---|
@@ -66,14 +69,14 @@ Spec Milestonea 1 je **ispunjen i arhiviran** ([archive/ARHITEKTURA_M1.md](./arc
 
 | Dokument | Svrha |
 |---|---|
-| [ARCHITECTURE.md](./architecture/ARCHITECTURE.md) | Sustav kakav stoji u `crates/`: granice crateova, tok podataka, **sva polja profila sa zadanim vrijednostima**, formati `.sokratis/*.json`, izlazni kodovi CLI-ja |
+| [ARCHITECTURE.md](./architecture/ARCHITECTURE.md) | Sustav kakav stoji u `crates/` i `apps/`: granice četiriju crateova (+ ljuska), tok podataka, **sva polja profila sa zadanim vrijednostima**, formati `.sokratis/*.json`, izlazni kodovi CLI-ja, **§11 što stoji u kodu a ne radi** |
 
 ## `workflow/` — kako radimo
 
 | Dokument | Svrha |
 |---|---|
-| [TESTING.md](./workflow/TESTING.md) | Vrste testova, fixture-politika, paritet s RAD.xlsx, brane prije commita |
-| [RUST.md](./workflow/RUST.md) | Rust-konvencije, dopušteni crateovi, pravilo „zašto Rust ovako", pojmovnik koji raste |
+| [TESTING.md](./workflow/TESTING.md) | Vrste testova (core · io · cli · store · sučelje), fixture-politika, paritet s RAD.xlsx, brane prije commita |
+| [RUST.md](./workflow/RUST.md) | Rust-konvencije, dopušteni crateovi, pravilo „zašto Rust ovako", pojmovnik koji raste (§4 Rust · §5 TS/Svelte) |
 | [AGENTI.md](./workflow/AGENTI.md) | Više agenata na više grana: uloge (orkestrator · graditelj · recenzent · čuvar dokumentacije), tokovi i stabla, protokol po cigli, spajanje, compact |
 
 ## `records/` — povijest

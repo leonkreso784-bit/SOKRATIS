@@ -6,7 +6,9 @@ s dokazom. Za više projekata odjednom.
 
 > 🚧 **U gradnji (rujan 2026).** Milestone 1 je zatvoren (2026-09-18) — verzija 0.1.0:
 > `core`/`io`/`cli` rade nad pravom git-povijesti (paritet s `RAD.xlsx` je test, ne tvrdnja).
-> Objava na GitHub i push čekaju autorov izričit OK. Ulaz u dokumentaciju:
+> **Milestone 2 (desktop) je u izvedbi** po odobrenom specu
+> [docs/plan/ARHITEKTURA_M2.md](./docs/plan/ARHITEKTURA_M2.md); aplikacije još nema, prva cigla je u
+> `main`-u kao kostur. Objava na GitHub i push čekaju autorov izričit OK. Ulaz u dokumentaciju:
 > [docs/README.md](./docs/README.md) · milestonei: [docs/plan/ROADMAP.md](./docs/plan/ROADMAP.md) ·
 > isporučeno: [docs/records/CHANGELOG.md](./docs/records/CHANGELOG.md).
 
@@ -29,7 +31,8 @@ daje signale s dokazom.**
 
 ## Stack
 
-Rust (`core` · `io` · `cli`) · Tauri 2 · Svelte 5 · dizajn-tokeni Sokrat Studyja.
+Rust (`core` · `io` · `store` · `cli`) · SQLite kroz `rusqlite` (registar i snimke, M2) · Tauri 2 ·
+Svelte 5 · dizajn-tokeni Sokrat Studyja.
 
 ## Pokretanje
 

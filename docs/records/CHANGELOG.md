@@ -5,9 +5,20 @@ Isporuka = ono što je u `main`-u; sesije su u `PROGRESS.md`.
 
 ## [Unreleased] — rad u tijeku
 
-*(bez koda — Milestone 2: desktop. Spec napisan 2026-09-18:
-[`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md), odluke S-012…S-022; čeka Leonov OK.
-Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md).)*
+**Milestone 2 (desktop) je u izvedbi** po odobrenom specu
+[`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md) (odluke S-012…S-022) i planu od 35 cigli.
+Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek sesije:
+[`PROGRESS.md`](./PROGRESS.md).
+
+- **`M2/1a` — kostur M2 (2026-09-18).** Korisnik CLI-ja **ne vidi ništa novo**: nema nove naredbe ni
+  promjene ponašanja, sve tri naredbe rade kao u 0.1.0. Što se ispod promijenilo: `Report` u JSON-u
+  dobiva **četiri nova polja** (`until`, `commits`, `deliveries`, `vision_totals`) — zasad prazna
+  (`null`/`[]`), pune ih cigle M2/3–M2/5; profil prima polje `test_path_exclude` (zadano `[]`,
+  ponašanje M2/9); dodan je **nov crate `sokratis-store`** (SQLite: otvori bazu, primijeni migraciju
+  — registra i snimki još nema). Tko čita `Report` kao ugovor, mora znati i ovo: **od cigle M2/2 se
+  oblik JSON-a mijenja samo namjerno**, uz snapshot-test i rečenicu u commitu (S-022). Što točno
+  stoji u kodu a ne radi: [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §11.
+  Brane: `cargo test --workspace` **65 testova**, `sokratis docs .` 100/100, `signals .` 0.
 
 ## [0.1.0] — 2026-09-17 — Jezgra i CLI (Milestone 1)
 

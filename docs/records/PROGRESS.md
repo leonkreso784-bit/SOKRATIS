@@ -243,9 +243,10 @@ plan cigla-po-cigla → agenti kao u M1 (nove grane/stabla otvara plan M2, ne po
 
 ---
 
-## 2026-09-18 (FABLE) — Brainstorming i spec M2 (desktop)
+## 2026-09-18 (FABLE) — Spec i plan M2 (desktop) + kostur `M2/1a`
 
-**Popodne. Sesija bez koda — samo spec.** (Prva polovica na Opusu 5, nastavak na Fableu 5.1.)
+**Popodne i večer.** Spec i plan su napisani bez ijednog retka koda; kod je došao tek na kraju, kao
+prva cigla M2. (Prva polovica na Opusu 5, nastavak na Fableu 5.1.)
 
 - **Ulaz pročitan redom, ništa napamet:** `CLAUDE.md`, `git log`/`worktree`/`remote` (samo `main`, jedno
   stablo, **remote ne postoji**), ledger M1 „STANJE ZA NOVU SESIJU", `docs/README` → PRD → ROADMAP
@@ -301,6 +302,13 @@ plan cigla-po-cigla → agenti kao u M1 (nove grane/stabla otvara plan M2, ne po
   zapisano:** T1 je podijeljen u dva commita jer korak 13 (`npm install`) čeka Leonov OK, a desktop crate bez
   ikona iz `tauri icon` ruši `cargo test --workspace` — pa je privremeno izvan `members` (komentar u
   `Cargo.toml` kaže zašto). Leon je tražio primopredaju u novu sesiju prije OK-a.
+- **Čuvar dokumentacije (način A + B) nakon `M2/1a`, pred novu sesiju:** `ARCHITECTURE` sada opisuje
+  **četiri** cratea i ljusku izvan workspacea, `Report` s 15 polja (četiri prazna do M2/3–M2/5),
+  profil s 39 polja i §11 popis kostura koji stoji a ne radi; `RUST.md` §2 dobio je `rusqlite`,
+  `notify`, `insta` (vraćen, S-022), `tauri` + plugine, §4 pet novih pojmova i nov §5 za TS/Svelte;
+  `TESTING.md` više ne tvrdi da `insta` nije ovisnost i dobio je retke za `store` i sučelje;
+  `CHANGELOG` Unreleased kaže što `M2/1a` mijenja u JSON-u. Audit svih `.md` prema gitu: ispravljene
+  tvrdnje „spec čeka Leonov OK", ledger M1 kao prva radnja nove sesije i Playwright kao brana M2.
 
 ### Što slijedi
 **Nova sesija dovršava M2 do kraja.** Prvo T1 korak 13 uz Leonov OK (`npm install` → `tauri icon` → desktop

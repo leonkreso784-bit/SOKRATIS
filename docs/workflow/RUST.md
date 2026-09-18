@@ -11,7 +11,7 @@
 | **edition 2024**, stable toolchain, MSVC target | zadano za nov projekt; MSVC jer Tauri to očekuje na Windowsu |
 | **`core` bez I/O-a** (S-002) | testira se bez gita; ownership bez lifetimeova prema vanjskom svijetu |
 | **greške:** `thiserror` u `core`/`io` (tipizirane), `anyhow` samo u `cli` | biblioteka mora reći *koja* greška; binarna smije samo ispisati |
-| **`unwrap()`/`expect()` samo u testovima** | u produkcijskom kodu pad je bug, ne tok |
+| **`unwrap()`/`expect()` samo u testovima**, uz iznimku koju **plan izričito imenuje i obrazloži** — danas jedina: `expect` na `tauri::Builder::run` (`apps/desktop/src-tauri/src/lib.rs`) | u produkcijskom kodu pad je bug, ne tok; iznimka vrijedi tamo gdje nastavak nema smisla (ljuska koja se nije digla) i mora stajati u cigli, ne u glavi |
 | **`?` umjesto `match` na `Result` gdje samo propagiramo** | manje buke, ista sigurnost |
 | **jedno pravilo = jedna datoteka** u `core/src/rules/` | novo pravilo ne dira stara; test uz kod |
 | **`///` doc-komentar na svakom javnom tipu i funkciji** | `cargo doc` postaje dokumentacija jezgre |
@@ -20,7 +20,7 @@
 | **lifetime samo gdje štedi kopiju koja bi boljela:** `IndicatorInput<'a>` je jedina iznimka u jezgri; `Context` je u vlasništvu (klonira se jednom po izvještaju) | pravila i parseri ostaju čitljivi bez `'a` |
 | **imenovanje:** tipovi `PascalCase`, funkcije/polja `snake_case`, engleski | S-008; clippy to i traži |
 
-## 2 · Dopušteni crateovi (M1) i zašto
+## 2 · Dopušteni crateovi i zašto
 
 | crate | uloga | zašto baš on |
 |---|---|---|
@@ -32,10 +32,29 @@
 | `chrono` (samo `io`) | današnji lokalni datum za `ReportInput.today` | odlučeno u planu M1 (T17): lokalni datum na Windowsu bez feature-gatea; jezgra datume računa sama (`civil.rs`), bez ovisnosti |
 | `tempfile` (dev) | privremeni repo u io- i cli-testovima | čišćenje bez ručnog `rm` |
 
+**Od M2** (pinane u `M2/1a`, `[workspace.dependencies]`; verzije su `max_stable_version` s crates.io
+na 2026-09-18):
+
+| crate | uloga | zašto baš on |
+|---|---|---|
+| `rusqlite` (`bundled`, samo `store`) | SQLite: registar projekata, postavke, snimke brojki (S-014) | zrelo vezivanje na SQLite bez ORM-a; **`bundled`** kompilira samu knjižnicu u binarnu — tuđi stroj nema `sqlite3.dll`, a instalacija ne smije tražiti ništa izvana |
+| `notify` (samo `io`) | watcher nad `.git`, docs i `.sokratis` (S-016) | jedini održavan prenosiv watcher; koristi ReadDirectoryChangesW na Windowsu. **Ovisnost je u manifestu od `M2/1a`, kod je dobiva u M2/13** |
+| `insta` (dev, `core`) | snapshot cijelog `Report`-a nad fixtureom pariteta | **vratio se u `M2/1a` s razlogom** (S-022): M1 ga je izbacio jer bi zamrznuo oblik koji se još mijenja, M2 gradi sučelje nad tim oblikom — pa svaka promjena JSON-a mora biti vidljiva u diffu snimke. Prvi snapshot-test dolazi s M2/2 |
+| `tauri` 2 (+ `tauri-build`) | ljuska: prozori, tray, ugovor prema sučelju (S-012, S-013) | **2.x, ne 3 alpha** — pinamo stabilno; `tray-icon` i `image-png` su jedine uključene mogućnosti |
+| `tauri-plugin-dialog` · `-notification` · `-autostart` · `-single-instance` | odabir mape, obavijest na Alert, pokretanje sa sustavom, jedna instanca (S-020) | službeni plugini istog izdanja; svaki pokriva točno jednu Leonovu odluku, nijedan ne nosi logiku |
+
+Nijedan nov crate za nešto što projekt već ima: `serde`/`serde_json` u `store` nisu dev-ovisnost jer
+snimka piše profil kao **kanonski JSON** (S-014) — `DefaultHasher` nije stabilan među verzijama, a
+zaseban crate samo za hash bio bi pravilo #6 naopako.
+
 Nova ovisnost = namjerna radnja: redak ovdje + obrazloženje u commitu (CLAUDE.md #6).
-`Cargo.lock` se commita. **`insta` je izašao** u krugu popravaka M1: stajao je u dva manifesta bez
-ijednog poziva, a neiskorištena ovisnost je pravilo #6 naopako; snapshot JSON-a čeka M2, kad se oblik
-`Report`-a zaključa za Tauri (`workflow/TESTING.md` §1).
+`Cargo.lock` se commita. Ovisnost smije čekati svoju ciglu (danas: `notify` i `insta`), ali samo ako
+je pinana u cigli koja je uvela i ovdje objašnjena — stanje koda je u
+[`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §11.
+
+**npm-ovisnosti sučelja** (`apps/desktop/package.json`, verzije pinane bez `^`) nisu crateovi i ne
+ulaze u ovu tablicu; što je zašto odabrano stoji u specu
+[`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md) §7.
 
 **`rust-toolchain.toml`** (korijen repoa, od 2026-09-18) pina i sam kompajler, ne samo crateove:
 `channel = "1.98.1"` + `rustfmt`/`clippy` kao komponente. Rustup ga čita sam kad se pokrene bilo koja
@@ -93,7 +112,7 @@ Test za pravilo: **Leon može pročitati datoteku i reći što radi.** Ako ne mo
 | `saturating_sub` | M1 (T12, `docs.rs`) | oduzimanje koje se zaustavlja na granici tipa umjesto da se prelije — ocjena docs-a zato nikad ne padne ispod 0 |
 | `for (kind, re) in &p.classifier` + `*kind` na Copy-enumu; `Vec` umjesto `HashMap` kad je redoslijed ugovor | M1 (T6, `classify.rs`) | iteracija po posuđenom vektoru parova čuva ugovoreni redoslijed (planiranje > dokumentacija > …); `HashMap` ga ne bi garantirao |
 | `lines()+filter_map(captures)` vs `(?m)`; stabilan `sort_by` | M1 (T4, `diary.rs`) | red-po-red s regexom bez multiline-zastavice je čitljiviji od jednog `(?m)` uzorka; `sort_by` čuva izvorni poredak jednakih ključeva |
-| `include_str!` za fixture u testu | M1 (T4, `diary.rs`; kasnije `plan.rs`) | ugrađuje sadržaj datoteke u binarku pri kompajliranju — test ne čita disk u vrijeme izvođenja |
+| `include_str!` za fixture u testu | M1 (T4, `diary.rs`; kasnije `plan.rs`, M2/1a `store/src/store.rs`) | ugrađuje sadržaj datoteke u binarku pri kompajliranju — test ne čita disk u vrijeme izvođenja, a SQL migracija ne može se „izgubiti" uz instalaciju |
 | `Vec::position()` + `&mut v[idx]` umjesto `iter_mut().find()`+`expect` | M1 (T5, `plan.rs`) | nađi indeks pa uzmi izmjenjivu referencu — izbjegava dvostruku posudbu koju kasnija izmjena susjednog polja komplicira |
 | unit struct kao pravilo | M1 (T13, `rules/*.rs`) | struct bez polja koji nosi samo `impl Rule`; identitet pravila je u tipu, ne u podacima |
 | `std::process::Command` bez shella | M1 (T15, `git.rs`) | pokreće vanjski proces s argumentima kao vektorom, bez interpretacije shella — nema escapinga ni injekcije |
@@ -141,5 +160,25 @@ Test za pravilo: **Leon može pročitati datoteku i reći što radi.** Ako ne mo
 | predznak nule u IEEE 754 (`-0.0`, `is_sign_positive`) | M1 (popravak M1, `metrics/indicators.rs`) | `f64::sum()` praznog iteratora je `-0.0`, a `assert_eq!(-0.0, 0.0)` je istina — mjera zato dobiva `+ 0.0`, a test gleda predznak |
 | `[dev-dependencies]` | M1 (popravak M7, `core/Cargo.toml`) | ovisnost koju traže samo testovi ne ulazi u isporučenu biblioteku; ne dijeli se ni između crateova (zato `cli` ima svoj `tests/common`) |
 | `mod common;` dijeljen između testnih binarija | M1 (popravak I7, `cli/tests/common/mod.rs`) | svaki `tests/*.rs` je **svoj** crate, pa se pomoćni modul u njega uključuje izvorno (`mod`), a ne linka kao biblioteka |
+| `pub(crate)` | M2/1a (`store/src/store.rs`) | vidljivost usko: polje smiju vidjeti moduli **istog** cratea (registar, postavke, snimke), vanjski korisnik ne — `Store` tako posjeduje `Connection` bez da je izlaže |
+| `const` tablica + `include_str!` za migracije | M2/1a (`store/src/store.rs`) | `&[(i64, &str)]` u konstanti drži par „verzija sheme → SQL"; petlja primijeni samo ono što je novije od zapisane verzije |
+| `Connection::query_row` s closureom nad retkom | M2/1a (`store/src/store.rs`) | rusqlite ne mapira tipove sam: closure `\|r\| r.get(0)` kaže koji stupac i u koji Rust-tip ide, pa je konverzija vidljiva na mjestu upita |
+| `#![cfg_attr(…, windows_subsystem = "windows")]` | M2/1a (`desktop/src-tauri/src/main.rs`) | atribut **na razini cratea** (`#!`) koji se primjenjuje uvjetno; ovdje: release build bez konzolnog prozora, debug ga zadržava zbog `eprintln!`-a |
+| builder-lanac `tauri::Builder::default()…run()` + `generate_context!` | M2/1a (`desktop/src-tauri/src/lib.rs`) | svaka metoda vraća `Self` pa se plugini nižu lancem; `run` uzima **vlasništvo** i ne vraća se do izlaza aplikacije, a makro ugradi `tauri.conf.json` u binarku pri kompilaciji |
 
 Redak se dodaje **u cigli u kojoj se pojam prvi put pojavi**, s referencom na datoteku.
+
+## 5 · TS/Svelte uz Rust (tok SUČELJE, od M2)
+
+Sučelje se piše u TypeScriptu i Svelteu 5, ali po istim pravilima: zaglavlje `// ZAŠTO OVAKO (cigla
+M2/N — naziv)` od 2–5 redaka u svakoj novoj datoteci, hrvatski komentari, engleski identifikatori
+(S-008), nijedan natpis izvan i18n rječnika (S-021), nijedna boja izvan tokena (S-017). Brane su
+`npm run check` u `apps/desktop`, ne `cargo` ([`TESTING.md`](./TESTING.md) §1). Pojmovi koji se ovdje
+uvode idu u ovu tablicu — **ne** u §4, koji je Rust.
+
+| pojam | prvi put | jedna rečenica |
+|---|---|---|
+| `mount(App, { target })` | M2/1a (`src/main.ts`) | Svelte 5 više ne radi `new App(...)`: komponenta se montira funkcijom na postojeći DOM-čvor |
+| runa `$state` | M2/1a (`src/App.svelte`) | vrijednost označena runom je reaktivna — promjena sama osvježi svaki prikaz koji je čita, bez `store`-a i bez `$:` |
+| dva ulaza u Viteu (`index.html` + `splash.html`) | M2/1a (`vite.config.ts`) | jedan build daje dvije HTML stranice; Tauri ih otvara kao dva prozora (splash i glavni, S-019) |
+| `svelte-check` | M2/1a (`package.json`, `npm run check:svelte`) | tipovi se provjeravaju i **unutar** `.svelte` datoteka, ne samo u `.ts` — to je TS-ekvivalent `cargo clippy` brane |
