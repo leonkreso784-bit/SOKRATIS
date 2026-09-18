@@ -1,0 +1,429 @@
+---
+source: crates/sokratis-core/tests/snapshot.rs
+expression: r
+---
+{
+  "generated_at": 1789660685,
+  "since": "2026-08-29",
+  "until": null,
+  "branch": "main",
+  "touched": {
+    "commits": 190,
+    "lines": 70164,
+    "files": 1801,
+    "skipped_lines": 0
+  },
+  "days": [
+    {
+      "date": "2026-08-29",
+      "commits": 10,
+      "commits_cumulative": 10,
+      "lines": 5348,
+      "hours": 4.9,
+      "deliveries": 4,
+      "deploys": 0,
+      "test_lines": 493
+    },
+    {
+      "date": "2026-08-30",
+      "commits": 9,
+      "commits_cumulative": 19,
+      "lines": 7717,
+      "hours": 8.0,
+      "deliveries": 7,
+      "deploys": 0,
+      "test_lines": 5
+    },
+    {
+      "date": "2026-08-31",
+      "commits": 25,
+      "commits_cumulative": 44,
+      "lines": 12503,
+      "hours": 14.7,
+      "deliveries": 16,
+      "deploys": 0,
+      "test_lines": 2664
+    },
+    {
+      "date": "2026-09-01",
+      "commits": 42,
+      "commits_cumulative": 86,
+      "lines": 18476,
+      "hours": 15.3,
+      "deliveries": 33,
+      "deploys": 1,
+      "test_lines": 743
+    },
+    {
+      "date": "2026-09-02",
+      "commits": 12,
+      "commits_cumulative": 98,
+      "lines": 1971,
+      "hours": 4.5,
+      "deliveries": 9,
+      "deploys": 4,
+      "test_lines": 168
+    },
+    {
+      "date": "2026-09-03",
+      "commits": 2,
+      "commits_cumulative": 100,
+      "lines": 743,
+      "hours": 1.0,
+      "deliveries": 0,
+      "deploys": 0,
+      "test_lines": 27
+    },
+    {
+      "date": "2026-09-04",
+      "commits": 13,
+      "commits_cumulative": 113,
+      "lines": 4545,
+      "hours": 6.7,
+      "deliveries": 7,
+      "deploys": 1,
+      "test_lines": 655
+    },
+    {
+      "date": "2026-09-05",
+      "commits": 22,
+      "commits_cumulative": 135,
+      "lines": 6978,
+      "hours": 11.6,
+      "deliveries": 13,
+      "deploys": 1,
+      "test_lines": 1018
+    },
+    {
+      "date": "2026-09-06",
+      "commits": 19,
+      "commits_cumulative": 154,
+      "lines": 2828,
+      "hours": 5.9,
+      "deliveries": 7,
+      "deploys": 0,
+      "test_lines": 1333
+    },
+    {
+      "date": "2026-09-07",
+      "commits": 4,
+      "commits_cumulative": 158,
+      "lines": 1051,
+      "hours": 3.0,
+      "deliveries": 2,
+      "deploys": 0,
+      "test_lines": 220
+    },
+    {
+      "date": "2026-09-08",
+      "commits": 3,
+      "commits_cumulative": 161,
+      "lines": 546,
+      "hours": 1.1,
+      "deliveries": 2,
+      "deploys": 0,
+      "test_lines": 102
+    },
+    {
+      "date": "2026-09-09",
+      "commits": 7,
+      "commits_cumulative": 168,
+      "lines": 1585,
+      "hours": 3.3,
+      "deliveries": 2,
+      "deploys": 0,
+      "test_lines": 348
+    },
+    {
+      "date": "2026-09-12",
+      "commits": 12,
+      "commits_cumulative": 180,
+      "lines": 3110,
+      "hours": 2.5,
+      "deliveries": 2,
+      "deploys": 0,
+      "test_lines": 401
+    },
+    {
+      "date": "2026-09-13",
+      "commits": 10,
+      "commits_cumulative": 190,
+      "lines": 2763,
+      "hours": 2.5,
+      "deliveries": 1,
+      "deploys": 0,
+      "test_lines": 745
+    }
+  ],
+  "kinds": [
+    {
+      "kind": "planning",
+      "commits": 26,
+      "share": 0.137,
+      "lines": 5512
+    },
+    {
+      "kind": "documentation",
+      "commits": 55,
+      "share": 0.289,
+      "lines": 2795
+    },
+    {
+      "kind": "execution",
+      "commits": 61,
+      "share": 0.321,
+      "lines": 25021
+    },
+    {
+      "kind": "polish",
+      "commits": 26,
+      "share": 0.137,
+      "lines": 30558
+    },
+    {
+      "kind": "debugging",
+      "commits": 22,
+      "share": 0.116,
+      "lines": 6278
+    }
+  ],
+  "commits": [],
+  "deliveries": [],
+  "indicators": [
+    {
+      "id": "working_days",
+      "value": 14.0,
+      "kind": "measure",
+      "formula": "dana s bar jednim commitom"
+    },
+    {
+      "id": "commits",
+      "value": 190.0,
+      "kind": "measure",
+      "formula": "broj commita od since"
+    },
+    {
+      "id": "commits_per_day",
+      "value": 13.6,
+      "kind": "measure",
+      "formula": "commits / working_days"
+    },
+    {
+      "id": "deliveries",
+      "value": 105.0,
+      "kind": "measure",
+      "formula": "naslova u dnevniku od since"
+    },
+    {
+      "id": "deliveries_per_day",
+      "value": 7.5,
+      "kind": "measure",
+      "formula": "deliveries / working_days"
+    },
+    {
+      "id": "hours",
+      "value": 85.0,
+      "kind": "proxy",
+      "formula": "git-hours: razmak < gap_h + start_h po sesiji, sortirano po author_time"
+    },
+    {
+      "id": "commits_per_hour",
+      "value": 2.2,
+      "kind": "proxy",
+      "formula": "commits / hours"
+    },
+    {
+      "id": "lines_changed",
+      "value": 70164.0,
+      "kind": "measure",
+      "formula": "Σ added + deleted"
+    },
+    {
+      "id": "test_lines",
+      "value": 8922.0,
+      "kind": "measure",
+      "formula": "Σ redaka na testnim putanjama"
+    },
+    {
+      "id": "test_share",
+      "value": 0.127,
+      "kind": "measure",
+      "formula": "test_lines / lines_changed"
+    },
+    {
+      "id": "deploys",
+      "value": 7.0,
+      "kind": "measure",
+      "formula": "isporuke s 🚀/deploy"
+    },
+    {
+      "id": "debugging_commits",
+      "value": 22.0,
+      "kind": "measure",
+      "formula": "effective_kind == debugging"
+    },
+    {
+      "id": "debugging_share",
+      "value": 0.116,
+      "kind": "measure",
+      "formula": "debugging_commits / commits"
+    },
+    {
+      "id": "docs_share",
+      "value": 0.289,
+      "kind": "measure",
+      "formula": "documentation / commits"
+    },
+    {
+      "id": "ci_fixes",
+      "value": 2.0,
+      "kind": "measure",
+      "formula": "subject ~ ci_fix_pattern"
+    },
+    {
+      "id": "owner_driven_deliveries",
+      "value": 19.0,
+      "kind": "measure",
+      "formula": "naslov sadrži owner_name"
+    },
+    {
+      "id": "closed_phases_in_range",
+      "value": 3.0,
+      "kind": "measure",
+      "formula": "zatvorene faze s to >= since"
+    },
+    {
+      "id": "closed_phase_avg_days",
+      "value": 8.5,
+      "kind": "measure",
+      "formula": "mean(days) zatvorenih faza"
+    }
+  ],
+  "phases": [
+    {
+      "id": "Osobni UGC-graditelj F1–F5",
+      "name": "Osobni UGC-graditelj F1–F5",
+      "state": "closed",
+      "total_bricks": 8,
+      "done_bricks": 8,
+      "from": "2026-08-02",
+      "to": "2026-08-06",
+      "days": 5,
+      "commits": 8
+    },
+    {
+      "id": "Frontend redizajn C0–C7 + KOSTUR·TELEFON·POLICA·SEO",
+      "name": "Frontend redizajn C0–C7 + KOSTUR·TELEFON·POLICA·SEO",
+      "state": "closed",
+      "total_bricks": 56,
+      "done_bricks": 56,
+      "from": "2026-08-07",
+      "to": "2026-09-01",
+      "days": 26,
+      "commits": 56
+    },
+    {
+      "id": "MREŽA — sanacija A–E",
+      "name": "MREŽA — sanacija A–E",
+      "state": "closed",
+      "total_bricks": 25,
+      "done_bricks": 25,
+      "from": "2026-08-31",
+      "to": "2026-09-01",
+      "days": 2,
+      "commits": 25
+    },
+    {
+      "id": "RAČUN R1 — OAuth + upitnik + dijalog",
+      "name": "RAČUN R1 — OAuth + upitnik + dijalog",
+      "state": "closed",
+      "total_bricks": 6,
+      "done_bricks": 6,
+      "from": "2026-09-02",
+      "to": "2026-09-02",
+      "days": 1,
+      "commits": 6
+    },
+    {
+      "id": "F1",
+      "name": "F1 · UREĐAJ",
+      "state": "running",
+      "total_bricks": 14,
+      "done_bricks": 11,
+      "from": "2026-09-04",
+      "to": null,
+      "days": 14,
+      "commits": 14
+    },
+    {
+      "id": "F2",
+      "name": "F2 · RAČUN",
+      "state": "running",
+      "total_bricks": 5,
+      "done_bricks": 1,
+      "from": "2026-09-06",
+      "to": null,
+      "days": 12,
+      "commits": 8
+    },
+    {
+      "id": "F3",
+      "name": "F3 · DVOJEZIČNOST",
+      "state": "planned",
+      "total_bricks": 3,
+      "done_bricks": 0,
+      "from": null,
+      "to": null,
+      "days": null,
+      "commits": 0
+    },
+    {
+      "id": "F4",
+      "name": "F4 · ČIŠĆENJE",
+      "state": "planned",
+      "total_bricks": 5,
+      "done_bricks": 0,
+      "from": null,
+      "to": null,
+      "days": null,
+      "commits": 0
+    },
+    {
+      "id": "F5",
+      "name": "F5 · VJEŽBE",
+      "state": "planned",
+      "total_bricks": 3,
+      "done_bricks": 0,
+      "from": null,
+      "to": null,
+      "days": null,
+      "commits": 0
+    },
+    {
+      "id": "F6",
+      "name": "F6 · MCP",
+      "state": "planned",
+      "total_bricks": 3,
+      "done_bricks": 0,
+      "from": null,
+      "to": null,
+      "days": null,
+      "commits": 0
+    },
+    {
+      "id": "F7",
+      "name": "F7 · OBJAVA",
+      "state": "planned",
+      "total_bricks": 3,
+      "done_bricks": 0,
+      "from": null,
+      "to": null,
+      "days": null,
+      "commits": 0
+    }
+  ],
+  "visions": [],
+  "vision_totals": [],
+  "docs": null,
+  "signals": []
+}
