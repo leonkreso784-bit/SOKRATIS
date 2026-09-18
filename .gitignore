@@ -10,6 +10,7 @@
 /apps/desktop/src-tauri/gen/
 
 # lokalno
+.playwright-mcp/
 .env
 .jank/
 *.log
