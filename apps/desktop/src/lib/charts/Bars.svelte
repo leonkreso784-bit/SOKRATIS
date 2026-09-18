@@ -1,20 +1,20 @@
 <!-- ZAŠTO OVAKO (cigla M2/23 — stupci): komponenta ne računa ništa osim koordinata; -->
 <!-- natpisi i boje dolaze izvana kao props/tokeni (S-021, S-018), sama ne zna nijednu riječ. -->
 <script lang="ts">
-  import { linear, niceMax, ticks } from './scale';
+  import { finiteMax, linear, niceMax, svgA11y, ticks } from './scale';
 
-  type Props = { values: number[]; labels?: string[]; height?: number };
-  let { values, labels = [], height = 160 }: Props = $props();
+  type Props = { values: number[]; labels?: string[]; height?: number; label?: string };
+  let { values, labels = [], height = 160, label }: Props = $props();
 
   const W = 600;
   const PAD = 24;
-  const max = $derived(niceMax(Math.max(0, ...values)));
+  const max = $derived(niceMax(finiteMax(values)));
   const y = $derived(linear([0, max], [height - PAD, PAD]));
   const bw = $derived(values.length ? (W - 2 * PAD) / values.length : 0);
-  const name = $derived(labels.join(', '));
+  const name = $derived(label && label.trim() !== '' ? label : labels.join(', '));
 </script>
 
-<svg viewBox="0 0 {W} {height}" role="img" aria-label={name} class="w-full">
+<svg viewBox="0 0 {W} {height}" {...svgA11y(name)} class="w-full">
   {#each ticks(max) as tk (tk)}
     <line x1={PAD} x2={W - PAD} y1={y(tk)} y2={y(tk)} stroke="var(--color-line)" />
     <text x={PAD - 4} y={y(tk)} text-anchor="end" dominant-baseline="middle" font-size="10" fill="var(--color-ink-2)"
