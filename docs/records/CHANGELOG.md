@@ -53,6 +53,32 @@ Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek sesije:
   `["/fixtures/"]` tek u T35.
   Brane na `main`-u nakon PROFIL (T8–T9) i JEZGRA 1/2 (T2–T3): `cargo fmt --check` OK · `cargo clippy
   --workspace -- -D warnings` OK · **72 testa** · `sokratis signals .` = nema signala.
+- **`M2/4` — zbroj vizija po stanju (2026-09-18).** Korisnik CLI-ja i dalje ne vidi ništa novo (tablica
+  vizije ne ispisuje) — `Report.vision_totals` više nije uvijek `[]`: broji vizije po `state` u JSON-u
+  (dug I6 riješen). Snimka ugovora netaknuta (fixture nema vizija, `vision_totals(&[])` i dalje `[]`).
+- **`M2/5` — redci commita i isporuke u `Report`-u (2026-09-18).** Korisnik CLI-ja i dalje ne vidi
+  ništa novo u tablici — ispod: `Report.commits` (redak po commitu: `sha` · `date` · `subject` ·
+  `kind` · `sub` · `overridden`) i `Report.deliveries` (redak po isporuci: `date` · `model` · `title` ·
+  `kind` · `deploy`) više nisu uvijek `[]` — hrane buduće poglede Dnevnik i Isporuke u sučelju.
+  Klasifikacija ide preko novog `commit_rows`, koji svaki commit klasificira jednom za ovaj redak;
+  `kind_stats` sad broji iz tih redaka umjesto da klasifikaciju ponavlja. **SNAPSHOT NAMJERNO
+  PROMIJENJEN** (S-022): `commits` 190 objekata, `deliveries` 105 (= pokazatelj `deliveries`); sva
+  ostala polja snimke ostaju duboko jednaka (programski dokazano), raspodjela `commits[].kind` = `kinds[]`.
+  Otvoreno (nalaz recenzije, ne popravljeno ovom ciglom): `metrics/indicators.rs` i dalje zove
+  `effective_kind` odvojeno za dva pokazatelja — commit se klasificira više od jednom, ne jednom kako
+  spec §3.2 traži; odluka na završnoj recenziji M2 (`BACKLOG.md`).
+- **`M2/6` — aktivne faze preko `phase_tag` iz profila (2026-09-18).** Nijedna promjena za korisnika
+  CLI-ja danas — aktivne faze se sad na commit vežu regexom `phase_tag` iz profila (`ph.id` ili dijete
+  `"{id}/"`), ne tvrdim prefiksom `"{id}/"` (dug I3 + M14 riješen); zadani profil (Sokrat Study) daje
+  iste brojke kao prije, diff snimke bajtno prazan.
+- **`M2/7` — snimka brojki i prijelaz signala (2026-09-18).** Korisnik CLI-ja ne vidi ništa novo —
+  `core/src/snapshot.rs` prestaje biti prazan modul: `SnapshotMetrics::from_report` (18 pokazatelja,
+  docs-ocjena, broj signala po težini), `diff` (promjene po `id`-u, NaN-svjestan), `worst_severity`,
+  `alerts_raised` (javlja SAMO prijelaz u Warn/Info → Alert, S-020) — priprema STORE T17 (snimke) i
+  DESKTOP T29/T30 (obavijesti). `lib.rs` dobiva točno jedan redak (`pub use snapshot::{…}`).
+  Brane nakon JEZGRA 2/2 (T4–T7, merge): `cargo fmt --check` OK · `cargo clippy --workspace -- -D
+  warnings` OK · **82 testa** · `sokratis signals .` = nema signala. Tok JEZGRA je time **gotov**
+  (T2–T7 svi u `main`-u).
 
 ## [0.1.0] — 2026-09-17 — Jezgra i CLI (Milestone 1)
 

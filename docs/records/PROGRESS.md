@@ -402,8 +402,74 @@ izričit OK.
   snimke), `BACKLOG.md` (I7 riješen, I9 djelomično), `ROADMAP.md` i `CLAUDE.md` (PROFIL gotov, JEZGRA
   napola, peto stablo).
 
+**Nastavak iste večeri — JEZGRA gotova (T4–T7), IO/STORE/SUČELJE nastavljaju.**
+
+- **JEZGRA druga polovica (T4–T7) spojena, tok GOTOV** (merge `7711a67`; T2–T7 svi u `main`-u):
+  - **M2/4** (`d126263`): `metrics/visions.rs::vision_totals` — `BTreeMap<&str, u32>` broji i sortira
+    vizije po stanju u jednom prolazu (dug I6 riješen); snimka ugovora netaknuta (fixture nema vizija).
+  - **M2/5** (`33ec2ac`): `commit_rows` klasificira svaki commit TOČNO JEDNOM za `Report.commits`
+    (`sha`·`date`·`subject`·`kind`·`sub`·`overridden`); `kind_stats` sad broji iz tih redaka (`zip`
+    nad paralelnim nizovima) umjesto da klasifikaciju ponovi; `Report.deliveries` prestaje biti uvijek
+    `[]`. **SNAPSHOT NAMJERNO PROMIJENJEN** (S-022): `commits` 190 objekata, `deliveries` 105 (=
+    pokazatelj `deliveries`). Recenzent (opus) je programski dokazao: sva ostala polja snimke izvan
+    `commits`/`deliveries` DUBOKO JEDNAKA (diff triju dijelova snimke po ključu najviše razine, prije/
+    poslije, sve tri identične), raspodjela `commits[].kind` = `kinds[]` (planning 26 · documentation
+    55 · execution 61 · polish 26 · debugging 22), redoslijed = fixture-log, 3 inverzije `date` su
+    poznati cherry-pickovi (S-007). **Nalaz recenzije, NIJE popravljen ovom ciglom (namjerno, izvan
+    dosega T5):** `metrics/indicators.rs` i dalje zove `effective_kind` odvojeno za dva pokazatelja
+    (`debugging_commits`, `docs_share`) — commit se time klasificira više od jednom po izvještaju, iako
+    spec §3.2 traži jednom. Zapisano u `BACKLOG.md` i `ARCHITECTURE.md` §11 kao otvoreno do završne
+    recenzije M2, **ne** kao riješeno.
+  - **M2/6** (`c4a5a71`): aktivne faze se na commit vežu regexom `phase_tag` iz profila
+    (`Option::is_some_and`), ne tvrdim prefiksom `"{id}/"` — dug I3 + M14 riješen; zadani profil
+    (Sokrat Study) daje iste brojke, diff snimke bajtno prazan (pokriven i rub `F1/10…F1/14`).
+  - **M2/7** (`722fb4d`): `src/snapshot.rs` prestaje biti prazan modul — `SnapshotMetrics::from_report`,
+    `diff` (promjene po `id`-u, `NaN == NaN` tretiran kao nepromijenjeno), `SignalCounts::from_signals`,
+    `worst_severity` (`Severity: Ord` + `max()`), `alerts_raised` (identitet signala `(rule,
+    title_key)`, javlja SAMO prijelaz u Alert — S-020). **Odstupanje od brifa, na kodu:** brifov test
+    je tražio `assert_eq!(m.docs_score, None)`, ali dijeljeni fixture `report::tests::input()` ima
+    `docs/records/PROGRESS.md` (poklapa zadani `diary_path`) pa `docs_health` vrati `Some(100)` —
+    graditelj je ispravio tvrdnju na `Some(100)` uz komentar u testu koji to obrazlaže. `mod tests` u
+    `report.rs` postao `pub(crate)` da `snapshot::tests` posudi isti fixture umjesto da ga duplicira.
+  - Recenzije: T5 i T7 na **opusu** (SPOJIVO, redom 4 i 5 Minor odgođenih), T6 na sonnetu (SPOJIVO bez
+    nalaza). Nijedan Minor ne blokira STORE T17 ni DESKTOP T29/T30.
+  - **Brane na `main`-u:** `cargo fmt --check` OK · `cargo clippy --workspace -- -D warnings` OK ·
+    **82 testa** · `sokratis signals .` = nema signala.
+- **IO — mjerenje M2/11 (performanse, dug M11) i krug popravaka.** Prvo mjerenje (release, topli keš,
+  Sokrat Study, `Measure-Command`): **prije 3318–3822 ms**, git-procesa 92 (test-repo 94). Poslije
+  popravka: **najbolje 1479,71 ms**, git-procesa **6** (test-repo 4) — dominantan trošak bio je jedan
+  `git log --numstat` nad cijelom poviješću umjesto po datoteci/grani. **Odluka orkestratora po
+  pravilu iz plana:** 1479,71 ms ≥ 500 ms → **T18 (keš sirovih commita u SQLite-u) ULAZI** u plan kao
+  isporuka, ne odgađa se. **Recenzija je prvo vratila ciglu s 2 Critical**, oba dokazana pokusom: (1)
+  `last_changes` je gubio zadnju promjenu putanje na merge-commitima (`--name-only` bez combined
+  diffa vidi samo prvog roditelja; primjer nad Sokrat Studyjem: `docs/README.md` davao stariji unix-
+  vremena umjesto stvarno zadnjeg); (2) bez `core.quotepath=false` git ne-ASCII imena `.md` datoteka
+  tiho vraća kao `None`. Paritet JSON-a stare/nove binarke bio je identičan usprkos oba kvara — **dokaz
+  da sam paritet JSON-a nije dovoljan test** za `last_changes`. Popravak: `--diff-merges=combined`
+  (ne `-m`, koji bi merge-commitu krivo pripisao čisto spojenu datoteku) i `-c core.quotepath=false`;
+  dva nova testa u `tests/last_changes.rs`, oba pala prije popravka na opisani uzrok. **Neovisno
+  provjereno nad Sokrat Studyjem: 0/56 neslaganja** (bilo netočno na barem jednom danu prije popravka).
+  Ponovna recenzija: SPOJIVO. M2/10, M2/11, M2/12 su time recenzirani SPOJIVO; M2/13 (watcher nad
+  `.git`, S-016) je u izradi.
+- **Ostali tokovi, izvan `main`-a (stanje za treći val, ne još isporučeno):** STORE — M2/15, M2/16
+  SPOJIVO, M2/17 (snimke, potrošač `SnapshotMetrics`/`diff` iz JEZGRE) u izradi; SUČELJE — M2/20,
+  M2/21, M2/22 SPOJIVO, M2/23 (SVG grafovi) na krugu popravka (2 Important: `label?` ostaje opcionalan
+  na sve četiri komponente grafa, imenovan graf = `role="img"`+`aria-label`, neimenovan =
+  `aria-hidden`). Pet stabala tokova otvoreno (`sokratis.jezgra` · `.profil` · `.io` · `.store` ·
+  `.ui`); CLI/DESKTOP/INTEGRACIJA se otvaraju kasnije po ovisnostima iz plana. Remote i dalje ne
+  postoji; push/objava i dalje čekaju Leonov izričit OK.
+- **Čuvar dokumentacije (način A), ovaj zapis:** `PROGRESS.md` (ova dopuna), `CHANGELOG.md` (retci
+  M2/4–M2/7 pod `[Unreleased]`), `RUST.md` §4 (`Iterator::zip`, `pub(crate) mod`, `Ord` derive +
+  `max()` nad enumom, `?` unutar `filter_map`-a; dopuna postojećih redaka `entry().or_insert()` i
+  `Option::is_some_and`), `ARCHITECTURE.md` (§2 koraci 6–7–10, §3 tri polja više nisu prazna i
+  `snapshot.rs` više nije prazan modul, §4/§6 `phase_tag` radi, §11 „izračunato ali ne izlazi u
+  tablicu" i nova stavka o dvostrukoj klasifikaciji), `BACKLOG.md` (I6 riješen, I3+M14 riješen, M11
+  izmjeren i popravljen ali ne zatvoren jer M2/11 nije u `main`-u, nova stavka „klasifikacija jednom"),
+  `ROADMAP.md` i `CLAUDE.md` (JEZGRA gotova, PROFIL gotov, IO/STORE/SUČELJE stanje).
+
 ### Što slijedi
-Drugi val graditelja nastavlja: JEZGRA T4–T7 na `feat/core-m2`, IO T10–T14 (uključujući ogradu pri
-`Project::open`, tek nakon što JEZGRA T3 i PROFIL T8 stoje u `main`-u — oba sad stoje), STORE T15–T18
-na petom stablu, SUČELJE T20+. INTEGRACIJA kad su svi tokovi u `main`-u. Push/remote i objava i dalje
-čekaju Leonov izričit OK; isto brisanje grana/stabala tokova na kraju M2.
+Treći val: IO T13 (watcher) → `git merge main` u `sokratis.io` → T14 (ograda pri `Project::open`,
+zatvara I9) → merge IO → otvara se `sokratis.cli` (T19, `--until`). STORE `git merge main` → T17
+(snimke) → T18 (keš, ULAZI po mjerenju M2/11) → merge STORE. SUČELJE T24–T28 nakon popravka T23.
+DESKTOP i INTEGRACIJA se otvaraju kad njihove ovisnosti stoje u `main`-u (plan M2). Push/remote i
+objava i dalje čekaju Leonov izričit OK; isto brisanje grana/stabala tokova na kraju M2.

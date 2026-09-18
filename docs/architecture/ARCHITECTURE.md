@@ -2,10 +2,12 @@
 
 **Status:** ✅ opisuje kod koji je u `main`-u — Milestone 1 (verzija 0.1.0, uključujući krug popravaka
 nakon završne recenzije) **plus kostur M2, cijel** (`M2/1a`+`M2/1b`: ugovor tipova, crate
-`sokratis-store`, `apps/desktop` s ikonama i `npm install`, desktop crate u workspaceu) **plus prve
-cigle ponašanja**: snapshot ugovora `Report`-a (M2/2), `until` kao gornja granica (M2/3), ograda
-putanja i `test_path_exclude` (M2/8, M2/9) — što od kostura još stoji deklarirano bez ponašanja je u
-§11 · **Zadnja provjera:** 2026-09-18
+`sokratis-store`, `apps/desktop` s ikonama i `npm install`, desktop crate u workspaceu) **plus tok
+JEZGRA, gotov** (M2/2…M2/7): snapshot ugovora `Report`-a, `until` kao gornja granica, zbroj vizija,
+redci commita/isporuke u `Report`-u, aktivne faze preko `phase_tag` iz profila, `SnapshotMetrics`/
+`diff`/`alerts_raised` **plus tok PROFIL, gotov** (M2/8, M2/9): ograda putanja i `test_path_exclude`
+— što od kostura još stoji deklarirano bez ponašanja (ili bez potrošača) je u §11 ·
+**Zadnja provjera:** 2026-09-18
 
 > **Što ovaj dokument JEST:** opis sustava kakav stoji u `crates/` i `apps/` — granice između crateova, tok
 > podataka, formati koje čita i ugovori prema korisniku CLI-ja. **Što NIJE:** kronologija (to su
@@ -89,15 +91,21 @@ Korak po korak, redoslijed je u `core/src/report.rs` (`build_report`) i nigdje d
 3. filtar `since`: ostaju commiti s `commit_date >= since` (S-011 — isti kriterij kao `git log --since`).
 4. `parse_diary` — naslovi dnevnika → `Vec<Delivery>`; `parse_plan` — redovi plana → faze.
 5. `hours_per_day` — sati po danu (sortirano po `author_time`, S-007).
-6. `day_stats` — redak po danu s commitom; `kind_stats` — vrste rada (ručni override po SHA pregazi klasifikator).
-7. faze: zatvorene se **broje** iz cijelog loga, aktivne iz plana i filtriranih commita. Zatvorena
+6. `commit_rows` — klasificira svaki commit (vrsta uz override, podvrsta) u redak za `Report.commits`
+   (M2/5); `day_stats` — redak po danu s commitom; `kind_stats` broji **iz tih redaka** (posuđenih
+   prije nego se pomaknu u `Report`), umjesto da klasifikaciju ponovi.
+7. faze: zatvorene se **broje** iz cijelog loga; aktivne se na filtrirane commite vežu regexom
+   `phase_tag` iz profila (M2/6, dug I3+M14 riješen), ne više tvrdim prefiksom `"{id}/"`. Zatvorena
    faza **bez ijednog pogođenog commita** ne ulazi ni u pokazatelje ni u tablicu — zatvorene faze
    dolaze iz profila, pa bi tuđi projekt sa zadanim profilom (S-005) dobio faze iz zraka.
 8. `indicators` — 18 pokazatelja, svaki s `kind` (`measure` ili `proxy`) i formulom. `IndicatorInput`
    nosi i `since` (iz `ReportInput`, dakle `--since`): pokazatelj o zatvorenim fazama mjeri isto
-   razdoblje kao ostatak izvještaja, ne `profile.since`.
+   razdoblje kao ostatak izvještaja, ne `profile.since`. **Nedovršeno (§11):** nekoliko pokazatelja
+   ovdje zove `effective_kind` odvojeno od koraka 6, pa se commit klasificira više od jednom po
+   izvještaju — spec §3.2 traži jednom.
 9. `docs_health` — ocjena i nalazi; `evaluate_all(default_rules())` — signali.
-10. `Report` se sastavi i serializira (`serde`).
+10. `Report` se sastavi i serializira (`serde`); `vision_totals` (zbroj vizija po stanju, M2/4) se
+    računa u istom koraku iz `input.visions`.
 
 **Grana:** metrike se računaju nad `profile.default_branch` ako ta grana postoji, inače nad trenutnom
 granom (`io/src/project.rs::input`). Ostale grane ulaze **samo u signale**. Ako ni jedna ni druga ne
@@ -110,17 +118,20 @@ postoji kao referenca (repo nakon `git init`, bez commita), `io` vraća `IoError
 `days` · `kinds` · `commits` · `deliveries` · `indicators` · `phases` · `visions` · `vision_totals` ·
 `docs` (`null` kad projekt nema mapu s dokumentacijom — nula bi bila laž) · `signals`.
 
-**Tri polja su od `M2/1a` u ugovoru, ali ih jezgra još ne puni** — deklarirana su prije potrošača da
-sučelje i snapshot ugovora (S-022) ne mijenjaju oblik svakom ciglom:
+**Tri polja koja je `M2/1a` deklarirala prazna sad jezgra puni** (M2/4, M2/5) — deklarirana su prije
+potrošača da sučelje i snapshot ugovora (S-022) ne mijenjaju oblik svakom ciglom:
 
-| polje | danas | puni ga |
+| polje | što nosi | puni ga |
 |---|---|---|
-| `commits` | uvijek `[]`; redak commita s vrstom i podvrstom za pogled Dnevnik | M2/5 |
-| `deliveries` | uvijek `[]`; M1 je isporuke iz dnevnika samo zbrajao po danu | M2/5 |
-| `vision_totals` | uvijek `[]`; zbroj vizija po stanju (dug I6) | M2/4 |
+| `commits` | redak po commitu (`CommitRow`: `sha` · `date` · `subject` · `kind` · `sub` · `overridden`) — ulaz za budući pogled Dnevnik | M2/5 |
+| `deliveries` | redak po isporuci (`Delivery`: `date` · `model` · `title` · `kind` · `deploy`); M1 je isporuke iz dnevnika samo zbrajao po danu, sad postoji i popis — ulaz za budući pogled Isporuke | M2/5 |
+| `vision_totals` | zbroj vizija po stanju (`VisionTotal { state, count }`, dug I6) | M2/4 |
 
-**`until` (M2/3) je iznimka — jezgra ga puni i njime filtrira, ali mu nitko još ne šalje pravu
-vrijednost.** `ReportInput.until: Option<String>` prolazi istu provjeru oblika kao `since`
+**CLI-tablica (`cli/src/table.rs`) ova tri polja još ne ispisuje** — korisnik CLI-ja zato ne vidi
+ništa novo; podaci postoje u JSON-u i čekaju sučelje M2 (§11).
+
+**`until` (M2/3) je iznimka istog oblika — jezgra ga puni i njime filtrira, ali mu nitko još ne šalje
+pravu vrijednost.** `ReportInput.until: Option<String>` prolazi istu provjeru oblika kao `since`
 (`ParseError::BadDate { field: "until", .. }`, let-chain u `build_report`) i filtrira commite i
 isporuke tako da ostane samo `commit_date`/`date <= until` (gornja granica uključuje cijeli dan,
 S-011). `civil::next_day` postoji za rezervu zone, isto zrcalo `prev_day`-a. U svakom stvarnom pozivu
@@ -128,9 +139,11 @@ danas je vrijednost i dalje `null`/`None`: `io` ga tako šalje (`--until` prema 
 učitavanju su IO T14), a CLI nema `--until` (T19) — tek ti potrošači daju prozoru stvarnu gornju
 granicu. Snimka ugovora (`snapshot.rs`) zato i dalje ima `until: null`.
 
-U `model.rs` stoje i tipovi koje pišu tek kasnije cigle:
-`VisionTotal`, `CommitRow`, `SignalCounts`, `MetricValue { id, value, kind }`, `SnapshotMetrics`,
-`MetricDelta` (snimke, M2/7 + M2/17), a `core/src/snapshot.rs` je prazan modul koji čeka M2/7.
+**`core/src/snapshot.rs` više nije prazan modul** (M2/7): `SnapshotMetrics::from_report`, `diff`,
+`SignalCounts::from_signals`, `worst_severity`, `alerts_raised` postoje i imaju testove — pune se
+tipovi `SignalCounts`, `MetricValue { id, value, kind }`, `SnapshotMetrics`, `MetricDelta` iz
+`model.rs`. Potrošača (snimke, STORE M2/17; obavijesti na prijelaz u Alert, DESKTOP T29/T30) još
+nema — detalji u §11.
 
 **`touched` je mjerač mjerača** — koliko je izvještaj stvarno dotaknuo (`core/src/report.rs`):
 
@@ -169,7 +182,7 @@ u dokumentaciji.
 | `diary_deploy_pattern` | regex (blok §5) | unos u dnevniku koji znači deploy |
 | `plan_brick` | regex (blok §5) | redak cigle u planu; `✅` znači gotova |
 | `plan_phase_name` | regex (blok §5) | naslov faze u planu |
-| `phase_tag` | regex (blok §5) | oznaka faze u opisu commita; **rezervirano — jezgra ga u 0.1.0 ne čita** (vidi §11) |
+| `phase_tag` | regex (blok §5) | oznaka aktivne faze u opisu commita; commit se veže na fazu (`ph.id` ili dijete `"{id}/"`) ako mu poklapa (dug I3+M14 riješen, M2/6) |
 | `classifier` | 4 pravila (blok §5) | uređena lista `(vrsta, regex)`; **redoslijed je ugovor** |
 | `gate_pattern` | regex (blok §5) | podvrsta „brana i mjerenje" |
 | `deploy_pattern` | regex (blok §5) | podvrsta „deploy" |
@@ -246,8 +259,8 @@ druga (mapa umjesto datoteke, nema dozvole, pokvaren JSON) se javlja s putanjom.
 
 **`.sokratis/profile.json`** — bilo koji podskup polja iz §4. Primjer je profil kojim Sokratis mjeri
 sam sebe (dogfooding): vlastiti plan nema cigle ni faze, a testovi mu žive u `crates/*/tests/`.
-`phase_tag` je u njemu upisan, ali u 0.1.0 ne radi ništa (rezervirano — §11): aktivne faze se vežu
-na commite tvrdo kodiranim prefiksom `"{id}/"`.
+`phase_tag` je u njemu upisan i od M2/6 stvarno radi: aktivne faze se na commite vežu ovim regexom,
+ne više tvrdo kodiranim prefiksom `"{id}/"`.
 
 ```json
 {
@@ -356,26 +369,28 @@ planira uzeti i kada je u [`../records/BACKLOG.md`](../records/BACKLOG.md), a za
 preuzeo M2 u [`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md) §8 i planu cigli
 [`../superpowers/plans/2026-09-18-m2-desktop.md`](../superpowers/plans/2026-09-18-m2-desktop.md).
 
-**Rezervirana polja profila** (deklarirana, jezgra ih ne čita):
+**Rezervirano polje profila** (deklarirano, jezgra ga ne čita):
 
 - **`include_unmerged`** — metrike su uvijek samo nad zadanom granom, a nespojene grane ulaze
   isključivo u signale.
-- **`phase_tag`** — aktivne faze se na commite vežu tvrdo kodiranim prefiksom `"{id}/"`
-  (`metrics/phases.rs`), ne ovim regexom; projekt koji cigle označava drukčije (`M1-3`, `[M1.3]`)
-  dobiva `from`/`days`/`commits` kao `None`/`0`, bez poruke. Jedini potrošač polja,
-  `classify::phase_tag()`, se izvan testova ne zove.
 
-**Izračunato, ali ne izlazi u `Report`:**
+(`phase_tag` je do M2/6 bilo ovdje — sad radi, §4 i §6.)
 
-- **`classify_sub`** (podvrsta commita: cigla · brana/mjerenje · deploy · ostalo) se računa i
-  testira — čeka pogled Dnevnik u M2.
+**Izračunato, ali ne izlazi u CLI-tablicu** (JSON ga od M2/4–M2/5 nosi, §3):
+
 - **`GitSource::worktrees`** je implementiran i testiran, ali izvještaj ga ne koristi: identitet
   projekta preko više radnih stabala je posao M2.
-- **vizije** prolaze kroz izvještaj nepromijenjene: nema zbroja po stanju (spec §2.3 ga je tražio) i
-  tablični ispis ih ne prikazuje uopće.
+- **`Report.commits`/`deliveries`/`vision_totals`** postoje u JSON-u, ali `cli/src/table.rs` ih ne
+  ispisuje — redak po commitu (uz `classify_sub`, sad `CommitRow.sub`), redak po isporuci i zbroj
+  vizija po stanju čekaju pogled Dnevnik/Isporuke/Vizije u sučelju M2.
 
 **Rubovi koje kod danas ne pokriva:**
 
+- **Commit se klasificira više od jednom po izvještaju**, iako spec §3.2 traži jednom.
+  `metrics/kinds.rs::commit_rows` (M2/5) klasificira svaki commit točno jednom za `Report.commits`, a
+  `kind_stats` broji iz tih redaka — ali `metrics/indicators.rs:31` (`kind_count`, pokazatelji
+  `debugging_commits` i `docs_share`) i dalje zove `effective_kind` odvojeno. Nalaz recenzije M2/5
+  (2026-09-18), otvoren do završne recenzije M2: [`../records/BACKLOG.md`](../records/BACKLOG.md).
 - **Putanje iz profila su ograđene u jezgri, ali ne još pri otvaranju projekta (I9, djelomično
   riješeno).** `Profile::validate_paths` (M2/8) sad odbija `..`, apsolutnu putanju i UNC/drive-prefiks
   za svih osam polja i `build_report` je zove prvi korak — pogrešan profil je greška s imenom polja
@@ -392,23 +407,28 @@ preuzeo M2 u [`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md) §8 i plan
   ostaje bez ijednog retka, a ime faze dulje od 50 znakova prelije stupac. JSON je ugovor i on je
   točan; tablica je pomoć za terminal.
 - **Cijena su procesi, ne parsiranje:** izvještaj nad Sokrat Studyjem traje ~3,2 s jer se zove
-  `git log -1` za **svaku** `.md` datoteku (56) i `rev-list --count` za **svaku** granu (31); jezgra
-  uz to klasificira svaki commit više puta. Nad Sokratisom je to 0,7 s. Mjerljivo, ne pogađano.
+  `git log -1` za **svaku** `.md` datoteku (56) i `rev-list --count` za **svaku** granu (31) — uz to
+  jezgra dio commita klasificira više puta (gore). Nad Sokratisom je to 0,7 s. Mjerljivo, ne
+  pogađano. **Tok IO (M2/11, izvan `main`-a) ovaj git-trošak već mjeri i smanjuje**: 92 → 6 procesa,
+  3318–3822 ms → 1479,71 ms nad Sokrat Studyjem (release, topli keš) — ulazi u `main` s tim tokom.
 - **SQLite snimke, watcher i popis projekata** su M2 (S-009); 0.1.x sve računa na zahtjev i ne piše
   ništa osim onoga što korisnik sam stavi u `.sokratis/`.
 
-**Kostur M2 (`M2/1a`+`M2/1b`) — deklarirano, bez ponašanja; četiri cigle (M2/2, M2/3, M2/8, M2/9)
-su ponašanje već dodale.** Cigla je namjerno unijela ugovor prije potrošača (jedna zajednička točka,
-pa se tokovi poslije ne sudaraju); dio i dalje stoji u kodu i ne radi ništa:
+**Kostur M2 (`M2/1a`+`M2/1b`) — deklarirano, bez ponašanja; tok JEZGRA (M2/2…M2/7) i tok PROFIL
+(M2/8, M2/9) su ponašanje već dodali, oba gotova.** Cigla je namjerno unijela ugovor prije potrošača
+(jedna zajednička točka, pa se tokovi poslije ne sudaraju); dio i dalje stoji u kodu bez potrošača ili
+čeka drugi tok:
 
-- **tri polja `Report`-a su prazna** (`commits`/`deliveries`/`vision_totals` `[]`) — §3. `until` više
-  nije u ovom popisu: jezgra ga od M2/3 validira i njime filtrira, samo mu `io`/CLI još ne šalju
-  stvarnu vrijednost (T14/T19) — vidi §3;
+- **`until` validira i filtrira jezgra (M2/3), ali mu `io`/CLI još ne šalju stvarnu vrijednost**
+  (T14/T19) — §3;
 - **`Profile::validate_paths` i `test_path_exclude` više nisu stub/prazni** (M2/8, M2/9) — rade ono
   što ime kaže. Ostaje samo io-dio ograde: `Project::open` još ne zove `validate_paths` (I9
   djelomično, T14) — §2, §4, §11 gore;
-- **`core/src/snapshot.rs` je prazan modul**, a tipovi `SnapshotMetrics`, `MetricValue`,
-  `MetricDelta`, `SignalCounts`, `CommitRow`, `VisionTotal` nemaju nijednog potrošača (M2/7);
+- **`core/src/snapshot.rs` više nije prazan modul** (M2/7): `SnapshotMetrics::from_report`, `diff`,
+  `SignalCounts::from_signals`, `worst_severity`, `alerts_raised` rade i imaju testove; `CommitRow` i
+  `VisionTotal` već imaju potrošača (`Report.commits`/`vision_totals`, M2/4–M2/5), ali
+  `SnapshotMetrics`/`MetricValue`/`MetricDelta`/`SignalCounts` još nemaju — čekaju STORE (snimke,
+  M2/17) i DESKTOP (obavijest na prijelaz u Alert, T29/T30) — §1, §3;
 - **`sokratis-store` zna otvoriti bazu i migrirati shemu, ali ga nitko ne zove**: ni CLI ni desktop
   nemaju tu ovisnost, pa baza nastaje samo u testu (registar M2/15, postavke M2/16, snimke M2/17) — §1;
 - **ovisnost bez potrošača:** `notify` u `io` (watcher M2/13) — pinana u `M2/1a` s obrazloženjem

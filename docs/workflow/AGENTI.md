@@ -48,9 +48,9 @@ pa su mu brane `npm run check` umjesto `cargo`; tokovi SUČELJE i DESKTOP nakon 
 `M2/1a`, korak 13 (`npm install` uz Leonov OK → ikone iz Leonova loga → desktop crate natrag u `members`)
 kao `M2/1b`. Otvoreno je **pet stabala**: `sokratis.jezgra` (`feat/core-m2`) · `sokratis.profil`
 (`feat/core-profile`) · `sokratis.io` (`feat/io-m2`) · `sokratis.store` (`feat/store`) · `sokratis.ui`
-(`feat/ui`). **PROFIL je gotov** (T8–T9 spojeno u `main`, merge `a2e9265`); **JEZGRA je spojila prvu
-polovicu** (T2–T3, merge `7d23c76`) i nastavlja na istoj grani (T4–T7). Stabla CLI/DESKTOP/INTEGRACIJA
-otvaraju se kasnije po ovisnostima iz plana (`git worktree list`).
+(`feat/ui`). **PROFIL i JEZGRA su gotovi** (T8–T9 spojeno u `main`, merge `a2e9265`; T2–T7 spojeno,
+merge `7d23c76` pa `7711a67`). Stabla CLI/DESKTOP/INTEGRACIJA otvaraju se kasnije po ovisnostima iz
+plana (`git worktree list`).
 
 ## 3 · Protokol po cigli
 
