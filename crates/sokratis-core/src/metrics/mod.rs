@@ -7,6 +7,6 @@ pub mod visions;
 pub use days::day_stats;
 pub use hours::hours_per_day;
 pub use indicators::indicators;
-pub use kinds::{effective_kind, kind_stats};
+pub use kinds::{commit_rows, effective_kind, kind_stats};
 pub use phases::{active_phases, closed_phases};
 pub use visions::vision_totals;

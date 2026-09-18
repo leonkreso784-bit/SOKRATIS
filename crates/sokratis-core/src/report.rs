@@ -12,10 +12,16 @@
 //! Sastavljanje ostaje jedino mjesto koje zna redoslijed: `vision_totals` je čisto mjerenje
 //! (`metrics::visions`) pozvano ovdje, isto kao `kind_stats` ili `day_stats` — sučelje samo
 //! oblikuje ono što `Report` već nosi (S-012).
+//!
+//! ZAŠTO RUST OVAKO (cigla M2/5 — redci commita, klasifikacija jednom)
+//! `commit_rows` klasificira svaki commit ovdje, JEDNOM; `kind_stats` posuđuje te redke prije nego
+//! što se pomaknu (`move`) u `Report` na kraju — posudba završava prije premještanja, pa borrow
+//! checker to dopušta bez klona (S-012: mjerenje u jezgri, ne u sučelju).
 use crate::docs::docs_health;
 use crate::metrics::indicators::IndicatorInput;
 use crate::metrics::{
-    active_phases, closed_phases, day_stats, hours_per_day, indicators, kind_stats, vision_totals,
+    active_phases, closed_phases, commit_rows, day_stats, hours_per_day, indicators, kind_stats,
+    vision_totals,
 };
 use crate::parse::{parse_diary, parse_git_log, parse_plan};
 use crate::rules::{default_rules, evaluate_all};
@@ -88,7 +94,8 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
         profile.session_start_hours,
     );
     let days = day_stats(&commits, &deliveries, &hours, profile);
-    let kinds = kind_stats(&commits, &input.overrides, &p);
+    let rows = commit_rows(&commits, &input.overrides, &p);
+    let kinds = kind_stats(&rows, &commits);
     // Zatvorene faze se broje iz SVIH commita loga (mogu prethoditi `since`); aktivne samo iz
     // filtriranih, jer prate napredak od danas unatrag.
     let mut phases = closed_phases(&all, &p);
@@ -121,8 +128,6 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
         last_code_commit: last_code,
     };
     let signals = evaluate_all(&default_rules(), &ctx);
-    // `classify_sub` ostaje javan za M2 (Dnevnik pogled po commitu); build_report ga svjesno
-    // (još) ne poziva.
     Ok(Report {
         generated_at: input.now,
         since: input.since.clone(),
@@ -140,9 +145,8 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
         },
         days,
         kinds,
-        // M2/1 kostur: prazno polje ugovora; puni ga M2/5 (commits, deliveries).
-        commits: vec![],
-        deliveries: vec![],
+        commits: rows,
+        deliveries,
         indicators,
         phases,
         vision_totals: vision_totals(&input.visions),
