@@ -3,10 +3,16 @@
 //! Default JE Sokrat Study (S-005). `deny_unknown_fields`: tipfeler u profilu je greška, ne tiho
 //! ignoriranje. `Patterns` drži kompilirane regexe (`Regex` nije `Serialize`), a tamo
 //! `Regex::captures_len()` prebroji grupe: regex bez grupe koju parser čita je greška, ne panika.
+//!
+//! ZAŠTO RUST OVAKO (cigla M2/8 — `inside_root`)
+//! `Component` je enum kojim `std::path` razlaže putanju; `matches!` na njemu je ograda bez ijednog
+//! string-uspoređivanja. `std::path` samo parsira tekst — ne dira disk — pa smije u jezgru bez I/O-a
+//! (S-002); `canonicalize` (koji disk dira) ovdje ne smije nikad.
 use crate::ParseError;
 use crate::model::WorkKind;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
+use std::path::{Component, Path};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ClassifierRule {
@@ -186,9 +192,29 @@ impl Profile {
         Ok(())
     }
 
-    /// Sve putanje iz profila moraju ostati unutar korijena repoa (nalaz I9). Stub do M2/8:
-    /// `build_report` i `Project::open` ga već zovu, pa ograda ulazi bez promjene potpisa.
+    /// Sve putanje iz profila moraju ostati unutar korijena repoa (nalaz I9): alat koji mjeri
+    /// repo se ne smije dati navesti da čita izvan njega (npr. `../../secrets`). Provjerava
+    /// osam polja koja profil deklarira kao putanje; poruka imenuje TOČNO polje jer profil piše
+    /// čovjek.
     pub fn validate_paths(&self) -> Result<(), ParseError> {
+        let fields = [
+            ("diary_path", &self.diary_path),
+            ("changelog_path", &self.changelog_path),
+            ("plan_path", &self.plan_path),
+            ("docs_dir", &self.docs_dir),
+            ("docs_index", &self.docs_index),
+            ("plan_dir", &self.plan_dir),
+            ("product_dir", &self.product_dir),
+            ("key_file", &self.key_file),
+        ];
+        for (name, value) in fields {
+            if !inside_root(value) {
+                return Err(ParseError::PathOutsideRoot {
+                    field: format!("profil.{name}"),
+                    value: value.clone(),
+                });
+            }
+        }
         Ok(())
     }
 
@@ -216,6 +242,18 @@ impl Profile {
                 .iter()
                 .any(|s| path.ends_with(s.as_str())))
     }
+}
+
+/// Ostaje li relativna putanja unutar korijena? Odbija `..` komponentu, apsolutnu putanju, korijen
+/// (`/x`, `\x`) i Windows prefiks (`C:`, `\\server`). Čisto parsiranje — `std::path` ne dira disk,
+/// pa smije u jezgru (S-002).
+pub fn inside_root(rel: &str) -> bool {
+    let p = Path::new(rel);
+    if p.is_absolute() {
+        return false;
+    }
+    p.components()
+        .all(|c| matches!(c, Component::Normal(_) | Component::CurDir))
 }
 
 pub struct Patterns {
@@ -343,5 +381,52 @@ mod tests {
         assert!(p.is_code_path("js/auth.js"));
         assert!(!p.is_code_path("docs/records/PROGRESS.md"));
         assert!(!p.is_code_path("CLAUDE.md"));
+    }
+
+    #[test]
+    fn inside_root_rejects_parent_absolute_and_drive_paths() {
+        for ok in [
+            "docs",
+            "docs/records/PROGRESS.md",
+            "./docs",
+            "CLAUDE.md",
+            "a/./b",
+        ] {
+            assert!(inside_root(ok), "{ok}");
+        }
+        for bad in [
+            "../..",
+            "docs/../../x",
+            "/etc/passwd",
+            "\\\\server\\share",
+            "C:\\Users",
+            "C:/x",
+            "..",
+            "docs/..",
+        ] {
+            assert!(!inside_root(bad), "{bad}");
+        }
+    }
+
+    #[test]
+    fn validate_paths_names_the_offending_field() {
+        let mut p = Profile::default();
+        assert!(p.validate_paths().is_ok(), "zadani profil je unutar repoa");
+        p.docs_dir = "../..".into();
+        match p.validate_paths() {
+            Err(ParseError::PathOutsideRoot { field, value }) => {
+                assert_eq!(
+                    (field.as_str(), value.as_str()),
+                    ("profil.docs_dir", "../..")
+                );
+            }
+            other => panic!("{other:?}"),
+        }
+        p.docs_dir = "docs".into();
+        p.key_file = "C:\\CLAUDE.md".into();
+        assert!(matches!(
+            p.validate_paths(),
+            Err(ParseError::PathOutsideRoot { field, .. }) if field == "profil.key_file"
+        ));
     }
 }
