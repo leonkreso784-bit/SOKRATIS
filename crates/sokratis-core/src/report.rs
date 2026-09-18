@@ -5,12 +5,23 @@
 //!
 //! ZAŠTO RUST OVAKO (cigla M2/3 — `until` gornja granica)
 //! `Option<&str>::is_none_or` (stabilan u edition 2024) izražava „nema gornje granice ILI je
-//! datum unutar nje" u jednom izrazu, bez ugnježđenog `match`-a u `filter`-u. Let-chain
-//! (`if let ... && !...`) u provjeri oblika je zrcalo postojeće `since`-provjere iznad.
+//! datum unutar nje" u jednom izrazu, bez ugnježđenog `match`-a u `filter`-u. Isti obrazac
+//! provjere oblika kao `since` gore, ovdje kroz let-chain jer je `until` `Option`.
+//!
+//! ZAŠTO RUST OVAKO (cigla M2/4 — zbroj vizija po stanju)
+//! Sastavljanje ostaje jedino mjesto koje zna redoslijed: `vision_totals` je čisto mjerenje
+//! (`metrics::visions`) pozvano ovdje, isto kao `kind_stats` ili `day_stats` — sučelje samo
+//! oblikuje ono što `Report` već nosi (S-012).
+//!
+//! ZAŠTO RUST OVAKO (cigla M2/5 — redci commita, klasifikacija jednom)
+//! `commit_rows` klasificira svaki commit ovdje, JEDNOM; `kind_stats` posuđuje te redke prije nego
+//! što se pomaknu (`move`) u `Report` na kraju — posudba završava prije premještanja, pa borrow
+//! checker to dopušta bez klona (S-012: mjerenje u jezgri, ne u sučelju).
 use crate::docs::docs_health;
 use crate::metrics::indicators::IndicatorInput;
 use crate::metrics::{
-    active_phases, closed_phases, day_stats, hours_per_day, indicators, kind_stats,
+    active_phases, closed_phases, commit_rows, day_stats, hours_per_day, indicators, kind_stats,
+    vision_totals,
 };
 use crate::parse::{parse_diary, parse_git_log, parse_plan};
 use crate::rules::{default_rules, evaluate_all};
@@ -83,11 +94,12 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
         profile.session_start_hours,
     );
     let days = day_stats(&commits, &deliveries, &hours, profile);
-    let kinds = kind_stats(&commits, &input.overrides, &p);
+    let rows = commit_rows(&commits, &input.overrides, &p);
+    let kinds = kind_stats(&rows, &commits);
     // Zatvorene faze se broje iz SVIH commita loga (mogu prethoditi `since`); aktivne samo iz
     // filtriranih, jer prate napredak od danas unatrag.
     let mut phases = closed_phases(&all, &p);
-    phases.extend(active_phases(plan_phases, &commits, &input.today));
+    phases.extend(active_phases(plan_phases, &commits, &input.today, &p));
     let indicators = indicators(
         &IndicatorInput {
             commits: &commits,
@@ -116,8 +128,6 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
         last_code_commit: last_code,
     };
     let signals = evaluate_all(&default_rules(), &ctx);
-    // `classify_sub` ostaje javan za M2 (Dnevnik pogled po commitu); build_report ga svjesno
-    // (još) ne poziva.
     Ok(Report {
         generated_at: input.now,
         since: input.since.clone(),
@@ -135,27 +145,30 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
         },
         days,
         kinds,
-        // M2/1 kostur: prazna polja ugovora; pune ih M2/5 (commits, deliveries) i M2/4 (vision_totals).
-        commits: vec![],
-        deliveries: vec![],
+        commits: rows,
+        deliveries,
         indicators,
         phases,
+        vision_totals: vision_totals(&input.visions),
         visions: input.visions.clone(),
-        vision_totals: vec![],
         docs,
         signals,
     })
 }
 
 #[cfg(test)]
-mod tests {
+// M2/7: `pub(crate)` na modulu (ne samo funkciji) — privatan `mod` je vidljiv samo iz svog
+// roditelja i potomaka, a `snapshot::tests` (brat, ne potomak) treba `report::tests::input()`.
+pub(crate) mod tests {
     use super::*;
     use crate::{BranchInfo, DocFile, WorkKind};
     use std::collections::HashMap;
 
     const LOG: &str = "@@a1|1788700000|1788700000|2026-08-28|2026-08-28|F1/1 prije since\n1\t0\tjs/a.js\n\n@@b2|1788854400|1788854400|2026-09-04|2026-09-04|fix: kvar u js\n5\t1\tjs/b.js\n\n@@c3|1788858000|1788858000|2026-09-04|2026-09-04|docs: zapis\n3\t0\tdocs/records/PROGRESS.md\n";
 
-    fn input() -> ReportInput {
+    // M2/7: `pub(crate)` da `snapshot::tests` posudi isti fixture umjesto da ga duplicira —
+    // brif (task-7) to izričito dopušta jer je JEZGRA vlasnik i ove i te datoteke.
+    pub(crate) fn input() -> ReportInput {
         ReportInput {
             git_log: LOG.into(),
             diary: Some("## 2026-09-04 (X) — 🚀 deploy nečega\n".into()),
