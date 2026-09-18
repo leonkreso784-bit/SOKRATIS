@@ -280,8 +280,21 @@ plan cigla-po-cigla → agenti kao u M1 (nove grane/stabla otvara plan M2, ne po
   odabran, ali cigla ulazi **tek ako mjerenje nakon M11 pokaže da treba** — skupi su procesi (56
   `git log -1` + 31 `rev-list`), ne parsiranje; keš to ne rješava, M11 rješava. Pravilo #4.
 
+- **Leon je spec odobrio** („Imaš moj OK") bez izmjena. **Plan cigli napisan** (`superpowers:writing-plans`):
+  `docs/superpowers/plans/2026-09-18-m2-desktop.md`, 3639 redaka, **35 cigli u 9 tokova** (KOSTUR ·
+  JEZGRA · PROFIL · IO · STORE · CLI · SUČELJE · DESKTOP · INTEGRACIJA), vlasništvo datoteka po toku,
+  graf ovisnosti među tokovima, test + kod po koraku. Verzije za pinanje provjerene na crates.io
+  (`max_stable_version`, ne Tauri 3 alpha) i npm-u; TypeScript ostaje 5.9.3 jer svelte-check ne prima 7.
+  Dvije stvari koje je pisanje plana **vratilo u ugovor** iako ih spec nije imenovao: `Report.deliveries`
+  (pogled Isporuke traži popis, M1 ih je samo zbrajao — T1/T5) i `MetricValue.kind` (stupac `kind` u
+  tablici `snapshot`). Jedno odstupanje od speca §5.1 zapisano u planu: nema naredbe `copy_path`, sučelje
+  kopira kroz `navigator.clipboard` (T28). Keš po SHA (T18) je **uvjetna** cigla po mjerenju T11.
+- `AGENTI.md` pokazuje na tokove M2 u planu (jedno mjesto); definicije agenata (`graditelj`, `recenzent`,
+  `cuvar-dokumentacije`) više ne nose putanju plana M1 ni `M1/N` — govore „aktivni plan", znaju za tok
+  SUČELJE (TS/Svelte, brane `npm run check`, zaglavlje `// ZAŠTO OVAKO`) i za S-012…S-022.
+
 ### Što slijedi
-**Leon čita spec** (`docs/plan/ARHITEKTURA_M2.md`) i daje OK ili traži izmjene. Nakon OK-a:
-`superpowers:writing-plans` → plan cigli u `docs/superpowers/plans/` → nov SDD ledger → agenti kao u
-M1 (tokovi i stabla se otvaraju po planu M2). Prije prve cigle koja treba `node_modules`: Leonov OK
-za `npm install`. Push/remote i dalje samo uz izričit OK.
+**Izvedba M2 po planu.** T1 (kostur) radi orkestrator na `main`-u; korak 13 (`npm install` u
+`apps/desktop`) čeka Leonov OK. Zatim stabla tokova i prvi val graditelja (JEZGRA T2, PROFIL T8, IO T10,
+SUČELJE T20). Ledger: `.superpowers/sdd/2026-09-18-m2-desktop/progress.md`. Push/remote i dalje samo uz
+izričit OK.

@@ -67,7 +67,7 @@ pogrešna uporaba**; `--help`/`--version` = 0) — sve rade nad pravim repozitor
 Sokrat Studyjem).
 Testovi i brane: `docs/workflow/TESTING.md`.
 
-## Stanje — TRENUTNO (2026-09-18 — M1 zatvoren, spec M2 napisan i čeka Leonov OK)
+## Stanje — TRENUTNO (2026-09-18 — M1 zatvoren, spec M2 odobren, plan M2 napisan, izvedba počinje)
 - **M0 gotov. M1 zatvoren.** Kod isporučen, recenziran i popravljen (T1–T22 + krug popravaka), verzija
   0.1.0, u `main`-u. Cijeli lanac radi nad pravim repozitorijem: `sokratis report/docs/signals` čitaju
   git kroz `io`, jezgra računa dane, sate, vrste rada, faze, 18 pokazatelja, docs-ocjenu i signale, CLI
@@ -88,8 +88,11 @@ Testovi i brane: `docs/workflow/TESTING.md`.
   (BACKLOG drži još dvije i pointere). Leonove datoteke za znak: `C:\Users\leonk\Downloads\sokratis
   logo .png` (ikona) · `download.png` (zaključak `S◍KRATIS`) · `sokratis-intro-clean-graph.html`
   (animacija 4,2 s, canvas, dva WebP-a) — spec §5.2–5.4 ih preuzima doslovno.
-  **Čeka Leonov OK na spec.** Tek potom: plan cigli (`superpowers:writing-plans` →
-  `docs/superpowers/plans/`) → nov SDD ledger → agenti kao u M1 (tokovi i stabla po planu M2).
+  **Leon je spec odobrio 2026-09-18** („Imaš moj OK"). **Plan cigli je napisan:**
+  `docs/superpowers/plans/2026-09-18-m2-desktop.md` — 35 cigli u 9 tokova (KOSTUR T1 · JEZGRA T2–T7 ·
+  PROFIL T8–T9 · IO T10–T14 · STORE T15–T18 · CLI T19 · SUČELJE T20–T28 · DESKTOP T29–T33 ·
+  INTEGRACIJA T34–T35), vlasništvo datoteka i ovisnosti među tokovima u planu (jedno mjesto). Ledger:
+  `.superpowers/sdd/2026-09-18-m2-desktop/progress.md`. Izvedba agentima po `AGENTI.md`.
 - **M0 za M2 izmjeren** (spec §10): Node 24 · npm 11 · WebView2 · MSVC · Rust 1.98.1 ✅; `cargo tauri`
   nije potreban globalno (`@tauri-apps/cli` je dev-ovisnost). **Jedina instalacija: `npm install` u
   `apps/desktop` — čeka Leonov OK**, kao svaka instalacija u M0.

@@ -2,8 +2,9 @@
 
 > Leon (2026-09-17): *„kreirat nekoliko agenata da se sustavno radi na cijelom projektu… više agenata
 > na više branča a ti ih kontroliraš i nadzireš."* Ovo je protokol. Definicije agenata su u
-> `.claude/agents/*.md`, praćene u repou od 2026-09-18 (prije toga globalno git-ignorirane); plan koji
-> izvode je `docs/superpowers/plans/2026-09-17-m1-jezgra-i-cli.md`.
+> `.claude/agents/*.md`, praćene u repou od 2026-09-18 (prije toga globalno git-ignorirane). Plan koji
+> izvode je **aktivni plan u `docs/superpowers/plans/`** — od 2026-09-18 to je
+> `2026-09-18-m2-desktop.md` (M1 plan `2026-09-17-m1-jezgra-i-cli.md` je izvršen i ostaje kao zapis).
 
 ## 1 · Uloge
 
@@ -36,8 +37,14 @@ Tokovi se **ne dodiruju po datotekama**, pa merge nema sudara. Jedina zajedničk
 zato T1 ide prvi i sam, pa se spoji u `main` prije nego se otvore ostala stabla.
 
 **Ova tablica je povijest M1.** Sve grane `feat/*` i stabla `sokratis.<tok>` iz nje su 2026-09-18
-obrisana uz Leonov OK (sve su bile spojene) — objašnjava merge-povijest, ne trenutno stanje. M2 dobiva
-svoju tablicu tokova kad plan M2 odredi vlasništvo datoteka.
+obrisana uz Leonov OK (sve su bile spojene) — objašnjava merge-povijest, ne trenutno stanje.
+
+**Tokovi M2** (9: KOSTUR · JEZGRA · PROFIL · IO · STORE · CLI · SUČELJE · DESKTOP · INTEGRACIJA), njihove
+grane, stabla, cigle, vlasništvo datoteka i **ovisnosti među tokovima** (koji se spaja prije kojeg) stoje
+na **jednom mjestu**: `docs/superpowers/plans/2026-09-18-m2-desktop.md`, odjeljak „Struktura datoteka i
+vlasništvo po tokovima" (S-010 — ovdje se ne prepisuju). Novo u M2: tok SUČELJE gradi TypeScript/Svelte,
+pa su mu brane `npm run check` umjesto `cargo`; tokovi SUČELJE i DESKTOP nakon `git worktree add` pokreću
+`npm ci` u svom stablu (`node_modules` je git-ignoriran). Stabla se otvaraju tek nakon T1 na `main`-u.
 
 ## 3 · Protokol po cigli
 
