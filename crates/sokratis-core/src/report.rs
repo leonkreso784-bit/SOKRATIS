@@ -5,12 +5,17 @@
 //!
 //! ZAŠTO RUST OVAKO (cigla M2/3 — `until` gornja granica)
 //! `Option<&str>::is_none_or` (stabilan u edition 2024) izražava „nema gornje granice ILI je
-//! datum unutar nje" u jednom izrazu, bez ugnježđenog `match`-a u `filter`-u. Let-chain
-//! (`if let ... && !...`) u provjeri oblika je zrcalo postojeće `since`-provjere iznad.
+//! datum unutar nje" u jednom izrazu, bez ugnježđenog `match`-a u `filter`-u. Isti obrazac
+//! provjere oblika kao `since` gore, ovdje kroz let-chain jer je `until` `Option`.
+//!
+//! ZAŠTO RUST OVAKO (cigla M2/4 — zbroj vizija po stanju)
+//! Sastavljanje ostaje jedino mjesto koje zna redoslijed: `vision_totals` je čisto mjerenje
+//! (`metrics::visions`) pozvano ovdje, isto kao `kind_stats` ili `day_stats` — sučelje samo
+//! oblikuje ono što `Report` već nosi (S-012).
 use crate::docs::docs_health;
 use crate::metrics::indicators::IndicatorInput;
 use crate::metrics::{
-    active_phases, closed_phases, day_stats, hours_per_day, indicators, kind_stats,
+    active_phases, closed_phases, day_stats, hours_per_day, indicators, kind_stats, vision_totals,
 };
 use crate::parse::{parse_diary, parse_git_log, parse_plan};
 use crate::rules::{default_rules, evaluate_all};
@@ -135,13 +140,13 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
         },
         days,
         kinds,
-        // M2/1 kostur: prazna polja ugovora; pune ih M2/5 (commits, deliveries) i M2/4 (vision_totals).
+        // M2/1 kostur: prazno polje ugovora; puni ga M2/5 (commits, deliveries).
         commits: vec![],
         deliveries: vec![],
         indicators,
         phases,
+        vision_totals: vision_totals(&input.visions),
         visions: input.visions.clone(),
-        vision_totals: vec![],
         docs,
         signals,
     })
