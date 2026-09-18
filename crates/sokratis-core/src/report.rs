@@ -2,6 +2,11 @@
 //! Ovo je jedino mjesto koje zna REDOSLIJED koraka; svaki korak je funkcija iz svog modula.
 //! `Context` klonira `commits`/`branches`/`docs` u vlasništvo — jedna kopija po izvještaju, a
 //! zauzvrat nijedan lifetime u potpisu pravila (S-002, RUST.md §1).
+//!
+//! ZAŠTO RUST OVAKO (cigla M2/3 — `until` gornja granica)
+//! `Option<&str>::is_none_or` (stabilan u edition 2024) izražava „nema gornje granice ILI je
+//! datum unutar nje" u jednom izrazu, bez ugnježđenog `match`-a u `filter`-u. Let-chain
+//! (`if let ... && !...`) u provjeri oblika je zrcalo postojeće `since`-provjere iznad.
 use crate::docs::docs_health;
 use crate::metrics::indicators::IndicatorInput;
 use crate::metrics::{
@@ -31,23 +36,42 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
             text: input.since.clone(),
         });
     }
+    // M2/3: `until` je gornja granica — isti ugovor kao `since` (oblik provjeren u jezgri, ne
+    // u `clap`-u/Tauriju), da isto pravilo vrijedi za CLI `--until` i birač raspona u sučelju.
+    if let Some(u) = &input.until
+        && !crate::civil::is_ymd(u)
+    {
+        return Err(ParseError::BadDate {
+            field: "until".into(),
+            text: u.clone(),
+        });
+    }
     profile.validate_dates()?;
     profile.validate_paths()?;
     let p = Patterns::compile(profile)?;
     let parsed = parse_git_log(&input.git_log)?;
     let all = parsed.commits;
-    // S-011: filtar `since` u jezgri je po `commit_date` (kao git `--since`), leksikografski
-    // usporediv jer je oblika `YYYY-MM-DD`.
+    // S-011: filtar `since`/`until` u jezgri je po `commit_date` (kao git `--since`/`--until`),
+    // leksikografski usporediv jer je oblika `YYYY-MM-DD`. `until` je uključiv (cijeli dan ulazi).
     let commits: Vec<Commit> = all
         .iter()
         .filter(|c| c.commit_date.as_str() >= input.since.as_str())
+        .filter(|c| {
+            input
+                .until
+                .as_deref()
+                .is_none_or(|u| c.commit_date.as_str() <= u)
+        })
         .cloned()
         .collect();
-    let deliveries = input
+    let deliveries: Vec<_> = input
         .diary
         .as_deref()
         .map(|d| parse_diary(d, &p, &input.since))
-        .unwrap_or_default();
+        .unwrap_or_default()
+        .into_iter()
+        .filter(|d| input.until.as_deref().is_none_or(|u| d.date.as_str() <= u))
+        .collect();
     let plan_phases = input
         .plan
         .as_deref()
@@ -294,6 +318,42 @@ mod tests {
             .map(|e| e.to_string())
             .unwrap_or_default();
         assert!(e.contains("closed_phases[1].to"), "{e}");
+    }
+
+    /// M2/3: `until` je zrcalo `since`-a — gornja granica, cijeli dan ulazi (S-011). Lokalni
+    /// `LOG` s četvrtim commitom POSLIJE granice ne dira dijeljeni `LOG` iznad (taj ostaje
+    /// netaknut za `assembles_everything_and_filters_by_since` i ostale testove).
+    #[test]
+    fn until_cuts_commits_and_deliveries_after_that_day_inclusive() {
+        const LOG_WITH_LATER_COMMIT: &str = "@@a1|1788700000|1788700000|2026-08-28|2026-08-28|F1/1 prije since\n1\t0\tjs/a.js\n\n@@b2|1788854400|1788854400|2026-09-04|2026-09-04|fix: kvar u js\n5\t1\tjs/b.js\n\n@@c3|1788858000|1788858000|2026-09-04|2026-09-04|docs: zapis\n3\t0\tdocs/records/PROGRESS.md\n\n@@d4|1789000000|1789000000|2026-09-06|2026-09-06|F1/2 poslije\n1\t0\tjs/d.js\n";
+        let mut i = input();
+        i.git_log = LOG_WITH_LATER_COMMIT.into();
+        i.diary = Some("## 2026-09-04 (X) — unutar\n## 2026-09-05 (X) — poslije\n".into());
+        i.until = Some("2026-09-04".into());
+        let r = build_report(&i, &Profile::default()).unwrap();
+        assert_eq!(r.until.as_deref(), Some("2026-09-04"));
+        assert!(r.days.iter().all(|d| d.date.as_str() <= "2026-09-04"));
+        assert_eq!(
+            r.days.iter().map(|d| d.deliveries).sum::<u32>(),
+            1,
+            "isporuka 05. ne ulazi"
+        );
+        assert_eq!(
+            r.touched.commits, 2,
+            "d4 (2026-09-06) je poslije until, ne ulazi"
+        );
+    }
+
+    #[test]
+    fn malformed_until_is_a_named_error() {
+        let mut i = input();
+        i.until = Some("4.9.2026".into());
+        match build_report(&i, &Profile::default()) {
+            Err(ParseError::BadDate { field, text }) => {
+                assert_eq!((field.as_str(), text.as_str()), ("until", "4.9.2026"));
+            }
+            other => panic!("očekivan BadDate, dobiveno {other:?}"),
+        }
     }
 
     #[test]
