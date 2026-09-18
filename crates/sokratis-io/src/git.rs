@@ -15,6 +15,10 @@
 //! `--name-only` ne ispisuje datoteke za merge) i tiho gutao ne-ASCII imena (zadano
 //! `core.quotepath` ih escapea) — oba dokazana pokusom nad Sokrat Studyjem i pokrivena testom
 //! `tests/last_changes.rs`. Vidi komentar UZ POZIV u `last_changes` za detalje dviju opcija.
+//!
+//! Cigla M2/12 (detached HEAD): `head_sha` je nova metoda traita — jedan poziv koji ima smisla
+//! SAMO na rubu (grane nema, commit ima), pa ne diramo brojač procesa na uobičajenom putu
+//! (`tests/perf.rs` broji iste 4 procesa kao prije). Poziva je iz `project.rs`, ne odavde.
 use crate::IoError;
 use sokratis_core::BranchInfo;
 use std::collections::HashMap;
@@ -40,6 +44,9 @@ pub trait GitSource {
     fn toplevel(&self) -> Result<PathBuf, IoError>;
     fn branch_exists(&self, name: &str) -> Result<bool, IoError>;
     fn current_branch(&self) -> Result<String, IoError>;
+    /// Kratki SHA trenutnog `HEAD` (`rev-parse --short HEAD`). Jedini poziv koji ima smisla u
+    /// DETACHED stanju (grane nema, ali commit postoji) — vidi `project.rs::input`.
+    fn head_sha(&self) -> Result<String, IoError>;
 }
 #[derive(Debug)]
 pub struct GitCli {
@@ -287,5 +294,11 @@ impl GitSource for GitCli {
     }
     fn current_branch(&self) -> Result<String, IoError> {
         Ok(self.run(&["branch", "--show-current"])?.trim().to_string())
+    }
+    fn head_sha(&self) -> Result<String, IoError> {
+        Ok(self
+            .run(&["rev-parse", "--short", "HEAD"])?
+            .trim()
+            .to_string())
     }
 }

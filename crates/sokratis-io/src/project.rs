@@ -13,6 +13,10 @@
 //! Cigla M2/11 (performanse, dug M11): `docs()` zove `last_changes` JEDNOM za sve datoteke
 //! (`HashMap<String, i64>`) umjesto `last_change` u petlji — isti podatak, 60 puta manje procesa
 //! na 60 dokumenata.
+//!
+//! Cigla M2/12 (detached HEAD): `input` sad razlikuje `ref_name` (što git čita) od `label` (što
+//! izvještaj pokazuje) — u detached stanju grane nema, ali commit postoji, pa `git.head_sha()`
+//! (poziva se SAMO na tom rubu) daje `HEAD@<sha>` umjesto lažne poruke „nema commita".
 use crate::{GitCli, GitSource, IoError};
 use sokratis_core::{DocFile, Profile, ReportInput, Vision, WorkKind};
 use std::collections::{BTreeMap, HashMap};
@@ -217,17 +221,31 @@ impl Project {
     /// postoje, dokumentacija, grane, ručni podaci i „sada"/„danas" (`chrono` — jedino mjesto sata
     /// u sustavu).
     pub fn input(&self, since: Option<&str>) -> Result<ReportInput, IoError> {
-        let branch = if self.git.branch_exists(&self.profile.default_branch)? {
-            self.profile.default_branch.clone()
+        // (ref_name, label): git čita `ref_name`, izvještaj pokazuje `label`. Razlikuju se samo u
+        // detached stanju, gdje grane nema, a commita ima — poruka „nema commita" bi lagala.
+        let (ref_name, label) = if self.git.branch_exists(&self.profile.default_branch)? {
+            (
+                self.profile.default_branch.clone(),
+                self.profile.default_branch.clone(),
+            )
         } else {
             // M2: `git branch --show-current` ispiše ime grane i u repou BEZ ijednog commita
             // (HEAD je „unborn"), pa ime nije dokaz da grana postoji — provjerava se referenca.
             // Bez toga bi git odgovorio svojim savjetom o `--`, a ne rečenicom o repozitoriju.
             let current = self.git.current_branch()?;
-            if current.is_empty() || !self.git.branch_exists(&current)? {
-                return Err(IoError::NoCommits(self.root.clone()));
+            if !current.is_empty() && self.git.branch_exists(&current)? {
+                (current.clone(), current)
+            } else {
+                // M2/12: ni zadana grana ni `current_branch()` ne postoje — repo je ili prazan
+                // (bez ijednog commita, pa `rev-parse HEAD` puca s `IoError::Git`) ili je HEAD
+                // DETACHED (grane nema, commit ima, pa `rev-parse` uspije). Razlika je jedini
+                // dokaz je li poruka „nema commita" istinita ili laž.
+                match self.git.head_sha() {
+                    Ok(sha) => ("HEAD".to_string(), format!("HEAD@{sha}")),
+                    Err(IoError::Git { .. }) => return Err(IoError::NoCommits(self.root.clone())),
+                    Err(e) => return Err(e),
+                }
             }
-            current
         };
         let read_opt = |rel: &str| std::fs::read_to_string(self.root.join(rel)).ok();
         let since = since
@@ -238,11 +256,11 @@ impl Project {
         // stariji od profila tiho dobivao kraći log nego što `Report.since` tvrdi.
         let fetch_since = self.profile.log_since().min(since.clone());
         Ok(ReportInput {
-            git_log: self.git.log(&branch, &fetch_since)?,
+            git_log: self.git.log(&ref_name, &fetch_since)?,
             diary: read_opt(&self.profile.diary_path),
             plan: read_opt(&self.profile.plan_path),
             docs: self.docs()?,
-            branches: self.git.branches(&branch)?,
+            branches: self.git.branches(&ref_name)?,
             overrides: self.overrides()?,
             visions: self.visions()?,
             now: SystemTime::now()
@@ -253,7 +271,7 @@ impl Project {
             since,
             // M2/1 kostur: gornju granicu uvodi M2/14 (`input_between`).
             until: None,
-            branch,
+            branch: label,
         })
     }
 }

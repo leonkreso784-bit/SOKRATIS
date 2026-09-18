@@ -210,6 +210,54 @@ fn profile_error_says_the_path_once_and_leaves_the_cause_to_the_chain() {
     );
 }
 
+/// M2/12: detached HEAD (grane nema, commita ima) je do sada davao `NoCommits` — laž, jer
+/// commiti postoje. Kad zadana grana ne postoji I `current_branch()` je prazan (detached), log
+/// se čita s `HEAD`, a oznaka u izvještaju postaje `HEAD@<sha>`.
+#[test]
+fn detached_head_with_commits_is_reported_as_head_at_sha_not_as_empty_repo() {
+    let r = Repo::init();
+    let sha = r.commit(
+        "js/a.js",
+        "1",
+        "F1/1 x",
+        "2026-09-01T10:00:00+02:00",
+        "2026-09-01T10:00:00+02:00",
+    );
+    write(
+        &r,
+        ".sokratis/profile.json",
+        r#"{ "default_branch": "nema", "since": "2026-09-01" }"#,
+    );
+    r.git(&["checkout", "-q", "--detach"]);
+    let p = Project::open(r.path()).unwrap();
+    let input = p.input(None).unwrap();
+    assert_eq!(input.branch, format!("HEAD@{sha}"));
+    assert!(input.git_log.contains(&sha));
+}
+
+/// Izvan brifa, dodano: detached HEAD kad ZADANA grana i dalje POSTOJI ne smije preskočiti na
+/// `HEAD@<sha>` — metrike su definirane nad zadanom granom (paritet s tablicom), pa se čita ona,
+/// bez obzira gdje trenutno pokazuje HEAD.
+#[test]
+fn detached_head_with_default_branch_present_still_reads_the_default_branch() {
+    let r = Repo::init();
+    r.commit(
+        "js/a.js",
+        "1",
+        "F1/1 x",
+        "2026-09-01T10:00:00+02:00",
+        "2026-09-01T10:00:00+02:00",
+    );
+    write(&r, ".sokratis/profile.json", r#"{ "since": "2026-09-01" }"#);
+    r.git(&["checkout", "-q", "--detach"]);
+    let p = Project::open(r.path()).unwrap();
+    let input = p.input(None).unwrap();
+    assert_eq!(
+        input.branch, "main",
+        "zadana grana postoji, oznaka ostaje njezino ime"
+    );
+}
+
 #[test]
 fn unknown_profile_field_is_an_error_and_missing_files_default() {
     let r = Repo::init();
