@@ -157,14 +157,18 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
 }
 
 #[cfg(test)]
-mod tests {
+// M2/7: `pub(crate)` na modulu (ne samo funkciji) — privatan `mod` je vidljiv samo iz svog
+// roditelja i potomaka, a `snapshot::tests` (brat, ne potomak) treba `report::tests::input()`.
+pub(crate) mod tests {
     use super::*;
     use crate::{BranchInfo, DocFile, WorkKind};
     use std::collections::HashMap;
 
     const LOG: &str = "@@a1|1788700000|1788700000|2026-08-28|2026-08-28|F1/1 prije since\n1\t0\tjs/a.js\n\n@@b2|1788854400|1788854400|2026-09-04|2026-09-04|fix: kvar u js\n5\t1\tjs/b.js\n\n@@c3|1788858000|1788858000|2026-09-04|2026-09-04|docs: zapis\n3\t0\tdocs/records/PROGRESS.md\n";
 
-    fn input() -> ReportInput {
+    // M2/7: `pub(crate)` da `snapshot::tests` posudi isti fixture umjesto da ga duplicira —
+    // brif (task-7) to izričito dopušta jer je JEZGRA vlasnik i ove i te datoteke.
+    pub(crate) fn input() -> ReportInput {
         ReportInput {
             git_log: LOG.into(),
             diary: Some("## 2026-09-04 (X) — 🚀 deploy nečega\n".into()),
