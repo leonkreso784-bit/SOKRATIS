@@ -8,6 +8,12 @@
 //! `Component` je enum kojim `std::path` razlaže putanju; `matches!` na njemu je ograda bez ijednog
 //! string-uspoređivanja. `std::path` samo parsira tekst — ne dira disk — pa smije u jezgru bez I/O-a
 //! (S-002); `canonicalize` (koji disk dira) ovdje ne smije nikad.
+//!
+//! ZAŠTO RUST OVAKO (cigla M2/9 — `test_path_exclude`)
+//! Rani `return false` u `is_test_path` je stražarska klauzula (guard clause): isključenje se
+//! provjerava PRIJE svih uključivih pravila, pa jedan pogodak u `test_path_exclude` presiječe
+//! ostatak funkcije bez ugniježđenih `if`. Zadano `[]` znači da `.any()` nad praznim vektorom vrati
+//! `false` i stara staza ostane netaknuta — paritet je zaštićen samim tipom, ne posebnim testom.
 use crate::ParseError;
 use crate::model::WorkKind;
 use regex::Regex;
@@ -219,6 +225,13 @@ impl Profile {
     }
 
     pub fn is_test_path(&self, path: &str) -> bool {
+        if self
+            .test_path_exclude
+            .iter()
+            .any(|x| path.contains(x.as_str()))
+        {
+            return false;
+        }
         self.test_path_prefixes
             .iter()
             .any(|p| path.starts_with(p.as_str()))
@@ -381,6 +394,22 @@ mod tests {
         assert!(p.is_code_path("js/auth.js"));
         assert!(!p.is_code_path("docs/records/PROGRESS.md"));
         assert!(!p.is_code_path("CLAUDE.md"));
+    }
+
+    #[test]
+    fn test_path_exclude_removes_fixtures_but_default_keeps_everything_under_tests() {
+        let d = Profile::default();
+        assert!(
+            d.is_test_path("tests/fixtures/big.log"),
+            "zadano = tablica: sve pod tests/ je test"
+        );
+        let p = Profile {
+            test_path_contains: vec!["/tests/".into()],
+            test_path_exclude: vec!["/fixtures/".into()],
+            ..Profile::default()
+        };
+        assert!(p.is_test_path("crates/sokratis-core/tests/parity.rs"));
+        assert!(!p.is_test_path("crates/sokratis-core/tests/fixtures/sokratstudy-2026-09-17.log"));
     }
 
     #[test]
