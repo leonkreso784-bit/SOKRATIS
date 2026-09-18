@@ -93,6 +93,12 @@ Testovi i brane: `docs/workflow/TESTING.md`.
   PROFIL T8–T9 · IO T10–T14 · STORE T15–T18 · CLI T19 · SUČELJE T20–T28 · DESKTOP T29–T33 ·
   INTEGRACIJA T34–T35), vlasništvo datoteka i ovisnosti među tokovima u planu (jedno mjesto). Ledger:
   `.superpowers/sdd/2026-09-18-m2-desktop/progress.md`. Izvedba agentima po `AGENTI.md`.
+- **T1 (kostur) je napola u `main`-u — commit `M2/1a`** (koraci 1–12): ugovor tipova, `sokratis-store`
+  kostur, `apps/desktop` datoteke, ovisnosti pinane, 65 testova zeleno. **Desktop crate je privremeno
+  izvan `[workspace] members`** (traži ikone koje generira `npm run tauri icon`, a to traži `npm install`).
+  **Korak 13 čeka Leonov OK za `npm install`** → ikone → crate natrag u `members` → `cargo build -p
+  sokratis-desktop` → commit `M2/1b` → stabla tokova → prvi val graditelja (JEZGRA T2 · PROFIL T8 ·
+  IO T10 · SUČELJE T20). Nijedno stablo tokova još ne postoji.
 - **M0 za M2 izmjeren** (spec §10): Node 24 · npm 11 · WebView2 · MSVC · Rust 1.98.1 ✅; `cargo tauri`
   nije potreban globalno (`@tauri-apps/cli` je dev-ovisnost). **Jedina instalacija: `npm install` u
   `apps/desktop` — čeka Leonov OK**, kao svaka instalacija u M0.

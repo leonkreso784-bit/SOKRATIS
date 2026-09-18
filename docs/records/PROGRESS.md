@@ -293,8 +293,18 @@ plan cigla-po-cigla → agenti kao u M1 (nove grane/stabla otvara plan M2, ne po
   `cuvar-dokumentacije`) više ne nose putanju plana M1 ni `M1/N` — govore „aktivni plan", znaju za tok
   SUČELJE (TS/Svelte, brane `npm run check`, zaglavlje `// ZAŠTO OVAKO`) i za S-012…S-022.
 
+- **T1 (kostur M2), koraci 1–12, na `main`-u kao `M2/1a`:** ugovor tipova u jezgri (`until`,
+  `Report.commits/deliveries/vision_totals`, `SnapshotMetrics`, `MetricValue{kind}`, `PathOutsideRoot`,
+  `test_path_exclude`, `validate_paths` stub), nov crate `sokratis-store` (migracija 0001 sa svih sedam
+  tablica, 1 test), `apps/desktop` kostur (npm datoteke s točnim verzijama, `src-tauri`), `workspace.dependencies`
+  pinane. Brane: fmt · clippy · **65 testova** (64 + 1) · docs 100/100 · signals 0. **Odstupanje od plana,
+  zapisano:** T1 je podijeljen u dva commita jer korak 13 (`npm install`) čeka Leonov OK, a desktop crate bez
+  ikona iz `tauri icon` ruši `cargo test --workspace` — pa je privremeno izvan `members` (komentar u
+  `Cargo.toml` kaže zašto). Leon je tražio primopredaju u novu sesiju prije OK-a.
+
 ### Što slijedi
-**Izvedba M2 po planu.** T1 (kostur) radi orkestrator na `main`-u; korak 13 (`npm install` u
-`apps/desktop`) čeka Leonov OK. Zatim stabla tokova i prvi val graditelja (JEZGRA T2, PROFIL T8, IO T10,
-SUČELJE T20). Ledger: `.superpowers/sdd/2026-09-18-m2-desktop/progress.md`. Push/remote i dalje samo uz
+**Nova sesija dovršava M2 do kraja.** Prvo T1 korak 13 uz Leonov OK (`npm install` → `tauri icon` → desktop
+crate natrag u `members` → `cargo build -p sokratis-desktop` → commit `M2/1b`), pa stabla tokova i prvi val
+graditelja (JEZGRA T2, PROFIL T8, IO T10, SUČELJE T20). Ledger: `.superpowers/sdd/2026-09-18-m2-desktop/progress.md`
+(odjeljak „STANJE ZA NOVU SESIJU" na dnu) + `NOVA-SESIJA-PROMPT.md` pored njega. Push/remote i dalje samo uz
 izričit OK.
