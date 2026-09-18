@@ -467,9 +467,53 @@ izričit OK.
   izmjeren i popravljen ali ne zatvoren jer M2/11 nije u `main`-u, nova stavka „klasifikacija jednom"),
   `ROADMAP.md` i `CLAUDE.md` (JEZGRA gotova, PROFIL gotov, IO/STORE/SUČELJE stanje).
 
+**Nastavak iste večeri — IO, STORE i SUČELJE recenzirani dalje u svojim granama; sesija staje (predugo trajanje).**
+
+- **IO (`sokratis.io`, `feat/io-m2`):** nakon M2/10–M2/12 (sve SPOJIVO) dodan **M2/13** (`e128986`):
+  watcher nad `.git`/docs/`.sokratis` s odgodom 600 ms, potiskivanjem vlastitih upisa i
+  `RefreshQueue`, javlja kroz `mpsc`, ne zna za Tauri (S-016). Recenzija (opus): SPOJIVO uz 6 Minor
+  odgođenih — tri prenesena kao uputa za DESKTOP T30 (watcher se ne obnavlja kad `.sokratis` tek
+  nastane; `reason` treba prioritet umjesto djelomičnog izračuna; uža provjera pretka). **M2/10–M2/13
+  su sve recenzirane SPOJIVO, ali nijedna nije u `main`-u** — sljedeći korak je `git merge main` u
+  `sokratis.io`, pa T14 (io-dio ograde putanja I9, `--until` prema gitu, `log --until`).
+- **STORE (`sokratis.store`, `feat/store`):** **M2/16** (postavke globalne i po projektu — tema,
+  jezik, autostart, prozor, raspon, zadnji pogled) i **M2/17** (snimke brojki jednom dnevno, upsert,
+  profil kao kanonski JSON, trend s oznakom promjene profila, S-014) spojeni na grani; M2/17 je
+  vratio jedan krug popravka (recenzija: druga snimka istog dana s manje metrika ostavljala je
+  jutrošnje retke, pa je `latest_snapshot` vraćao mješavinu — popravljeno DELETE+INSERT u istoj
+  transakciji, `893b3e7`). **M2/15–M2/17 su sve recenzirane SPOJIVO, nespojene u `main`.** M2/18
+  (keš sirovih commita, uvjetna cigla koja **ULAZI** po mjerenju M2/11) nije još započeta.
+- **SUČELJE (`sokratis.ui`, `feat/ui`):** nakon M2/20–M2/22 (SPOJIVO) dodani **M2/23** (SVG grafovi —
+  `Bars`/`Line`/`Ring`/`Sparkline` nad `scale.ts`, S-018; jedan krug popravka: graf bez imena je
+  ukras, `niceMax`/`linePath` ne propuštaju NaN, Ring-tooltip ne oblikuje postotak) i **M2/24**
+  (splash — Leonova canvas-animacija portirana doslovno, 4,2 s, preskočiva,
+  `prefers-reduced-motion` = zadnji kadar, S-019; jedan krug popravka: `splash:done` mora stići
+  točno jednom i kad se slika ne učita ili se prozor preskoči prije učitavanja, ne samo na sretnom
+  putu — `37d5da4`). **M2/20–M2/24 su sve recenzirane SPOJIVO, nespojene u `main`.** M2/25–M2/28
+  (okvir s `api.ts`, pogledi) nisu započete. Otvoreno: orkestratorova ručna provjera puta greške
+  splasha u pregledniku (namjerno pokvaren URL slike u dev-poslužitelju) — bez commita, prenosi se
+  u novu sesiju.
+- **T18 (keš sirovih commita) ostaje odluka „ulazi"** po mjerenju M2/11 (release, topli keš, nad
+  Sokrat Studyjem: najbolje 1479,71 ms, i dalje ≥ prag 500 ms) — potvrđena, ne ponovno izmjerena.
+- **Leon je sesiju zatvorio jer je postala preduga.** Ovo NIJE zastanak na kraju milestonea — M2
+  nastavlja u sljedećoj sesiji bez novog OK-a za nastavak rada, samo za push/remote/objavu i
+  brisanje grana na kraju M2 kao i dosad. GitHub: remote i dalje **ne postoji**; Leon je tijekom
+  sesije najavio da će napraviti repo, ali nijedan URL nije stigao dovoljno pouzdano da uđe u
+  dokumentaciju.
+- **Čuvar dokumentacije (Način B, audit pred kraj sesije):** `CLAUDE.md` „Stanje — TRENUTNO" i
+  „Agenti" (naslov i sadržaj usklađeni sa stvarnim stanjem grana; „Agenti" je ispravljen jer je
+  tvrdio da su IO/STORE/SUČELJE nespojena ali dalje generički „u planu", bez da kaže da su već
+  recenzirani SPOJIVO), `ROADMAP.md` „Gdje smo" i status M2 u tablici milestonea usklađeni; `docs/
+  README.md`, `AGENTI.md`, `ARCHITECTURE.md`, `BACKLOG.md`, `CHANGELOG.md` provjereni — bez izmjene,
+  jer već točno govore samo o `main`-u (ništa iz nespojenih grana im nije bilo upisano). `sokratis
+  docs .` i dalje 100/100, 0 nalaza; `sokratis signals .` i dalje nema signala.
+
 ### Što slijedi
-Treći val: IO T13 (watcher) → `git merge main` u `sokratis.io` → T14 (ograda pri `Project::open`,
-zatvara I9) → merge IO → otvara se `sokratis.cli` (T19, `--until`). STORE `git merge main` → T17
-(snimke) → T18 (keš, ULAZI po mjerenju M2/11) → merge STORE. SUČELJE T24–T28 nakon popravka T23.
-DESKTOP i INTEGRACIJA se otvaraju kad njihove ovisnosti stoje u `main`-u (plan M2). Push/remote i
+**Nastavak iste sesijske niti, u novoj sesiji — ne nova analiza, nego spajanje.** Prvo pročitati
+`.superpowers/sdd/2026-09-18-m2-desktop/progress.md`, odjeljak „STANJE ZA NOVU SESIJU" (najnoviji, na
+dnu) — on nosi redoslijed spajanja, dispatch-napomene i sve odgođene Minor nalaze po ciglama (S-010,
+ne prepisuje se ovdje). Ukratko: `git merge main` u `sokratis.io` → T14 → merge IO. STORE → T18
+(mjerenje već kaže da ulazi) → merge STORE. SUČELJE → T25–T28 nakon okvira s `api.ts` (i orkestratorova
+provjera puta greške splasha). Potom CLI (T19, kad je IO u `main`-u), DESKTOP (T29–T33, i dalje čeka
+Leonov PNG tray-znak) i INTEGRACIJA (T34–T35) kad njihove ovisnosti stoje u `main`-u. Push/remote i
 objava i dalje čekaju Leonov izričit OK; isto brisanje grana/stabala tokova na kraju M2.
