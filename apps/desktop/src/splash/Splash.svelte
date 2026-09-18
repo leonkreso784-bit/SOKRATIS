@@ -1,13 +1,17 @@
-<!-- ZAŠTO OVAKO (cigla M2/24 — splash): komponenta samo učitava dvije slike i pokreće -->
-<!-- `startIntro`; klik/tipka prekida (S-019), kraj javlja `splash:done` koji DESKTOP T31 sluša. -->
+<!-- ZAŠTO OVAKO (cigla M2/24 — splash; krug popravka 1): splash se NIKAD ne smije zaglaviti — -->
+<!-- `announce` ide kroz `once()` pa `splash:done` stigne točno jednom, što god se dogodi (kraj, -->
+<!-- klik, tipka i prije i poslije učitavanja slika, ili greška učitavanja); DESKTOP T31 sluša. -->
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { startIntro } from './intro';
+  import { once, startIntro } from './intro';
   import markUrl from '../assets/intro/mark.webp';
   import graphUrl from '../assets/intro/graph.webp';
 
   let canvas: HTMLCanvasElement;
   let intro: { skip(): void } | null = null;
+  // Postavlja je `announce` (kroz `once`) — sprječava da `startIntro` krene NAKON što je
+  // korisnik već preskočio dok su se slike još učitavale.
+  let finished = false;
 
   const load = (src: string) =>
     new Promise<HTMLImageElement>((ok, err) => {
@@ -19,27 +23,56 @@
 
   // `__TAURI_INTERNALS__` postoji samo unutar Tauri prozora; u pregledniku (npr. `npm run dev`)
   // se `emit` ne smije ni pozvati, pa dinamički uvoz `@tauri-apps/api/event` ide iza te straže.
-  async function announce() {
+  // Greška u slanju (npr. `emit` odbije) ostaje ovdje — `announce` se svejedno smatra izvršenim.
+  async function emitDone() {
     if (!('__TAURI_INTERNALS__' in window)) {
       console.info('splash:done (bez Taurija)');
       return;
     }
-    const { emit } = await import('@tauri-apps/api/event');
-    await emit('splash:done');
+    try {
+      const { emit } = await import('@tauri-apps/api/event');
+      await emit('splash:done');
+    } catch (e) {
+      console.error('splash: slanje splash:done nije uspjelo', e);
+    }
+  }
+
+  // JEDINO mjesto koje javlja kraj splasha — `once` jamči „točno jednom" bez obzira odakle se
+  // pozove (kraj animacije, klik, tipka, greška učitavanja slike).
+  const announce = once(() => {
+    finished = true;
+    void emitDone();
+  });
+
+  // Klik/tipka: dok slike još nisu učitane `intro` je `null`, pa preskakanje znači odmah javiti
+  // kraj (S-019 — mora se moći preskočiti i prije nego što se ima što animirati).
+  function skip() {
+    if (intro) {
+      intro.skip();
+    } else {
+      announce();
+    }
   }
 
   onMount(async () => {
-    const [mark, graph] = await Promise.all([load(markUrl), load(graphUrl)]);
-    intro = startIntro(
-      canvas,
-      { mark, graph },
-      { onDone: announce, reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches },
-    );
+    try {
+      const [mark, graph] = await Promise.all([load(markUrl), load(graphUrl)]);
+      // Korisnik je mogao preskočiti dok smo čekali slike — tad se intro više ne smije pokrenuti.
+      if (finished) return;
+      intro = startIntro(
+        canvas,
+        { mark, graph },
+        { onDone: announce, reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches },
+      );
+    } catch (e) {
+      console.error('splash: slike se nisu učitale, preskačem animaciju', e);
+      announce();
+    }
   });
 </script>
 
-<svelte:window onkeydown={() => intro?.skip()} />
-<div class="stage" onclick={() => intro?.skip()} role="presentation">
+<svelte:window onkeydown={skip} />
+<div class="stage" onclick={skip} role="presentation">
   <!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
   <!-- `<canvas>` je po HTML5 "interaktivan sadržaj" (može sadržavati fallback), ali ovaj nema
        nikakvu interakciju — role="img" + aria-label je standardni WAI-ARIA obrazac za canvas. -->

@@ -1,10 +1,21 @@
 // ZAŠTO OVAKO (cigla M2/24 — splash)
-// Vremenska crta je ČISTA funkcija `frame(ms)` (testira se bez platna), a `paint` je doslovan port
+// Vremenska crta je ČISTA funkcija `frame(ms)` (testira se bez platna), `paint` je doslovan port
 // Leonova canvas-koda (sokratis-intro-clean-graph.html, 2026-09-18) — brojke se ne „poboljšavaju".
-// Boje su ovdje HEKS namjerno: canvas ne čita CSS tokene, animacija je doslovan port izvornika, pa
-// `#0b1017`/`#17212b`/`#00dce8` stoje kao konstante (jedina iznimka od „boje samo kroz tokene", S-017).
-// `requestAnimationFrame` petlja stane na TOTAL_MS ili na `skip()`; reduced-motion crta zadnji kadar.
+// Boje su HEKS namjerno (canvas ne čita tokene, iznimka od S-017): `#0b1017`/`#17212b`/`#00dce8`.
+// `requestAnimationFrame` petlja stane na TOTAL_MS ili `skip()`; reduced-motion crta zadnji kadar.
 export const TOTAL_MS = 4200;
+
+// Krug popravka 1 (recenzija): `splash:done` mora stići TOČNO JEDNOM što god se dogodilo (kraj,
+// klik, tipka, greška učitavanja) — `once` je zajednička brava koju `Splash.svelte` stavlja oko
+// jedinog mjesta koje taj događaj šalje.
+export function once(fn: () => void): () => void {
+  let called = false;
+  return () => {
+    if (called) return;
+    called = true;
+    fn();
+  };
+}
 
 // `clamp` čuva NaN (nedefinirano vrijeme) na 0 umjesto da ga propusti kroz Math.min/max, koji s NaN-om
 // vraćaju NaN — izvan Leonova izvornika (koji nikad ne zove paint s NaN-om), dodano radi otpornosti.
@@ -71,6 +82,7 @@ export function paint(
       ctx.restore();
     }
   };
+  // 1) stupci — svaki od četiri isječka otkriva `draw()` odozdo prema gore, jedan za drugim
   SLICES.forEach(([l, r, top], i) => {
     // `SLICES` i `f.bars` su uvijek iste duljine (4); `?? 0` čuva `noUncheckedIndexedAccess`
     // bez izjave da vrijednost sigurno postoji.
@@ -82,6 +94,7 @@ export function paint(
     draw();
     ctx.restore();
   });
+  // 2) brisanje — vodoravni "wipe" preko sredine, s vlastitom alfom neovisnom o širini reza
   ctx.save();
   ctx.beginPath();
   ctx.rect(240, 260, 790 * f.wipe, 530);
@@ -89,11 +102,13 @@ export function paint(
   ctx.globalAlpha = f.wipeAlpha;
   draw();
   ctx.restore();
+  // 3) cijeli znak — puni krug bez isjecanja, samo prosijava (alfa raste s `f.whole`)
   ctx.save();
   ctx.globalAlpha = f.whole;
   draw();
   ctx.restore();
   ctx.restore();
+  // 4) prsten — kružni luk oko znaka koji raste s `f.ring`, isjecen na uski prsten (evenodd)
   if (f.ring > 0) {
     ctx.save();
     ctx.beginPath();
@@ -109,6 +124,7 @@ export function paint(
     ctx.restore();
   }
   ctx.restore();
+  // 5) natpis — "S◍KRATIS" prelazi preko slova O tek kad se znak skupi (`f.settle`)
   ctx.save();
   ctx.globalAlpha = f.settle;
   ctx.fillStyle = '#00dce8';

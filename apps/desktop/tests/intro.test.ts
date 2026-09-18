@@ -2,7 +2,7 @@
 // `frame(ms)` je čista funkcija bez platna, pa se testira izravno bez laživog DOM-a (bez jsdom).
 // Vrijednosti su Leonove (sokratis-intro-clean-graph.html, 2026-09-18) — brojke su ovdje ugovor.
 import { describe, expect, it } from 'vitest';
-import { TOTAL_MS, frame } from '../src/splash/intro';
+import { TOTAL_MS, frame, once } from '../src/splash/intro';
 
 describe('vremenska crta animacije (Leon, 2026-09-18)', () => {
   it('na 0 ms ništa nije počelo', () => {
@@ -54,5 +54,20 @@ describe('vremenska crta animacije (Leon, 2026-09-18)', () => {
       expect(v).toBeGreaterThanOrEqual(0);
       expect(v).toBeLessThanOrEqual(1);
     }
+  });
+});
+
+// krug popravka 1 (recenzija): splash mora javiti `splash:done` TOČNO JEDNOM što god se dogodilo
+// (kraj animacije, klik, tipka, greška učitavanja slike) — `once` je zajednička brava za to.
+describe('once() — brava protiv dvostrukog poziva', () => {
+  it('poziva zamotanu funkciju samo prvi put', () => {
+    let calls = 0;
+    const fn = once(() => {
+      calls += 1;
+    });
+    fn();
+    fn();
+    fn();
+    expect(calls).toBe(1);
   });
 });
