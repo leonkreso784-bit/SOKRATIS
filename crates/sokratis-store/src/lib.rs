@@ -6,8 +6,14 @@
 //! ZAŠTO RUST OVAKO (cigla M2/15 — registar)
 //! `pub mod registry` + re-export: pozivatelj (desktop, T29) piše `sokratis_store::ProjectRecord`
 //! umjesto `sokratis_store::registry::ProjectRecord` — modul je organizacija koda, ne dio API-ja.
+//!
+//! ZAŠTO RUST OVAKO (cigla M2/16 — postavke)
+//! `settings.rs` nema vlastite tipove (samo `String` ključ→vrijednost) pa nema što re-eksportirati —
+//! `impl Store` u njemu je vidljiv kroz `pub use store::Store` iznad, isti modul-je-organizacija
+//! princip kao kod registra.
 pub mod error;
 pub mod registry;
+pub mod settings;
 pub mod store;
 pub use error::StoreError;
 pub use registry::{ProjectRecord, WorktreeRecord};
