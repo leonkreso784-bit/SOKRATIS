@@ -9,6 +9,10 @@
 //! ne ostavi pola JSON-a na mjestu datoteke koju git prati. `BTreeMap` u `write_override` (umjesto
 //! `HashMap` kojim se čita) daje deterministički redoslijed ključeva — stabilan tekst, `git diff`
 //! od jednog retka.
+//!
+//! Cigla M2/11 (performanse, dug M11): `docs()` zove `last_changes` JEDNOM za sve datoteke
+//! (`HashMap<String, i64>`) umjesto `last_change` u petlji — isti podatak, 60 puta manje procesa
+//! na 60 dokumenata.
 use crate::{GitCli, GitSource, IoError};
 use sokratis_core::{DocFile, Profile, ReportInput, Vision, WorkKind};
 use std::collections::{BTreeMap, HashMap};
@@ -185,6 +189,14 @@ impl Project {
         if docs_dir.is_dir() {
             walk(&docs_dir, &mut paths)?;
         }
+        // Cigla M2/11 (dug M11): jedan `git log --name-only` za SVE dokumente umjesto poziva po
+        // datoteci — s 60 dokumenata je stari put trošio 60 git-procesa na isto pitanje.
+        // `docs_dir` pokriva podstablo rekurzivno; `:(glob)*.md` dodaje `.md` iz KORIJENA (glob bez
+        // `**` ne silazi u podmape), jer korijenske datoteke inače ne bi bile pokrivene niti jednim
+        // pathspecom kad `docs_dir` nije korijen.
+        let changes = self
+            .git
+            .last_changes(&[self.profile.docs_dir.as_str(), ":(glob)*.md"])?;
         let mut out = Vec::new();
         for p in paths {
             let rel = p
@@ -194,7 +206,7 @@ impl Project {
                 .replace('\\', "/");
             out.push(DocFile {
                 content: std::fs::read_to_string(&p)?,
-                last_change_time: self.git.last_change(&rel)?,
+                last_change_time: changes.get(&rel).copied(),
                 path: rel,
             });
         }
