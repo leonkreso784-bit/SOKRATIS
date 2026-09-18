@@ -10,6 +10,11 @@
 //! poziv-po-grani jednim `for-each-ref` s atomom `ahead-behind`, uz stari put kao rezervu
 //! (`branches_per_ref`) kad atom ne postoji (git < 2.41). Let-chain (`if let … && let …`) u
 //! `last_changes` je stabilan od Rust 1.88 — čita se kao jedna provjera, ne ugniježđeni `if`-ovi.
+//!
+//! Krug popravka 1 (recenzija): `last_changes` je gubio doprinos merge-commita (zadano
+//! `--name-only` ne ispisuje datoteke za merge) i tiho gutao ne-ASCII imena (zadano
+//! `core.quotepath` ih escapea) — oba dokazana pokusom nad Sokrat Studyjem i pokrivena testom
+//! `tests/last_changes.rs`. Vidi komentar UZ POZIV u `last_changes` za detalje dviju opcija.
 use crate::IoError;
 use sokratis_core::BranchInfo;
 use std::collections::HashMap;
@@ -228,7 +233,29 @@ impl GitSource for GitCli {
     fn last_changes(&self, pathspecs: &[&str]) -> Result<HashMap<String, i64>, IoError> {
         // Log je od najnovijeg prema starijem, pa je PRVA pojava putanje njezina zadnja promjena.
         // Jedan proces za SVE putanje odjednom (cigla M2/11) umjesto `last_change` po datoteci.
-        let mut args = vec!["log", "--format=@@%at", "--name-only", "--"];
+        //
+        // Krug popravka 1 (recenzija, dokazano pokusom nad Sokrat Studyjem — docs/README.md):
+        // - `-c core.quotepath=false` je GIT-OVA GLOBALNA opcija, MORA doći PRIJE `log`: bez nje
+        //   git ne-ASCII znak u imenu datoteke ispisuje escapean u navodnicima (npr.
+        //   `"docs/\304\215...md"`), pa ključ nikad ne pogodi mapu koju čita `project.rs`. NE
+        //   MIJEŠATI s DRUGIM `-c` niže (`--diff-merges=combined`, kratica `-c`, ali opcija
+        //   PODNAREDBE `log` — pišemo je puno ime baš da se ne zamijeni s ovom).
+        // - Zadano `git log --name-only` NE ispisuje popis datoteka za merge-commit (dvosmisleno
+        //   prema kojem roditelju uspoređivati), pa datoteka čija je STVARNA zadnja promjena bila
+        //   UNUTAR merge-commita (razrješenje sudara) tiho dobiva stariji datum s neke od grana.
+        //   `--diff-merges=combined` ispisuje datoteke koje se razlikuju od SVIH roditelja
+        //   odjednom — isto mjerilo kojim git već presuđuje ULAZI li merge uopće u log kad je
+        //   putanja zadana (zato stari `last_change`, bez ijedne od ovih opcija, ostaje ispravan:
+        //   ta simplifikacija povijesti radi i bez `--name-only`). `tests/last_changes.rs` dokaz.
+        let mut args = vec![
+            "-c",
+            "core.quotepath=false",
+            "log",
+            "--format=@@%at",
+            "--diff-merges=combined",
+            "--name-only",
+            "--",
+        ];
         args.extend_from_slice(pathspecs);
         let out = self.run(&args)?;
         let mut map = HashMap::new();
