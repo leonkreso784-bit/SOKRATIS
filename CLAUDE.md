@@ -68,7 +68,7 @@ pogrešna uporaba**; `--help`/`--version` = 0) — sve rade nad pravim repozitor
 Sokrat Studyjem).
 Testovi i brane: `docs/workflow/TESTING.md`.
 
-## Stanje — TRENUTNO (2026-09-18 — M1 zatvoren; M2 u izvedbi, kostur dovršen, stabla tokova otvorena)
+## Stanje — TRENUTNO (2026-09-18 — M1 zatvoren; M2 u izvedbi, kostur dovršen, PROFIL gotov, JEZGRA napola)
 - **M0 gotov. M1 zatvoren.** Kod isporučen, recenziran i popravljen (T1–T22 + krug popravaka), verzija
   0.1.0, u `main`-u. Cijeli lanac radi nad pravim repozitorijem: `sokratis report/docs/signals` čitaju
   git kroz `io`, jezgra računa dane, sate, vrste rada, faze, 18 pokazatelja, docs-ocjenu i signale, CLI
@@ -103,12 +103,19 @@ Testovi i brane: `docs/workflow/TESTING.md`.
   `node:url` (nova ovisnost samo radi config-datoteke nije opravdana, pravilo #6). Brane: fmt ·
   clippy `--workspace` · **65 testova** · `npm run check` zelen · `npm run build` daje `dist/` s oba
   HTML-a · `signals .` 0.
-- **Stabla tokova su otvorena, sva na `cb963e8`:** `sokratis.jezgra` (`feat/core-m2`) · `sokratis.profil`
-  (`feat/core-profile`) · `sokratis.io` (`feat/io-m2`) · `sokratis.ui` (`feat/ui`). Prvi val graditelja
-  poslan: JEZGRA T2 · PROFIL T8 · IO T10 · SUČELJE T20. Stabla STORE/CLI/DESKTOP/INTEGRACIJA otvaraju
-  se kasnije po ovisnostima iz plana. **Rust-brane u stablima tokova rade bez desktop cratea**
-  (`--workspace --exclude sokratis-desktop`); pune brane s desktopom vrti orkestrator na `main`-u
-  nakon svakog spajanja — [`docs/workflow/AGENTI.md`](docs/workflow/AGENTI.md) §5.
+- **Pet radnih stabala tokova otvoreno:** `sokratis.jezgra` (`feat/core-m2`) · `sokratis.profil`
+  (`feat/core-profile`) · `sokratis.io` (`feat/io-m2`) · `sokratis.store` (`feat/store`) ·
+  `sokratis.ui` (`feat/ui`). **Tok PROFIL je gotov** (T8–T9 spojeno, merge `a2e9265`): ograda putanja
+  iz profila (`inside_root`/`Profile::validate_paths`, jezgreni dio duga I9 — io-dio čeka IO T14) i
+  `test_path_exclude`. **Tok JEZGRA je spojio prvu polovicu** (T2–T3, merge `7d23c76`) i nastavlja na
+  istoj grani (T4–T7): snapshot ugovora `Report`-a (dug I7, riješen) i `until` kao gornja granica
+  razdoblja (S-011) — `io`/CLI mu još ne šalju stvarnu vrijednost (T14/T19). Brane na `main`-u nakon
+  oba spajanja: fmt · clippy `--workspace` · **72 testa** · `signals .` 0. Ostali tokovi u tijeku
+  (izvan `main`-a): IO M2/10 SPOJIVO na recenziji/M2/11 u izradi, STORE M2/15 SPOJIVO/M2/16 na
+  recenziji, SUČELJE M2/20 na recenziji, JEZGRA M2/4 u izradi. Stabla CLI/DESKTOP/INTEGRACIJA
+  otvaraju se kasnije po ovisnostima iz plana. **Rust-brane u stablima tokova rade bez desktop
+  cratea** (`--workspace --exclude sokratis-desktop`); pune brane s desktopom vrti orkestrator na
+  `main`-u nakon svakog spajanja — [`docs/workflow/AGENTI.md`](docs/workflow/AGENTI.md) §5.
 - **M0 za M2 izmjeren** (spec §10): Node 24 · npm 11 · WebView2 · MSVC · Rust 1.98.1 ✅; `cargo tauri`
   nije potreban globalno (`@tauri-apps/cli` je dev-ovisnost). Jedina instalacija (`npm install` u
   `apps/desktop`) je odrađena 2026-09-18 uz Leonov OK.
@@ -135,9 +142,10 @@ samo na prijelaz u Alert · **S-021** HR/EN od M2 · **S-022** snapshot `Report`
 Uloge i protokol: `docs/workflow/AGENTI.md`. Graditelj radi **jednu ciglu u svom stablu**, recenzent presuđuje
 u dva prolaza, čuvar dokumentacije piše zapise; **samo orkestrator spaja u `main`**. Nakon compacta stanje se
 čita iz gita (`git log --oneline -15` · `git worktree list`), ne iz sjećanja. **Grane i stabla tokova M1 su
-obrisane 2026-09-18** (uz Leonov OK, sve spojene). Sad su otvorena **četiri od devet stabala tokova M2**
-(JEZGRA · PROFIL · IO · SUČELJE); ostala (STORE · CLI · DESKTOP · INTEGRACIJA) otvaraju se kasnije po
-ovisnostima iz plana — popis i vlasništvo datoteka su u planu M2, ne ovdje.
+obrisane 2026-09-18** (uz Leonov OK, sve spojene). Sad je otvoreno **pet od devet stabala tokova M2**
+(JEZGRA · PROFIL · IO · STORE · SUČELJE); **PROFIL je gotov** (T8–T9 spojeno u `main`). Ostala
+(CLI · DESKTOP · INTEGRACIJA) otvaraju se kasnije po ovisnostima iz plana — popis i vlasništvo
+datoteka su u planu M2, ne ovdje.
 
 ## Dokumentacija — ulaz je SAMO `docs/README.md`
 Složena **po ulozi dokumenta** (kao Sokrat Study): `product/` ŠTO · `plan/` ŠTO SADA (najviše **jedan**

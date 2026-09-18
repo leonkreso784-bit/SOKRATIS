@@ -46,9 +46,10 @@ vlasništvo po tokovima" (S-010 — ovdje se ne prepisuju). Novo u M2: tok SUČE
 pa su mu brane `npm run check` umjesto `cargo`; tokovi SUČELJE i DESKTOP nakon `git worktree add` pokreću
 `npm ci` u svom stablu (`node_modules` je git-ignoriran). **T1 je cijel u `main`-u:** koraci 1–12 kao
 `M2/1a`, korak 13 (`npm install` uz Leonov OK → ikone iz Leonova loga → desktop crate natrag u `members`)
-kao `M2/1b`. Otvorena su **četiri stabla** (sva od `cb963e8`): `sokratis.jezgra` (`feat/core-m2`) ·
-`sokratis.profil` (`feat/core-profile`) · `sokratis.io` (`feat/io-m2`) · `sokratis.ui` (`feat/ui`); prvi
-val graditelja poslan (JEZGRA T2 · PROFIL T8 · IO T10 · SUČELJE T20). Stabla STORE/CLI/DESKTOP/INTEGRACIJA
+kao `M2/1b`. Otvoreno je **pet stabala**: `sokratis.jezgra` (`feat/core-m2`) · `sokratis.profil`
+(`feat/core-profile`) · `sokratis.io` (`feat/io-m2`) · `sokratis.store` (`feat/store`) · `sokratis.ui`
+(`feat/ui`). **PROFIL je gotov** (T8–T9 spojeno u `main`, merge `a2e9265`); **JEZGRA je spojila prvu
+polovicu** (T2–T3, merge `7d23c76`) i nastavlja na istoj grani (T4–T7). Stabla CLI/DESKTOP/INTEGRACIJA
 otvaraju se kasnije po ovisnostima iz plana (`git worktree list`).
 
 ## 3 · Protokol po cigli
