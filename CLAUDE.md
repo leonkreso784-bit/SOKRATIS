@@ -20,7 +20,8 @@ sati zbog cherry-pickova — se u Sokratisu **ispravlja, ne prenosi** (S-007).
 
 ## Stack
 - **Rust** (stable, MSVC target, edition 2024) · Cargo workspace: `crates/sokratis-core` (čisti, bez
-  I/O-a) · `crates/sokratis-io` (git, datoteke, profil) · `crates/sokratis-cli` (binarna `sokratis`).
+  I/O-a) · `crates/sokratis-io` (git, datoteke, profil) · `crates/sokratis-cli` (binarna `sokratis`) ·
+  [M2 spec] `crates/sokratis-store` (SQLite) · `apps/desktop/src-tauri` (crate `sokratis-desktop`).
 - **Desktop [M2]:** Tauri 2 (`apps/desktop`) · sučelje **Svelte 5 + Tailwind v4** + `tokens.css`
   prenesen iz Sokrat Studyja (4 teme, zadana svijetla „Akademsko plavo"). Znak Sokratisa je **nov**.
 - **Pohrana:** ručni podaci u `<repo>/.sokratis/` (profil · overridei · vizije) · [M2] SQLite u
@@ -66,7 +67,7 @@ pogrešna uporaba**; `--help`/`--version` = 0) — sve rade nad pravim repozitor
 Sokrat Studyjem).
 Testovi i brane: `docs/workflow/TESTING.md`.
 
-## Stanje — TRENUTNO (2026-09-18 — M1 zatvoren, sljedeće je spec M2)
+## Stanje — TRENUTNO (2026-09-18 — M1 zatvoren, spec M2 napisan i čeka Leonov OK)
 - **M0 gotov. M1 zatvoren.** Kod isporučen, recenziran i popravljen (T1–T22 + krug popravaka), verzija
   0.1.0, u `main`-u. Cijeli lanac radi nad pravim repozitorijem: `sokratis report/docs/signals` čitaju
   git kroz `io`, jezgra računa dane, sate, vrste rada, faze, 18 pokazatelja, docs-ocjenu i signale, CLI
@@ -82,9 +83,16 @@ Testovi i brane: `docs/workflow/TESTING.md`.
   (privatni remote prvo; javna objava tek nakon ograde putanja iz profila, BACKLOG I9). Toolchain je
   pinan (`rust-toolchain.toml`, 1.98.1) i definicije agenata su u repou — obje odluke Leon je odobrio
   2026-09-18.
-- **Sljedeće: spec za M2 (desktop).** Brainstorming s Leonom → jedan aktivni spec
-  `docs/plan/ARHITEKTURA_M2.md` → plan cigla-po-cigla → agenti kao u M1. Leonov zahtjev za
-  znak/animaciju pri otvaranju stoji u `docs/plan/ROADMAP.md` (red M2).
+- **Spec M2 je napisan (2026-09-18): `docs/plan/ARHITEKTURA_M2.md`** — iz brainstorminga s Leonom,
+  trinaest odluka zapisano kao **S-012…S-022** u `DECISIONS.md`; preuzima 7 od 9 stavki duga M1
+  (BACKLOG drži još dvije i pointere). Leonove datoteke za znak: `C:\Users\leonk\Downloads\sokratis
+  logo .png` (ikona) · `download.png` (zaključak `S◍KRATIS`) · `sokratis-intro-clean-graph.html`
+  (animacija 4,2 s, canvas, dva WebP-a) — spec §5.2–5.4 ih preuzima doslovno.
+  **Čeka Leonov OK na spec.** Tek potom: plan cigli (`superpowers:writing-plans` →
+  `docs/superpowers/plans/`) → nov SDD ledger → agenti kao u M1 (tokovi i stabla po planu M2).
+- **M0 za M2 izmjeren** (spec §10): Node 24 · npm 11 · WebView2 · MSVC · Rust 1.98.1 ✅; `cargo tauri`
+  nije potreban globalno (`@tauri-apps/cli` je dev-ovisnost). **Jedina instalacija: `npm install` u
+  `apps/desktop` — čeka Leonov OK**, kao svaka instalacija u M0.
 - **Prva radnja nove sesije:** `git log --oneline -15` · `git worktree list` · ledger
   `.superpowers/sdd/2026-09-17-m1-jezgra-i-cli/progress.md`, odjeljak „STANJE ZA NOVU SESIJU" na dnu
   (operativna uputa, ne izvor činjenica o projektu), pa `docs/README.md`.
@@ -99,7 +107,14 @@ Puni tekst: `docs/records/DECISIONS.md`. **S-001** Rust · **S-002** core bez I/
 proces iza traita · **S-004** ručni podaci u `.sokratis/` u repou · **S-005** zadano = Sokrat Study, profil
 pregazi · **S-006** sučelje web (Svelte 5), ne Rust GUI · **S-007** sati po `author_time`, sortirano ·
 **S-008** engleski identifikatori u jezgri · **S-009** SQLite tek u M2 · **S-010** jedna činjenica, jedno
-mjesto · **S-011** `--since` računa cijeli dan, ne goli datum.
+mjesto · **S-011** `--since` računa cijeli dan, ne goli datum · **[M2 spec]** **S-012** Tauri ugovor =
+`Report` nepromijenjen, mjerenje u `core`, oblikovanje u Svelteu · **S-013** nov crate `sokratis-store`,
+`desktop` bez logike · **S-014** SQLite = istina koju git ne zna + pogodnost (snimke brojki, keš sirovih
+commita tek nakon mjerenja) · **S-015** projekt = `git-common-dir`, ručni podaci u glavno stablo, Sokratis
+ne commita · **S-016** watcher u `io`, odgoda 600 ms, bez petlje · **S-017** `tokens.css` cijel, `brand-*`
+iz loga izmjeren, Tailwind kroz Vite plugin · **S-018** grafovi vlastiti SVG · **S-019** animacija jednom
+po pokretanju, prozor čeka, preskočiva · **S-020** tray minimizira, autostart, jedna instanca, obavijest
+samo na prijelaz u Alert · **S-021** HR/EN od M2 · **S-022** snapshot `Report`-a prva cigla M2.
 
 ## Agenti — više grana, jedan orkestrator
 Uloge i protokol: `docs/workflow/AGENTI.md`. Graditelj radi **jednu ciglu u svom stablu**, recenzent presuđuje

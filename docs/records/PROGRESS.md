@@ -240,3 +240,48 @@ spec za M2 (desktop).
 ### Što slijedi
 **Spec za M2 (desktop).** Brainstorming s Leonom → jedan aktivni spec `docs/plan/ARHITEKTURA_M2.md` →
 plan cigla-po-cigla → agenti kao u M1 (nove grane/stabla otvara plan M2, ne postoje danas).
+
+---
+
+## 2026-09-18 (FABLE) — Brainstorming i spec M2 (desktop)
+
+**Popodne. Sesija bez koda — samo spec.** (Prva polovica na Opusu 5, nastavak na Fableu 5.1.)
+
+- **Ulaz pročitan redom, ništa napamet:** `CLAUDE.md`, `git log`/`worktree`/`remote` (samo `main`, jedno
+  stablo, **remote ne postoji**), ledger M1 „STANJE ZA NOVU SESIJU", `docs/README` → PRD → ROADMAP
+  red M2 → BACKLOG „Iz završne recenzije M1" → ARCHITECTURE §2–3 i §11 → arhivirani spec M1 (cijeli,
+  kao uzor odjeljaka) → `tokens.css` Sokrat Studyja (samo čitanje).
+- **M0 za M2 izmjeren na stroju:** Node 24.11.1 · npm 11.6.2 · WebView2 153 · MSVC 14.44 · Rust 1.98.1
+  ✅; `cargo tauri`, pnpm, `gh` ❌. Zaključak u specu §10: `@tauri-apps/cli` kao pinana dev-ovisnost
+  → **ništa globalno ne treba**; jedina instalacija je `npm install` u `apps/desktop` i čeka Leonov OK.
+- **Brainstorming (superpowers:brainstorming, arhitektonski put), trinaest pitanja, jedno po jedno;**
+  Leonovi odgovori: stalno otvoren za proučavanje · prvi ekran Pregled svih projekata sa signalima ·
+  svih 8 pogleda s uređivanjem · SQLite registar + snimke + keš · watcher na `.git` + gumb · tray
+  minimizira + autostart + obavijest samo na prijelaz u Alert · „Dodaj projekt" odabirom mape, stabla
+  se grupiraju sama · grafovi vlastiti SVG · sve četiri teme, `brand-*` iz loga · birač raspona,
+  zadano cijeli projekt · HR/EN prekidač već u M2 · dug M1: 7 od 9 · ručni podaci u glavno stablo ·
+  animacija jednom po pokretanju, prozor čeka.
+- **Leon je usred sesije dostavio znak i animaciju** (`C:\Users\leonk\Downloads\download.png` = zaključak
+  `S◍KRATIS`; `sokratis-intro-clean-graph.html` = canvas animacija 4,2 s s dva WebP-a). Pročitan je
+  **kod**, ne opis: vremenska crta (stupci · brisanje · prsten · lik · skupljanje i natpis `#00dce8`)
+  i `prefers-reduced-motion` grana su u specu §5.2 doslovno. Dvije bilješke koje kod nije znao: neonski
+  cijan na bijeloj ima kontrast ≈1,7:1 → `brand-*` se **izvodi i mjeri** (S-017), ne kopira; tray na
+  16 px traži pojednostavljen znak bez lika (§5.4).
+- **Tri pristupa ljusci** izložena s preporukom (tanak Tauri + ugovor `Report`; debeo Tauri; sve u
+  desktop crateu); Leon odobrio prvi uz posudbu iz drugog (mjerenja u `core`). Dizajn predstavljen u
+  tri kruga (granice i ugovor · SQLite, tok, watcher · sučelje, testovi, izlazni uvjet), svaki krug
+  odobren prije idućeg.
+- **Napisano:** `docs/plan/ARHITEKTURA_M2.md` (12 odjeljaka, isti kostur kao spec M1) ·
+  `DECISIONS.md` **S-012…S-022** · BACKLOG: sedam stavki duga → pointer na spec §8, HR/EN podijeljen na
+  sučelje (M2) i CLI-tablicu (M3), dvije nove ideje (vektorizacija znaka, otvaranje u editoru) ·
+  ROADMAP (uvod, „Gdje smo", red M2) · `docs/README` (plan/ indeks) · `CLAUDE.md` (stanje, stack,
+  žive odluke) · `CHANGELOG` Unreleased.
+- **Jedno odstupanje od Leonova izbora, s razlogom, zapisano u specu §4.4 i S-014:** keš po SHA je
+  odabran, ali cigla ulazi **tek ako mjerenje nakon M11 pokaže da treba** — skupi su procesi (56
+  `git log -1` + 31 `rev-list`), ne parsiranje; keš to ne rješava, M11 rješava. Pravilo #4.
+
+### Što slijedi
+**Leon čita spec** (`docs/plan/ARHITEKTURA_M2.md`) i daje OK ili traži izmjene. Nakon OK-a:
+`superpowers:writing-plans` → plan cigli u `docs/superpowers/plans/` → nov SDD ledger → agenti kao u
+M1 (tokovi i stabla se otvaraju po planu M2). Prije prve cigle koja treba `node_modules`: Leonov OK
+za `npm install`. Push/remote i dalje samo uz izričit OK.

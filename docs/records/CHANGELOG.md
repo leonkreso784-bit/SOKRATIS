@@ -5,7 +5,9 @@ Isporuka = ono što je u `main`-u; sesije su u `PROGRESS.md`.
 
 ## [Unreleased] — rad u tijeku
 
-*(prazno — sljedeće je Milestone 2: desktop. Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md).)*
+*(bez koda — Milestone 2: desktop. Spec napisan 2026-09-18:
+[`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md), odluke S-012…S-022; čeka Leonov OK.
+Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md).)*
 
 ## [0.1.0] — 2026-09-17 — Jezgra i CLI (Milestone 1)
 

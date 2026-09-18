@@ -55,11 +55,12 @@ zatvorenim milestoneom · `ideas/` s prvom idejom koja je prevelika za redak u b
 ## `plan/` — što sada
 
 Spec Milestonea 1 je **ispunjen i arhiviran** ([archive/ARHITEKTURA_M1.md](./archive/ARHITEKTURA_M1.md));
-spec za M2 (desktop) **tek dolazi**. Do tada `plan/` nosi samo živi roadmap.
+**jedini aktivni spec je M2** (desktop), napisan 2026-09-18 i čeka Leonov OK prije plana cigli.
 
 | Dokument | Svrha |
 |---|---|
 | [ROADMAP.md](./plan/ROADMAP.md) | 🟩 **živ** — milestonei M0–M3, status, što je sljedeće |
+| [ARHITEKTURA_M2.md](./plan/ARHITEKTURA_M2.md) | 🟩 **AKTIVAN SPEC** — desktop: granice (`store`, `desktop` bez logike), Tauri ugovor (`Report` nepromijenjen), SQLite shema, watcher, 8 pogleda, teme i znak, splash, ovisnosti, dug M1 koji preuzima, testovi, M0 alati, izlazni uvjet 0.2.0 |
 
 ## `architecture/` — što je izgrađeno
 

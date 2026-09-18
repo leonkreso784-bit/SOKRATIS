@@ -109,3 +109,131 @@ odbijena: paritet je test korisnosti, ne test bugova. Backlog: javiti Leonu da `
    zapadnije od pohranjenog pomaka odbacio commite koje jezgrin filtar zadržava (prvi dan zatvorene
    faze prvi strada). Mjerodavan ostaje jezgrin `commit_date >= since`, pa rezerva ne mijenja ni
    jednu brojku — čini izvještaj neovisnim o stroju, što je uvjet za CI (M3).
+
+---
+
+## S-012 — Tauri ugovor = `Report` nepromijenjen; mjerenje u `core`, oblikovanje u Svelteu (2026-09-18)
+
+**Kontekst:** M2 dodaje sučelje nad jezgrom iz M1. Tri pristupa: tanak Tauri koji vraća `Report`
+kakav jest; debeo Tauri koji priprema gotove modele po ekranu; sve u desktop crateu.
+**Odluka:** naredba `get_report` vraća **isti JSON koji ispisuje `sokratis report --json`**; jedini
+nov oblik prema sučelju je tanak `ProjectSummary` za Pregled. Ono što je **mjerenje** (zbroj vizija po
+stanju, razlika dviju snimki, `until`) ide u `core` i izlazi u `Report`; ono što je **oblikovanje**
+(postoci, sati na decimalu, natpisi) radi Svelte u jednom modulu s testom. Debeo Tauri odbijen:
+oblikovanje bi postojalo dvaput (tablica i ekran) i svaka promjena dizajna dirala bi Rust.
+**Posljedice:** sučelje i terminal čitaju isti ugovor — kad se raziđu, zna se tko laže; snapshot
+`Report`-a (S-022) čuva oba odjednom; CLI dobiva `--until` da svaku brojku s ekrana Leon može ponoviti.
+
+## S-013 — nov crate `sokratis-store`; `desktop` bez logike (2026-09-18)
+
+**Kontekst:** SQLite, registar projekata i watcher trebaju negdje živjeti. Kandidati: unutar `io`,
+unutar Tauri cratea, ili nov crate.
+**Odluka:** pohrana je nov crate `sokratis-store` koji ovisi o `core` (tipovi), ne o `io`; watcher ide
+u `io` (to je I/O nad diskom); `apps/desktop/src-tauri` (crate `sokratis-desktop`) drži samo naredbe,
+prozore, tray i splash — **ništa što bi se htjelo testirati**.
+**Posljedice:** `store` se testira nad `:memory:` bazom bez gita; watcher se testira bez prozora
+(javlja kroz `mpsc` kanal); CLI kasnije može posuditi registar (`sokratis projects`). Cijena: jedan
+crate više u workspaceu.
+
+## S-014 — što SQLite drži: istina koju git ne zna + pogodnost koja se izvodi iznova (2026-09-18)
+
+**Kontekst:** S-009 je rekao „SQLite u M2", ne za što. PRD §6: git je izvor istine, izvještaj je
+uvijek isti za isti git. Leon je odabrao registar + snimke + keš.
+**Odluka:** baza `%LOCALAPPDATA%\sokratis\sokratis.db` drži (a) **istinu koju git ne zna**: registar
+projekata, postavke, odabran raspon po projektu; (b) **pogodnost**: snimke brojki jednom dnevno
+(`SnapshotMetrics`, ne cijeli `Report` — on se reproducira iz gita) uz zapis profila kao **kanonski
+JSON** (ne hash: `DefaultHasher` nije stabilan među verzijama, a nova ovisnost samo za hash je pravilo
+#6 naopako), i keš **sirovih** činjenica o commitu po SHA — nikad klasifikacije, jer ona ovisi o
+regexima iz profila. **Keš ulazi tek ako mjerenje nakon M11 pokaže da treba** (pravilo #4); do tada
+je tablica definirana i prazna. Zamjenjuje `%APPDATA%\sokratis\config.json` iz ocrta M1.
+**Posljedice:** promjena profila je vidljiva kao oznaka u trendu, ne kao lažni lom krivulje; nikad
+nema zapisa po commitu („dnevni zadatak koji bilježi" ostaje odbijen); brisanje baze gubi samo
+registar i postavke, sve ostalo se izvodi iznova.
+
+## S-015 — projekt = zajednički git-direktorij; ručni podaci se pišu u glavno stablo (2026-09-18)
+
+**Kontekst:** Sokrat Study ima pet radnih stabala; `.sokratis/` je praćen u gitu, pa svako stablo
+ima svoj primjerak koji se razilazi do spajanja. PRD kaže da su stabla jedan projekt.
+**Odluka:** identitet projekta je `git rev-parse --git-common-dir`; dodavanje bilo kojeg stabla
+grupira sva; `overrides.json` i `visions.json` se pišu **uvijek u glavno stablo** (ono uz `.git`),
+atomarno (privremena datoteka + `rename`), u obliku kakav Leon piše rukom. **Sokratis nikad ne
+commita sam** — upis je necommitana izmjena u `git status`. Alternative (stablo zadane grane; stablo
+koje je dodano; pitati) odbijene: prebacuju se, nestaju, ili traže odluku u trenutku ispravka.
+**Posljedice:** jedno mjesto za ručne podatke, bez razilaženja; `GitSource::worktrees` iz M1 dobiva
+prvog potrošača; stablo obrisano izvan Sokratisa nestaje s popisa, glavno se ne mijenja samo.
+
+## S-016 — watcher u `io`: `.git` + docs + `.sokratis`, odgoda 600 ms, bez petlje (2026-09-18)
+
+**Kontekst:** aplikacija je stalno otvorena; Leon je odabrao osvježavanje watcherom + gumb.
+Periodični tajmer i „samo ručno" odbijeni (stare brojke, prazan CPU-posao).
+**Odluka:** `notify` u `io`, po projektu nadzire zajednički `.git` (`HEAD`, `refs/`, `logs/HEAD`,
+`packed-refs`), dnevnik/plan/`docs/` u svakom stablu i `.sokratis/` u glavnom. Tri zaštite sa svojim
+testovima: **odgoda 600 ms** sažima rafal jednog commita u jedan izračun; **vlastiti upisi su
+potisnuti** 2 s da uređivanje vrste ne pokrene petlju; **izračun je serijski po projektu**, novi
+događaj zamjenjuje čekanje. Javlja kroz `mpsc` kanal, ne zna za Tauri.
+**Posljedice:** M11 (performanse) prestaje biti udobnost i postaje uvjet — 3,2 s u petlji je kvar;
+cilj ispod 500 ms je mjerenje u testu, ne tvrdnja.
+
+## S-017 — `tokens.css` preuzet cijel; `brand-*` iz loga, izmjeren; Tailwind kroz Vite plugin (2026-09-18)
+
+**Kontekst:** S-006 traži isti izgled kao Sokrat Study; Sokratis ima svoj znak (cijan `#00dce8`,
+ljubičasti čvorovi, tamni disk). Neonski cijan na bijeloj ima kontrast ≈1,7:1.
+**Odluka:** struktura `tokens.css` (`@theme static`, semantička imena, brisanje zadane palete) i sve
+četiri teme preuzimaju se kakve jesu; **mijenja se samo obitelj `brand-*`**, izvedena iz hue-a loga
+(≈183°) tako da `brand-600/700` prolaze ≥ 4,5:1 na sve tri plohe svake svijetle teme, a neon ostaje
+za tamne teme i sam znak. Provjera je skripta `check:contrast`, ne oko. Tailwind kroz
+`@tailwindcss/vite` — Vite je ionako tu zbog Sveltea.
+**Posljedice:** Sokratis izgleda kao rođak Sokrat Studyja, ne klon; svaka boja u markupu je token;
+promjena vrijednosti tokena traži ponovno mjerenje. Sokrat Study se ne dira.
+
+## S-018 — grafovi su vlastiti SVG, bez biblioteke (2026-09-18)
+
+**Kontekst:** tablica je imala grafove (kumulativna linija, pita vrsta rada) i gubila ih pri dopuni;
+Leon proučava, pa grafovi nisu ukras. Kandidati: ručni SVG, uPlot/LayerChart, Chart.js.
+**Odluka:** četiri Svelte komponente (`Bars` · `Line` · `Ring` · `Sparkline`) s bojama isključivo
+`var(--color-*)`. Biblioteke odbijene: jedna ovisnost više za pinati i obrazlagati, i posao vezanja
+njezinih boja na tokene bez kojeg teme razočaraju; Chart.js uz to nosi vlastit prepoznatljiv izgled.
+**Posljedice:** teme rade bez dodatnog koda; osi, mreža i tooltip su naši i ostaju jednostavni
+(`<title>`/`aria-label`); kad točaka bude tisuće, mjerenje odlučuje o biblioteci — ne prije.
+
+## S-019 — animacija jednom po pokretanju procesa; glavni prozor čeka; preskočiva (2026-09-18)
+
+**Kontekst:** Leon je dostavio gotovu animaciju (`sokratis-intro-clean-graph.html`, 4,2 s, canvas,
+dva WebP-a) i zaključak `S ◍ KRATIS`. Uz autostart i tray, pravo pokretanje je rijetko, otvaranje
+prozora iz traya često.
+**Odluka:** splash je zaseban prozor bez okvira; animacija se preuzima **doslovno** (vremenska crta,
+boje, dvije slike) i vrti **jednom po pokretanju procesa**, ne pri otvaranju iz traya. Za to vrijeme
+se učitavaju projekti; glavni prozor se pokazuje kad su **oba** gotova. Klik/tipka preskače na zadnji
+kadar; `prefers-reduced-motion` dobiva zadnji kadar odmah (kao u Leonovu kodu).
+**Posljedice:** 4,2 s nikad nije prazno čekanje; znak je dio identiteta bez da smeta petnaest puta
+na dan; tray-ikona traži pojednostavljen znak jer se lik na 16 px stopi (provjera gledanjem).
+
+## S-020 — tray minimizira, autostart, jedna instanca, obavijest samo na prijelaz u Alert (2026-09-18)
+
+**Kontekst:** PRD traži tray i obavijest na Alert; Leon je odabrao najprisutniju varijantu.
+**Odluka:** X sakriva prozor, izlaz je izričit iz tray-izbornika; autostart s Windowsom je postavka
+koju Leon može isključiti; `single-instance` podiže postojeći prozor umjesto druge ikone; obavijest
+OS-a ide **samo kad signal prijeđe u Alert ili se pojavi nov Alert**, nikad pri svakom osvježavanju.
+**Posljedice:** watcher radi i dok prozor ne postoji, pa obavijest stiže i dok Leon ne gleda; ista
+nespojena grana ne javlja svakih par minuta; četiri Tauri plugina (dialog, notification, autostart,
+single-instance) su namjerne ovisnosti.
+
+## S-021 — HR/EN prekidač već u M2; rječnik s jednakim ključevima (2026-09-18)
+
+**Kontekst:** BACKLOG je HR/EN vodio kao „M2/M3"; S-008 je jezgru već učinio engleskom. Leon je
+odabrao prekidač odmah, ne samo hrvatski s rječnikom.
+**Odluka:** `hr.json` + `en.json`, jedan ključ po natpisu, vlastiti `t(key)` bez biblioteke; test
+tvrdi da obje datoteke imaju iste ključeve; nijedan natpis u komponenti. Jezgrini identifikatori su
+ključevi, natpisi su vrijednosti.
+**Posljedice:** svaki novi ekran traži dva natpisa i provjeru širine; objava u M3 ne traži prolazak
+kroz ekrane; CLI-tablica ostaje hrvatska (BACKLOG, M3).
+
+## S-022 — snapshot `Report`-a je prva cigla M2; oblik se mijenja samo namjerno (2026-09-18)
+
+**Kontekst:** M1 je `insta` uklonio jer bi snimka zamrznula oblik koji se još mijenja (I7); M2 gradi
+sučelje nad tim oblikom, pa svaka nenamjerna promjena JSON-a tiho lomi ekran.
+**Odluka:** prva cigla M2 je snapshot cijelog `Report`-a nad fixtureom pariteta (`insta` se vraća
+jednim retkom); svaki dodatak koji mijenja oblik (`until`, `vision_totals`, `commits`) mijenja
+snimku **namjerno** (`cargo insta review`) s obrazloženjem u commitu.
+**Posljedice:** ugovor CLI ↔ sučelje ima jedan test; recenzent vidi promjenu oblika u diffu snimke,
+ne u pogađanju; `RUST.md` §2 dobiva `insta` natrag kao dev-ovisnost `core`-a.
