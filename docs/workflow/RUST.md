@@ -88,7 +88,7 @@ Test za pravilo: **Leon može pročitati datoteku i reći što radi.** Ako ne mo
 | `Option<T>` | M1 (docs) | vrijednost ili ništa, bez `null` |
 | `Vec<T>`, `HashMap<K, V>` | M1 (metrike) | rastući niz; mapa ključ → vrijednost |
 | iteratori (`iter().filter().map()`) | M1 (metrike) | lijeni cjevovod nad kolekcijom; `collect()` ga materijalizira |
-| `trait` i trait objekt (`Box<dyn Rule>`) | M1 (T13, `rules/mod.rs`) | ugovor koji tip ispunjava; `dyn` = poziv preko ugovora u vrijeme izvođenja, pa jedan `Vec` drži raznorodna pravila |
+| `trait` i trait objekt (`Box<dyn Rule>`) | M1 (T13, `rules/mod.rs`); dopuna M2/14b (`io/src/cache.rs`, `&dyn CommitCache`/`&dyn GitSource`; `io/src/project.rs`, `Option<&dyn CommitCache>`) | ugovor koji tip ispunjava; `dyn` = poziv preko ugovora u vrijeme izvođenja, pa jedan `Vec` drži raznorodna pravila. Posuđeni trait-objekt (`&dyn`) kao argument funkcije nosi istu ideju bez vlasništva: pozivatelj bira implementaciju (SQLite, memorija u testu) po pozivu, a `io` je nikad ne poznaje po imenu (S-013); `Option<&dyn …>` dodaje „ili nijedna" istim mehanizmom kao `Option` nad bilo kojim tipom |
 | `derive` | M1 (model) | kompajler generira implementaciju (`Debug`, `Clone`, `Serialize`) |
 | `mod` i `pub` | M1 (workspace) | moduli su datoteke/mape; ništa nije javno dok ne kažeš |
 | `#[cfg(test)]` | M1 (prvi test) | kod koji postoji samo pri `cargo test` |
@@ -186,6 +186,9 @@ Test za pravilo: **Leon može pročitati datoteku i reći što radi.** Ako ne mo
 | oporavak iz otrovanog `Mutex`-a (`PoisonError::into_inner`) | M2/13 (`io/src/watch.rs::lock_shared`) | kad jedna nit panira dok drži bravu, `Mutex` se „otruje"; `unwrap_or_else(\|p\| p.into_inner())` svjesno nastavlja sa stanjem ispod jer ovdje nema invarijante koja bi ostala polupisana — alternativa `expect()`-u (pravilo #6) opravdana u zaglavlju cigle |
 | `thread::spawn` s `loop`/`recv_timeout` kao „otkucaj" | M2/13 (`io/src/watch.rs::debounce_loop`) | pozadinska nit se budi periodički umjesto da čeka zauvijek; izlazi sama kad `RecvTimeoutError::Disconnected` javi da su svi pošiljatelji nestali, bez ručnog signala za gašenje |
 | `std::slice::from_ref` | M2/13 (`io/tests/watch.rs`) | pretvara `&T` u `&[T]` bez kloniranja — jedan element kao rezanje, gdje `clippy::cloned_ref_to_slice_refs` odbija `&[x.clone()]` |
+| `Box<dyn Error + Send + Sync>` | M2/14b (`io/src/cache.rs`, `CacheError`) | tip greške čiji KONKRETAN nositelj `io` ne poznaje (dolazi iz stranog cratea, npr. `rusqlite`, ožičen tek u desktopu T29) — jedini potpis koji prihvaća „bilo koja greška" i smije putovati preko granice dretvi (`Send + Sync`) |
+| `Stdio::piped()` + `Child::stdin.take()` | M2/14b (`io/src/git.rs::run_with_stdin`) | otvara pipe na stdin/stdout/stderr djeteta procesa; `take()` uzima vlasništvo nad `Option<ChildStdin>` da se pipe stvarno ZATVORI (drop) prije `wait_with_output()` — bez toga `git --stdin` čeka EOF zauvijek |
+| inverz parsera / okrugli put (round-trip) | M2/14b (`core/src/parse/gitlog.rs::format_gitlog`, test `parse → format → parse`) | funkcija koja poništava drugu (`format_gitlog` je inverz `parse_git_log`-a); test okruglog puta tvrdi da su ulaz i rezultat nakon oba prolaza jednaki, ne samo da svaki prolaz zasebno radi |
 
 Redak se dodaje **u cigli u kojoj se pojam prvi put pojavi**, s referencom na datoteku.
 

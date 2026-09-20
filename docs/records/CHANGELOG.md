@@ -146,6 +146,23 @@ Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek sesije:
   Brane nakon spajanja (merge `11b1708`): `cargo fmt --check` OK · `cargo clippy --workspace
   --all-targets -- -D warnings` OK · `cargo test --workspace` **124 testa, 0 padova** · `sokratis
   signals .` = nema signala. Tok CLI je time **gotov** (T19 u `main`-u).
+- **`M2/14b` — potrošač keša sirovih commita (2026-09-20, cigla IZVAN plana od 35).** Napisao ju je
+  orkestrator, ne brif iz plana: povod je mjerenje M2/11 (izvještaj nad Sokrat Studyjem i dalje ≥ prag
+  500 ms) i keš iz M2/18 (dotad bez potrošača). Korisnik CLI-ja ne vidi ništa novo — CLI keš i dalje ne
+  koristi. Ispod: `sokratis-io` dobiva `CommitCache` (trait `cached`/`store`) i `cached_log` —
+  `GitSource::rev_list` kaže što je dostižno u prozoru SADA, keš vraća poznate commite, `git log
+  --no-walk --stdin` dovlači SAMO nedostajuće; `commit --amend`/`reset --hard` time ne ostavljaju stari
+  SHA u brojkama iako ostaje u kešu. `sokratis-core` dobiva `format_gitlog` (inverz parsera git loga, s
+  testom okruglog puta) jer keš pamti `Commit`-e, ne sirovi tekst. `io` i dalje ne ovisi o `store`
+  (S-013) — adapter prema `sokratis-store` dolazi u desktopu (T29). **Izmjereno nad Sokrat Studyjem**
+  (release, `SOKRATIS_PERF_REPO`): bez keša ~2,0–2,7 s, topao keš + izvještaj **256–472 ms** — cilj
+  < 500 ms postignut. Poznata ograničenja (`BACKLOG.md`): `touched.skipped_lines` na keširanom putu ne
+  broji retke iz PRVOG čitanja commita; ključ keša je kratki SHA (`%h`), pa se keš jednom puni iznova
+  ako git produlji kraticu (točnost ne strada).
+  Brane nakon spajanja (merge `0740685`): `cargo fmt --check` OK · `cargo clippy --workspace
+  --all-targets -- -D warnings` OK · `cargo test --workspace` **136 testova, 0 padova, 1 ignoriran**
+  (mjerni test) · `sokratis signals .` = nema signala. Tok IO je time **gotov u cijelosti** (T10–T14 +
+  M2/14b u `main`-u).
 
 ## [0.1.0] — 2026-09-17 — Jezgra i CLI (Milestone 1)
 

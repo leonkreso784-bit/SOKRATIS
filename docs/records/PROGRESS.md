@@ -655,7 +655,61 @@ dokumentacije koji u njoj radi, novim odlomkom „Nastavak iste sesije", ne novi
   kraju sesije). RUST.md §4 nedirana — cigla ne uvodi nov pojam (`as_deref()` je već u pojmovniku, M1
   T11a). `cargo run -q -p sokratis-cli -- docs .` provjeren prije i poslije izmjena.
 
+**Nastavak iste sesije — IO 2/2 (M2/14b, potrošač keša) spojen u `main`, tok IO potpuno gotov.**
+
+- **M2/14b spojen** (merge `0740685`: `f3fdd11` + krug popravka `9604dbd`, samo komentari). **Cigla
+  izvan plana od 35** — napisao ju je orkestrator, ne graditelj po brifu iz plana: povod je mjerenje
+  M2/11 (izvještaj nad Sokrat Studyjem i dalje ≥ prag 500 ms) i cigla M2/18 (SQLite keš sirovih
+  commita, već u `main`-u kroz STORE, dotad bez potrošača).
+  - `sokratis-core`: `parse::gitlog::format_gitlog(&[Commit]) -> String` — INVERZ `parse_git_log`-a, s
+    testom okruglog puta (parsiraj → formatiraj → parsiraj daje isti `Vec<Commit>`); `ReportInput.git_log`
+    ostaje tekst bez obzira dolazi li od `git log` ili od keša (S-012), ugovor i snapshot netaknuti.
+  - `sokratis-io`: trait `CommitCache { cached, store }` + `cached_log(...)` u novom `src/cache.rs`;
+    `GitSource` dobiva `rev_list` (isti prozor i poredak kao `log`, izvedeno iz JEDNE funkcije
+    `window_args` da se dva puta ne mogu razići) i `log_commits` (`git log --no-walk=unsorted --stdin`,
+    stdin kroz `Stdio::piped()` + `take()`); `Project::input_cached(since, until, &dyn CommitCache)`;
+    nove greške `IoError::Cache` · `CacheIncomplete { sha }` · `LogParse`.
+  - **Ponašanje:** `rev-list` kaže ŠTO je dostižno u prozoru SADA; keš vraća commite koje već zna;
+    dovlače se SAMO nedostajući (`git log --no-walk --stdin`); u izvještaj ulaze ISKLJUČIVO dostižni
+    commiti (obavezni testovi: `commit --amend` i `reset --hard` ne ostavljaju stari SHA u brojkama,
+    iako ostaje u kešu — golo „dovuci sve novije od najnovijeg keširanog" taj rub ne bi pokrilo). Prozor
+    uvijek presuđuje `rev-list`, ne keš. Greška keša je VIDLJIVA — nema tihog povratka na puni log
+    (politiku „kad se to smije dogoditi" dobiva desktop, T29). `io` i dalje NE ovisi o `store` (S-013)
+    — adapter prema `sokratis-store` dolazi u desktopu (T29). CLI keš i dalje ne koristi.
+  - **Poznata ograničenja, zapisana u `BACKLOG.md`:** `touched.skipped_lines` na keširanom putu ne broji
+    retke preskočene pri PRVOM čitanju commita (keš pamti `Commit`-e, ne sirovi tekst); ključ keša je
+    kratki SHA (`%h`) — ako git jednog dana produlji kraticu, keš se jednom puni iznova, točnost ne strada.
+  - **Mjerenje nad Sokrat Studyjem** (samo čitanje, `--release`, `#[ignore]` test
+    `measure_cached_input_over_a_real_repo` kroz varijablu `SOKRATIS_PERF_REPO`, test ujedno tvrdi
+    jednakost commita i JSON-a `build_report`-a između keširanog i običnog puta): graditelj — bez keša
+    2696 ms · hladan keš 2853 ms (5 procesa) · topao keš 441 ms (4 procesa) · `build_report` 31 ms ·
+    topao ulaz + izvještaj **472 ms**; recenzent (opus), neovisno ponovljeno — 2022 ms · 1663 ms · 237 ms
+    · 19 ms · **256 ms**. Cilj < 500 ms postignut u oba mjerenja.
+  - **Brane na `main`-u:** `cargo fmt --check` OK · `cargo clippy --workspace --all-targets -- -D
+    warnings` OK · `cargo test --workspace` **136 passed, 0 failed, 1 ignored** (ignoriran je upravo
+    mjerni test) · paritet (`parity.rs`) i snapshot zeleni bez izmjene · `sokratis signals .` = nema
+    signala. `main` pushan na `origin` (trajni OK, pravilo #1).
+  - **Tok IO je time GOTOV u cijelosti** (T10–T14 + M2/14b), uz PROFIL, JEZGRA, STORE i CLI otprije
+    gotove. Time su ispunjeni svi preduvjeti za DESKTOP (T29–T33) OSIM sučelja.
+- **Stanje ostalog, nepromijenjeno ovim spajanjem:** SUČELJE (`sokratis.ui`, `feat/ui`) — M2/20–M2/24 i
+  M2/25 (okvir s `api.ts`) SPOJIVO, **M2/26 sad recenziran SPOJIVO**, **M2/27** (SVG-grafovi u pogledu)
+  u krugu popravka — vizualni nalaz: prsten (Ring) prevelik, bez legende; **M2/28** slijedi. Ništa od
+  SUČELJA još nije u `main`-u. Sedam stabala i dalje na disku.
+- **Opseg preostatka ove sesije nepromijenjen (Leonova odluka):** DESKTOP (T29–T33), INTEGRACIJA
+  (T34–T35) i završna recenzija cijelog M2 su **treća sesija**.
+- **Čuvar dokumentacije (način A), ovaj zapis:** `PROGRESS.md` (ovaj odlomak), `CHANGELOG.md` (redak
+  M2/14b pod `[Unreleased]`, izričito označen kao cigla izvan plana), `RUST.md` §4 (novi retci:
+  `Box<dyn Error + Send + Sync>`, `Stdio::piped()` + `take()`, inverz parsera/okrugli put; dopuna
+  postojećeg retka o trait-objektu za `&dyn CommitCache`/`Option<&dyn CommitCache>` kao posuđeni,
+  zamjenjivi trait-objekt), `ROADMAP.md` („Gdje smo", status M2 — tok IO gotov u cijelosti),
+  `CLAUDE.md` („Stanje — TRENUTNO": M2/14b gotov, keš ima potrošača u `io`, adapter čeka T29),
+  `BACKLOG.md` (dva nova poznata ograničenja). `docs/plan/superpowers/…m2-desktop.md` NIJE dirana (plan
+  je zapis; da je M2/14b izvan njega stoji ovdje, ne tamo). `ARCHITECTURE.md` namjerno nedirana (čuvar
+  B je piše cijelu za IO/STORE/CLI na kraju sesije). `cargo run -q -p sokratis-cli -- docs .` provjeren
+  prije i poslije izmjena.
+
 ### Što slijedi
-Spajanje SUČELJE (nakon M2/26–M2/28) pa M2/14b (potrošač keša, tok IO); CLI je gotov. DESKTOP i
-INTEGRACIJA su treća sesija. Ledger:
-`.superpowers/sdd/2026-09-18-m2-desktop/progress.md`, odjeljak „STANJE ZA NOVU SESIJU".
+Spajanje SUČELJA (nakon M2/27–M2/28, uz krug popravka Ring-a) je jedino što još stoji između `main`-a i
+DESKTOP-a; tokovi KOSTUR · PROFIL · JEZGRA · STORE · IO · CLI su svi gotovi i u `main`-u. DESKTOP
+(T29–T33), INTEGRACIJA (T34–T35) i završna recenzija cijelog M2 su **treća sesija** (Leonova odluka).
+Ledger: `.superpowers/sdd/2026-09-18-m2-desktop/progress.md`, odjeljak „STANJE ZA NOVU SESIJU".

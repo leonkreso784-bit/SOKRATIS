@@ -18,6 +18,8 @@
 | `sokratis docs .` mjeri samo korijen i `docs_dir`; `.md` pod `apps/desktop` (npr. budući README sučelja) nitko ne provjerava | M3 (profil: više `docs_dir`-ova ili `extra_docs_dirs`) | nalaz čuvara 2026-09-18 |
 | „Klasifikacija jednom" (spec §3.2) nije dovršena: `metrics/kinds.rs::commit_rows`/`kind_stats` (M2/5) klasificiraju svaki commit jednom za `Report.commits`, ali `metrics/indicators.rs:31` (`kind_count`) i dalje zove `effective_kind` odvojeno za `debugging_commits`/`docs_share` — commit se klasificira više od jednom | M2, odluka na završnoj recenziji | nalaz recenzije M2/5 (2026-09-18); stanje koda: `ARCHITECTURE.md` §11 |
 | `sokratis report --table` u zaglavlju ispisuje samo „od {since}" — `until` se u tabličnom ispisu ne vidi iako je prozor ograničen (JSON je točan) | M2, završni krug popravaka | nalaz recenzije M2/19 (2026-09-20); `table.rs` nema presedan za uvjetno dodavanje polja u zaglavlje |
+| Keširani put (`cached_log`, M2/14b) ne broji `touched.skipped_lines` iz PRVOG čitanja commita — keš pamti `Commit`-e (strukturu), ne sirovi tekst git loga | M2, desktop (T29) ili odluka da nije bitno | poznato ograničenje ugrađeno u zaglavlje `io/src/cache.rs`; ne utječe na commite/redak-brojke, samo na broj preskočenih redaka pri parsiranju |
+| Ključ keša sirovih commita je kratki SHA (`%h`) — ako git jednog dana produlji zadanu duljinu kratice, keš se jednom puni iznova (jednokratni trošak, ne kvar) | M2, desktop (T29) ili odluka da nije bitno | poznato ograničenje ugrađeno u zaglavlje `io/src/cache.rs`; točnost brojki ne strada |
 
 ## Iz završne recenzije M1 (nalazi koji nisu popravljeni u M1)
 
@@ -67,7 +69,6 @@ Ovdje ostaju samo dvije stavke koje M2 **ne** uzima:
 | Pogled s telefona na LAN-u (lokalni servis + PWA) | razmatrano kao ljuska C; nije odabrano, ali jezgra to ne sprječava |
 | Snimke ocjena kroz vrijeme kao graf (trend docs-čistoće) | → spec M2 [§4.2](../plan/ARHITEKTURA_M2.md) (S-014); samo pointer |
 | `gix` umjesto `git` procesa | tek kad mjerenje kaže da je sporo (S-003) |
-| Keš parsiranih commita po SHA u SQLite-u | → spec M2 [§4.4](../plan/ARHITEKTURA_M2.md): tablica definirana, cigla **tek ako mjerenje nakon M11** to traži (pravilo #4) |
 | Vektorizacija znaka (danas raster WebP/PNG iz Leonove datoteke) | kad tray na 16 px ili instalater to zatraže; M2 rješava pojednostavljenim rasterom |
 | Otvaranje nalaza dokumentacije u editoru (danas klik kopira putanju) | M3; traži `tauri-plugin-opener` — jedna ovisnost više |
 
