@@ -20,6 +20,11 @@
 //! `ParseError::PathOutsideRoot`-a (ime polja + vrijednost) bi se ispisala DVAPUT, isto što je I5
 //! već jednom popravio za `Profile`/`Manual`. Ime polja i dalje stiže do korisnika — samo kroz
 //! LANAC (`std::error::Error::source`), ne kroz top-poruku.
+//!
+//! Cigla M2/14b (potrošač keša): tri nove varijante slijede ISTI obrazac I5. `Cache` nosi
+//! `crate::cache::CacheError` (`Box<dyn Error + Send + Sync>`) — thiserror i njemu daje `#[source]`
+//! jer std implementira `Error` za taj boksani tip. `CacheIncomplete` NEMA `#[source]`: rub koji
+//! opisuje (git tvrdi da je commit dostižan, pa ga ne vrati) nema uzrok izvan sebe.
 use std::path::PathBuf;
 use thiserror::Error;
 #[derive(Debug, Error)]
@@ -56,4 +61,10 @@ pub enum IoError {
     Encode(#[from] serde_json::Error),
     #[error("watcher: {0}")]
     Watch(String),
+    #[error("keš commita")]
+    Cache(#[source] crate::cache::CacheError),
+    #[error("keš commita: git nije vratio commit {sha} koji je sam naveo kao dostižan")]
+    CacheIncomplete { sha: String },
+    #[error("git log se ne da pročitati")]
+    LogParse(#[source] sokratis_core::ParseError),
 }

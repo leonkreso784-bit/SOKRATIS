@@ -24,7 +24,11 @@
 //! prije nego što bi itko prijavio grešku. `input_between` postaje jedino mjesto koje sastavlja
 //! `ReportInput`; `input` je tanka omotnica (`until: None`) da postojeći pozivatelj (CLI) ostane
 //! nepromijenjen.
-use crate::{GitCli, GitSource, IoError};
+//!
+//! Cigla M2/14b (potrošač keša): `input_between`/`input_cached` su sad tanke omotnice oko
+//! privatne `input_with`, koja uzima `Option<&dyn CommitCache>` — `None` čita git izravno,
+//! `Some(cache)` ide kroz `cached_log`. Jedna razlika u tijelu, dva javna imena.
+use crate::{CommitCache, GitCli, GitSource, IoError, cached_log};
 use sokratis_core::{DocFile, Profile, ReportInput, Vision, WorkKind};
 use std::collections::{BTreeMap, HashMap};
 use std::path::{Path, PathBuf};
@@ -234,13 +238,14 @@ impl Project {
     }
 
     /// Sastavlja `ReportInput` za jezgru: grana, log od `profile.log_since()` do `until` (ako je
-    /// zadan), dnevnik/plan ako postoje, dokumentacija, grane, ručni podaci i „sada"/„danas"
-    /// (`chrono` — jedino mjesto sata u sustavu). `until` je gornja granica razdoblja (S-011); bez
-    /// nje (`None`) log ide do kraja.
-    pub fn input_between(
+    /// zadan; direktno iz gita ili kroz keš — vidi `cache` niže), dnevnik/plan ako postoje,
+    /// dokumentacija, grane, ručni podaci i „sada"/„danas" (`chrono` — jedino mjesto sata u
+    /// sustavu). `until` je gornja granica razdoblja (S-011); bez nje (`None`) log ide do kraja.
+    fn input_with(
         &self,
         since: Option<&str>,
         until: Option<&str>,
+        cache: Option<&dyn CommitCache>,
     ) -> Result<ReportInput, IoError> {
         // (ref_name, label): git čita `ref_name`, izvještaj pokazuje `label`. Razlikuju se samo u
         // detached stanju, gdje grane nema, a commita ima — poruka „nema commita" bi lagala.
@@ -276,8 +281,14 @@ impl Project {
         // i početke zatvorenih faza) i korisnikova `--since`. Bez tog `min`-a je `--since`
         // stariji od profila tiho dobivao kraći log nego što `Report.since` tvrdi.
         let fetch_since = self.profile.log_since().min(since.clone());
+        // Jedina razlika između dva puta (cigla M2/14b): `Some(cache)` ide kroz `cached_log`
+        // (dovlači SAMO nedostajuće commite), `None` čita git izravno kao prije.
+        let git_log = match cache {
+            Some(cache) => cached_log(&self.git, cache, &ref_name, &fetch_since, until)?,
+            None => self.git.log(&ref_name, &fetch_since, until)?,
+        };
         Ok(ReportInput {
-            git_log: self.git.log(&ref_name, &fetch_since, until)?,
+            git_log,
             diary: read_opt(&self.profile.diary_path),
             plan: read_opt(&self.profile.plan_path),
             docs: self.docs()?,
@@ -293,6 +304,28 @@ impl Project {
             until: until.map(str::to_string),
             branch: label,
         })
+    }
+
+    /// Prozor BEZ keša: git se čita izravno. CLI (T19) i pozivatelji koji ne biraju gornju
+    /// granicu i dalje zovu `input`, tanku omotnicu oko ovoga.
+    pub fn input_between(
+        &self,
+        since: Option<&str>,
+        until: Option<&str>,
+    ) -> Result<ReportInput, IoError> {
+        self.input_with(since, until, None)
+    }
+
+    /// Prozor KROZ keš (cigla M2/14b, S-014): `cached_log` pita `rev_list` ŠTO je dostižno SADA i
+    /// dovlači SAMO commite kojih `cache` još nema — amend/rebase/reset nikad ne ostave stari SHA
+    /// u brojkama, iako ostaje u kešu kao smeće.
+    pub fn input_cached(
+        &self,
+        since: Option<&str>,
+        until: Option<&str>,
+        cache: &dyn CommitCache,
+    ) -> Result<ReportInput, IoError> {
+        self.input_with(since, until, Some(cache))
     }
 
     /// `input(since)` = `input_between(since, None)` — CLI (T19) i pozivatelji koji ne biraju
