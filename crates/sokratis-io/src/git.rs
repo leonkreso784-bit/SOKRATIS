@@ -24,7 +24,7 @@
 //! umjesto praznog stringa jer „nema gornje granice" i „granica je prazan datum" NISU isto stanje,
 //! a `match`/`if let` nad `Option` to prisiljava na svakom pozivu (ne pušta ni jedan slučaj da
 //! prođe tiho). Rezerva prema naprijed je DVA dana (`next_day` dvaput), ne jedan kao za `since`:
-//! smjer je suprotan, pa je i račun zone suprotan (vidi komentar uz `until_arg`).
+//! smjer je suprotan, pa je i račun zone suprotan (vidi doc-komentar `window_args`).
 //!
 //! Cigla M2/14b (potrošač keša): `window_args` izdvaja `since_arg`/`until_arg` iz `log` u JEDNU
 //! funkciju koju sad zove i `rev_list` — dva puta se ne mogu razići jer postoji samo jedan. Nova
@@ -74,8 +74,26 @@ fn output_to_result(out: Output, repo: &Path, args: &[&str]) -> Result<String, I
 }
 
 /// `since_arg`/`until_arg` za `log` I `rev_list` — jedna funkcija da se prozor dovlačenja ne može
-/// razići između dvije naredbe. Rezerve zone (dan unatrag za `since`, dva dana unaprijed za
-/// `until`) ostaju točno kakve jesu — vidi doc-komentare `GitSource::log`/`until_arg` niže.
+/// razići između dvije naredbe (cigla M2/14b — prije refaktora je svaka naredba gradila svoj).
+///
+/// `since_arg`: ` 00:00:00` fiksira sat na ponoć — git-ov parser datuma bez sata uzima TRENUTNO
+/// DOBA DANA (sat kad se naredba pokreće), ne ponoć, izmjereno nad Sokrat Studyjem
+/// (`--since=2026-08-29` u 17:15 → 183 commita, `--since='2026-08-29 00:00'` → 190 commita). Bez
+/// fiksnog sata bi tablica ovisila o TOME KADA se izvještaj generira, ne samo o datumu. `prev_day`
+/// dodaje JEDAN dan rezerve unatrag (nalaz I2): ta je ponoć u zoni STROJA, a datumi commita
+/// (`%ad`/`%cd`) su u zoni COMMITA, pa bi git zapadno od pohranjenog pomaka odbacio commit koji
+/// jezgra (`commit_date >= since`) zadržava.
+///
+/// `until_arg`: rezerva prema naprijed je DVA dana (`next_day` dvaput), ne jedan kao za `since` —
+/// smjer je suprotan, pa je i račun zone suprotan. Primjer: commit datiran `until` u zoni −12:00
+/// pada na `until+1 12:00 UTC`, a stroj u zoni −12:00 ima ponoć `until+2` tek u `until+2 12:00 UTC`
+/// — jedan dan rezerve (kao za `since`) ne bi bio dovoljan u OVOM smjeru, jer se granica pomiče
+/// prema BUDUĆNOSTI, ne prošlosti.
+///
+/// U OBA slučaja jezgra presuđuje `since <= commit_date <= until` string-usporedbom (S-011), pa
+/// rezerva ovdje NE mijenja nijednu brojku — samo osigurava da git ne odbaci commit prije nego što
+/// jezgra stigne odlučiti. `unwrap_or_else` vraća neispravan datum nepromijenjen u oba slučaja:
+/// njega jezgra prijavi kao `ParseError::BadDate` (C2), ne ovaj sloj.
 fn window_args(since: &str, until: Option<&str>) -> (String, Option<String>) {
     let from = sokratis_core::civil::prev_day(since).unwrap_or_else(|| since.to_string());
     let since_arg = format!("--since={from} 00:00:00");
@@ -99,7 +117,7 @@ pub trait GitSource {
     ///
     /// `until` je gornja granica (cigla M2/14, S-011 dopuna 2): `None` znači „bez gornje granice"
     /// (do kraja loga). Kad je zadan, implementacija MORA dodati DVA dana rezerve prema naprijed —
-    /// vidi komentar uz `until_arg` u `GitCli::log` za izračun. Jezgra presuđuje
+    /// vidi doc-komentar `window_args` za izračun. Jezgra presuđuje
     /// `commit_date <= until`, pa rezerva ovdje ne mijenja nijednu brojku, samo osigurava da git
     /// ne odbaci commit prije nego što jezgra stigne odlučiti.
     fn log(&self, branch: &str, since: &str, until: Option<&str>) -> Result<String, IoError>;
@@ -168,6 +186,11 @@ impl GitCli {
     /// i onda ZATVORITI (drop) — bez zatvaranja `git --stdin` čeka EOF koji nikad ne stiže. Ako
     /// pisanje padne (proces je već izašao), svejedno se čeka ishod: proces koji je pukao svojom
     /// greškom je vjerodostojniji uzrok nego naš `write_all`.
+    ///
+    /// Cijeli stdin se upiše PRIJE čitanja stdouta (`wait_with_output` čita oba tek nakon petlje
+    /// upisa) — sigurno SAMO za naredbe koje iscrpe stdin prije prvog bajta izlaza (`git log
+    /// --stdin` sve revizije pročita u `setup_revisions` prije ijednog retka ispisa). Naredba koja
+    /// bi ispis slala USPOREDO s čitanjem stdina bi se mogla zaglaviti kad stdout napuni cijev.
     fn run_with_stdin(&self, args: &[&str], input: &str) -> Result<String, IoError> {
         self.calls.set(self.calls.get() + 1);
         let mut child = Command::new("git")
