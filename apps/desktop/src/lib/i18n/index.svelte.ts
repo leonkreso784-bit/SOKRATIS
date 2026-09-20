@@ -19,3 +19,10 @@ export function setLang(l: Lang): void {
 export function t(key: string, params?: Record<string, string | number>): string {
   return translate(dicts[current], key, params);
 }
+
+// Dopuna M2/26: `format.ts` (M2/22) svoje funkcije oblikovanja (`relative`, …) namjerno gradi oko
+// `dict: Dict`, ne oko `t()` — ova ljuska je jedini javni put do TOG rječnika u trenutnom jeziku, da
+// pozivatelj ne mora sam ponoviti `dicts[current]` (S-010, jedno mjesto zna vezu jezik → rječnik).
+export function getDict(): Dict {
+  return dicts[current];
+}

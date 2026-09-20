@@ -11,6 +11,7 @@ import type {
   Report,
   Settings,
   Severity,
+  Signal,
   TrendPoint,
   Vision,
   VisionTotal,
@@ -50,6 +51,20 @@ export class MockApi implements Api {
   private readonly overrides = new Map<string, WorkKind>();
   private visions: Vision[] = [];
   private readonly listeners = new Set<(id: number) => void>();
+
+  // Snimka jezgre (M2/17) nema signala — pravila (M2/29+) se nisu ni pokrenula kad je snimljena, pa
+  // `this.report.signals` je uvijek `[]`. Bez primjera traka signala (M2/26) i kartica u Pregledu
+  // nemaju što pokazati u dev-prikazu ni testu. Ovo je SAMO mock koji se koristi kad snimka nema
+  // nijedan signal — `TauriApi` (T34) uvijek vraća prave signale koje je jezgra stvarno izračunala.
+  private readonly mockSignals: Signal[] = [
+    {
+      rule: 'unmerged-branches',
+      severity: 'warn',
+      title_key: 'signal.unmerged_branches',
+      evidence: ['feat/x nije spojena u main (12 commita iza)', 'feat/y nije spojena u main (3 commita iza)'],
+      since: null,
+    },
+  ];
 
   async listProjects(): Promise<ProjectSummary[]> {
     const counts = this.countSignalsBySeverity();
@@ -93,6 +108,7 @@ export class MockApi implements Api {
       commits: this.commitsWithOverrides(),
       visions: this.visions,
       vision_totals: this.visionTotals(),
+      signals: this.signalsForReport(),
     };
   }
 
@@ -155,10 +171,18 @@ export class MockApi implements Api {
   }
 
   private countSignalsBySeverity(): { info: number; warn: number; alert: number } {
-    const info = this.report.signals.filter((s) => s.severity === 'info').length;
-    const warn = this.report.signals.filter((s) => s.severity === 'warn').length;
-    const alert = this.report.signals.filter((s) => s.severity === 'alert').length;
+    const signals = this.signalsForReport();
+    const info = signals.filter((s) => s.severity === 'info').length;
+    const warn = signals.filter((s) => s.severity === 'warn').length;
+    const alert = signals.filter((s) => s.severity === 'alert').length;
     return { info, warn, alert };
+  }
+
+  // Prava snimka nikad nema signala (gore) — dok postoji, mock ih nadomjesti primjerom da Pregled i
+  // traka signala imaju što pokazati; čim jezgra jednom isporuči neprazan `signals`, ovo se samo od
+  // sebe prestaje koristiti.
+  private signalsForReport(): Signal[] {
+    return this.report.signals.length > 0 ? this.report.signals : this.mockSignals;
   }
 
   // Info se ne broji u „najgore" — nijedno pravilo (M2) danas ne javlja Info, a i da javi, to nije
