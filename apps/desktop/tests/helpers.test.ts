@@ -1,11 +1,12 @@
-// ZAŠTO OVAKO (cigla M2/26 — testovi za sortiranje, boju i sažetak signala u Pregledu)
+// ZAŠTO OVAKO (cigla M2/26 — testovi za sortiranje, boju i sažetak signala u Pregledu;
+// dopunjeno M2/27 — `phaseRows`/`bricksPerDay` za pogled Faze)
 // Čiste funkcije, čist test bez DOM-a i bez Svelte runa: `hr.json` uvezen izravno kao `Dict`, isti
 // obrazac kao `tests/format.test.ts` — `signalSummary` tako vidi PRAVI rječnik, ne ručno prepisan
 // tekst (S-010), a hrvatska množina (jedan/dva-četiri/pet i više) se provjerava na stvarnim ključevima.
 import { describe, expect, it } from 'vitest';
 import hr from '../src/lib/i18n/hr.json';
-import type { ProjectSummary } from '../src/lib/types';
-import { severityClass, signalSummary, sortProjects } from '../src/views/helpers';
+import type { Phase, ProjectSummary } from '../src/lib/types';
+import { bricksPerDay, phaseRows, severityClass, signalSummary, sortProjects } from '../src/views/helpers';
 
 const project = (name: string, worst: ProjectSummary['worst']): ProjectSummary => ({
   id: name.length,
@@ -64,5 +65,44 @@ describe('signalSummary', () => {
   });
   it('pet i više ide na "many" oblik hrvatske množine', () => {
     expect(signalSummary({ info: 0, warn: 0, alert: 5 }, hr)).toBe('5 uzbuna');
+  });
+});
+
+// Minimalna faza za testove — polja koja test ne provjerava dobivaju neutralnu vrijednost, ne `as Phase`
+// (S-005 duh: prava vrijednost, ne pretvaranje da je tip zadovoljen).
+const phase = (id: string, state: Phase['state'], days: Phase['days'] = null, doneBricks = 0): Phase => ({
+  id,
+  name: id,
+  state,
+  total_bricks: 1,
+  done_bricks: doneBricks,
+  from: null,
+  to: null,
+  days,
+  commits: 0,
+});
+
+describe('phaseRows', () => {
+  it('razvrstava faze po state u closed/running/planned', () => {
+    const phases = [phase('a', 'closed'), phase('b', 'running'), phase('c', 'planned'), phase('d', 'closed')];
+    const rows = phaseRows(phases);
+    expect(rows.closed.map((p) => p.id)).toEqual(['a', 'd']);
+    expect(rows.running.map((p) => p.id)).toEqual(['b']);
+    expect(rows.planned.map((p) => p.id)).toEqual(['c']);
+  });
+  it('prazan popis daje tri prazna niza', () => {
+    expect(phaseRows([])).toEqual({ closed: [], running: [], planned: [] });
+  });
+});
+
+describe('bricksPerDay', () => {
+  it('done_bricks / days', () => {
+    expect(bricksPerDay(phase('x', 'running', 3, 6))).toBe(2);
+  });
+  it('days: 0 -> null (dijeljenje s nulom nema smisla)', () => {
+    expect(bricksPerDay(phase('x', 'running', 0, 6))).toBeNull();
+  });
+  it('days: null -> null (faza bez razdoblja)', () => {
+    expect(bricksPerDay(phase('x', 'planned', null, 0))).toBeNull();
   });
 });

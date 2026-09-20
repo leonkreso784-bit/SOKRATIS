@@ -4,7 +4,7 @@
 // ostaje tanak prikaz koji samo poziva ove funkcije. Množina ide iz rječnika (S-021), ova datoteka
 // samo bira KOJI oblik (jedan/dva-četiri/pet-i-više) — sam tekst nikad nije ovdje ušiven.
 import { translate, type Dict } from '../lib/i18n/t';
-import type { ProjectSummary, Severity } from '../lib/types';
+import type { Phase, ProjectSummary, Severity } from '../lib/types';
 
 const SEVERITY_RANK: Record<Severity, number> = { alert: 0, warn: 1, info: 2 };
 const NO_SIGNAL_RANK = 3;
@@ -48,4 +48,23 @@ export function signalSummary(c: { info: number; warn: number; alert: number }, 
     .filter((sev) => c[sev] > 0)
     .map((sev) => translate(dict, `signals.count.${sev}.${pluralCategory(c[sev])}`, { n: c[sev] }));
   return parts.length > 0 ? parts.join(' · ') : translate(dict, 'signals.none');
+}
+
+// Pogled Faze (cigla M2/27) razvrstava `Report.phases` po `state` u tri odjeljka; jezgra već zna
+// stanje svake faze (`model.rs`), ovo je samo razvrstavanje — nijedan izračun (S-012).
+export function phaseRows(phases: Phase[]): { closed: Phase[]; running: Phase[]; planned: Phase[] } {
+  return {
+    closed: phases.filter((p) => p.state === 'closed'),
+    running: phases.filter((p) => p.state === 'running'),
+    planned: phases.filter((p) => p.state === 'planned'),
+  };
+}
+
+// Odstupanje od S-012 (zapisano u ledgeru M2/27, odluka orkestratora): omjer "cigle/dan" (spec §6.2)
+// jezgra još ne daje u `Phase` — dok taj dug ne bude zatvoren u `core`, računa se OVDJE i samo ovdje.
+// `days` je `0` ili `null` kad faza nema razdoblje (npr. tek planirana) — dijeljenje bi dalo `NaN`/
+// `Infinity`, pa oboje vraća `null` i `format.ts` ga ispisuje kao crticu.
+export function bricksPerDay(p: Phase): number | null {
+  if (!p.days) return null;
+  return p.done_bricks / p.days;
 }

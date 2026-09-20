@@ -4,8 +4,8 @@
   // retka Sidebar+main)
   // `onMount` je Svelteov standardni "kad je komponenta u DOM-u" udarac — ovdje je to JEDINO mjesto
   // koje povlači početne postavke i popis projekata (S-010: jedno mjesto pokretanja, ne u svakoj
-  // podkomponenti). Ostali pogledi (Tempo, Vrste rada, …) dolaze u T27–T28; do tada `<main>` samo
-  // javlja da se čita, umjesto da ostane prazan.
+  // podkomponenti). Dopunjeno M2/27: Tempo/Vrste rada/Pokazatelji/Faze usmjereni; preostali pogledi
+  // (Dnevnik, Isporuke, Vizije, Dokumentacija — T28) ostaju na `{:else}` dok ne dobiju svoje komponente.
   import { onMount } from 'svelte';
   import { api } from './lib/api';
   import { app, applyTheme, loadProjects } from './lib/state.svelte';
@@ -14,6 +14,10 @@
   import Sidebar from './lib/shell/Sidebar.svelte';
   import SignalBar from './lib/shell/SignalBar.svelte';
   import Overview from './views/Overview.svelte';
+  import Tempo from './views/Tempo.svelte';
+  import Kinds from './views/Kinds.svelte';
+  import Indicators from './views/Indicators.svelte';
+  import Phases from './views/Phases.svelte';
 
   onMount(async () => {
     app.settings = await api.getSettings();
@@ -31,6 +35,14 @@
     <main class="flex-1 overflow-auto p-4">
       {#if app.view === 'overview'}
         <Overview />
+      {:else if app.view === 'tempo'}
+        <Tempo />
+      {:else if app.view === 'kinds'}
+        <Kinds />
+      {:else if app.view === 'indicators'}
+        <Indicators />
+      {:else if app.view === 'phases'}
+        <Phases />
       {:else}
         <p>{t('common.loading')}</p>
       {/if}
