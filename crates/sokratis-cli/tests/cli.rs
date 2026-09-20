@@ -124,6 +124,57 @@ fn json_and_table_together_is_a_usage_error() {
     assert!(String::from_utf8_lossy(&out.stderr).contains("--table"));
 }
 
+/// M2/19: `--until` je gornja granica razdoblja (S-011/S-012) — jednodnevni prozor (`since` ==
+/// `until`) hvata točno commit prvog dana, a `d2` (03-09) ostaje izvan. Neispravan oblik datuma
+/// jezgra prijavi kao imenovanu grešku (`malformed_until_is_a_named_error`), CLI je samo ispiše
+/// (izlaz 3, poruka spominje polje `until`) — bez vlastite validacije datuma u CLI-ju.
+#[test]
+fn report_until_limits_the_window_and_is_echoed_in_json() {
+    let r = Repo::init();
+    r.commit(
+        "js/a.js",
+        "1",
+        "F1/1 prvi",
+        "2026-09-01T10:00:00+02:00",
+        "2026-09-01T10:00:00+02:00",
+    );
+    r.commit(
+        "js/b.js",
+        "1",
+        "F1/2 drugi",
+        "2026-09-03T10:00:00+02:00",
+        "2026-09-03T10:00:00+02:00",
+    );
+    let out = bin()
+        .args([
+            "report",
+            r.path().to_str().unwrap(),
+            "--json",
+            "--since",
+            "2026-09-01",
+            "--until",
+            "2026-09-01",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(
+        out.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let v: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(v["until"], "2026-09-01");
+    assert_eq!(v["touched"]["commits"], 1);
+
+    let bad = bin()
+        .args(["report", r.path().to_str().unwrap(), "--until", "1.9.2026"])
+        .output()
+        .unwrap();
+    assert_eq!(bad.status.code(), Some(3));
+    assert!(String::from_utf8_lossy(&bad.stderr).contains("until"));
+}
+
 #[test]
 fn not_a_repo_exits_3_with_message() {
     let dir = tempfile::tempdir().unwrap();
