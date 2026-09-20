@@ -27,19 +27,24 @@ opisuje [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §1
 **Sedam od devet stavki preuzeo je spec M2** — [`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md)
 §8 ih nabraja s mjestom u specu i testom koji ih dokazuje: snapshot `Report`-a (I7) · performanse
 (M11) · ograda putanja (I9) · zbroj vizija (I6) · `phase_tag` (I3 + M14) · detached HEAD · testni redak
-koji fixture prevlada (odgođena 8). **I7 je riješena ciglom M2/2** (2026-09-18): snapshot-test postoji
-i pada na svaku nenamjernu promjenu oblika. **I9 je djelomično riješena ciglom M2/8**: jezgra
-(`Profile::validate_paths`/`inside_root`) odbija putanju izvan repoa; io-dio (provjera pri
-`io::Project::open`, prije nego se profil pročita s diska) čeka T14 — I9 ostaje otvorena dok taj dio
-ne uđe. **Repo je od 2026-09-20 javan (S-023), pa io-dio I9 više nije uvjet objave nego dug prema
-javnom kodu — T14 ima prednost.** Uz to otvoreno iz iste odluke: LICENCA ne postoji (kod je vidljiv,
-ali nije licenciran za tuđu uporabu) — stavka „README EN · LICENCA" gore time dobiva na težini. Testni redak koji fixture prevlada (odgođena 8) je riješen ciglom M2/9 (`test_path_exclude`).
+koji fixture prevlada (odgođena 8). **Svih sedam je sad riješeno u `main`-u.** **I7 je riješena ciglom
+M2/2** (2026-09-18): snapshot-test postoji i pada na svaku nenamjernu promjenu oblika. **I9 je
+zatvorena u cijelosti** (2026-09-20, tok IO): jezgra (`Profile::validate_paths`/`inside_root`, M2/8)
+odbija putanju izvan repoa; io-dio — `io::Project::open` zove `validate_paths()` odmah nakon
+učitavanja profila, prije nego se ijedna putanja pročita s diska (M2/14, merge `3ca068c`) — je ušao.
+Repo je od 2026-09-20 javan (S-023); ova ograda je bila dug prema javnom kodu, sad zatvoren u
+cijelosti. Preostaje samo LICENCA, koja ne postoji (kod je vidljiv, ali nije licenciran za tuđu
+uporabu) — stavka „README EN · LICENCA" gore time ostaje jedina otvorena iz te odluke. Testni redak
+koji fixture prevlada (odgođena 8) je riješen ciglom M2/9 (`test_path_exclude`).
 **I6 je riješena ciglom M2/4**: `Report.vision_totals` zbraja vizije po stanju. **`phase_tag` (I3 +
 M14) je riješen ciglom M2/6**: aktivne faze se na commit vežu regexom iz profila, ne tvrdim
 prefiksom; zadani profil (Sokrat Study) daje iste brojke kao prije (diff snimke bajtno prazan).
-**Performanse (M11) su izmjerene i io-dio popravljen ciglom M2/11** (tok IO, još **izvan `main`-a**):
-3318–3822 ms → 1479,71 ms nad Sokrat Studyjem (release, topli keš), git-procesa 92 → 6 — stavka
-ostaje otvorena dok M2/11 ne uđe u `main`, ne zatvarati je unaprijed.
+**Performanse (M11) su izmjerene i popravljene ciglom M2/11** (tok IO, u `main`-u od 2026-09-20):
+3318–3822 ms → 1479,71 ms nad Sokrat Studyjem (release, topli keš), git-procesa 92 → 6; krug popravka
+(`--diff-merges=combined`, `-c core.quotepath=false`) potvrdio 0/56 neslaganja nad Sokrat Studyjem.
+Mjerenje je ostalo ≥ prag 500 ms — zato je keš sirovih commita (M2/18) ušao u plan; sad je i on u
+`main`-u (tok STORE). **Detached HEAD riješen ciglom M2/12**: `Report.branch` postaje `HEAD@<sha>`,
+ne lažno „nema commita".
 Stanje koda za sve gore: [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §11.
 Ovdje ostaju samo dvije stavke koje M2 **ne** uzima:
 

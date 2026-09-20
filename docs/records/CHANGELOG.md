@@ -106,6 +106,38 @@ Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek sesije:
   --all-targets -- -D warnings` OK · `cargo test --workspace` **107 testova, 0 padova** (store crate
   sam **26**: 2 unit + 10 cache + 3 registry + 2 settings + 9 snapshots) · `sokratis signals .` = nema
   signala. Tok STORE je time **gotov** (T15–T18 svi u `main`-u).
+- **`M2/10` — pisanje ručnih podataka u glavno stablo, atomarno (2026-09-20, S-015).** Korisnik CLI-ja
+  ne vidi ništa novo (CLI ne piše `overrides.json`/`visions.json`) — `Project::write_override`/
+  `write_visions` pišu kroz `.tmp` pa `rename` (atomarno: pad usred pisanja ne ostavlja pola JSON-a) u
+  GLAVNO stablo (`main_root`, roditelj `common_dir`), ne u radno stablo iz kojeg je pozvano — pisanje
+  iz linked worktree-a završava na jednom mjestu koje git prati.
+- **`M2/11` — performanse: ~94 → 4 git-procesa po izvještaju (2026-09-20, dug M11).** Korisnik CLI-ja
+  dobiva brži `report`: `last_changes` čita zadnju promjenu SVIH dokumenata jednim `git log
+  --name-only` umjesto po datoteci, `branches()` čita `ahead-behind` jednim `for-each-ref` (uz rezervu
+  `branches_per_ref` za git < 2.41) umjesto po grani. Izmjereno nad Sokrat Studyjem: 92 → 6
+  git-procesa, 3318–3822 ms → **1479,71 ms**. Krug popravka: `--diff-merges=combined` (merge-commit
+  više ne gubi doprinos putanje) i `-c core.quotepath=false` (ne-ASCII imena datoteka se više ne
+  gube) — 0/56 neslaganja nad Sokrat Studyjem nakon popravka. Mjerenje ostaje ≥ prag 500 ms → keš
+  sirovih commita (M2/18, već u `main`-u kroz STORE) je time uvjet ispunio.
+- **`M2/12` — detached HEAD dobiva istinitu oznaku (2026-09-20).** Repozitorij u detached HEAD stanju
+  (grana ne postoji, commit postoji) više ne javlja lažno „repozitorij nema commita" —
+  `Report.branch` postaje `HEAD@<sha>` (`GitSource::head_sha`), grane i log se i dalje čitaju.
+- **`M2/13` — watcher nad `.git`, docs i `.sokratis` (2026-09-20, S-016).** Ispod CLI-ja (watcher još
+  nema potrošača — DESKTOP T30): `Watcher` javlja najviše jedan `WatchEvent` po projektu 600 ms nakon
+  zadnje promjene, potiskuje vlastite upise (uklj. `.tmp` privremenu datoteku i mkdir pretka kad
+  `.sokratis` tek nastaje) i serijalizira preklapajuće izračune (`RefreshQueue`).
+- **`M2/14` — birač raspona i ograda putanja pri otvaranju (2026-09-20, S-011 dopuna 2, dug I9
+  ZATVOREN).** `GitSource::log` dobiva `until` (rezerva dva dana prema naprijed); `Project::open` sad
+  zove `validate_paths()` ODMAH nakon učitavanja profila — putanja izvan repoa (npr. `docs_dir:
+  "../.."`) je greška s imenom polja (`IoError::ProfileInvalid`) već pri otvaranju projekta, ne tek
+  kad jezgra pokuša pročitati datoteku izvan njega. Time je **dug I9 zatvoren u cijelosti** (jezgreni
+  dio M2/8 + io-dio M2/14). `--until` u CLI-ju samom i dalje ne postoji (dolazi s M2/19). Krug
+  popravka: `IoError::ProfileInvalid` drži uzrok samo u `#[source]` lancu (obrazac I5) — CLI je prije
+  rečenicu o polju ispisivao dvaput.
+  Brane nakon svih pet (merge `3ca068c`): `cargo fmt --check` OK · `cargo clippy --workspace
+  --all-targets -- -D warnings` OK · `cargo test --workspace` **123 testova, 0 padova** · `sokratis
+  signals .` = nema signala. Tok IO je time **gotov** osim M2/14b (potrošač keša, cigla koju plan
+  nema, nastavlja na istoj grani).
 
 ## [0.1.0] — 2026-09-17 — Jezgra i CLI (Milestone 1)
 

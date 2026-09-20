@@ -391,14 +391,6 @@ preuzeo M2 u [`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md) §8 i plan
   `kind_stats` broji iz tih redaka — ali `metrics/indicators.rs:31` (`kind_count`, pokazatelji
   `debugging_commits` i `docs_share`) i dalje zove `effective_kind` odvojeno. Nalaz recenzije M2/5
   (2026-09-18), otvoren do završne recenzije M2: [`../records/BACKLOG.md`](../records/BACKLOG.md).
-- **Putanje iz profila su ograđene u jezgri, ali ne još pri otvaranju projekta (I9, djelomično
-  riješeno).** `Profile::validate_paths` (M2/8) sad odbija `..`, apsolutnu putanju i UNC/drive-prefiks
-  za svih osam polja i `build_report` je zove prvi korak — pogrešan profil je greška s imenom polja
-  (`ParseError::PathOutsideRoot`), ne tiha kriva putanja. Preostaje `io::Project::open` (T14): dok ta
-  cigla ne uđe, `root.join(docs_dir)` u `io`-u i dalje prihvaća `..`/apsolutnu putanju (Rustov `join`
-  apsolutnu **zamijeni**) prije nego jezgra uopće dobije priliku odbiti profil, pa `"docs_dir":
-  "../.."` zna pročitati `.md` izvan repoa i tek onda pasti na gitu s porukom koja ne kaže što je
-  krivo.
 - **Detached HEAD:** `git branch --show-current` je prazan i kad repo ima commite, pa takav radni
   primjerak dobiva poruku `repozitorij nema commita` — kriva poruka u rubnom stanju koje CLI ne cilja.
 - **Tablični ispis (`cli/src/table.rs`) nije dovršen kao sučelje:** udjeli su goli razlomci
@@ -422,8 +414,8 @@ preuzeo M2 u [`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md) §8 i plan
 - **`until` validira i filtrira jezgra (M2/3), ali mu `io`/CLI još ne šalju stvarnu vrijednost**
   (T14/T19) — §3;
 - **`Profile::validate_paths` i `test_path_exclude` više nisu stub/prazni** (M2/8, M2/9) — rade ono
-  što ime kaže. Ostaje samo io-dio ograde: `Project::open` još ne zove `validate_paths` (I9
-  djelomično, T14) — §2, §4, §11 gore;
+  što ime kaže; io-dio ograde (`Project::open` zove `validate_paths` pri otvaranju, tok IO M2/14) je
+  ušao 2026-09-20 — dug I9 je time zatvoren u cijelosti — §2, §4, §11 gore;
 - **`core/src/snapshot.rs` više nije prazan modul** (M2/7): `SnapshotMetrics::from_report`, `diff`,
   `SignalCounts::from_signals`, `worst_severity`, `alerts_raised` rade i imaju testove; `CommitRow` i
   `VisionTotal` već imaju potrošača (`Report.commits`/`vision_totals`, M2/4–M2/5), ali

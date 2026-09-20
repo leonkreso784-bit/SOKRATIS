@@ -587,7 +587,51 @@ dokumentacije koji u njoj radi, novim odlomkom „Nastavak iste sesije", ne novi
   TRENUTNO": STORE gotov, datum stanja). `ARCHITECTURE.md` namjerno nedirana (radi je čuvar način B na
   kraju sesije). `sokratis docs .` provjeren prije i poslije izmjena.
 
+**Nastavak iste sesije — IO (T10–T14) spojen u `main`, dug I9 zatvoren u cijelosti.**
+
+- **IO (T10–T14) spojen** (merge `3ca068c`): pisanje ručnih podataka u GLAVNO stablo, atomarno `.tmp`+
+  `rename` (M2/10, S-015) · performanse — `last_changes` jednim `git log --name-only` za sve
+  dokumente, `branches()` jednim `for-each-ref` s `ahead-behind` (rezerva `branches_per_ref` za git <
+  2.41); ~94 → 4 git-procesa po `input()`, 3,5 s → 1,48 s nad Sokrat Studyjem (M2/11, dug M11; krug
+  popravka: `--diff-merges=combined` i `-c core.quotepath=false` jer je paritet-po-datoteci otkrio da
+  je stari batch gubio doprinos merge-commita i ne-ASCII imena — 0/56 neslaganja nakon popravka) ·
+  detached HEAD sad daje `HEAD@<sha>`, ne lažno „nema commita" (M2/12) · watcher nad `.git`/docs/
+  `.sokratis`, odgoda 600 ms, potiskivanje vlastitih upisa (uklj. `.tmp` i predak), serijski red
+  (M2/13, S-016; 7/7 ponovljenih pokretanja zeleno, recenzirao opus) · `input_between(since, until)` s
+  rezervom zone od dva dana prema naprijed, `GitSource::log` dobiva `until`, **`Project::open` sad
+  zove `validate_paths()` → `IoError::ProfileInvalid` — io-dio ograde putanja je ušao, DUG I9 JE TIME
+  ZATVOREN U CIJELOSTI** (jezgreni dio M2/8 + io-dio M2/14; krug popravka: uzrok ostaje samo u lancu
+  grešaka, CLI je prije rečenicu o polju ispisivao dvaput). Popis commita: `git log --oneline
+  0c99c76..3ca068c -- crates/`.
+- **Brane na `main`-u nakon spajanja:** `cargo fmt --check` OK · `cargo clippy --workspace
+  --all-targets -- -D warnings` OK · `cargo test --workspace` **123 passed, 0 failed** · `sokratis
+  signals .` nema signala. `main` pushan na `origin` (trajni OK, pravilo #1).
+- **Sedam stabala na disku** (`git worktree list`): `main` · `sokratis.jezgra` · `.profil` · `.io` ·
+  `.store` · `.ui` · **`.cli`** (novo, `feat/cli-m2`, otvoreno danas). Spojene grane i njihova stabla
+  ostaju dok Leon ne kaže.
+- **U izvedbi, nije u `main`-u:** tok IO nastavlja s **M2/14b — potrošač keša** (cigla koju plan nema:
+  `rev-list` daje dostižne SHA-ove, keš vraća poznate, `git log --no-walk --stdin` samo nedostajuće;
+  trait `CommitCache` u `io`, adapter u desktopu), na istoj grani `feat/io-m2`. **Tok CLI je otvoren
+  danas** (`sokratis.cli`, `feat/cli-m2`) za **M2/19** (`report --until`) — `--until` u CLI-ju zato
+  još NE postoji u `main`-u. SUČELJE (`feat/ui`) — **M2/25** (okvir s `api.ts`) recenziran SPOJIVO,
+  **M2/26** u izvedbi.
+- **Ručna provjera puta greške splasha** (otvorena stavka iz prošle sesije) je **odrađena danas**:
+  obje slike namjerno srušene u pregledniku → `splash:done` točno jednom u oba slučaja; bez commita
+  (nije bio potreban popravak koda).
+- **Sitnost koja se ne rješava ovim tokom (zapisana u ledgeru za završni krug popravaka):** doc-
+  komentar uz `sokratis_core::civil::next_day` kaže da IO gradi `--until=<dan+1>`, a stvarna rezerva
+  (po Interfaces retku brifa T14) je dva dana — `crates/sokratis-io/src/git.rs` je dosljedan brifu,
+  samo je `civil.rs`-ov komentar zastario; datoteka je izvan vlasništva toka IO.
+- **Čuvar dokumentacije (način A), ovaj zapis:** `PROGRESS.md` (ovaj odlomak), `CHANGELOG.md` (retci
+  M2/10–M2/14 pod `[Unreleased]`), `RUST.md` §4 (atomarni `rename`, `Cell<u32>`, `mpsc::Sender`/
+  `Receiver`, `Arc<Mutex<_>>`, oporavak iz otrovanog mutexa, `thread::spawn`+`recv_timeout` kao
+  otkucaj, `std::slice::from_ref`; dopuna let-chain retka za `git.rs::last_changes`) i §2 (`notify`
+  redak: watcher sad u `main`-u, ne samo pinana ovisnost), `ROADMAP.md` („Gdje smo", status M2),
+  `CLAUDE.md` („Stanje — TRENUTNO" i „Agenti"), `BACKLOG.md` (I9 zatvoren u cijelosti, M11 zatvoren
+  jer je M2/11 u `main`-u). `ARCHITECTURE.md` namjerno dirana SAMO u tvrdnji o I9 u §11 (ostatak radi
+  čuvar B na kraju sesije). `cargo run -q -p sokratis-cli -- docs .` provjeren prije i poslije izmjena.
+
 ### Što slijedi
-Spajanje IO (nakon T14 i M2/14b) pa SUČELJE (nakon T25 i preostalih cigli okvira) pa CLI (T19, kad je
-IO u `main`-u); DESKTOP i INTEGRACIJA su treća sesija. Ledger:
+Spajanje SUČELJE (nakon M2/26–M2/28) pa CLI (T19, `--until`) pa M2/14b (potrošač keša, tok IO);
+DESKTOP i INTEGRACIJA su treća sesija. Ledger:
 `.superpowers/sdd/2026-09-18-m2-desktop/progress.md`, odjeljak „STANJE ZA NOVU SESIJU".
