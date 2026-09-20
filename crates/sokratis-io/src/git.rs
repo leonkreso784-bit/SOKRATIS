@@ -3,8 +3,31 @@
 //! MAPIRA u `IoError` po uzroku (`map_err`); `String::from_utf8_lossy` toleriše tuđi ne-UTF-8
 //! bajt umjesto da sruši izvještaj. `HashSet<String>` daje O(1) „je li grana spojena", `let-else`
 //! preskače neispravan redak, a `unwrap_or(0)` na `%(authordate:unix)` je svjesna alternativa.
+//!
+//! Cigla M2/11 (performanse, dug M11): `Cell<u32>` broji pokrenute procese kroz `&self` bez
+//! `mut` (trait `GitSource` posuđuje nepromjenjivo) — mjerač za `tests/perf.rs`. `last_changes`
+//! zamjenjuje `last_change` po datoteci jednim `git log --name-only`; `branches` zamjenjuje
+//! poziv-po-grani jednim `for-each-ref` s atomom `ahead-behind`, uz stari put kao rezervu
+//! (`branches_per_ref`) kad atom ne postoji (git < 2.41). Let-chain (`if let … && let …`) u
+//! `last_changes` je stabilan od Rust 1.88 — čita se kao jedna provjera, ne ugniježđeni `if`-ovi.
+//!
+//! Krug popravka 1 (recenzija): `last_changes` je gubio doprinos merge-commita (zadano
+//! `--name-only` ne ispisuje datoteke za merge) i tiho gutao ne-ASCII imena (zadano
+//! `core.quotepath` ih escapea) — oba dokazana pokusom nad Sokrat Studyjem i pokrivena testom
+//! `tests/last_changes.rs`. Vidi komentar UZ POZIV u `last_changes` za detalje dviju opcija.
+//!
+//! Cigla M2/12 (detached HEAD): `head_sha` je nova metoda traita — jedan poziv koji ima smisla
+//! SAMO na rubu (grane nema, commit ima), pa ne diramo brojač procesa na uobičajenom putu
+//! (`tests/perf.rs` broji iste 4 procesa kao prije). Poziva je iz `project.rs`, ne odavde.
+//!
+//! Cigla M2/14 (birač raspona, S-011 dopuna 2): `log` dobiva `until: Option<&str>` — `Option`
+//! umjesto praznog stringa jer „nema gornje granice" i „granica je prazan datum" NISU isto stanje,
+//! a `match`/`if let` nad `Option` to prisiljava na svakom pozivu (ne pušta ni jedan slučaj da
+//! prođe tiho). Rezerva prema naprijed je DVA dana (`next_day` dvaput), ne jedan kao za `since`:
+//! smjer je suprotan, pa je i račun zone suprotan (vidi komentar uz `until_arg`).
 use crate::IoError;
 use sokratis_core::BranchInfo;
+use std::collections::HashMap;
 use std::path::PathBuf;
 use std::process::Command;
 pub trait GitSource {
@@ -15,26 +38,52 @@ pub trait GitSource {
     /// izvještaj generira, ne samo o datumu. Uz to MORA dovući DAN VIŠE (nalaz I2): ta je ponoć
     /// u zoni stroja, a datumi commita u zoni commita, pa granicu mora presuditi jezgrin
     /// `commit_date >= since`, ne git. Rezerva ne mijenja nijednu brojku — jezgra je odbaci.
-    fn log(&self, branch: &str, since: &str) -> Result<String, IoError>;
+    ///
+    /// `until` je gornja granica (cigla M2/14, S-011 dopuna 2): `None` znači „bez gornje granice"
+    /// (do kraja loga). Kad je zadan, implementacija MORA dodati DVA dana rezerve prema naprijed —
+    /// vidi komentar uz `until_arg` u `GitCli::log` za izračun. Jezgra presuđuje
+    /// `commit_date <= until`, pa rezerva ovdje ne mijenja nijednu brojku, samo osigurava da git
+    /// ne odbaci commit prije nego što jezgra stigne odlučiti.
+    fn log(&self, branch: &str, since: &str, until: Option<&str>) -> Result<String, IoError>;
     fn branches(&self, default_branch: &str) -> Result<Vec<BranchInfo>, IoError>;
     fn worktrees(&self) -> Result<Vec<PathBuf>, IoError>;
     fn last_change(&self, path: &str) -> Result<Option<i64>, IoError>;
+    /// Zadnja promjena (unix-vrijeme) za SVAKU putanju koju je git ikad dirnuo pod danim
+    /// pathspecovima — jednim `git log --name-only` (cigla M2/11, dug M11). Zamjenjuje poziv
+    /// `last_change` po datoteci: `docs()` je s 60 dokumenata trošio 60 procesa na isto pitanje.
+    fn last_changes(&self, pathspecs: &[&str]) -> Result<HashMap<String, i64>, IoError>;
     fn common_dir(&self) -> Result<PathBuf, IoError>;
     fn toplevel(&self) -> Result<PathBuf, IoError>;
     fn branch_exists(&self, name: &str) -> Result<bool, IoError>;
     fn current_branch(&self) -> Result<String, IoError>;
+    /// Kratki SHA trenutnog `HEAD` (`rev-parse --short HEAD`). Jedini poziv koji ima smisla u
+    /// DETACHED stanju (grane nema, ali commit postoji) — vidi `project.rs::input`.
+    fn head_sha(&self) -> Result<String, IoError>;
 }
 #[derive(Debug)]
 pub struct GitCli {
     pub repo: PathBuf,
+    /// Broji koliko je `git` procesa ovaj `GitCli` pokrenuo (mjerač; `tests/perf.rs`, cigla M2/11).
+    /// `Cell` daje unutarnju promjenjivost kroz `&self` — `GitSource` metode posuđuju nepromjenjivo
+    /// (trait to zahtijeva), a brojač ipak mora rasti pri svakom pozivu.
+    calls: std::cell::Cell<u32>,
 }
 impl GitCli {
     pub fn new(repo: impl Into<PathBuf>) -> Self {
-        Self { repo: repo.into() }
+        Self {
+            repo: repo.into(),
+            calls: std::cell::Cell::new(0),
+        }
+    }
+
+    /// Koliko je `git` procesa pokrenuto kroz ovaj `GitCli` otkad je stvoren (mjerač, ne semantika).
+    pub fn calls(&self) -> u32 {
+        self.calls.get()
     }
 
     /// Pokreće `git` u repozitoriju bez shella i mapira ishod u `IoError`.
     fn run(&self, args: &[&str]) -> Result<String, IoError> {
+        self.calls.set(self.calls.get() + 1);
         let out = Command::new("git")
             .arg("-C")
             .arg(&self.repo)
@@ -70,29 +119,11 @@ impl GitCli {
             self.repo.join(rel)
         })
     }
-}
-impl GitSource for GitCli {
-    fn log(&self, branch: &str, since: &str) -> Result<String, IoError> {
-        // ` 00:00:00` fiksira sat na ponoć, a `prev_day` dodaje dan rezerve zbog zone — vidi
-        // doc-komentar `GitSource::log` (trait) za oba razloga. `unwrap_or_else` vraća neispravan
-        // datum nepromijenjen: njega jezgra prijavi kao `ParseError::BadDate` (C2), ne ovaj sloj.
-        let from = sokratis_core::civil::prev_day(since).unwrap_or_else(|| since.to_string());
-        let since_arg = format!("--since={from} 00:00:00");
-        self.run(&[
-            "log",
-            branch,
-            &since_arg,
-            "--reverse",
-            "--date=format:%Y-%m-%d",
-            "--format=@@%h|%at|%ct|%ad|%cd|%s",
-            "--numstat",
-            // Završni `--` kaže gitu „dalje nema putanja": bez njega je ime grane dvosmisleno s
-            // datotekom istog imena (nalaz M2). Mora biti ZADNJI — sve iza `--` git čita kao
-            // putanju, pa bi `--` odmah iza grane pojeo naše opcije.
-            "--",
-        ])
-    }
-    fn branches(&self, default_branch: &str) -> Result<Vec<BranchInfo>, IoError> {
+
+    /// Rezerva za `branches()` na gitu starijem od 2.41 (nema atom `ahead-behind`): isti rezultat,
+    /// ali TRI poziva po grani (`branch --merged` jednom + `rev-list --count` po grani) — M1 put,
+    /// izmjereno u cigli M2/11 kao ~94 procesa nad 30 grana. Ostaje u kodu kao dokazana rezerva.
+    fn branches_per_ref(&self, default_branch: &str) -> Result<Vec<BranchInfo>, IoError> {
         // `merged` dolazi iz posebnog poziva (git ga računa naspram trenutnog HEAD-a preko
         // `--merged`), a starost i „ahead" iz `for-each-ref`/`rev-list` po grani.
         let merged: std::collections::HashSet<String> = self
@@ -139,6 +170,88 @@ impl GitSource for GitCli {
         }
         Ok(out)
     }
+}
+
+/// Parsira jedan redak `for-each-ref --format=ime|unix|ahead behind` u `BranchInfo`. `ahead` je
+/// broj commitova koje grana ima a zadana nema (isto što je stari kod računao s
+/// `rev-list default..name --count`), pa je `ahead == 0` istovjetno onome što je `git branch
+/// --merged` govorio — zadana grana provjerava se i imenom, za slučaj da git ikad vrati drukčiji
+/// rezultat za samo-usporedbu.
+fn parse_ahead_behind(out: &str, default_branch: &str) -> Vec<BranchInfo> {
+    let mut result = Vec::new();
+    for line in out.lines() {
+        let mut parts = line.trim().splitn(3, '|');
+        let (Some(name), Some(t), Some(ahead_behind)) = (parts.next(), parts.next(), parts.next())
+        else {
+            continue;
+        };
+        let last_commit_time: i64 = t.parse().unwrap_or(0);
+        let ahead_of_default: u32 = ahead_behind
+            .split_whitespace()
+            .next()
+            .and_then(|s| s.parse().ok())
+            .unwrap_or(0);
+        result.push(BranchInfo {
+            name: name.to_string(),
+            last_commit_time,
+            ahead_of_default,
+            merged: name == default_branch || ahead_of_default == 0,
+        });
+    }
+    result
+}
+impl GitSource for GitCli {
+    fn log(&self, branch: &str, since: &str, until: Option<&str>) -> Result<String, IoError> {
+        // ` 00:00:00` fiksira sat na ponoć, a `prev_day` dodaje dan rezerve zbog zone — vidi
+        // doc-komentar `GitSource::log` (trait) za oba razloga. `unwrap_or_else` vraća neispravan
+        // datum nepromijenjen: njega jezgra prijavi kao `ParseError::BadDate` (C2), ne ovaj sloj.
+        let from = sokratis_core::civil::prev_day(since).unwrap_or_else(|| since.to_string());
+        let since_arg = format!("--since={from} 00:00:00");
+        // Dva dana rezerve prema naprijed (cigla M2/14, S-011 dopuna 2): commit datiran `until` u
+        // zoni −12:00 pada na `until+1 12:00 UTC`, a stroj u zoni −12:00 ima ponoć `until+2` tek u
+        // `until+2 12:00 UTC` — jedan dan rezerve (kao za `since`) ne bi bio dovoljan u OVOM smjeru,
+        // jer se granica pomiče prema BUDUĆNOSTI, ne prošlosti. Jezgra presuđuje
+        // `commit_date <= until`, pa rezerva ne mijenja nijednu brojku — samo osigurava da git ne
+        // odbaci commit prije nego što jezgra stigne odlučiti. `unwrap_or_else` vraća neispravan
+        // datum nepromijenjen iz istog razloga kao kod `since` (jezgra ga prijavi kao `BadDate`).
+        let until_arg = until.map(|u| {
+            let plus2 = sokratis_core::civil::next_day(u)
+                .and_then(|d| sokratis_core::civil::next_day(&d))
+                .unwrap_or_else(|| u.to_string());
+            format!("--until={plus2} 00:00:00")
+        });
+        let mut args = vec!["log", branch, &since_arg];
+        if let Some(a) = &until_arg {
+            args.push(a);
+        }
+        args.extend([
+            "--reverse",
+            "--date=format:%Y-%m-%d",
+            "--format=@@%h|%at|%ct|%ad|%cd|%s",
+            "--numstat",
+            // Završni `--` kaže gitu „dalje nema putanja": bez njega je ime grane dvosmisleno s
+            // datotekom istog imena (nalaz M2). Mora biti ZADNJI — sve iza `--` git čita kao
+            // putanju, pa bi `--` odmah iza grane pojeo naše opcije.
+            "--",
+        ]);
+        self.run(&args)
+    }
+    fn branches(&self, default_branch: &str) -> Result<Vec<BranchInfo>, IoError> {
+        // Jedan `for-each-ref` s atomom `%(ahead-behind:<default>)` (git ≥ 2.41) zamjenjuje
+        // stara TRI poziva po grani (`branch --merged` jednom + `rev-list --count` po grani) —
+        // cigla M2/11, dug M11. Ako git ne zna atom (stariji od 2.41), poruka o grešci sadrži
+        // ime atoma; rezerva je stari put, sporiji ali dokazano isti rezultat (test ostaje zelen).
+        let fmt = format!(
+            "--format=%(refname:short)|%(authordate:unix)|%(ahead-behind:{default_branch})"
+        );
+        match self.run(&["for-each-ref", "refs/heads", &fmt]) {
+            Ok(out) => Ok(parse_ahead_behind(&out, default_branch)),
+            Err(IoError::Git { stderr, .. }) if stderr.contains("ahead-behind") => {
+                self.branches_per_ref(default_branch)
+            }
+            Err(e) => Err(e),
+        }
+    }
     fn worktrees(&self) -> Result<Vec<PathBuf>, IoError> {
         Ok(self
             .run(&["worktree", "list", "--porcelain"])?
@@ -150,6 +263,47 @@ impl GitSource for GitCli {
     fn last_change(&self, path: &str) -> Result<Option<i64>, IoError> {
         let s = self.run(&["log", "-1", "--format=%at", "--", path])?;
         Ok(s.trim().parse().ok())
+    }
+    fn last_changes(&self, pathspecs: &[&str]) -> Result<HashMap<String, i64>, IoError> {
+        // Log je od najnovijeg prema starijem, pa je PRVA pojava putanje njezina zadnja promjena.
+        // Jedan proces za SVE putanje odjednom (cigla M2/11) umjesto `last_change` po datoteci.
+        //
+        // Krug popravka 1 (recenzija, dokazano pokusom nad Sokrat Studyjem — docs/README.md):
+        // - `-c core.quotepath=false` je GIT-OVA GLOBALNA opcija, MORA doći PRIJE `log`: bez nje
+        //   git ne-ASCII znak u imenu datoteke ispisuje escapean u navodnicima (npr.
+        //   `"docs/\304\215...md"`), pa ključ nikad ne pogodi mapu koju čita `project.rs`. NE
+        //   MIJEŠATI s DRUGIM `-c` niže (`--diff-merges=combined`, kratica `-c`, ali opcija
+        //   PODNAREDBE `log` — pišemo je puno ime baš da se ne zamijeni s ovom).
+        // - Zadano `git log --name-only` NE ispisuje popis datoteka za merge-commit (dvosmisleno
+        //   prema kojem roditelju uspoređivati), pa datoteka čija je STVARNA zadnja promjena bila
+        //   UNUTAR merge-commita (razrješenje sudara) tiho dobiva stariji datum s neke od grana.
+        //   `--diff-merges=combined` ispisuje datoteke koje se razlikuju od SVIH roditelja
+        //   odjednom — isto mjerilo kojim git već presuđuje ULAZI li merge uopće u log kad je
+        //   putanja zadana (zato stari `last_change`, bez ijedne od ovih opcija, ostaje ispravan:
+        //   ta simplifikacija povijesti radi i bez `--name-only`). `tests/last_changes.rs` dokaz.
+        let mut args = vec![
+            "-c",
+            "core.quotepath=false",
+            "log",
+            "--format=@@%at",
+            "--diff-merges=combined",
+            "--name-only",
+            "--",
+        ];
+        args.extend_from_slice(pathspecs);
+        let out = self.run(&args)?;
+        let mut map = HashMap::new();
+        let mut current: Option<i64> = None;
+        for line in out.lines() {
+            if let Some(ts) = line.strip_prefix("@@") {
+                current = ts.trim().parse().ok();
+            } else if !line.trim().is_empty()
+                && let Some(ts) = current
+            {
+                map.entry(line.trim().to_string()).or_insert(ts);
+            }
+        }
+        Ok(map)
     }
     fn common_dir(&self) -> Result<PathBuf, IoError> {
         self.path_of(&["rev-parse", "--git-common-dir"])
@@ -167,5 +321,11 @@ impl GitSource for GitCli {
     }
     fn current_branch(&self) -> Result<String, IoError> {
         Ok(self.run(&["branch", "--show-current"])?.trim().to_string())
+    }
+    fn head_sha(&self) -> Result<String, IoError> {
+        Ok(self
+            .run(&["rev-parse", "--short", "HEAD"])?
+            .trim()
+            .to_string())
     }
 }

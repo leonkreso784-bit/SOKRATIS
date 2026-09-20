@@ -2,6 +2,10 @@
 //! Integracijski testovi u `tests/` vide `sokratis-io` kao VANJSKI korisnik (samo javni API), a
 //! `mod common;` je zajednički pomoćni modul — privremeni repo s fiksnim datumima. Tvrdnje su na
 //! izlazu prave `git` naredbe, jer ovaj sloj i postoji zato da razgovara s procesom.
+//!
+//! Cigla M2/14: `log` je dobio treći argument `until: Option<&str>` — postojeći pozivi ovdje
+//! testiraju SAMO donju granicu, pa šalju `None` (izostavljena gornja nije novo ponašanje koje bi
+//! ovi testovi trebali čuvati).
 mod common;
 use common::Repo;
 use sokratis_io::{GitCli, GitSource, IoError, Project};
@@ -24,7 +28,7 @@ fn log_has_fixture_format_and_since_filters_by_commit_date() {
         "2026-09-08T21:19:43+02:00",
     );
     let g = GitCli::new(r.path());
-    let log = g.log("main", "2026-08-29").unwrap();
+    let log = g.log("main", "2026-08-29", None).unwrap();
     assert!(
         !log.contains(&old),
         "commit s committer-datumom prije since otpada"
@@ -74,7 +78,7 @@ fn since_is_fetched_with_one_day_of_reserve_so_the_boundary_is_zone_neutral() {
         "2026-09-08T00:05:00+02:00",
     );
     let g = GitCli::new(r.path());
-    let log = g.log("main", "2026-09-08").unwrap();
+    let log = g.log("main", "2026-09-08", None).unwrap();
     assert!(
         log.contains(&after_midnight),
         "00:05 na since-datum mora uci bez obzira na sat i zonu stroja"

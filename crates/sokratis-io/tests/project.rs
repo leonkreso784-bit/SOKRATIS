@@ -3,6 +3,10 @@
 //! `write()` je lokalni pomoćnik za ručne JSON-datoteke. Testovi zovu samo javni API
 //! (`Project::open`, `docs`, `input`); ono što čuvaju je ponašanje na RUBU — nema datoteke,
 //! putanja je direktorij, tipfeler u profilu, `--since` izvan profilskog prozora.
+//!
+//! Cigla M2/14 (birač raspona, ograda putanja pri otvaranju, dug I9): dva nova testa čuvaju da
+//! `open` odbije profil čija putanja izlazi iz repoa PRIJE nego što se icim čita, i da
+//! `input_between` proslijedi `until` i jezgri (`ReportInput.until`) i gitu (s rezervom zone).
 mod common;
 use common::Repo;
 use sokratis_core::WorkKind;
@@ -210,6 +214,54 @@ fn profile_error_says_the_path_once_and_leaves_the_cause_to_the_chain() {
     );
 }
 
+/// M2/12: detached HEAD (grane nema, commita ima) je do sada davao `NoCommits` — laž, jer
+/// commiti postoje. Kad zadana grana ne postoji I `current_branch()` je prazan (detached), log
+/// se čita s `HEAD`, a oznaka u izvještaju postaje `HEAD@<sha>`.
+#[test]
+fn detached_head_with_commits_is_reported_as_head_at_sha_not_as_empty_repo() {
+    let r = Repo::init();
+    let sha = r.commit(
+        "js/a.js",
+        "1",
+        "F1/1 x",
+        "2026-09-01T10:00:00+02:00",
+        "2026-09-01T10:00:00+02:00",
+    );
+    write(
+        &r,
+        ".sokratis/profile.json",
+        r#"{ "default_branch": "nema", "since": "2026-09-01" }"#,
+    );
+    r.git(&["checkout", "-q", "--detach"]);
+    let p = Project::open(r.path()).unwrap();
+    let input = p.input(None).unwrap();
+    assert_eq!(input.branch, format!("HEAD@{sha}"));
+    assert!(input.git_log.contains(&sha));
+}
+
+/// Izvan brifa, dodano: detached HEAD kad ZADANA grana i dalje POSTOJI ne smije preskočiti na
+/// `HEAD@<sha>` — metrike su definirane nad zadanom granom (paritet s tablicom), pa se čita ona,
+/// bez obzira gdje trenutno pokazuje HEAD.
+#[test]
+fn detached_head_with_default_branch_present_still_reads_the_default_branch() {
+    let r = Repo::init();
+    r.commit(
+        "js/a.js",
+        "1",
+        "F1/1 x",
+        "2026-09-01T10:00:00+02:00",
+        "2026-09-01T10:00:00+02:00",
+    );
+    write(&r, ".sokratis/profile.json", r#"{ "since": "2026-09-01" }"#);
+    r.git(&["checkout", "-q", "--detach"]);
+    let p = Project::open(r.path()).unwrap();
+    let input = p.input(None).unwrap();
+    assert_eq!(
+        input.branch, "main",
+        "zadana grana postoji, oznaka ostaje njezino ime"
+    );
+}
+
 #[test]
 fn unknown_profile_field_is_an_error_and_missing_files_default() {
     let r = Repo::init();
@@ -227,4 +279,75 @@ fn unknown_profile_field_is_an_error_and_missing_files_default() {
         Project::open(r.path()).unwrap_err(),
         IoError::Profile { .. }
     ));
+}
+
+/// Dug I9 (repo JAVAN na GitHubu, cigla M2/14): profil koji navede putanju IZVAN repoa (npr.
+/// `docs_dir: "../.."`) se odbija VEĆ pri `open`-u, prije nego što bilo tko pozove `docs()` ili
+/// zatraži izvještaj. Ime polja (`profil.docs_dir`) i vrijednost (`../..`) moraju biti dohvatljivi
+/// — ali po obrascu I5 (susjedni test iznad, `profile_error_says_the_path_once_and_leaves_the_cause_to_the_chain`)
+/// SAMO kroz LANAC uzroka, ne kroz top-poruku: krug popravka 1 (recenzija) — prva verzija je
+/// poruku ugradila kroz `{source}`, pa je `anyhow` na CLI-ju (`{e:#}`) ispisivao istu rečenicu
+/// dvaput (top-poruka + „Caused by").
+#[test]
+fn profile_path_outside_repo_is_rejected_at_open_with_field_name() {
+    let r = Repo::init();
+    r.commit(
+        "js/a.js",
+        "1",
+        "F1/1 x",
+        "2026-09-01T10:00:00+02:00",
+        "2026-09-01T10:00:00+02:00",
+    );
+    write(&r, ".sokratis/profile.json", r#"{ "docs_dir": "../.." }"#);
+    let err = Project::open(r.path()).expect_err("mora pasti");
+    let top = err.to_string();
+    assert!(
+        !top.contains("docs_dir"),
+        "uzrok se ne smije ugraditi u top-poruku: {top}"
+    );
+    let cause = std::error::Error::source(&err)
+        .map(|c| c.to_string())
+        .unwrap_or_default();
+    assert!(
+        cause.contains("profil.docs_dir") && cause.contains("../.."),
+        "{cause}"
+    );
+}
+
+/// `input_between` prosljeđuje `until` i u `ReportInput.until` (jezgra ga presuđuje) i gitu (kao
+/// gornju granicu dovlačenja, s dva dana rezerve zbog zone — `GitSource::log`). Tri commita razmaka
+/// jedan dan i tri dana od `until` provjeravaju da je rezerva dovoljna za prvi, a NE i za drugi.
+#[test]
+fn input_between_passes_until_to_the_core_and_fetches_with_reserve() {
+    let r = Repo::init();
+    r.commit(
+        "js/a.js",
+        "1",
+        "F1/1 prvi",
+        "2026-09-01T10:00:00+02:00",
+        "2026-09-01T10:00:00+02:00",
+    );
+    r.commit(
+        "js/b.js",
+        "1",
+        "F1/2 drugi",
+        "2026-09-03T10:00:00+02:00",
+        "2026-09-03T10:00:00+02:00",
+    );
+    r.commit(
+        "js/c.js",
+        "1",
+        "F1/3 treci",
+        "2026-09-06T10:00:00+02:00",
+        "2026-09-06T10:00:00+02:00",
+    );
+    write(&r, ".sokratis/profile.json", r#"{ "since": "2026-09-01" }"#);
+    let p = Project::open(r.path()).unwrap();
+    let i = p.input_between(None, Some("2026-09-03")).unwrap();
+    assert_eq!(i.until.as_deref(), Some("2026-09-03"));
+    assert!(i.git_log.contains("F1/2 drugi"), "dan `until` je uključen");
+    assert!(
+        !i.git_log.contains("F1/3 treci"),
+        "tri dana kasnije je izvan rezerve od dva dana"
+    );
 }
