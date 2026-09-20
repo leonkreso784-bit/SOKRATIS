@@ -21,8 +21,8 @@ sati zbog cherry-pickova — se u Sokratisu **ispravlja, ne prenosi** (S-007).
 ## Stack
 - **Rust** (stable, MSVC target, edition 2024) · Cargo workspace: `crates/sokratis-core` (čisti, bez
   I/O-a) · `crates/sokratis-io` (git, datoteke, profil) · `crates/sokratis-cli` (binarna `sokratis`) ·
-  `crates/sokratis-store` (SQLite) i `apps/desktop/src-tauri` (crate `sokratis-desktop`) — **kostur na
-  `main`-u od `M2/1a`**; desktop crate je privremeno izvan `members` (čeka `npm install`).
+  `crates/sokratis-store` (SQLite) i `apps/desktop/src-tauri` (crate `sokratis-desktop`) — **kostur
+  cijel u `main`-u** (`M2/1a`+`M2/1b`); desktop crate je u `[workspace] members` i builda se.
 - **Desktop [M2]:** Tauri 2 (`apps/desktop`) · sučelje **Svelte 5 + Tailwind v4** + `tokens.css`
   prenesen iz Sokrat Studyja (4 teme, zadana svijetla „Akademsko plavo"). Znak Sokratisa je **nov**.
 - **Pohrana:** ručni podaci u `<repo>/.sokratis/` (profil · overridei · vizije) · [M2] SQLite u
@@ -41,8 +41,10 @@ sati zbog cherry-pickova — se u Sokratisu **ispravlja, ne prenosi** (S-007).
 
 ## ⚠️ KRITIČNA PRAVILA
 1. **Jedna cigla = jedan commit.** Zahvat koji raste preko cigle se reže. Na kraju milestonea **STANI
-   i javi se.** Objava na GitHub i svaki push na `main` (kad remote bude postojao) = **Leonov izričit OK**;
-   nijedno ranije odobrenje se ne proteže na sljedeće.
+   i javi se.** **Push na `origin`: Leon je 2026-09-20 dao TRAJNI OK** — orkestrator sam pusha `main`
+   nakon svakog spajanja toka (tek kad pune brane prođu) i grane tokova na kraju sesije (sigurnosna
+   kopija). **I dalje traži Leonov izričit OK:** force-push, brisanje grane na remoteu, novi remote,
+   promjena vidljivosti, izdanje/tag. Repo je JAVAN (S-023) — tajne se traže PRIJE commita.
 2. **Prije commita:** `cargo fmt --check` · `cargo clippy --all-targets -- -D warnings` · `cargo test`.
    Crveno ne ide u commit.
 3. **Uvijek ažuriraj `docs/`** nakon izmjene: `PROGRESS.md` (sesija) + `CHANGELOG.md` (isporuka) +
@@ -68,7 +70,7 @@ pogrešna uporaba**; `--help`/`--version` = 0) — sve rade nad pravim repozitor
 Sokrat Studyjem).
 Testovi i brane: `docs/workflow/TESTING.md`.
 
-## Stanje — TRENUTNO (2026-09-18 — M1 zatvoren; M2 u izvedbi, kostur `M2/1a` u `main`-u)
+## Stanje — TRENUTNO (2026-09-18 večer — M1 zatvoren; M2 u izvedbi, JEZGRA+PROFIL u `main`-u, IO/STORE/SUČELJE recenzirani dalje u granama; sesija stala jer je predugo trajala, ne jer je M2 gotov)
 - **M0 gotov. M1 zatvoren.** Kod isporučen, recenziran i popravljen (T1–T22 + krug popravaka), verzija
   0.1.0, u `main`-u. Cijeli lanac radi nad pravim repozitorijem: `sokratis report/docs/signals` čitaju
   git kroz `io`, jezgra računa dane, sate, vrste rada, faze, 18 pokazatelja, docs-ocjenu i signale, CLI
@@ -80,10 +82,16 @@ Testovi i brane: `docs/workflow/TESTING.md`.
 - **Leon je 2026-09-18 dao izričit OK: svih 8 grana `feat/*` i njihovih 8 radnih stabala
   `sokratis.<tok>` je obrisano** (sve su bile spojene). `main` je sada **jedina grana i jedino
   stablo** (`git worktree list` · `git branch -a`). Time je M1 zatvoren.
-- **Na Leona i dalje čeka** (ne radi se bez njegova izričitog OK-a): push/remote/objava na GitHub
-  (privatni remote prvo; javna objava tek nakon ograde putanja iz profila, BACKLOG I9). Toolchain je
-  pinan (`rust-toolchain.toml`, 1.98.1) i definicije agenata su u repou — obje odluke Leon je odobrio
-  2026-09-18.
+- **Repo je od 2026-09-20 JAVAN na GitHubu** — `origin` = `leonkreso784-bit/SOKRATIS`, Leonov izričit
+  OK i njegova odluka da bude javan (S-023: što je time postalo javno, pretraga na tajne, posljedice).
+  Pushani su `main` i tri nespojene grane tokova (`feat/io-m2` · `feat/store` · `feat/ui`). **Svaki
+  novi fixture ili dokument je od sada javna objava — tajne se traže PRIJE commita.** io-dio ograde
+  putanja (I9, cigla T14) je time dug prema javnom kodu i ima prednost; licence još nema (BACKLOG).
+- **Na Leona i dalje čeka** (ne radi se bez njegova izričitog OK-a): brisanje grana i radnih stabala
+  tokova M2 na kraju milestonea (lokalno i na remoteu). Pushevi više NE čekaju — trajni OK, pravilo #1. **Tray-znak za T33 je riješen:** Leon je 2026-09-20 odabrao
+  da se radi iz `apps/desktop/src/assets/intro/graph.webp` (znak bez lika iz njegove animacije) — ne
+  čeka se nikakav novi PNG. Toolchain je pinan (`rust-toolchain.toml`, 1.98.1) i definicije agenata
+  su u repou — obje odluke Leon je odobrio 2026-09-18.
 - **Spec M2 je napisan (2026-09-18): `docs/plan/ARHITEKTURA_M2.md`** — iz brainstorminga s Leonom,
   trinaest odluka zapisano kao **S-012…S-022** u `DECISIONS.md`; preuzima 7 od 9 stavki duga M1
   (BACKLOG drži još dvije i pointere). Leonove datoteke za znak: `C:\Users\leonk\Downloads\sokratis
@@ -94,23 +102,52 @@ Testovi i brane: `docs/workflow/TESTING.md`.
   PROFIL T8–T9 · IO T10–T14 · STORE T15–T18 · CLI T19 · SUČELJE T20–T28 · DESKTOP T29–T33 ·
   INTEGRACIJA T34–T35), vlasništvo datoteka i ovisnosti među tokovima u planu (jedno mjesto). Ledger:
   `.superpowers/sdd/2026-09-18-m2-desktop/progress.md`. Izvedba agentima po `AGENTI.md`.
-- **T1 (kostur) je napola u `main`-u — commit `M2/1a`** (koraci 1–12): ugovor tipova, `sokratis-store`
-  kostur, `apps/desktop` datoteke, ovisnosti pinane, 65 testova zeleno. **Desktop crate je privremeno
-  izvan `[workspace] members`** (traži ikone koje generira `npm run tauri icon`, a to traži `npm install`).
-  **Korak 13 čeka Leonov OK za `npm install`** → ikone → crate natrag u `members` → `cargo build -p
-  sokratis-desktop` → commit `M2/1b` → stabla tokova → prvi val graditelja (JEZGRA T2 · PROFIL T8 ·
-  IO T10 · SUČELJE T20). Nijedno stablo tokova još ne postoji.
+- **T1 (kostur) je cijel u `main`-u — `M2/1a` + `M2/1b`:** ugovor tipova, `sokratis-store` kostur,
+  `apps/desktop` datoteke i ovisnosti pinane (`M2/1a`), pa `npm install` uz Leonov OK (80 paketa, 0
+  ranjivosti), ikone iz Leonova loga (`npm run tauri icon`; `android/`·`ios/` nisu commitani —
+  desktop-only) i desktop crate natrag u `[workspace] members` (`M2/1b`). Odstupanje od plana,
+  zapisano u commitu: `apps/desktop/vite.config.ts` uvozi `defineConfig` iz `vitest/config` umjesto
+  `node:url` (nova ovisnost samo radi config-datoteke nije opravdana, pravilo #6). Brane: fmt ·
+  clippy `--workspace` · **65 testova** · `npm run check` zelen · `npm run build` daje `dist/` s oba
+  HTML-a · `signals .` 0.
+- **Pet radnih stabala tokova otvoreno:** `sokratis.jezgra` (`feat/core-m2`) · `sokratis.profil`
+  (`feat/core-profile`) · `sokratis.io` (`feat/io-m2`) · `sokratis.store` (`feat/store`) ·
+  `sokratis.ui` (`feat/ui`). **Tok PROFIL je gotov** (T8–T9 spojeno, merge `a2e9265`): ograda putanja
+  iz profila (`inside_root`/`Profile::validate_paths`, jezgreni dio duga I9 — io-dio čeka IO T14) i
+  `test_path_exclude`. **Tok JEZGRA je gotov** (T2–T7, merge `7d23c76` pa `7711a67`): snapshot ugovora
+  `Report`-a (dug I7, riješen), `until` kao gornja granica razdoblja (S-011 — `io`/CLI mu još ne šalju
+  stvarnu vrijednost, T14/T19), zbroj vizija po stanju (dug I6, riješen), redci commita i isporuke u
+  `Report`-u (`commits`/`deliveries` više nisu uvijek `[]`, hrane buduće poglede Dnevnik/Isporuke),
+  aktivne faze preko `phase_tag` iz profila (dug I3+M14, riješen), `SnapshotMetrics`/`diff`/
+  `worst_severity`/`alerts_raised` u `snapshot.rs`. **Nalaz recenzije, namjerno neriješen ovim
+  tokom:** `metrics/indicators.rs` i dalje klasificira dio commita odvojeno od `commit_rows` — spec
+  §3.2 „jednom" nije dovršeno; otvoreno do završne recenzije M2 (`docs/records/BACKLOG.md`). Brane na
+  `main`-u nakon svih spajanja: fmt · clippy `--workspace` · **82 testa** · `signals .` 0.
+  **Ostala tri toka su otišla dalje u svojim granama, ali NIŠTA od ovoga nije spojeno u `main`**
+  (brojke i presude: `PROGRESS.md`, dopuna „Nastavak iste večeri"): IO (`feat/io-m2`) — M2/10–M2/13
+  (atomarno pisanje, performanse gita — mjerenje ≥ prag 500 ms → T18 po planu zato **ulazi** —,
+  detached HEAD, watcher S-016) sve recenzirano SPOJIVO; M2/14 (io-dio ograde I9, `--until` prema
+  gitu) nije započeta. STORE (`feat/store`) — M2/15–M2/17 (registar, postavke, snimke uz jedan krug
+  popravka: snimka dana je cjelovita zamjena) sve recenzirano SPOJIVO; M2/18 (keš, uvjetna cigla) nije
+  započeta. SUČELJE (`feat/ui`) — M2/20–M2/24 (tokeni, HR/EN, `format.ts`, SVG grafovi, splash — svaka
+  uz najviše jedan krug popravka) sve recenzirano SPOJIVO; M2/25–M2/28 (okvir s `api.ts`, pogledi)
+  nisu započete; otvorena je još orkestratorova ručna provjera puta greške splasha u pregledniku
+  (bez commita). Stabla CLI/DESKTOP/INTEGRACIJA otvaraju se kasnije po ovisnostima iz plana; tray-znak
+  za T33 radi se iz Leonova `graph.webp` (gore). **Rust-brane u stablima tokova rade bez desktop cratea**
+  (`--workspace --exclude sokratis-desktop`); pune brane s desktopom vrti orkestrator na `main`-u
+  nakon svakog spajanja — [`docs/workflow/AGENTI.md`](docs/workflow/AGENTI.md) §5.
+- **Sesija je večeras stala jer je predugo trajala (Leonova odluka), ne zato što je M2 gotov ili što
+  je došao zastanak na kraju milestonea.** Nastavak nije nova analiza nego spajanje gornja tri toka u
+  `main`, redom kako im ovisnosti dopuštaju. **Prva radnja nove sesije:** `git log --oneline -15` ·
+  `git worktree list`, pa ledger `.superpowers/sdd/2026-09-18-m2-desktop/progress.md`, odjeljak
+  „STANJE ZA NOVU SESIJU" **na dnu datoteke** (operativno stanje po cigli, dispatch-napomene i svi
+  odgođeni Minor nalazi žive **samo ondje**, S-010 — ovaj dokument ih ne ponavlja), pa `docs/README.md`.
 - **M0 za M2 izmjeren** (spec §10): Node 24 · npm 11 · WebView2 · MSVC · Rust 1.98.1 ✅; `cargo tauri`
-  nije potreban globalno (`@tauri-apps/cli` je dev-ovisnost). **Jedina instalacija: `npm install` u
-  `apps/desktop` — čeka Leonov OK**, kao svaka instalacija u M0.
-- **Prva radnja nove sesije:** `git log --oneline -15` · `git worktree list` · ledger
-  `.superpowers/sdd/2026-09-18-m2-desktop/progress.md`, odjeljak „STANJE ZA NOVU SESIJU" na dnu (uz
-  `NOVA-SESIJA-PROMPT.md` pored njega; operativna uputa, ne izvor činjenica o projektu), pa
-  `docs/README.md`.
+  nije potreban globalno (`@tauri-apps/cli` je dev-ovisnost). Jedina instalacija (`npm install` u
+  `apps/desktop`) je odrađena 2026-09-18 uz Leonov OK.
 - **Agenti definirani:** `.claude/agents/{graditelj,recenzent,cuvar-dokumentacije}.md`, praćene u
   repou od 2026-09-18; protokol nadzora `docs/workflow/AGENTI.md` (orkestrator = ova sesija, jedini
-  spaja u `main`). Radna stabla tokova trenutno ne postoje — plan M2 ih je odredio (9 tokova), a
-  otvaraju se nakon `M2/1b`.
+  spaja u `main`).
 - Što je isporučeno i kada zna `CHANGELOG.md`; tijek sesija `PROGRESS.md`. Ovaj odjeljak to ne ponavlja.
 
 ## Ključne odluke — samo žive
@@ -125,14 +162,18 @@ commita tek nakon mjerenja) · **S-015** projekt = `git-common-dir`, ručni poda
 ne commita · **S-016** watcher u `io`, odgoda 600 ms, bez petlje · **S-017** `tokens.css` cijel, `brand-*`
 iz loga izmjeren, Tailwind kroz Vite plugin · **S-018** grafovi vlastiti SVG · **S-019** animacija jednom
 po pokretanju, prozor čeka, preskočiva · **S-020** tray minimizira, autostart, jedna instanca, obavijest
-samo na prijelaz u Alert · **S-021** HR/EN od M2 · **S-022** snapshot `Report`-a prva cigla M2.
+samo na prijelaz u Alert · **S-021** HR/EN od M2 · **S-022** snapshot `Report`-a prva cigla M2 ·
+**S-023** repo javan na GitHubu od 2026-09-20 (Leonova odluka, prije kraja M2); tajne se traže prije commita.
 
 ## Agenti — više grana, jedan orkestrator
 Uloge i protokol: `docs/workflow/AGENTI.md`. Graditelj radi **jednu ciglu u svom stablu**, recenzent presuđuje
 u dva prolaza, čuvar dokumentacije piše zapise; **samo orkestrator spaja u `main`**. Nakon compacta stanje se
 čita iz gita (`git log --oneline -15` · `git worktree list`), ne iz sjećanja. **Grane i stabla tokova M1 su
-obrisane 2026-09-18** (uz Leonov OK, sve spojene); trenutno postoji samo `main`. Grane i stabla devet tokova
-M2 otvaraju se nakon što T1 (kostur) bude cijel u `main`-u — popis je u planu M2, ne ovdje.
+obrisane 2026-09-18** (uz Leonov OK, sve spojene). Sad je otvoreno **pet od devet stabala tokova M2**
+(JEZGRA · PROFIL · IO · STORE · SUČELJE); **JEZGRA i PROFIL su gotovi** (T2–T7 i T8–T9 spojeni u
+`main`), **IO/STORE/SUČELJE su recenzirani do svoje zadnje cigle (SPOJIVO), ali nespojeni** —
+spajanje je prva radnja nove sesije. Ostala (CLI · DESKTOP · INTEGRACIJA) otvaraju se kasnije po
+ovisnostima iz plana — popis i vlasništvo datoteka su u planu M2, ne ovdje.
 
 ## Dokumentacija — ulaz je SAMO `docs/README.md`
 Složena **po ulozi dokumenta** (kao Sokrat Study): `product/` ŠTO · `plan/` ŠTO SADA (najviše **jedan**

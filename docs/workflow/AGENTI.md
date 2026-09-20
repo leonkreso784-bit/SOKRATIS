@@ -44,9 +44,16 @@ grane, stabla, cigle, vlasništvo datoteka i **ovisnosti među tokovima** (koji 
 na **jednom mjestu**: `docs/superpowers/plans/2026-09-18-m2-desktop.md`, odjeljak „Struktura datoteka i
 vlasništvo po tokovima" (S-010 — ovdje se ne prepisuju). Novo u M2: tok SUČELJE gradi TypeScript/Svelte,
 pa su mu brane `npm run check` umjesto `cargo`; tokovi SUČELJE i DESKTOP nakon `git worktree add` pokreću
-`npm ci` u svom stablu (`node_modules` je git-ignoriran). **Stabla se otvaraju tek kad je T1 cijel u
-`main`-u:** koraci 1–12 su ušli kao `M2/1a`, korak 13 (`npm install` → ikone → desktop crate u `members`)
-čeka Leonov OK i ide kao `M2/1b`. Dotad postoji samo `main` (`git worktree list`).
+`npm ci` u svom stablu (`node_modules` je git-ignoriran). **T1 je cijel u `main`-u:** koraci 1–12 kao
+`M2/1a`, korak 13 (`npm install` uz Leonov OK → ikone iz Leonova loga → desktop crate natrag u `members`)
+kao `M2/1b`. Otvoreno je **pet stabala**: `sokratis.jezgra` (`feat/core-m2`) · `sokratis.profil`
+(`feat/core-profile`) · `sokratis.io` (`feat/io-m2`) · `sokratis.store` (`feat/store`) · `sokratis.ui`
+(`feat/ui`). **PROFIL i JEZGRA su gotovi** (T8–T9 spojeno u `main`, merge `a2e9265`; T2–T7 spojeno,
+merge `7d23c76` pa `7711a67`). **IO, STORE i SUČELJE su otišle dalje u svojim granama i sve njihove
+dosadašnje cigle su recenzirane SPOJIVO** (IO M2/10–M2/13 · STORE M2/15–M2/17 · SUČELJE M2/20–M2/24),
+**ali ništa od toga nije spojeno u `main`** — stanje po cigli i sljedeći koraci su u ledgeru
+`.superpowers/sdd/2026-09-18-m2-desktop/progress.md`, odjeljak „STANJE ZA NOVU SESIJU". Stabla
+CLI/DESKTOP/INTEGRACIJA otvaraju se kasnije po ovisnostima iz plana (`git worktree list`).
 
 ## 3 · Protokol po cigli
 
@@ -79,8 +86,12 @@ INTEGRACIJA (T20–T22) u svom stablu od svježeg `main`-a.
 - Recenzent ide odmah nakon svakog izvještaja; ne čeka se kraj toka.
 - Orkestrator ne piše kod tokova; ako graditelj tri puta zapne na istoj cigli, orkestrator je preuzima sam i **zapiše zašto** u PROGRESS.
 - **Leon se ne pita usred cigle** — osim kad cigla traži **instalaciju** ili **njegov materijal**: u M2 su
-  to `npm install` (T1, korak 13) i izvor tray-ikone (T33), oboje imenovano u planu unaprijed. Inače se
-  pita: prije M0, na kraju milestonea (zastanak), prije pusha/objave.
+  to `npm install` (T1, korak 13 — odrađeno 2026-09-18 kao `M2/1b`) i izvor tray-ikone (T33 — riješeno 2026-09-20: Leon je odabrao `graph.webp` iz svoje animacije).
+  Inače se pita: prije M0, na kraju milestonea (zastanak), prije pusha/objave.
+- **Brane u stablima tokova rade bez desktop cratea** (`cargo ... --workspace --exclude sokratis-desktop`)
+  — svako stablo Rust-tokova inače kompilira cijeli Tauri i traži `dist/`, koji ta stabla ne grade; pune
+  brane s desktopom (`cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test`, bez
+  isključivanja) vrti orkestrator na `main`-u nakon svakog spajanja.
 
 ## 6 · Compact
 
