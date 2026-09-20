@@ -173,6 +173,12 @@ Test za pravilo: **Leon može pročitati datoteku i reći što radi.** Ako ne mo
 | `pub(crate) mod` (na modulu, ne funkciji) | M2/7 (`report.rs`, `mod tests`) | vidljivost cijelog modula ograničena na crate umjesto na roditelja: sestrinski modul (`snapshot::tests`) smije posuditi `report::tests::input()`, vanjski korisnik cratea ne vidi ništa novo |
 | `#[derive(PartialOrd, Ord)]` + `Iterator::max()` nad enumom | M2/7 (`snapshot.rs::worst_severity`; derive na `Severity` je od M1/T1) | redoslijed varijanti u definiciji enuma (`Info < Warn < Alert`) postaje ugovor za usporedbu — `max()` nad nizom enum-vrijednosti vrati „najtežu" bez ijedne grane `match`-a |
 | `?` unutar `filter_map`-ove zatvorenja | M2/7 (`snapshot.rs::diff`) | `let b = *before.get(id)?;` unutar zatvorenja koje `filter_map` očekuje: `None` iz `?` znači „preskoči ovaj element", ne prekid cijele funkcije — isto načelo kao `?` na `Option` (§4 gore), ali primijenjeno po elementu unutar cjevovoda |
+| više `impl` blokova istog tipa u različitim datotekama | M2/15 (`store/src/registry.rs`; nastavlja se u `settings.rs`, `snapshots.rs`, `cache.rs`) | Rust dopušta razdvajanje `impl Store` po modulima — `store.rs` drži vezu i migracije, a svaki „posao" (registar, postavke, snimke, keš) svoju datoteku |
+| `params![...]` makro (rusqlite) | M2/15 (`store/src/registry.rs`) | veže vrijednosti u SQL upit bez ručnog formatiranja teksta — nema injekcije, nema quotinga |
+| `.optional()` (`rusqlite::OptionalExtension`) nad `query_row` | M2/15 (`store/src/registry.rs`) | „nema retka" (npr. postavka koja nikad nije zapisana) postaje `Ok(None)` umjesto greške `QueryReturnedNoRows` |
+| `Path`/`PathBuf::to_string_lossy()` | M2/15 (`store/src/registry.rs`) | pretvara putanju u tekst za SQLite (koji ne zna za `PathBuf`); neispravan UTF-8 u putanji zamjenjuje znakom umjesto panike — isto načelo kao `String::from_utf8_lossy` (§4 gore), na drugom tipu |
+| `Connection::unchecked_transaction()` za skupni upis | M2/15 (`store/src/registry.rs::set_worktrees`; kasnije M2/17 `save_snapshot`, M2/18 `put_commits`) | više redaka u jednoj transakciji umjesto `execute` po retku — jedan fsync umjesto stotina, i pad usred upisa vraća SVE (rollback bez `commit()`) |
+| SQL upsert `INSERT … ON CONFLICT … DO UPDATE` | M2/16 (`store/src/settings.rs`) | piše-ili-mijenja u jednom SQL-pozivu bez utrke između čitanja i pisanja — zamjena za ručni „SELECT pa INSERT-ili-UPDATE" |
 
 Redak se dodaje **u cigli u kojoj se pojam prvi put pojavi**, s referencom na datoteku.
 

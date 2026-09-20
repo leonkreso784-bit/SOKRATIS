@@ -79,6 +79,33 @@ Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek sesije:
   Brane nakon JEZGRA 2/2 (T4–T7, merge): `cargo fmt --check` OK · `cargo clippy --workspace -- -D
   warnings` OK · **82 testa** · `sokratis signals .` = nema signala. Tok JEZGRA je time **gotov**
   (T2–T7 svi u `main`-u).
+- **`M2/15` — registar projekata i stabala (2026-09-20).** Korisnik CLI-ja ne vidi ništa novo (CLI ne
+  dira `sokratis-store`) — crate dobiva `registry.rs`: `add_project`/`list_projects`/`project`/
+  `rename_project`/`remove_project`/`touch_project`/`set_worktrees`/`worktrees`. Identitet projekta je
+  `git_common_dir` (S-015): dva radna stabla istog repozitorija dijele jedan zapis, duplikat vraća ime
+  već upisanog umjesto da tiho spoji; brisanje projekta kaskadno odnosi njegova radna stabla i
+  postavke (`ON DELETE CASCADE`).
+- **`M2/16` — postavke, globalne i po projektu (2026-09-20).** `setting`/`set_setting` (tema, jezik,
+  autostart, položaj prozora) i `project_setting`/`set_project_setting` (raspon, zadnji pogled) —
+  upisuju kroz `INSERT … ON CONFLICT DO UPDATE` u jednom SQL-pozivu; čitanje postavke koja nikad nije
+  zapisana vraća `None`, ne grešku; pisanje na uklonjen ili nepostojeći projekt je tipizirana
+  `NoSuchProject`, ne sirova greška stranog ključa.
+- **`M2/17` — snimke brojki, profil kao kanonski JSON, trend (2026-09-20, S-014).**
+  `record_profile`/`save_snapshot`/`trend`/`latest_snapshot`: profil se sprema u kanonskom obliku
+  (ključevi sortirani preko `serde_json::Value`/`BTreeMap`) pa dva sadržajno jednaka profila u drugom
+  poretku dijele isti `profile_seen_id`; metrika koja je `NaN` ili beskonačna se preskače pri upisu,
+  ne pretvara u nulu. **Krug popravka:** druga snimka istog dana je sad **cjelovita zamjena** —
+  `DELETE` pa `INSERT` u istoj transakciji — jer je ostavljala jutrošnje retke kad je večernja snimka
+  imala manje metrika, pa je `latest_snapshot` vraćao mješavinu dviju snimki.
+- **`M2/18` — keš sirovih commita po SHA (2026-09-20, uvjetna cigla, S-014).** Ušla je jer je mjerenje
+  M2/11 dalo 1479,71 ms ≥ prag 500 ms: `put_commits`/`cached_commits`/`newest_cached_commit_date`
+  čuvaju SIROVE commite (nikad klasifikaciju) po SHA, `INSERT OR IGNORE` u jednoj transakciji. Korisnik
+  CLI-ja i dalje ne vidi ništa novo — keš nema potrošača dok IO ne dobije inkrementalni `git log` +
+  punjenje/čitanje keša (posebna cigla, nije izgrađena).
+  Brane nakon svih četiriju (merge `e9b01c7`): `cargo fmt --check` OK · `cargo clippy --workspace
+  --all-targets -- -D warnings` OK · `cargo test --workspace` **107 testova, 0 padova** (store crate
+  sam **26**: 2 unit + 10 cache + 3 registry + 2 settings + 9 snapshots) · `sokratis signals .` = nema
+  signala. Tok STORE je time **gotov** (T15–T18 svi u `main`-u).
 
 ## [0.1.0] — 2026-09-17 — Jezgra i CLI (Milestone 1)
 

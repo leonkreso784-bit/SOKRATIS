@@ -543,3 +543,51 @@ objava i dalje čekaju Leonov izričit OK; isto brisanje grana/stabala tokova na
 ograde putanja, I9) ima prednost jer je kod sada javan; licenca ne postoji (BACKLOG). **Leon je isti
 dan dao TRAJNI OK za pusheve** — pravilo #1 u `CLAUDE.md` je prepisano (što orkestrator pusha sam, a
 što i dalje traži izričit OK).
+
+---
+
+## 2026-09-20 (FABLE) — Druga sesija izvedbe M2: STORE (T15–T18) spojen u `main`
+
+**Nastavak iste sesijske niti nakon zastanka s kraja prve sesije (2026-09-18) i kratke sesije objave
+(isti dan, gore). Ovaj naslov nosi cijelu drugu sesiju izvedbe — dopunjuje ga svaki sljedeći čuvar
+dokumentacije koji u njoj radi, novim odlomkom „Nastavak iste sesije", ne novim naslovom.**
+
+- **STORE (T15–T18) spojen** (merge `e9b01c7`): registar projekata i stabala s migracijama (M2/15,
+  `registry.rs`: `add_project`/`list_projects`/`project`/`rename_project`/`remove_project`/
+  `touch_project`/`set_worktrees`/`worktrees`, identitet = `git_common_dir`, S-015) · postavke
+  globalne i po projektu (M2/16, `settings.rs`: upsert `ON CONFLICT … DO UPDATE`) · snimke brojki s
+  trendom i profilom kao kanonskim JSON-om (M2/17, `snapshots.rs`, S-014 — uz jedan krug popravka:
+  druga snimka istog dana je sad cjelovita zamjena, `DELETE` pa `INSERT` u istoj transakciji, jer je
+  ostavljala jutrošnje retke, `893b3e7`) · keš sirovih commita po SHA (M2/18, `cache.rs` — uvjetna
+  cigla koja je UŠLA jer je mjerenje M2/11 dalo 1479,71 ms ≥ prag 500 ms, S-014; keš drži samo sirove
+  commite, nikad klasifikaciju). Popis commita: `git log --oneline 3098d5b..e9b01c7`.
+- **Brane na `main`-u nakon spajanja:** `cargo fmt --check` OK · `cargo clippy --workspace
+  --all-targets -- -D warnings` OK · `cargo test --workspace` **107 passed, 0 failed** · `sokratis
+  signals .` nema signala. `main` pushan na `origin` (trajni OK, pravilo #1).
+- **Ispravak brojke:** `task-18-report.md` (graditeljev izvještaj, negitiran) zbraja testove store
+  cratea krivo kao 21; zbroj njegovih vlastitih navedenih dijelova (2 unit + 10 cache + 3 registry +
+  2 settings + 9 snapshots) je **26** — u dokumente ide 26.
+- **Tok STORE je time GOTOV** (T15–T18 u `main`-u), uz PROFIL i JEZGRA otprije gotove.
+- **Ostala dva otvorena toka nepromijenjena ovim spajanjem** (stanje potvrđeno iz gita, ne iz starijih
+  zapisa): IO (`sokratis.io`, `feat/io-m2`) — T10–T13 i dalje recenzirani SPOJIVO, **T14** (io-dio
+  ograde putanja I9 + `--until` prema gitu) u izvedbi, još nije u `main`-u; iza T14 dolazi cigla koju
+  plan nema, **M2/14b — potrošač keša** (tok IO: `rev-list` daje dostižne SHA-ove, keš vraća poznate,
+  `git log --no-walk --stdin` samo nedostajuće; trait `CommitCache` u `io`, adapter u desktopu) — još
+  nije izgrađena. SUČELJE (`sokratis.ui`, `feat/ui`) — T20–T24 recenzirani SPOJIVO, **T25** u izvedbi,
+  još nije u `main`-u.
+- **Šest stabala i dalje na disku** (`git worktree list`: `main` + `sokratis.io` · `.jezgra` · `.profil`
+  · `.store` · `.ui`); `feat/store` je sad spojena grana, ali grana i njeno stablo ostaju dok Leon ne
+  da izričit OK za brisanje (nepromijenjeno pravilo).
+- **Opseg preostatka ove sesije, Leonova odluka:** u `main` ulazi sve osim DESKTOP-a (T29–T33) i
+  INTEGRACIJE (T34–T35); oni i završna recenzija cijelog M2 su treća sesija.
+- **Čuvar dokumentacije (način A), ovaj zapis:** `PROGRESS.md` (ovaj naslov), `CHANGELOG.md` (retci
+  M2/15–M2/18 pod `[Unreleased]`), `RUST.md` §4 (šest novih pojmova iz store-cratea: više `impl`
+  blokova po datotekama, `params!` makro, `.optional()`, `to_string_lossy()` na putanji,
+  `unchecked_transaction`, SQL upsert), `ROADMAP.md` („Gdje smo" i status M2), `CLAUDE.md` („Stanje —
+  TRENUTNO": STORE gotov, datum stanja). `ARCHITECTURE.md` namjerno nedirana (radi je čuvar način B na
+  kraju sesije). `sokratis docs .` provjeren prije i poslije izmjena.
+
+### Što slijedi
+Spajanje IO (nakon T14 i M2/14b) pa SUČELJE (nakon T25 i preostalih cigli okvira) pa CLI (T19, kad je
+IO u `main`-u); DESKTOP i INTEGRACIJA su treća sesija. Ledger:
+`.superpowers/sdd/2026-09-18-m2-desktop/progress.md`, odjeljak „STANJE ZA NOVU SESIJU".
