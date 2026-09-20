@@ -20,8 +20,8 @@ radi: `architecture/ARCHITECTURE.md` (§11).
 **Leon je dao izričit OK 2026-09-18:** svih 8 grana tokova i njihovih radnih stabala je obrisano
 (sve su bile spojene) — `main` je sada jedina grana i jedino stablo. Time je Milestone 1 zatvoren.
 Toolchain je pinan (`rust-toolchain.toml`, 1.98.1) i definicije agenata su u repou
-(`.claude/agents/*.md`) — obje odluke Leon je odobrio isti dan. Na Leona i dalje čeka (ne radi se
-bez njegova OK-a): push i objava na GitHub (remote još ne postoji).
+(`.claude/agents/*.md`) — obje odluke Leon je odobrio isti dan. **Repozitorij je od 2026-09-20 javan
+na GitHubu** (`origin`, Leonov izričit OK; odluka i što je time postalo javno: `DECISIONS.md` S-023).
 
 **Spec M2 je napisan 2026-09-18** ([ARHITEKTURA_M2.md](./ARHITEKTURA_M2.md)) iz brainstorminga s Leonom
 (trinaest odluka, pitanje po pitanje; zapisane kao S-012…S-022 u `records/DECISIONS.md`). Preuzima

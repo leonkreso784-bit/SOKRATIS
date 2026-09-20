@@ -86,7 +86,7 @@ INTEGRACIJA (T20–T22) u svom stablu od svježeg `main`-a.
 - Recenzent ide odmah nakon svakog izvještaja; ne čeka se kraj toka.
 - Orkestrator ne piše kod tokova; ako graditelj tri puta zapne na istoj cigli, orkestrator je preuzima sam i **zapiše zašto** u PROGRESS.
 - **Leon se ne pita usred cigle** — osim kad cigla traži **instalaciju** ili **njegov materijal**: u M2 su
-  to `npm install` (T1, korak 13 — odrađeno 2026-09-18 kao `M2/1b`) i izvor tray-ikone (T33, još čeka).
+  to `npm install` (T1, korak 13 — odrađeno 2026-09-18 kao `M2/1b`) i izvor tray-ikone (T33 — riješeno 2026-09-20: Leon je odabrao `graph.webp` iz svoje animacije).
   Inače se pita: prije M0, na kraju milestonea (zastanak), prije pusha/objave.
 - **Brane u stablima tokova rade bez desktop cratea** (`cargo ... --workspace --exclude sokratis-desktop`)
   — svako stablo Rust-tokova inače kompilira cijeli Tauri i traži `dist/`, koji ta stabla ne grade; pune

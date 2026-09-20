@@ -517,3 +517,28 @@ ne prepisuje se ovdje). Ukratko: `git merge main` u `sokratis.io` → T14 → me
 provjera puta greške splasha). Potom CLI (T19, kad je IO u `main`-u), DESKTOP (T29–T33, i dalje čeka
 Leonov PNG tray-znak) i INTEGRACIJA (T34–T35) kad njihove ovisnosti stoje u `main`-u. Push/remote i
 objava i dalje čekaju Leonov izričit OK; isto brisanje grana/stabala tokova na kraju M2.
+
+## 2026-09-20 (FABLE) — Repo javan na GitHubu (Leonov OK), tray-znak iz `graph.webp`
+
+**Kratka sesija nakon zatvaranja prve sesije izvedbe M2. Nijedna cigla; jedna objava i dvije odluke.**
+
+- **Leon je dao izričit OK za push i odlučio da repo bude JAVAN** (želi ga dijeliti). Prije pusha mu je
+  rečeno što time postaje javno (fixturei pariteta = cijeli dnevnik, plan, README i git-log Sokrat
+  Studyja; lokalne putanje u dokumentaciji; e-mail autora u povijesti) — odgovor: nije bitno. Odluka,
+  kontekst i posljedice: `DECISIONS.md` **S-023** (jedno mjesto, ne ponavlja se ovdje).
+- **Prije pusha sve četiri grane pretražene na tajne** (`git grep` po uzorcima ključeva/tokena/JWT-a/
+  privatnih ključeva, pa labaviji prolaz po dodjelama `password=`/`token:` i e-mail adresama): ništa
+  nije nađeno; u datotekama stoje samo dvije bezazlene adrese (kontakt projekta, testna).
+- **Pushano:** `main` (`9acbeef`) · `feat/io-m2` (`e128986`) · `feat/store` (`9fba0d1`) ·
+  `feat/ui` (`37d5da4`). Remote je bio prazan repo (ništa nije pregaženo); `git ls-remote` nakon pusha
+  daje iste SHA-ove kao lokalne grane. Tri grane tokova su ujedno prva sigurnosna kopija recenziranog,
+  a nespojenog rada (IO T10–T13 · STORE T15–T18 · SUČELJE T20–T24).
+- **Tray-znak (T33) riješen bez novog crteža:** Leon nije razumio što se traži; pokazalo se da njegova
+  animacija već sadrži znak bez lika (`apps/desktop/src/assets/intro/graph.webp`: prsten + četiri stupca
+  + linija s točkama). Leon je odabrao njega. T33 više ne čeka nikakav materijal.
+- **T18 (keš) je izgrađen** na kraju prethodne sesije (`9fba0d1`, nakon čuvareva audita) — NIJE
+  recenziran; paket za recenziju je spreman u ledgeru.
+
+**Što slijedi:** nepromijenjeno — ledger, odjeljak „STANJE ZA NOVU SESIJU". Novo iz S-023: T14 (io-dio
+ograde putanja, I9) ima prednost jer je kod sada javan; licenca ne postoji (BACKLOG). Svaki idući push
+traži Leonov OK (pravilo #1), osim ako on izričito kaže da je odobrenje trajno.

@@ -241,3 +241,21 @@ ne u pogađanju; `RUST.md` §2 dobiva `insta` natrag kao dev-ovisnost `core`-a.
 **Dopuna (2026-09-18, pri pisanju plana):** „prva cigla" znači **prva cigla toka JEZGRA (T2)**. Prije nje
 ide kostur T1 (orkestrator), koji nova polja `Report`-a dodaje **prazna** — pa snimka nastaje nad kosturom
 i od tada čuva svako punjenje (T3–T5 mijenjaju snimku namjerno, s rečenicom u commitu).
+
+## S-023 — repozitorij je javan na GitHubu od 2026-09-20, prije kraja M2 (Leonova odluka)
+
+**Kontekst:** dotadašnji plan je bio „privatni remote prvo; javna objava tek nakon ograde putanja iz
+profila (I9)" i objava kao dio M3. Leon je 2026-09-20 dao izričit OK za push i potvrdio da repo
+**treba biti javan** jer ga želi dijeliti s drugim ljudima. Prije pusha mu je rečeno što time postaje
+javno: fixturei pariteta sadrže cijeli `PROGRESS.md`, `RASPORED.md`, `README.md` i git-log Sokrat
+Studyja (`crates/sokratis-core/tests/fixtures/sokratstudy-2026-09-17.*`), dokumentacija nosi lokalne
+putanje (`C:\Users\leonk\…`), a povijest commita autorov e-mail. Odgovor: nije bitno, neka bude javno.
+**Odluka:** `origin` = GitHub repo `leonkreso784-bit/SOKRATIS` (javan). Prvi push: `main` i tri
+nespojene grane tokova (`feat/io-m2`, `feat/store`, `feat/ui`) — grane i kao sigurnosna kopija rada koji
+je dotad postojao samo na Leonovu disku. Prije pusha sve četiri grane su pretražene na tajne (ključevi,
+tokeni, lozinke, privatni ključevi): **ništa nije nađeno**.
+**Posljedice:** io-dio ograde putanja (I9, cigla T14) više nije uvjet objave nego **dug prema javnom
+kodu** — alat koji netko skine smije čitati samo unutar repoa koji mjeri, pa T14 dobiva prednost.
+Licenca, README na engleskom i instalater ostaju M3; dok licence nema, kod je javno vidljiv ali **nije
+licenciran za tuđu uporabu** (BACKLOG). Svaki novi fixture iz tuđeg ili privatnog repozitorija od sada
+je javna objava — pregledava se na tajne PRIJE commita, ne prije pusha.

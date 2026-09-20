@@ -446,3 +446,4 @@ izgrađeno, piše se spec za M3.
 instalater (MSI/NSIS) · nova pravila signala · GitHub/Vercel adapteri · otvaranje datoteke u editoru
 (samo kopiranje putanje) · natpisi CLI-tablice · `include_unmerged` · vektorizacija znaka · README EN,
 licenca, objava · push/remote (čeka Leonov izričit OK; javna objava tek nakon I9, koji ovaj spec zatvara).
+*(Pretečeno 2026-09-20: Leon je repo objavio javno prije kraja M2 — `DECISIONS.md` S-023; I9 i dalje zatvara ovaj spec, ciglom T14.)*

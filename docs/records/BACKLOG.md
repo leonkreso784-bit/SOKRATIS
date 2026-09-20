@@ -31,7 +31,9 @@ koji fixture prevlada (odgođena 8). **I7 je riješena ciglom M2/2** (2026-09-18
 i pada na svaku nenamjernu promjenu oblika. **I9 je djelomično riješena ciglom M2/8**: jezgra
 (`Profile::validate_paths`/`inside_root`) odbija putanju izvan repoa; io-dio (provjera pri
 `io::Project::open`, prije nego se profil pročita s diska) čeka T14 — I9 ostaje otvorena dok taj dio
-ne uđe. Testni redak koji fixture prevlada (odgođena 8) je riješen ciglom M2/9 (`test_path_exclude`).
+ne uđe. **Repo je od 2026-09-20 javan (S-023), pa io-dio I9 više nije uvjet objave nego dug prema
+javnom kodu — T14 ima prednost.** Uz to otvoreno iz iste odluke: LICENCA ne postoji (kod je vidljiv,
+ali nije licenciran za tuđu uporabu) — stavka „README EN · LICENCA" gore time dobiva na težini. Testni redak koji fixture prevlada (odgođena 8) je riješen ciglom M2/9 (`test_path_exclude`).
 **I6 je riješena ciglom M2/4**: `Report.vision_totals` zbraja vizije po stanju. **`phase_tag` (I3 +
 M14) je riješen ciglom M2/6**: aktivne faze se na commit vežu regexom iz profila, ne tvrdim
 prefiksom; zadani profil (Sokrat Study) daje iste brojke kao prije (diff snimke bajtno prazan).

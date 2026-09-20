@@ -80,12 +80,17 @@ Testovi i brane: `docs/workflow/TESTING.md`.
 - **Leon je 2026-09-18 dao izričit OK: svih 8 grana `feat/*` i njihovih 8 radnih stabala
   `sokratis.<tok>` je obrisano** (sve su bile spojene). `main` je sada **jedina grana i jedino
   stablo** (`git worktree list` · `git branch -a`). Time je M1 zatvoren.
-- **Na Leona i dalje čeka** (ne radi se bez njegova izričitog OK-a): push/remote/objava na GitHub
-  (privatni remote prvo; javna objava tek nakon ograde putanja iz profila, BACKLOG I9) — remote i
-  dalje ne postoji, nijedan URL ne ulazi u dokumentaciju dok ga Leon izričito ne potvrdi; izvor
-  tray-znaka za cigli T33 (detalj niže); brisanje grana i radnih stabala tokova M2 na kraju
-  milestonea. Toolchain je pinan (`rust-toolchain.toml`, 1.98.1) i definicije agenata su u repou —
-  obje odluke Leon je odobrio 2026-09-18.
+- **Repo je od 2026-09-20 JAVAN na GitHubu** — `origin` = `leonkreso784-bit/SOKRATIS`, Leonov izričit
+  OK i njegova odluka da bude javan (S-023: što je time postalo javno, pretraga na tajne, posljedice).
+  Pushani su `main` i tri nespojene grane tokova (`feat/io-m2` · `feat/store` · `feat/ui`). **Svaki
+  novi fixture ili dokument je od sada javna objava — tajne se traže PRIJE commita.** io-dio ograde
+  putanja (I9, cigla T14) je time dug prema javnom kodu i ima prednost; licence još nema (BACKLOG).
+- **Na Leona i dalje čeka** (ne radi se bez njegova izričitog OK-a): svaki IDUĆI push (pravilo #1 —
+  prvo odobrenje se ne proteže, osim ako Leon izričito kaže da je trajno); brisanje grana i radnih
+  stabala tokova M2 na kraju milestonea. **Tray-znak za T33 je riješen:** Leon je 2026-09-20 odabrao
+  da se radi iz `apps/desktop/src/assets/intro/graph.webp` (znak bez lika iz njegove animacije) — ne
+  čeka se nikakav novi PNG. Toolchain je pinan (`rust-toolchain.toml`, 1.98.1) i definicije agenata
+  su u repou — obje odluke Leon je odobrio 2026-09-18.
 - **Spec M2 je napisan (2026-09-18): `docs/plan/ARHITEKTURA_M2.md`** — iz brainstorminga s Leonom,
   trinaest odluka zapisano kao **S-012…S-022** u `DECISIONS.md`; preuzima 7 od 9 stavki duga M1
   (BACKLOG drži još dvije i pointere). Leonove datoteke za znak: `C:\Users\leonk\Downloads\sokratis
@@ -126,9 +131,8 @@ Testovi i brane: `docs/workflow/TESTING.md`.
   započeta. SUČELJE (`feat/ui`) — M2/20–M2/24 (tokeni, HR/EN, `format.ts`, SVG grafovi, splash — svaka
   uz najviše jedan krug popravka) sve recenzirano SPOJIVO; M2/25–M2/28 (okvir s `api.ts`, pogledi)
   nisu započete; otvorena je još orkestratorova ručna provjera puta greške splasha u pregledniku
-  (bez commita). Stabla CLI/DESKTOP/INTEGRACIJA otvaraju se kasnije po ovisnostima iz plana; DESKTOP
-  (T33) uz to čeka od Leona pojednostavljen PNG tray-znak bez Sokratova lika (prsten + stupci, izvor
-  ≥ 256 px, prozirna pozadina; spec §5.4). **Rust-brane u stablima tokova rade bez desktop cratea**
+  (bez commita). Stabla CLI/DESKTOP/INTEGRACIJA otvaraju se kasnije po ovisnostima iz plana; tray-znak
+  za T33 radi se iz Leonova `graph.webp` (gore). **Rust-brane u stablima tokova rade bez desktop cratea**
   (`--workspace --exclude sokratis-desktop`); pune brane s desktopom vrti orkestrator na `main`-u
   nakon svakog spajanja — [`docs/workflow/AGENTI.md`](docs/workflow/AGENTI.md) §5.
 - **Sesija je večeras stala jer je predugo trajala (Leonova odluka), ne zato što je M2 gotov ili što
@@ -157,7 +161,8 @@ commita tek nakon mjerenja) · **S-015** projekt = `git-common-dir`, ručni poda
 ne commita · **S-016** watcher u `io`, odgoda 600 ms, bez petlje · **S-017** `tokens.css` cijel, `brand-*`
 iz loga izmjeren, Tailwind kroz Vite plugin · **S-018** grafovi vlastiti SVG · **S-019** animacija jednom
 po pokretanju, prozor čeka, preskočiva · **S-020** tray minimizira, autostart, jedna instanca, obavijest
-samo na prijelaz u Alert · **S-021** HR/EN od M2 · **S-022** snapshot `Report`-a prva cigla M2.
+samo na prijelaz u Alert · **S-021** HR/EN od M2 · **S-022** snapshot `Report`-a prva cigla M2 ·
+**S-023** repo javan na GitHubu od 2026-09-20 (Leonova odluka, prije kraja M2); tajne se traže prije commita.
 
 ## Agenti — više grana, jedan orkestrator
 Uloge i protokol: `docs/workflow/AGENTI.md`. Graditelj radi **jednu ciglu u svom stablu**, recenzent presuđuje
