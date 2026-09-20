@@ -283,8 +283,11 @@ fn unknown_profile_field_is_an_error_and_missing_files_default() {
 
 /// Dug I9 (repo JAVAN na GitHubu, cigla M2/14): profil koji navede putanju IZVAN repoa (npr.
 /// `docs_dir: "../.."`) se odbija VEĆ pri `open`-u, prije nego što bilo tko pozove `docs()` ili
-/// zatraži izvještaj — poruka mora nositi ime polja (`profil.docs_dir`), jer profil piše čovjek i
-/// mora znati KOJE polje popraviti.
+/// zatraži izvještaj. Ime polja (`profil.docs_dir`) i vrijednost (`../..`) moraju biti dohvatljivi
+/// — ali po obrascu I5 (susjedni test iznad, `profile_error_says_the_path_once_and_leaves_the_cause_to_the_chain`)
+/// SAMO kroz LANAC uzroka, ne kroz top-poruku: krug popravka 1 (recenzija) — prva verzija je
+/// poruku ugradila kroz `{source}`, pa je `anyhow` na CLI-ju (`{e:#}`) ispisivao istu rečenicu
+/// dvaput (top-poruka + „Caused by").
 #[test]
 fn profile_path_outside_repo_is_rejected_at_open_with_field_name() {
     let r = Repo::init();
@@ -297,10 +300,17 @@ fn profile_path_outside_repo_is_rejected_at_open_with_field_name() {
     );
     write(&r, ".sokratis/profile.json", r#"{ "docs_dir": "../.." }"#);
     let err = Project::open(r.path()).expect_err("mora pasti");
-    let msg = format!("{err:#}");
+    let top = err.to_string();
     assert!(
-        msg.contains("profil.docs_dir") && msg.contains("../.."),
-        "{msg}"
+        !top.contains("docs_dir"),
+        "uzrok se ne smije ugraditi u top-poruku: {top}"
+    );
+    let cause = std::error::Error::source(&err)
+        .map(|c| c.to_string())
+        .unwrap_or_default();
+    assert!(
+        cause.contains("profil.docs_dir") && cause.contains("../.."),
+        "{cause}"
     );
 }
 

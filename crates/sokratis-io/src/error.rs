@@ -12,11 +12,14 @@
 //! pukla) umjesto `notify::Error`-a kroz `#[from]` — `watch_project` javlja PO PUTANJI kod pada,
 //! pa je jedna varijanta s gotovim tekstom jednostavnija od posebnog tipa za svaki izvor greške.
 //!
-//! Cigla M2/14 (ograda putanja pri otvaranju, dug I9): `ProfileInvalid` UGRAĐUJE `{source}` u
-//! vlastitu poruku — za razliku od `Profile`/`Manual` (I5: uzrok ostaje SAMO u lancu, da ga
-//! `anyhow` na CLI-ju ne ispiše dvaput). Ovdje je razlog obrnut: `ParseError::PathOutsideRoot` je
-//! JEDAN kratak redak (ime polja + vrijednost), ne popis 38 polja, a poruka mora „nositi ime
-//! polja" i kad se `IoError` čita izravno (bez `anyhow`-omota) — npr. u testu io-sloja.
+//! Cigla M2/14 (ograda putanja pri otvaranju, dug I9): `ProfileInvalid` slijedi ISTI obrazac kao
+//! `Profile`/`Manual` (I5) — uzrok ostaje SAMO u `#[source]` lancu, poruka ga ne ponavlja. Krug
+//! popravka 1 (recenzija): prva verzija je poruku ugradila kroz `{source}` da bi test mogao čitati
+//! ime polja izravno iz `IoError::to_string()`, ali to je bio brifov propust, ne pravilo — kad
+//! `IoError::ProfileInvalid` prođe kroz `anyhow` na CLI-ju (`main` ispisuje `{e:#}`), rečenica
+//! `ParseError::PathOutsideRoot`-a (ime polja + vrijednost) bi se ispisala DVAPUT, isto što je I5
+//! već jednom popravio za `Profile`/`Manual`. Ime polja i dalje stiže do korisnika — samo kroz
+//! LANAC (`std::error::Error::source`), ne kroz top-poruku.
 use std::path::PathBuf;
 use thiserror::Error;
 #[derive(Debug, Error)]
@@ -41,7 +44,7 @@ pub enum IoError {
         #[source]
         source: serde_json::Error,
     },
-    #[error("profil {path}: {source}")]
+    #[error("profil {path}")]
     ProfileInvalid {
         path: PathBuf,
         #[source]
