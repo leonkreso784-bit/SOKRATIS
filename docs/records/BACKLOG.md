@@ -17,6 +17,7 @@
 | Instalater (Tauri bundler, MSI/NSIS) | M3 | |
 | `sokratis docs .` mjeri samo korijen i `docs_dir`; `.md` pod `apps/desktop` (npr. budući README sučelja) nitko ne provjerava | M3 (profil: više `docs_dir`-ova ili `extra_docs_dirs`) | nalaz čuvara 2026-09-18 |
 | „Klasifikacija jednom" (spec §3.2) nije dovršena: `metrics/kinds.rs::commit_rows`/`kind_stats` (M2/5) klasificiraju svaki commit jednom za `Report.commits`, ali `metrics/indicators.rs:31` (`kind_count`) i dalje zove `effective_kind` odvojeno za `debugging_commits`/`docs_share` — commit se klasificira više od jednom | M2, odluka na završnoj recenziji | nalaz recenzije M2/5 (2026-09-18); stanje koda: `ARCHITECTURE.md` §11 |
+| `sokratis report --table` u zaglavlju ispisuje samo „od {since}" — `until` se u tabličnom ispisu ne vidi iako je prozor ograničen (JSON je točan) | M2, završni krug popravaka | nalaz recenzije M2/19 (2026-09-20); `table.rs` nema presedan za uvjetno dodavanje polja u zaglavlje |
 
 ## Iz završne recenzije M1 (nalazi koji nisu popravljeni u M1)
 

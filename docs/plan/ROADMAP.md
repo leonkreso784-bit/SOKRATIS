@@ -65,13 +65,20 @@ time zatvoren u cijelosti** (jezgreni dio M2/8 + io-dio M2/14). Brane na `main`-
 (IO + STORE + JEZGRA + PROFIL): `cargo fmt --check` OK · `cargo clippy --workspace --all-targets -- -D
 warnings` OK · **123 testa** · `sokratis signals .` 0. `main` pushan na `origin`.
 
+**Tok CLI je gotov** (T19, merge `11b1708`, 2026-09-20, nastavak iste sesije): `sokratis report`
+dobiva `--until YYYY-MM-DD` (M2/19) — zrcali `--since`, poziva `Project::input_between`; `docs`/
+`signals` i dalje ne primaju `until`. Neispravan `--until` → kod 3 s porukom iz jezgre; `until <
+since` → prazan izvještaj, kod 0. Poznato ograničenje: `--table` u zaglavlju ne pokazuje `until`
+(JSON je ugovor i on je točan; odgođeno u `records/BACKLOG.md`). Brane na `main`-u nakon spajanja
+(CLI + IO + STORE + JEZGRA + PROFIL): `cargo fmt --check` OK · `cargo clippy --workspace
+--all-targets -- -D warnings` OK · **124 testa** · `sokratis signals .` 0. `main` pushan na `origin`.
+
 **Preostali rad je izvan `main`-a:** tok IO nastavlja s **M2/14b — potrošač keša** (cigla koju plan
 nema: `rev-list` → dostižni SHA-ovi, keš daje poznate, `log --no-walk --stdin` samo nedostajuće; trait
-`CommitCache` u `io`, adapter u desktopu) na istoj grani `feat/io-m2`. **Tok CLI je otvoren danas**
-(`sokratis.cli`, `feat/cli-m2`) za **M2/19** (`report --until` — u `main`-u još ne postoji). SUČELJE
-(`feat/ui`) — M2/20–M2/24 recenzirano SPOJIVO, **M2/25** (okvir s `api.ts`) recenziran SPOJIVO,
-**M2/26** u izvedbi. **Sedam stabala otvoreno** (`git worktree list`): `main` · `sokratis.jezgra` ·
-`.profil` · `.io` · `.store` · `.ui` · `.cli`. **Opseg preostatka ove sesije, Leonova odluka:** u
+`CommitCache` u `io`, adapter u desktopu) na istoj grani `feat/io-m2`. SUČELJE (`feat/ui`) —
+M2/20–M2/24 recenzirano SPOJIVO, **M2/25** (okvir s `api.ts`) recenziran SPOJIVO, **M2/26** u krugu
+popravka. **Sedam stabala otvoreno** (`git worktree list`): `main` · `sokratis.jezgra` · `.profil` ·
+`.io` · `.store` · `.ui` · `.cli`. **Opseg preostatka ove sesije, Leonova odluka:** u
 `main` ulazi sve osim DESKTOP-a (T29–T33) i INTEGRACIJE (T34–T35); oni i završna recenzija cijelog M2
 su treća sesija. Nastavak: ledger `.superpowers/sdd/2026-09-18-m2-desktop/progress.md`, odjeljak
 „STANJE ZA NOVU SESIJU" na dnu.
@@ -82,7 +89,7 @@ su treća sesija. Nastavak: ledger `.superpowers/sdd/2026-09-18-m2-desktop/progr
 |---|---|---|---|---|
 | **M0** | **Toolchain** | Visual Studio Build Tools (workload „Desktop development with C++") · rustup s MSVC targetom · `cargo --version` · workspace koji se builda | …pokrenuti `cargo test` u ovom folderu i dobiti zeleno na praznom testu | ✅ gotovo (2026-09-17) |
 | **M1** | **Jezgra + CLI** | `core` · `io` (git-proces, profil, ručni podaci) · `cli` · paritet s `RAD.xlsx` · ispravak sati · docs-ocjena · signali `unmerged-branches` i `docs-lag` | …nad Sokrat Studyjem iz terminala dobiti iste brojke kao u tablici, ispravne sate, ocjenu docs-a i dva signala s dokazom; staviti `sokratis signals` u preflight | ✅ **zatvoren 2026-09-18** (0.1.0, T1–T22 + krug popravaka u `main`; grane i stabla tokova obrisani uz Leonov OK) |
-| **M2** | **Desktop** | Tauri 2 · Svelte 5 · tokeni Sokrat Studyja (sve 4 teme, `brand-*` iz loga) · `sokratis-store` (SQLite: registar · snimke · keš) · watcher · tray · autostart · obavijesti · svih 8 pogleda s uređivanjem · HR/EN · **znak Sokratisa** = ikona aplikacije + animacija pri pokretanju u kojoj logo stoji na mjestu slova „o" (Leonove datoteke od 2026-09-18, spec §5.2–5.4) · 7 od 9 stavki duga M1 — sve u [ARHITEKTURA_M2.md](./ARHITEKTURA_M2.md) | …spec §11: pokrenuti Sokratis, vidjeti animaciju, Pregled sa Sokrat Studyjem kao jednim projektom od pet stabala, svih 8 pogleda s brojkama istim kao CLI, osvježenje bez klika nakon commita, obavijest na Alert iz traya | 🟨 **u izvedbi, druga sesija (2026-09-20)** — kostur T1 cijel u `main`-u (`M2/1a`+`M2/1b`), PROFIL (T8–T9), JEZGRA (T2–T7), STORE (T15–T18) i IO (T10–T14) gotovi i spojeni — **dug I9 zatvoren u cijelosti**; SUČELJE (T20–T24 SPOJIVO, M2/25 SPOJIVO, M2/26 u izvedbi) još nespojeno, CLI (T19) otvoren danas. Opseg ove sesije (Leonova odluka): sve osim DESKTOP-a i INTEGRACIJE; oni i završna recenzija M2 su treća sesija — nastavak: ledger `.superpowers/sdd/2026-09-18-m2-desktop/progress.md` |
+| **M2** | **Desktop** | Tauri 2 · Svelte 5 · tokeni Sokrat Studyja (sve 4 teme, `brand-*` iz loga) · `sokratis-store` (SQLite: registar · snimke · keš) · watcher · tray · autostart · obavijesti · svih 8 pogleda s uređivanjem · HR/EN · **znak Sokratisa** = ikona aplikacije + animacija pri pokretanju u kojoj logo stoji na mjestu slova „o" (Leonove datoteke od 2026-09-18, spec §5.2–5.4) · 7 od 9 stavki duga M1 — sve u [ARHITEKTURA_M2.md](./ARHITEKTURA_M2.md) | …spec §11: pokrenuti Sokratis, vidjeti animaciju, Pregled sa Sokrat Studyjem kao jednim projektom od pet stabala, svih 8 pogleda s brojkama istim kao CLI, osvježenje bez klika nakon commita, obavijest na Alert iz traya | 🟨 **u izvedbi, druga sesija (2026-09-20)** — kostur T1 cijel u `main`-u (`M2/1a`+`M2/1b`), PROFIL (T8–T9), JEZGRA (T2–T7), STORE (T15–T18), IO (T10–T14) i CLI (T19, `report --until`) gotovi i spojeni — **dug I9 zatvoren u cijelosti**; SUČELJE (T20–T24 SPOJIVO, M2/25 SPOJIVO, M2/26 u krugu popravka) još nespojeno. Opseg ove sesije (Leonova odluka): sve osim DESKTOP-a i INTEGRACIJE; oni i završna recenzija M2 su treća sesija — nastavak: ledger `.superpowers/sdd/2026-09-18-m2-desktop/progress.md` |
 | **M3** | **Objava** | ostala pravila · profil za tuđe projekte · HR/EN · instalater · znak · README EN · licenca · GitHub | …instalirati Sokratis s GitHuba na čist stroj i priključiti tuđi repo | 📋 planirano |
 
 ## Pravila vožnje (Leonova, ne mijenjaju se između milestonea)

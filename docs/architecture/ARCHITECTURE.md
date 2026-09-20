@@ -331,7 +331,7 @@ radnog stabla — korijen se dobiva iz `git rev-parse --show-toplevel`.
 
 | naredba | ispis | izlazni kod |
 |---|---|---|
-| `sokratis report [putanja] [--since YYYY-MM-DD] [--json\|--table]` | cijeli `Report`; **bez zastavice je JSON**, `--table` daje tablicu s hrvatskim natpisima; zastavice su **isključive** (`--json --table` je pogrešna uporaba, ne „zadnja pobjeđuje") | 0 |
+| `sokratis report [putanja] [--since YYYY-MM-DD] [--until YYYY-MM-DD] [--json\|--table]` | cijeli `Report`; **bez zastavice je JSON**, `--table` daje tablicu s hrvatskim natpisima (zaglavlje pokazuje samo `since` — `until` se u tablici ne vidi, `docs/records/BACKLOG.md`); zastavice su **isključive** (`--json --table` je pogrešna uporaba, ne „zadnja pobjeđuje") | 0 (`until < since` → prazan izvještaj, i dalje 0) |
 | `sokratis docs [putanja] [--json]` | ocjena, broj nalaza, kašnjenje; bez `docs_dir` poruka `docs: nema mape s dokumentacijom (n/a)` | 0 |
 | `sokratis signals [putanja] [--json]` | signali s dokazom, ili `nema signala` | **0** nema · **1** Warn · **2** Alert |
 
@@ -343,7 +343,8 @@ pokvaren profil, tipfeler u datumu ili regex bez grupe) ispisuje se na stderr ka
 `--version` idu na stdout i daju **0**. `process::exit` je u `main` i nigdje drugdje: izlazni kod je
 ugovor prema preflightu, a ne nuspojava.
 
-`--since` postoji samo na `report`; `docs` i `signals` uzimaju `since` iz profila.
+`--since` i `--until` (M2/19) postoje samo na `report`; `docs` i `signals` uzimaju `since` iz profila
+i `until` ne primaju (uvijek `None`).
 
 ## 10 · Dvije zamke koje je otkrio dogfooding
 
@@ -411,8 +412,8 @@ preuzeo M2 u [`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md) §8 i plan
 (jedna zajednička točka, pa se tokovi poslije ne sudaraju); dio i dalje stoji u kodu bez potrošača ili
 čeka drugi tok:
 
-- **`until` validira i filtrira jezgra (M2/3), ali mu `io`/CLI još ne šalju stvarnu vrijednost**
-  (T14/T19) — §3;
+- **`until` validira i filtrira jezgra (M2/3); `io` i CLI mu sad šalju stvarnu vrijednost** (`io` od
+  M2/14, CLI od M2/19: `report --until`) — §3;
 - **`Profile::validate_paths` i `test_path_exclude` više nisu stub/prazni** (M2/8, M2/9) — rade ono
   što ime kaže; io-dio ograde (`Project::open` zove `validate_paths` pri otvaranju, tok IO M2/14) je
   ušao 2026-09-20 — dug I9 je time zatvoren u cijelosti — §2, §4, §11 gore;

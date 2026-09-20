@@ -138,6 +138,14 @@ Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek sesije:
   --all-targets -- -D warnings` OK · `cargo test --workspace` **123 testova, 0 padova** · `sokratis
   signals .` = nema signala. Tok IO je time **gotov** osim M2/14b (potrošač keša, cigla koju plan
   nema, nastavlja na istoj grani).
+- **`M2/19` — `sokratis report --until` (2026-09-20).** Korisnik CLI-ja dobiva novu zastavicu:
+  `--until YYYY-MM-DD` ograničava izvještaj na gornju granicu razdoblja (zrcali `--since`, S-011/
+  S-012) — `docs` i `signals` je i dalje ne primaju. Neispravan datum → izlazni kod 3 s porukom koja
+  imenuje polje; `until` prije `since` daje prazan izvještaj, kod 0. Poznato ograničenje: `--table` u
+  zaglavlju `until` ne ispisuje (JSON je ugovor i on je točan; odgođeno u `BACKLOG.md`).
+  Brane nakon spajanja (merge `11b1708`): `cargo fmt --check` OK · `cargo clippy --workspace
+  --all-targets -- -D warnings` OK · `cargo test --workspace` **124 testa, 0 padova** · `sokratis
+  signals .` = nema signala. Tok CLI je time **gotov** (T19 u `main`-u).
 
 ## [0.1.0] — 2026-09-17 — Jezgra i CLI (Milestone 1)
 

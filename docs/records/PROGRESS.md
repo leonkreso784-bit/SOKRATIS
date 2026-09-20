@@ -631,7 +631,31 @@ dokumentacije koji u njoj radi, novim odlomkom „Nastavak iste sesije", ne novi
   jer je M2/11 u `main`-u). `ARCHITECTURE.md` namjerno dirana SAMO u tvrdnji o I9 u §11 (ostatak radi
   čuvar B na kraju sesije). `cargo run -q -p sokratis-cli -- docs .` provjeren prije i poslije izmjena.
 
+**Nastavak iste sesije — CLI (T19) spojen u `main`, tok CLI gotov.**
+
+- **CLI (T19) spojen** (merge `11b1708`): `sokratis report` dobiva `--until YYYY-MM-DD` (M2/19,
+  `292fa0d`) — zrcali `--since`; `report_for` sad zove `Project::input_between(since, until)` umjesto
+  `input(since)`, poziv u `Cmd::Report` prosljeđuje `until.as_deref()`; `docs` i `signals` i dalje
+  šalju `None, None`. Neispravan `--until` → izlazni kod 3, poruku daje jezgra i imenuje polje;
+  `until < since` → prazan izvještaj, kod 0. Provjereno nad ovim repoom: `--until 2026-09-18` je dao
+  124 commita umjesto 134 u tom trenutku mjerenja (brojku ne prepisuj dalje — S-010).
+- **Brane na `main`-u nakon spajanja:** `cargo fmt --check` OK · `cargo clippy --workspace
+  --all-targets -- -D warnings` OK · `cargo test --workspace` **124 passed, 0 failed** · `sokratis
+  signals .` nema signala. `main` pushan na `origin` (trajni OK, pravilo #1).
+- **Poznato ograničenje, odgođeno za završni krug popravaka M2** (recenzentov Minor): `--table` u
+  zaglavlju ispisuje samo „od {since}" — `until` se u tabličnom ispisu ne vidi iako je prozor
+  ograničen; JSON (ugovor) je točan. Zapisano u `BACKLOG.md`.
+- **Tok CLI je time GOTOV** (T19 u `main`-u), uz PROFIL, JEZGRA, STORE i IO otprije gotove.
+- **Stanje ostalog, nepromijenjeno ovim spajanjem:** IO nastavlja s M2/14b (potrošač keša) u izvedbi;
+  SUČELJE — M2/25 recenziran SPOJIVO, M2/26 u krugu popravka. Sedam stabala i dalje na disku.
+- **Čuvar dokumentacije (način A), ovaj zapis:** `PROGRESS.md` (ovaj odlomak), `CHANGELOG.md` (redak
+  M2/19 pod `[Unreleased]`), `BACKLOG.md` (novi redak: `--table` ne pokazuje `until`), `ROADMAP.md`
+  („Gdje smo", status M2), `CLAUDE.md` („Komande", „Stanje — TRENUTNO", „Agenti"). `ARCHITECTURE.md`
+  dirana SAMO u §9 (CLI naredbe) i u tvrdnji §11 da `io`/CLI ne šalju `until` (ostatak radi čuvar B na
+  kraju sesije). RUST.md §4 nedirana — cigla ne uvodi nov pojam (`as_deref()` je već u pojmovniku, M1
+  T11a). `cargo run -q -p sokratis-cli -- docs .` provjeren prije i poslije izmjena.
+
 ### Što slijedi
-Spajanje SUČELJE (nakon M2/26–M2/28) pa CLI (T19, `--until`) pa M2/14b (potrošač keša, tok IO);
-DESKTOP i INTEGRACIJA su treća sesija. Ledger:
+Spajanje SUČELJE (nakon M2/26–M2/28) pa M2/14b (potrošač keša, tok IO); CLI je gotov. DESKTOP i
+INTEGRACIJA su treća sesija. Ledger:
 `.superpowers/sdd/2026-09-18-m2-desktop/progress.md`, odjeljak „STANJE ZA NOVU SESIJU".
