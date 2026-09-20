@@ -39,7 +39,7 @@ na 2026-09-18):
 |---|---|---|
 | `rusqlite` (`bundled`, samo `store`) | SQLite: registar projekata, postavke, snimke brojki (S-014) | zrelo vezivanje na SQLite bez ORM-a; **`bundled`** kompilira samu knjižnicu u binarnu — tuđi stroj nema `sqlite3.dll`, a instalacija ne smije tražiti ništa izvana |
 | `notify` (samo `io`) | watcher nad `.git`, docs i `.sokratis` (S-016) | jedini održavan prenosiv watcher; koristi ReadDirectoryChangesW na Windowsu. **Ovisnost je u manifestu od `M2/1a`, kod je dobiva u M2/13** |
-| `insta` (dev, `core`) | snapshot cijelog `Report`-a nad fixtureom pariteta | **vratio se u `M2/1a` s razlogom** (S-022): M1 ga je izbacio jer bi zamrznuo oblik koji se još mijenja, M2 gradi sučelje nad tim oblikom — pa svaka promjena JSON-a mora biti vidljiva u diffu snimke. Prvi snapshot-test dolazi s M2/2 |
+| `insta` (dev, `core`) | snapshot cijelog `Report`-a nad fixtureom pariteta | **vratio se u `M2/1a` s razlogom** (S-022): M1 ga je izbacio jer bi zamrznuo oblik koji se još mijenja, M2 gradi sučelje nad tim oblikom — pa svaka promjena JSON-a mora biti vidljiva u diffu snimke. Prvi snapshot-test je M2/2 (2026-09-18): `crates/sokratis-core/tests/snapshot.rs`, 467 redaka, 15 ključeva — namjerna promjena oblika: [`TESTING.md`](./TESTING.md) §1 |
 | `tauri` 2 (+ `tauri-build`) | ljuska: prozori, tray, ugovor prema sučelju (S-012, S-013) | **2.x, ne 3 alpha** — pinamo stabilno; `tray-icon` i `image-png` su jedine uključene mogućnosti |
 | `tauri-plugin-dialog` · `-notification` · `-autostart` · `-single-instance` | odabir mape, obavijest na Alert, pokretanje sa sustavom, jedna instanca (S-020) | službeni plugini istog izdanja; svaki pokriva točno jednu Leonovu odluku, nijedan ne nosi logiku |
 
@@ -108,7 +108,7 @@ Test za pravilo: **Leon može pročitati datoteku i reći što radi.** Ako ne mo
 | Hinnantov `days_from_civil` | M1 (T3, `civil.rs`) | poznati algoritam (Howard Hinnant) za datum → broj dana bez kalendarske ovisnosti (`chrono` ostaje samo u `io`, S-011 kontekst) |
 | `HashSet<&str>` / `HashSet<String>` za članstvo | M1 (T12, `docs.rs`; kasnije `git.rs`) | skup za provjeru „je li unutra" u O(1), bez duplikata i bez brige za redoslijed |
 | `rsplit_once` | M1 (T12, `docs.rs`) | dijeli string na zadnjem pojavljivanju uzorka, vraća `Option<(prefiks, sufiks)>` |
-| struct-update `..Default::default()` | M1 (T12, `docs.rs` test) | preostala polja literala preuzimaju zadane vrijednosti; test postavlja samo polje koje testira |
+| struct-update `..Default::default()` | M1 (T12, `docs.rs` test); dopuna M2/9 (`profile.rs` test — zamjena za `let mut p = Profile::default(); p.polje = …` koje clippy odbija kao `field_reassign_with_default`) | preostala polja literala preuzimaju zadane vrijednosti; test postavlja samo polje koje testira |
 | `saturating_sub` | M1 (T12, `docs.rs`) | oduzimanje koje se zaustavlja na granici tipa umjesto da se prelije — ocjena docs-a zato nikad ne padne ispod 0 |
 | `for (kind, re) in &p.classifier` + `*kind` na Copy-enumu; `Vec` umjesto `HashMap` kad je redoslijed ugovor | M1 (T6, `classify.rs`) | iteracija po posuđenom vektoru parova čuva ugovoreni redoslijed (planiranje > dokumentacija > …); `HashMap` ga ne bi garantirao |
 | `lines()+filter_map(captures)` vs `(?m)`; stabilan `sort_by` | M1 (T4, `diary.rs`) | red-po-red s regexom bez multiline-zastavice je čitljiviji od jednog `(?m)` uzorka; `sort_by` čuva izvorni poredak jednakih ključeva |
@@ -125,11 +125,11 @@ Test za pravilo: **Leon može pročitati datoteku i reći što radi.** Ako ne mo
 | `ErrorKind::NotFound` kao jedini opravdan fallback | M1 (T17, `project.rs`) | jedino „datoteka ne postoji" smije tiho pasti na zadano; svaka druga greška čitanja profila se propagira |
 | rekurzivna fn s `&mut Vec` | M1 (T17, `project.rs`) | funkcija poziva samu sebe i puni zajednički izmjenjivi vektor (npr. popis docs-a po podmapama) umjesto da vraća i spaja rezultate |
 | `strip_prefix` + `replace('\\', '/')` za prenosive putanje | M1 (T17, `project.rs`) | ukloni apsolutni prefiks pa zamijeni Windows-separator kosom crtom da izlaz bude isti na svim OS-ovima |
-| `std::path::Component::ParentDir` | M1 (T17, `tests/project.rs`) | prepoznaje `..` segment putanje kao zaseban tip komponente, ne kao običan string za usporedbu |
+| `std::path::Component::ParentDir` | M1 (T17, `tests/project.rs`); dopuna M2/8 (`profile.rs`, `inside_root`: `Normal`/`CurDir` su jedine dopuštene varijante) | prepoznaje segment putanje (`..`, obična komponenta, `.`, korijen, disk) kao zaseban tip, ne kao string za usporedbu |
 | `Vec<&Commit>` | M1 (T8, `metrics/hours.rs`) | vektor referenci umjesto vlasništva kad metrika samo čita commite koje već drži pozivatelj |
 | `BTreeMap` | M1 (T8, `metrics/hours.rs`) | mapa sortirana po ključu — korisna kad se ispisuje po danu uzlazno bez naknadnog sortiranja |
-| `entry().or_insert()` / `or_default()` | M1 (T8, `metrics/hours.rs`; kasnije `metrics/days.rs`) | dohvati-ili-umetni u jednom potezu, bez dvostrukog pretraživanja mape |
-| `Option::is_some_and` | M1 (T11b, `metrics/indicators.rs`; kasnije popravak C1, `parse/plan.rs`) | provjerava predikat nad sadržajem `Option` bez ručnog `match`/`unwrap` — nad `Captures::get` to je „grupa postoji **i** nije prazna" u jednom izrazu |
+| `entry().or_insert()` / `or_default()` | M1 (T8, `metrics/hours.rs`; kasnije `metrics/days.rs`); dopuna M2/4 (`metrics/visions.rs`, `BTreeMap<&str, u32>` — brojanje i sortiranje po ključu u jednom prolazu) | dohvati-ili-umetni u jednom potezu, bez dvostrukog pretraživanja mape |
+| `Option::is_some_and` | M1 (T11b, `metrics/indicators.rs`; kasnije popravak C1, `parse/plan.rs`); dopuna M2/6 (`metrics/phases.rs`, `active_phases` — `phase_tag(...)` presuđuje pripada li commit fazi u jednom izrazu bez ugnježđenog `match`-a) | provjerava predikat nad sadržajem `Option` bez ručnog `match`/`unwrap` — nad `Captures::get` to je „grupa postoji **i** nije prazna" u jednom izrazu |
 | `Option::filter` | M1 (T8, `metrics/hours.rs`) | zadrži `Some` samo ako sadržaj zadovoljava predikat, inače `None` |
 | `BTreeMap<&str, Acc>` s posuđenim ključem | M1 (T9, `metrics/days.rs`) | ključ mape je posudba iz izvornih podataka, ne kopija — akumulator ne smije nadživjeti izvor |
 | privatni `#[derive(Default)]` akumulator | M1 (T9, `metrics/days.rs`) | pomoćni struct vidljiv samo unutar modula, s automatskim nula-stanjem za zbrajanje po danu/vrsti |
@@ -165,6 +165,14 @@ Test za pravilo: **Leon može pročitati datoteku i reći što radi.** Ako ne mo
 | `Connection::query_row` s closureom nad retkom | M2/1a (`store/src/store.rs`) | rusqlite ne mapira tipove sam: closure `\|r\| r.get(0)` kaže koji stupac i u koji Rust-tip ide, pa je konverzija vidljiva na mjestu upita |
 | `#![cfg_attr(…, windows_subsystem = "windows")]` | M2/1a (`desktop/src-tauri/src/main.rs`) | atribut **na razini cratea** (`#!`) koji se primjenjuje uvjetno; ovdje: release build bez konzolnog prozora, debug ga zadržava zbog `eprintln!`-a |
 | builder-lanac `tauri::Builder::default()…run()` + `generate_context!` | M2/1a (`desktop/src-tauri/src/lib.rs`) | svaka metoda vraća `Self` pa se plugini nižu lancem; `run` uzima **vlasništvo** i ne vraća se do izlaza aplikacije, a makro ugradi `tauri.conf.json` u binarku pri kompilaciji |
+| `Option::is_none_or` | M2/3 (`report.rs`, filtar `until`) | izražava „nema gornje granice ILI je vrijednost unutar nje" u jednom izrazu nad `Option`, bez ugniježđenog `match`-a u `filter`-u |
+| let-chain (`if let PATTERN = IZRAZ && UVJET`) | M2/3 (`report.rs`, provjera oblika `until`) | stabilno od edition 2024: `let`-uzorak i dodatni bool-uvjet u istom `if`, bez ugniježđenog `if` unutar `if let` |
+| `matches!(izraz, uzorak1 \| uzorak2)` | M2/8 (`profile.rs`, `inside_root`) | provjerava odgovara li vrijednost jednom od navedenih uzoraka i vraća `bool` u jednom izrazu — kraće od `match` koji bi za isti test trebao granu za svaku varijantu |
+| stražarska klauzula (guard clause, rani `return`) | M2/9 (`profile.rs`, `is_test_path`) | isključenje (`test_path_exclude`) se provjerava PRIJE svih uključivih pravila; jedan pogodak presiječe ostatak funkcije bez ugniježđenih `if`-ova |
+| `Iterator::zip` nad paralelnim nizovima | M2/5 (`metrics/kinds.rs`, `kind_stats`) | spaja `rows` i `commits` (isti redoslijed, ista dužina) u parove bez ručnog indeksiranja (`v[i]`) — stane na kraću sekvencu ako duljine ikad ne bi bile jednake |
+| `pub(crate) mod` (na modulu, ne funkciji) | M2/7 (`report.rs`, `mod tests`) | vidljivost cijelog modula ograničena na crate umjesto na roditelja: sestrinski modul (`snapshot::tests`) smije posuditi `report::tests::input()`, vanjski korisnik cratea ne vidi ništa novo |
+| `#[derive(PartialOrd, Ord)]` + `Iterator::max()` nad enumom | M2/7 (`snapshot.rs::worst_severity`; derive na `Severity` je od M1/T1) | redoslijed varijanti u definiciji enuma (`Info < Warn < Alert`) postaje ugovor za usporedbu — `max()` nad nizom enum-vrijednosti vrati „najtežu" bez ijedne grane `match`-a |
+| `?` unutar `filter_map`-ove zatvorenja | M2/7 (`snapshot.rs::diff`) | `let b = *before.get(id)?;` unutar zatvorenja koje `filter_map` očekuje: `None` iz `?` znači „preskoči ovaj element", ne prekid cijele funkcije — isto načelo kao `?` na `Option` (§4 gore), ali primijenjeno po elementu unutar cjevovoda |
 
 Redak se dodaje **u cigli u kojoj se pojam prvi put pojavi**, s referencom na datoteku.
 

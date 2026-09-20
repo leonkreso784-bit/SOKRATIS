@@ -17,9 +17,12 @@
 **Test-prvo** (CLAUDE.md #7): fixture → očekivano → implementacija. Rub koji prepoznaš odmah dobiva test.
 
 **Snapshot `Report`-a** je ugovor prema sučelju (S-022): `insta` je **dev-ovisnost `core`-a od
-`M2/1a`**, a sam test (`crates/sokratis-core/tests/snapshot.rs`, snimka nad fixtureom pariteta)
-dolazi s ciglom M2/2. Od tada svaka promjena oblika JSON-a mora biti **namjerna** — `cargo insta
-review` i rečenica u commitu koja kaže koje se polje promijenilo i zašto.
+`M2/1a`**, a sam test postoji od cigle M2/2 (2026-09-18) —
+`crates/sokratis-core/tests/snapshot.rs` + `tests/snapshots/snapshot__report-sokratstudy-2026-09-17.snap`
+(467 redaka, 15 ključeva na vrhu). Od sada svaka promjena oblika JSON-a mora biti **namjerna**:
+`INSTA_UPDATE=always cargo test -p sokratis-core --test snapshot` prepiše snimku, `git diff` pokaže
+točno što se promijenilo, a rečenica u commitu kaže koje polje i zašto. Provjeri prije `git add` da
+nije ostao `.snap.new` (insta ga ostavi kad snimka još ne postoji ili se pending-diff nije razriješio).
 
 ## 2 · Fixture-politika
 
@@ -71,8 +74,9 @@ cargo test
 ```
 
 Cigla koja dira `apps/desktop` (tokovi SUČELJE i DESKTOP) uz to vrti **`npm run check`** u
-`apps/desktop` — dok `npm install` čeka Leonov OK, tamo nema `node_modules` i ta brana se ne može
-pokrenuti (stanje: [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §11).
+`apps/desktop` — `npm install` je odrađen 2026-09-18 (`M2/1b`), `node_modules` postoji i brana je
+zelena (svelte-check 0 grešaka + vitest). Rust-tokovi u svojim stablima vrte brane **bez** desktop
+cratea; razlog i naredba: [`AGENTI.md`](./AGENTI.md) §5.
 
 Crveno ne ide u commit. **Izlazni kod 1 nije dokaz da je pao test koji testiraš** — čita se poruka
 (pouka iz Sokrat Studyja). CI (GitHub Actions) dolazi s M3, kad postoji remote. Koliko testova ima
