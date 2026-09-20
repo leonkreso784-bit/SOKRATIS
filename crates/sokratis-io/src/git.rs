@@ -24,12 +24,88 @@
 //! umjesto praznog stringa jer „nema gornje granice" i „granica je prazan datum" NISU isto stanje,
 //! a `match`/`if let` nad `Option` to prisiljava na svakom pozivu (ne pušta ni jedan slučaj da
 //! prođe tiho). Rezerva prema naprijed je DVA dana (`next_day` dvaput), ne jedan kao za `since`:
-//! smjer je suprotan, pa je i račun zone suprotan (vidi komentar uz `until_arg`).
+//! smjer je suprotan, pa je i račun zone suprotan (vidi doc-komentar `window_args`).
+//!
+//! Cigla M2/14b (potrošač keša): `window_args` izdvaja `since_arg`/`until_arg` iz `log` u JEDNU
+//! funkciju koju sad zove i `rev_list` — dva puta se ne mogu razići jer postoji samo jedan. Nova
+//! `run_with_stdin` otvara `Stdio::piped()` na stdin/stdout/stderr i `take()`-a `child.stdin`: pipe
+//! se MORA zatvoriti (drop) prije `wait_with_output()`, inače `git --stdin` čeka EOF zauvijek.
+//! Mapiranje ishoda procesa u `IoError` je izdvojeno u `output_to_result`/`spawn_error` — isto za
+//! `run` i `run_with_stdin`, da se ne kopira.
 use crate::IoError;
 use sokratis_core::BranchInfo;
 use std::collections::HashMap;
-use std::path::PathBuf;
-use std::process::Command;
+use std::io::Write;
+use std::path::{Path, PathBuf};
+use std::process::{Command, Output, Stdio};
+
+/// Argumenti OBLIKA ispisa po commitu — dijele ih `log` (šetnja cijelom poviješću) i `log_commits`
+/// (samo navedeni SHA-ovi): isti tekstualni ugovor, jedan izvor istine.
+const LOG_FORMAT_ARGS: [&str; 3] = [
+    "--date=format:%Y-%m-%d",
+    "--format=@@%h|%at|%ct|%ad|%cd|%s",
+    "--numstat",
+];
+
+/// Greška spawn-a procesa (`git` nije na PATH-u ili druga IO greška) — dijeli je `run` i
+/// `run_with_stdin`.
+fn spawn_error(e: std::io::Error) -> IoError {
+    if e.kind() == std::io::ErrorKind::NotFound {
+        IoError::GitMissing
+    } else {
+        IoError::Io(e)
+    }
+}
+
+/// Mapira izlaz gotovog procesa (status + stdout/stderr) u `IoError` — dijele je `run` i
+/// `run_with_stdin`, da mapiranje postoji na jednom mjestu.
+fn output_to_result(out: Output, repo: &Path, args: &[&str]) -> Result<String, IoError> {
+    if !out.status.success() {
+        let stderr = String::from_utf8_lossy(&out.stderr).trim().to_string();
+        if stderr.contains("not a git repository") {
+            return Err(IoError::NotARepo(repo.to_path_buf()));
+        }
+        return Err(IoError::Git {
+            cmd: args.join(" "),
+            stderr,
+        });
+    }
+    Ok(String::from_utf8_lossy(&out.stdout).to_string())
+}
+
+/// `since_arg`/`until_arg` za `log` I `rev_list` — jedna funkcija da se prozor dovlačenja ne može
+/// razići između dvije naredbe (cigla M2/14b — prije refaktora je svaka naredba gradila svoj).
+///
+/// `since_arg`: ` 00:00:00` fiksira sat na ponoć — git-ov parser datuma bez sata uzima TRENUTNO
+/// DOBA DANA (sat kad se naredba pokreće), ne ponoć, izmjereno nad Sokrat Studyjem
+/// (`--since=2026-08-29` u 17:15 → 183 commita, `--since='2026-08-29 00:00'` → 190 commita). Bez
+/// fiksnog sata bi tablica ovisila o TOME KADA se izvještaj generira, ne samo o datumu. `prev_day`
+/// dodaje JEDAN dan rezerve unatrag (nalaz I2): ta je ponoć u zoni STROJA, a datumi commita
+/// (`%ad`/`%cd`) su u zoni COMMITA, pa bi git zapadno od pohranjenog pomaka odbacio commit koji
+/// jezgra (`commit_date >= since`) zadržava.
+///
+/// `until_arg`: rezerva prema naprijed je DVA dana (`next_day` dvaput), ne jedan kao za `since` —
+/// smjer je suprotan, pa je i račun zone suprotan. Primjer: commit datiran `until` u zoni −12:00
+/// pada na `until+1 12:00 UTC`, a stroj u zoni −12:00 ima ponoć `until+2` tek u `until+2 12:00 UTC`
+/// — jedan dan rezerve (kao za `since`) ne bi bio dovoljan u OVOM smjeru, jer se granica pomiče
+/// prema BUDUĆNOSTI, ne prošlosti.
+///
+/// U OBA slučaja jezgra presuđuje `since <= commit_date <= until` string-usporedbom (S-011), pa
+/// rezerva ovdje NE mijenja nijednu brojku — samo osigurava da git ne odbaci commit prije nego što
+/// jezgra stigne odlučiti. `unwrap_or_else` vraća neispravan datum nepromijenjen u oba slučaja:
+/// njega jezgra prijavi kao `ParseError::BadDate` (C2), ne ovaj sloj.
+fn window_args(since: &str, until: Option<&str>) -> (String, Option<String>) {
+    let from = sokratis_core::civil::prev_day(since).unwrap_or_else(|| since.to_string());
+    let since_arg = format!("--since={from} 00:00:00");
+    let until_arg = until.map(|u| {
+        let plus2 = sokratis_core::civil::next_day(u)
+            .and_then(|d| sokratis_core::civil::next_day(&d))
+            .unwrap_or_else(|| u.to_string());
+        format!("--until={plus2} 00:00:00")
+    });
+    (since_arg, until_arg)
+}
+
 pub trait GitSource {
     /// `since` je goli datum `YYYY-MM-DD`. Implementacija MORA dodati sat `00:00:00`: git-ov
     /// parser datuma bez sata uzima TRENUTNO DOBA DANA (sat kad se naredba pokreće), ne ponoć —
@@ -41,7 +117,7 @@ pub trait GitSource {
     ///
     /// `until` je gornja granica (cigla M2/14, S-011 dopuna 2): `None` znači „bez gornje granice"
     /// (do kraja loga). Kad je zadan, implementacija MORA dodati DVA dana rezerve prema naprijed —
-    /// vidi komentar uz `until_arg` u `GitCli::log` za izračun. Jezgra presuđuje
+    /// vidi doc-komentar `window_args` za izračun. Jezgra presuđuje
     /// `commit_date <= until`, pa rezerva ovdje ne mijenja nijednu brojku, samo osigurava da git
     /// ne odbaci commit prije nego što jezgra stigne odlučiti.
     fn log(&self, branch: &str, since: &str, until: Option<&str>) -> Result<String, IoError>;
@@ -59,6 +135,18 @@ pub trait GitSource {
     /// Kratki SHA trenutnog `HEAD` (`rev-parse --short HEAD`). Jedini poziv koji ima smisla u
     /// DETACHED stanju (grane nema, ali commit postoji) — vidi `project.rs::input`.
     fn head_sha(&self) -> Result<String, IoError>;
+    /// Kratki SHA-ovi (`%h`) commita u ISTOM prozoru i ISTIM redom kojim ih `log` ispisuje (cigla
+    /// M2/14b, potrošač keša) — brz poziv bez `--numstat` da presudi ŠTO je dostižno.
+    fn rev_list(
+        &self,
+        branch: &str,
+        since: &str,
+        until: Option<&str>,
+    ) -> Result<Vec<String>, IoError>;
+    /// `git log` SAMO za navedene SHA-ove (bez šetnje poviješću), u istom obliku kao `log`.
+    /// Prazan popis → prazan tekst BEZ pokretanja procesa (keš koji već zna sve ne smije platiti
+    /// cijenu procesa za ništa).
+    fn log_commits(&self, shas: &[String]) -> Result<String, IoError>;
 }
 #[derive(Debug)]
 pub struct GitCli {
@@ -89,24 +177,47 @@ impl GitCli {
             .arg(&self.repo)
             .args(args)
             .output()
-            .map_err(|e| {
-                if e.kind() == std::io::ErrorKind::NotFound {
-                    IoError::GitMissing
-                } else {
-                    IoError::Io(e)
-                }
-            })?;
-        if !out.status.success() {
-            let stderr = String::from_utf8_lossy(&out.stderr).trim().to_string();
-            if stderr.contains("not a git repository") {
-                return Err(IoError::NotARepo(self.repo.clone()));
+            .map_err(spawn_error)?;
+        output_to_result(out, &self.repo, args)
+    }
+
+    /// Pokreće `git` s ULAZOM na stdin (cigla M2/14b — `log_commits`): `Stdio::piped()` otvara sve
+    /// tri cijevi, `child.stdin.take()` izvadi stdin iz `Child`-a da ga možemo POSUDITI za pisanje
+    /// i onda ZATVORITI (drop) — bez zatvaranja `git --stdin` čeka EOF koji nikad ne stiže. Ako
+    /// pisanje padne (proces je već izašao), svejedno se čeka ishod: proces koji je pukao svojom
+    /// greškom je vjerodostojniji uzrok nego naš `write_all`.
+    ///
+    /// Cijeli stdin se upiše PRIJE čitanja stdouta (`wait_with_output` čita oba tek nakon petlje
+    /// upisa) — sigurno SAMO za naredbe koje iscrpe stdin prije prvog bajta izlaza (`git log
+    /// --stdin` sve revizije pročita u `setup_revisions` prije ijednog retka ispisa). Naredba koja
+    /// bi ispis slala USPOREDO s čitanjem stdina bi se mogla zaglaviti kad stdout napuni cijev.
+    fn run_with_stdin(&self, args: &[&str], input: &str) -> Result<String, IoError> {
+        self.calls.set(self.calls.get() + 1);
+        let mut child = Command::new("git")
+            .arg("-C")
+            .arg(&self.repo)
+            .args(args)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .map_err(spawn_error)?;
+        let write_err = match child.stdin.take() {
+            Some(mut stdin) => {
+                let result = stdin.write_all(input.as_bytes());
+                drop(stdin); // zatvara pipe (EOF) PRIJE cekanja na proces
+                result.err()
             }
-            return Err(IoError::Git {
-                cmd: args.join(" "),
-                stderr,
-            });
+            None => None,
+        };
+        let out = child.wait_with_output().map_err(IoError::Io)?;
+        match output_to_result(out, &self.repo, args) {
+            Ok(text) => match write_err {
+                Some(e) => Err(IoError::Io(e)),
+                None => Ok(text),
+            },
+            Err(e) => Err(e),
         }
-        Ok(String::from_utf8_lossy(&out.stdout).to_string())
     }
 
     /// Pretvara relativan izlaz git-naredbe (npr. `rev-parse --show-toplevel`) u apsolutnu putanju.
@@ -202,39 +313,59 @@ fn parse_ahead_behind(out: &str, default_branch: &str) -> Vec<BranchInfo> {
 }
 impl GitSource for GitCli {
     fn log(&self, branch: &str, since: &str, until: Option<&str>) -> Result<String, IoError> {
-        // ` 00:00:00` fiksira sat na ponoć, a `prev_day` dodaje dan rezerve zbog zone — vidi
-        // doc-komentar `GitSource::log` (trait) za oba razloga. `unwrap_or_else` vraća neispravan
-        // datum nepromijenjen: njega jezgra prijavi kao `ParseError::BadDate` (C2), ne ovaj sloj.
-        let from = sokratis_core::civil::prev_day(since).unwrap_or_else(|| since.to_string());
-        let since_arg = format!("--since={from} 00:00:00");
-        // Dva dana rezerve prema naprijed (cigla M2/14, S-011 dopuna 2): commit datiran `until` u
-        // zoni −12:00 pada na `until+1 12:00 UTC`, a stroj u zoni −12:00 ima ponoć `until+2` tek u
-        // `until+2 12:00 UTC` — jedan dan rezerve (kao za `since`) ne bi bio dovoljan u OVOM smjeru,
-        // jer se granica pomiče prema BUDUĆNOSTI, ne prošlosti. Jezgra presuđuje
-        // `commit_date <= until`, pa rezerva ne mijenja nijednu brojku — samo osigurava da git ne
-        // odbaci commit prije nego što jezgra stigne odlučiti. `unwrap_or_else` vraća neispravan
-        // datum nepromijenjen iz istog razloga kao kod `since` (jezgra ga prijavi kao `BadDate`).
-        let until_arg = until.map(|u| {
-            let plus2 = sokratis_core::civil::next_day(u)
-                .and_then(|d| sokratis_core::civil::next_day(&d))
-                .unwrap_or_else(|| u.to_string());
-            format!("--until={plus2} 00:00:00")
-        });
+        // `window_args` fiksira sat na ponoć i dodaje rezervu zone (dan unatrag za `since`, dva
+        // dana unaprijed za `until`) — vidi doc-komentar `GitSource::log` (trait) i `window_args`
+        // (gore) za oba razloga. Jezgra presuđuje `since <= commit_date <= until` string-usporedbom,
+        // pa rezerva ovdje ne mijenja nijednu brojku, samo osigurava da git ne odbaci commit prije
+        // nego što jezgra stigne odlučiti.
+        let (since_arg, until_arg) = window_args(since, until);
         let mut args = vec!["log", branch, &since_arg];
         if let Some(a) = &until_arg {
             args.push(a);
         }
-        args.extend([
-            "--reverse",
-            "--date=format:%Y-%m-%d",
-            "--format=@@%h|%at|%ct|%ad|%cd|%s",
-            "--numstat",
-            // Završni `--` kaže gitu „dalje nema putanja": bez njega je ime grane dvosmisleno s
-            // datotekom istog imena (nalaz M2). Mora biti ZADNJI — sve iza `--` git čita kao
-            // putanju, pa bi `--` odmah iza grane pojeo naše opcije.
-            "--",
-        ]);
+        args.push("--reverse");
+        args.extend(LOG_FORMAT_ARGS);
+        // Završni `--` kaže gitu „dalje nema putanja": bez njega je ime grane dvosmisleno s
+        // datotekom istog imena (nalaz M2). Mora biti ZADNJI — sve iza `--` git čita kao
+        // putanju, pa bi `--` odmah iza grane pojeo naše opcije.
+        args.push("--");
         self.run(&args)
+    }
+    fn rev_list(
+        &self,
+        branch: &str,
+        since: &str,
+        until: Option<&str>,
+    ) -> Result<Vec<String>, IoError> {
+        // ISTI `window_args` kao `log` — prozor dovlačenja i prozor „što je dostižno" ne mogu se
+        // razići jer dolaze iz iste funkcije. `--abbrev-commit` daje `%h`-duljinu SHA-ova, isto što
+        // `log`-ov `--format=@@%h|…` ispisuje u zaglavlju.
+        let (since_arg, until_arg) = window_args(since, until);
+        let mut args = vec!["rev-list", branch, &since_arg];
+        if let Some(a) = &until_arg {
+            args.push(a);
+        }
+        args.extend(["--reverse", "--abbrev-commit", "--"]);
+        Ok(self
+            .run(&args)?
+            .lines()
+            .map(str::trim)
+            .filter(|l| !l.is_empty())
+            .map(str::to_string)
+            .collect())
+    }
+    fn log_commits(&self, shas: &[String]) -> Result<String, IoError> {
+        // Prazan popis → prazan tekst BEZ pokretanja procesa: keš koji već zna sve ne smije
+        // platiti cijenu procesa za ništa (brojač `calls` ostaje netaknut).
+        if shas.is_empty() {
+            return Ok(String::new());
+        }
+        // `--no-walk=unsorted` čita revizije SAMO s popisa (bez šetnje roditeljima) i ne sortira ih
+        // — redoslijed ionako presuđuje `cached_log` (iz `rev_list`), ne ovaj poziv.
+        let mut args = vec!["log", "--no-walk=unsorted", "--stdin"];
+        args.extend(LOG_FORMAT_ARGS);
+        let input = format!("{}\n", shas.join("\n"));
+        self.run_with_stdin(&args, &input)
     }
     fn branches(&self, default_branch: &str) -> Result<Vec<BranchInfo>, IoError> {
         // Jedan `for-each-ref` s atomom `%(ahead-behind:<default>)` (git ≥ 2.41) zamjenjuje

@@ -2,6 +2,10 @@
 //! `let … else` (Rust 1.65+): raspakiraj ili izađi s greškom u istom retku — bez ugniježđenog
 //! `match`. `splitn(6, '|')` čuva `|` unutar opisa commita jer zadnji komad uzima ostatak.
 //! `commits.last_mut()` = posudba zadnjeg elementa za upis (`&mut`) — jedan `&mut` u jednom trenu.
+//!
+//! Cigla M2/14b (potrošač keša, `io`): `format_gitlog` je INVERZ ovog parsera — keš pamti
+//! `Commit`-e (strukturu), ne sirovi tekst, pa `io` mora znati sastaviti tekst natrag u istom
+//! obliku da `ReportInput.git_log` ostane TEKST bez obzira dolazi li od `git log` ili od keša (S-012).
 use crate::{Commit, FileChange, ParseError};
 
 #[derive(Debug)]
@@ -73,6 +77,24 @@ pub fn parse_git_log(text: &str) -> Result<Parsed, ParseError> {
     })
 }
 
+/// Inverz `parse_git_log`: tekst koji parser pročita natrag u ISTE commite (`skipped_lines == 0`).
+/// Redak po commitu `@@{sha}|{author_time}|{commit_time}|{date}|{commit_date}|{subject}`, pa po
+/// datoteci `{added}\t{deleted}\t{path}`; svaki redak završava s `\n`, bez praznih redaka. Binarna
+/// datoteka je u modelu već `0/0` (parser `-` čita kao 0), pa se ispisuje `0\t0\t…` — brojke iste.
+pub fn format_gitlog(commits: &[Commit]) -> String {
+    let mut out = String::new();
+    for c in commits {
+        out.push_str(&format!(
+            "@@{}|{}|{}|{}|{}|{}\n",
+            c.sha, c.author_time, c.commit_time, c.date, c.commit_date, c.subject
+        ));
+        for f in &c.files {
+            out.push_str(&format!("{}\t{}\t{}\n", f.added, f.deleted, f.path));
+        }
+    }
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -117,5 +139,72 @@ mod tests {
             parse_git_log("@@abc|1|2\n").unwrap_err(),
             ParseError::BadLine { line: 1, .. }
         ));
+    }
+
+    /// Cigla M2/14b: `format_gitlog` je inverz `parse_git_log` — ručno složen `Vec<Commit>`
+    /// pokriva rubove koje sirovi git ispis zna proizvesti: commit bez datoteka, `0/0`, `|` u
+    /// naslovu, ne-ASCII putanju, putanju s razmakom i putanju u navodnicima kakvu git ispiše
+    /// (doslovan tekst s navodnicima i kosom crtom, NE pravi tab).
+    #[test]
+    fn format_then_parse_is_identity() {
+        let cs = vec![
+            Commit {
+                sha: "abc1234".to_string(),
+                author_time: 1788664600,
+                commit_time: 1788817583,
+                date: "2026-09-06".to_string(),
+                commit_date: "2026-09-08".to_string(),
+                subject: "F1/1 bez datoteka".to_string(),
+                files: Vec::new(),
+            },
+            Commit {
+                sha: "def5678".to_string(),
+                author_time: 1788700000,
+                commit_time: 1788700000,
+                date: "2026-09-06".to_string(),
+                commit_date: "2026-09-06".to_string(),
+                subject: "docs: zapis | s okomitom crtom".to_string(),
+                files: vec![
+                    FileChange {
+                        path: "assets/logo.png".to_string(),
+                        added: 0,
+                        deleted: 0,
+                    },
+                    FileChange {
+                        path: "docs/čćž.md".to_string(),
+                        added: 1,
+                        deleted: 2,
+                    },
+                    FileChange {
+                        path: "docs/s razmakom.md".to_string(),
+                        added: 3,
+                        deleted: 4,
+                    },
+                    FileChange {
+                        path: "\"docs/a\\tb.md\"".to_string(),
+                        added: 5,
+                        deleted: 6,
+                    },
+                ],
+            },
+        ];
+        let parsed = parse_git_log(&format_gitlog(&cs)).unwrap();
+        assert_eq!(parsed.commits, cs);
+        assert_eq!(parsed.skipped_lines, 0);
+    }
+
+    /// Krug LOG → parse → format → parse ostaje isti skup commita; jedini redak smeća u `LOG`
+    /// nestaje jer format ne piše retke koje parser ne bi mogao pročitati natrag.
+    #[test]
+    fn parse_then_format_drops_only_the_garbage_line() {
+        let p1 = parse_git_log(LOG).unwrap();
+        let p2 = parse_git_log(&format_gitlog(&p1.commits)).unwrap();
+        assert_eq!(p2.commits, p1.commits);
+        assert_eq!(p2.skipped_lines, 0);
+    }
+
+    #[test]
+    fn format_of_nothing_is_empty() {
+        assert_eq!(format_gitlog(&[]), "");
     }
 }
