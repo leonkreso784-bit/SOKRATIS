@@ -4,7 +4,7 @@
 // ostaje tanak prikaz koji samo poziva ove funkcije. Množina ide iz rječnika (S-021), ova datoteka
 // samo bira KOJI oblik (jedan/dva-četiri/pet-i-više) — sam tekst nikad nije ovdje ušiven.
 import { translate, type Dict } from '../lib/i18n/t';
-import type { Phase, ProjectSummary, Severity } from '../lib/types';
+import type { Phase, ProjectSummary, Severity, WorkKind } from '../lib/types';
 
 const SEVERITY_RANK: Record<Severity, number> = { alert: 0, warn: 1, info: 2 };
 const NO_SIGNAL_RANK = 3;
@@ -67,4 +67,23 @@ export function phaseRows(phases: Phase[]): { closed: Phase[]; running: Phase[];
 export function bricksPerDay(p: Phase): number | null {
   if (!p.days) return null;
   return p.done_bricks / p.days;
+}
+
+// Krug popravka 1 (vizualna provjera M2/27): pogled Vrste rada crta boju NA DVA MJESTA (segment
+// prstena i oznaka u retku tablice) — obje strane moraju čitati boju iz JEDNE mape, inače prva
+// izmjena tokena razvuče prsten i legendu u dvije različite boje bez ijedne greške u testu (S-010).
+// Pet tokena iz `tokens.css`, provjereno da sve postoje pod ovim imenima (M2/27 brief).
+const KIND_COLORS: Record<WorkKind, string> = {
+  planning: 'var(--color-brand-500)',
+  documentation: 'var(--color-accent)',
+  execution: 'var(--color-ink-green)',
+  polish: 'var(--color-ink-amber)',
+  debugging: 'var(--color-ink-red)',
+};
+
+// `WorkKind` je zatvoren enum u TypeScriptu, ali `Report` stiže kao JSON (runtime ne provjerava
+// tip) — nepoznata vrsta NE smije tiho pogoditi susjedni token u mapi, zato eksplicitan fallback
+// na neutralnu tintu umjesto pukog `KIND_COLORS[kind]` bez zaštite.
+export function kindColor(kind: WorkKind): string {
+  return KIND_COLORS[kind] ?? 'var(--color-ink-2)';
 }

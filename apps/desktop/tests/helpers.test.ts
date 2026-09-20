@@ -1,12 +1,13 @@
 // ZAŠTO OVAKO (cigla M2/26 — testovi za sortiranje, boju i sažetak signala u Pregledu;
-// dopunjeno M2/27 — `phaseRows`/`bricksPerDay` za pogled Faze)
+// dopunjeno M2/27 — `phaseRows`/`bricksPerDay` za pogled Faze; krug popravka 1 — `kindColor`
+// dijeljena mapa boja koju koriste i prsten i legenda u tablici u pogledu Vrste rada)
 // Čiste funkcije, čist test bez DOM-a i bez Svelte runa: `hr.json` uvezen izravno kao `Dict`, isti
 // obrazac kao `tests/format.test.ts` — `signalSummary` tako vidi PRAVI rječnik, ne ručno prepisan
 // tekst (S-010), a hrvatska množina (jedan/dva-četiri/pet i više) se provjerava na stvarnim ključevima.
 import { describe, expect, it } from 'vitest';
 import hr from '../src/lib/i18n/hr.json';
-import type { Phase, ProjectSummary } from '../src/lib/types';
-import { bricksPerDay, phaseRows, severityClass, signalSummary, sortProjects } from '../src/views/helpers';
+import type { Phase, ProjectSummary, WorkKind } from '../src/lib/types';
+import { bricksPerDay, kindColor, phaseRows, severityClass, signalSummary, sortProjects } from '../src/views/helpers';
 
 const project = (name: string, worst: ProjectSummary['worst']): ProjectSummary => ({
   id: name.length,
@@ -104,5 +105,22 @@ describe('bricksPerDay', () => {
   });
   it('days: null -> null (faza bez razdoblja)', () => {
     expect(bricksPerDay(phase('x', 'planned', null, 0))).toBeNull();
+  });
+});
+
+describe('kindColor', () => {
+  it('svih pet vrsta rada ima svoj token boje (var(--color-...))', () => {
+    const kinds: WorkKind[] = ['planning', 'documentation', 'execution', 'polish', 'debugging'];
+    for (const k of kinds) {
+      expect(kindColor(k)).toMatch(/^var\(--color-[a-z0-9-]+\)$/);
+    }
+  });
+  it('svih pet je MEĐUSOBNO različitih tokena (segment prstena i redak tablice se ne smiju stopiti)', () => {
+    const kinds: WorkKind[] = ['planning', 'documentation', 'execution', 'polish', 'debugging'];
+    const colors = kinds.map(kindColor);
+    expect(new Set(colors).size).toBe(5);
+  });
+  it('nepoznata vrsta ne pogađa tiho na krivu boju iz mape — vraća neutralni fallback', () => {
+    expect(kindColor('nepostojeca' as WorkKind)).toBe('var(--color-ink-2)');
   });
 });
