@@ -19,6 +19,12 @@
 //! Cigla M2/12 (detached HEAD): `head_sha` je nova metoda traita — jedan poziv koji ima smisla
 //! SAMO na rubu (grane nema, commit ima), pa ne diramo brojač procesa na uobičajenom putu
 //! (`tests/perf.rs` broji iste 4 procesa kao prije). Poziva je iz `project.rs`, ne odavde.
+//!
+//! Cigla M2/14 (birač raspona, S-011 dopuna 2): `log` dobiva `until: Option<&str>` — `Option`
+//! umjesto praznog stringa jer „nema gornje granice" i „granica je prazan datum" NISU isto stanje,
+//! a `match`/`if let` nad `Option` to prisiljava na svakom pozivu (ne pušta ni jedan slučaj da
+//! prođe tiho). Rezerva prema naprijed je DVA dana (`next_day` dvaput), ne jedan kao za `since`:
+//! smjer je suprotan, pa je i račun zone suprotan (vidi komentar uz `until_arg`).
 use crate::IoError;
 use sokratis_core::BranchInfo;
 use std::collections::HashMap;
@@ -32,7 +38,13 @@ pub trait GitSource {
     /// izvještaj generira, ne samo o datumu. Uz to MORA dovući DAN VIŠE (nalaz I2): ta je ponoć
     /// u zoni stroja, a datumi commita u zoni commita, pa granicu mora presuditi jezgrin
     /// `commit_date >= since`, ne git. Rezerva ne mijenja nijednu brojku — jezgra je odbaci.
-    fn log(&self, branch: &str, since: &str) -> Result<String, IoError>;
+    ///
+    /// `until` je gornja granica (cigla M2/14, S-011 dopuna 2): `None` znači „bez gornje granice"
+    /// (do kraja loga). Kad je zadan, implementacija MORA dodati DVA dana rezerve prema naprijed —
+    /// vidi komentar uz `until_arg` u `GitCli::log` za izračun. Jezgra presuđuje
+    /// `commit_date <= until`, pa rezerva ovdje ne mijenja nijednu brojku, samo osigurava da git
+    /// ne odbaci commit prije nego što jezgra stigne odlučiti.
+    fn log(&self, branch: &str, since: &str, until: Option<&str>) -> Result<String, IoError>;
     fn branches(&self, default_branch: &str) -> Result<Vec<BranchInfo>, IoError>;
     fn worktrees(&self) -> Result<Vec<PathBuf>, IoError>;
     fn last_change(&self, path: &str) -> Result<Option<i64>, IoError>;
@@ -189,16 +201,30 @@ fn parse_ahead_behind(out: &str, default_branch: &str) -> Vec<BranchInfo> {
     result
 }
 impl GitSource for GitCli {
-    fn log(&self, branch: &str, since: &str) -> Result<String, IoError> {
+    fn log(&self, branch: &str, since: &str, until: Option<&str>) -> Result<String, IoError> {
         // ` 00:00:00` fiksira sat na ponoć, a `prev_day` dodaje dan rezerve zbog zone — vidi
         // doc-komentar `GitSource::log` (trait) za oba razloga. `unwrap_or_else` vraća neispravan
         // datum nepromijenjen: njega jezgra prijavi kao `ParseError::BadDate` (C2), ne ovaj sloj.
         let from = sokratis_core::civil::prev_day(since).unwrap_or_else(|| since.to_string());
         let since_arg = format!("--since={from} 00:00:00");
-        self.run(&[
-            "log",
-            branch,
-            &since_arg,
+        // Dva dana rezerve prema naprijed (cigla M2/14, S-011 dopuna 2): commit datiran `until` u
+        // zoni −12:00 pada na `until+1 12:00 UTC`, a stroj u zoni −12:00 ima ponoć `until+2` tek u
+        // `until+2 12:00 UTC` — jedan dan rezerve (kao za `since`) ne bi bio dovoljan u OVOM smjeru,
+        // jer se granica pomiče prema BUDUĆNOSTI, ne prošlosti. Jezgra presuđuje
+        // `commit_date <= until`, pa rezerva ne mijenja nijednu brojku — samo osigurava da git ne
+        // odbaci commit prije nego što jezgra stigne odlučiti. `unwrap_or_else` vraća neispravan
+        // datum nepromijenjen iz istog razloga kao kod `since` (jezgra ga prijavi kao `BadDate`).
+        let until_arg = until.map(|u| {
+            let plus2 = sokratis_core::civil::next_day(u)
+                .and_then(|d| sokratis_core::civil::next_day(&d))
+                .unwrap_or_else(|| u.to_string());
+            format!("--until={plus2} 00:00:00")
+        });
+        let mut args = vec!["log", branch, &since_arg];
+        if let Some(a) = &until_arg {
+            args.push(a);
+        }
+        args.extend([
             "--reverse",
             "--date=format:%Y-%m-%d",
             "--format=@@%h|%at|%ct|%ad|%cd|%s",
@@ -207,7 +233,8 @@ impl GitSource for GitCli {
             // datotekom istog imena (nalaz M2). Mora biti ZADNJI — sve iza `--` git čita kao
             // putanju, pa bi `--` odmah iza grane pojeo naše opcije.
             "--",
-        ])
+        ]);
+        self.run(&args)
     }
     fn branches(&self, default_branch: &str) -> Result<Vec<BranchInfo>, IoError> {
         // Jedan `for-each-ref` s atomom `%(ahead-behind:<default>)` (git ≥ 2.41) zamjenjuje

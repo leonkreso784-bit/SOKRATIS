@@ -17,6 +17,13 @@
 //! Cigla M2/12 (detached HEAD): `input` sad razlikuje `ref_name` (što git čita) od `label` (što
 //! izvještaj pokazuje) — u detached stanju grane nema, ali commit postoji, pa `git.head_sha()`
 //! (poziva se SAMO na tom rubu) daje `HEAD@<sha>` umjesto lažne poruke „nema commita".
+//!
+//! Cigla M2/14 (birač raspona, ograda putanja, dug I9): `open` zove `profile.validate_paths()`
+//! ODMAH nakon učitavanja profila — prije ove cigle je ogradu putanja provjeravala SAMO jezgra
+//! (`build_report`), pa je alat mogao pročitati datoteke izvan repoa (npr. `docs_dir: "../.."`)
+//! prije nego što bi itko prijavio grešku. `input_between` postaje jedino mjesto koje sastavlja
+//! `ReportInput`; `input` je tanka omotnica (`until: None`) da postojeći pozivatelj (CLI) ostane
+//! nepromijenjen.
 use crate::{GitCli, GitSource, IoError};
 use sokratis_core::{DocFile, Profile, ReportInput, Vision, WorkKind};
 use std::collections::{BTreeMap, HashMap};
@@ -120,6 +127,15 @@ impl Project {
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => Profile::default(),
             Err(e) => return Err(IoError::Io(e)),
         };
+        // Dug I9 (repo je JAVAN): ograda putanja se provjerava OVDJE, pri otvaranju, ne tek kad
+        // netko zatraži izvještaj — inače `docs()`/`input_between()` mogu pročitati datoteke izvan
+        // repoa prije nego što ijedan poziv jezgre stigne prijaviti profil neispravnim.
+        profile
+            .validate_paths()
+            .map_err(|source| IoError::ProfileInvalid {
+                path: profile_path.clone(),
+                source,
+            })?;
         Ok(Project {
             root,
             common_dir,
@@ -217,10 +233,15 @@ impl Project {
         Ok(out)
     }
 
-    /// Sastavlja `ReportInput` za jezgru: grana, log od `profile.log_since()`, dnevnik/plan ako
-    /// postoje, dokumentacija, grane, ručni podaci i „sada"/„danas" (`chrono` — jedino mjesto sata
-    /// u sustavu).
-    pub fn input(&self, since: Option<&str>) -> Result<ReportInput, IoError> {
+    /// Sastavlja `ReportInput` za jezgru: grana, log od `profile.log_since()` do `until` (ako je
+    /// zadan), dnevnik/plan ako postoje, dokumentacija, grane, ručni podaci i „sada"/„danas"
+    /// (`chrono` — jedino mjesto sata u sustavu). `until` je gornja granica razdoblja (S-011); bez
+    /// nje (`None`) log ide do kraja.
+    pub fn input_between(
+        &self,
+        since: Option<&str>,
+        until: Option<&str>,
+    ) -> Result<ReportInput, IoError> {
         // (ref_name, label): git čita `ref_name`, izvještaj pokazuje `label`. Razlikuju se samo u
         // detached stanju, gdje grane nema, a commita ima — poruka „nema commita" bi lagala.
         let (ref_name, label) = if self.git.branch_exists(&self.profile.default_branch)? {
@@ -256,7 +277,7 @@ impl Project {
         // stariji od profila tiho dobivao kraći log nego što `Report.since` tvrdi.
         let fetch_since = self.profile.log_since().min(since.clone());
         Ok(ReportInput {
-            git_log: self.git.log(&ref_name, &fetch_since)?,
+            git_log: self.git.log(&ref_name, &fetch_since, until)?,
             diary: read_opt(&self.profile.diary_path),
             plan: read_opt(&self.profile.plan_path),
             docs: self.docs()?,
@@ -269,9 +290,14 @@ impl Project {
                 .unwrap_or(0),
             today: chrono::Local::now().format("%Y-%m-%d").to_string(),
             since,
-            // M2/1 kostur: gornju granicu uvodi M2/14 (`input_between`).
-            until: None,
+            until: until.map(str::to_string),
             branch: label,
         })
+    }
+
+    /// `input(since)` = `input_between(since, None)` — CLI (T19) i pozivatelji koji ne biraju
+    /// gornju granicu i dalje zovu ovo, dvoargumentno ime.
+    pub fn input(&self, since: Option<&str>) -> Result<ReportInput, IoError> {
+        self.input_between(since, None)
     }
 }

@@ -3,6 +3,10 @@
 //! `write()` je lokalni pomoćnik za ručne JSON-datoteke. Testovi zovu samo javni API
 //! (`Project::open`, `docs`, `input`); ono što čuvaju je ponašanje na RUBU — nema datoteke,
 //! putanja je direktorij, tipfeler u profilu, `--since` izvan profilskog prozora.
+//!
+//! Cigla M2/14 (birač raspona, ograda putanja pri otvaranju, dug I9): dva nova testa čuvaju da
+//! `open` odbije profil čija putanja izlazi iz repoa PRIJE nego što se icim čita, i da
+//! `input_between` proslijedi `until` i jezgri (`ReportInput.until`) i gitu (s rezervom zone).
 mod common;
 use common::Repo;
 use sokratis_core::WorkKind;
@@ -275,4 +279,65 @@ fn unknown_profile_field_is_an_error_and_missing_files_default() {
         Project::open(r.path()).unwrap_err(),
         IoError::Profile { .. }
     ));
+}
+
+/// Dug I9 (repo JAVAN na GitHubu, cigla M2/14): profil koji navede putanju IZVAN repoa (npr.
+/// `docs_dir: "../.."`) se odbija VEĆ pri `open`-u, prije nego što bilo tko pozove `docs()` ili
+/// zatraži izvještaj — poruka mora nositi ime polja (`profil.docs_dir`), jer profil piše čovjek i
+/// mora znati KOJE polje popraviti.
+#[test]
+fn profile_path_outside_repo_is_rejected_at_open_with_field_name() {
+    let r = Repo::init();
+    r.commit(
+        "js/a.js",
+        "1",
+        "F1/1 x",
+        "2026-09-01T10:00:00+02:00",
+        "2026-09-01T10:00:00+02:00",
+    );
+    write(&r, ".sokratis/profile.json", r#"{ "docs_dir": "../.." }"#);
+    let err = Project::open(r.path()).expect_err("mora pasti");
+    let msg = format!("{err:#}");
+    assert!(
+        msg.contains("profil.docs_dir") && msg.contains("../.."),
+        "{msg}"
+    );
+}
+
+/// `input_between` prosljeđuje `until` i u `ReportInput.until` (jezgra ga presuđuje) i gitu (kao
+/// gornju granicu dovlačenja, s dva dana rezerve zbog zone — `GitSource::log`). Tri commita razmaka
+/// jedan dan i tri dana od `until` provjeravaju da je rezerva dovoljna za prvi, a NE i za drugi.
+#[test]
+fn input_between_passes_until_to_the_core_and_fetches_with_reserve() {
+    let r = Repo::init();
+    r.commit(
+        "js/a.js",
+        "1",
+        "F1/1 prvi",
+        "2026-09-01T10:00:00+02:00",
+        "2026-09-01T10:00:00+02:00",
+    );
+    r.commit(
+        "js/b.js",
+        "1",
+        "F1/2 drugi",
+        "2026-09-03T10:00:00+02:00",
+        "2026-09-03T10:00:00+02:00",
+    );
+    r.commit(
+        "js/c.js",
+        "1",
+        "F1/3 treci",
+        "2026-09-06T10:00:00+02:00",
+        "2026-09-06T10:00:00+02:00",
+    );
+    write(&r, ".sokratis/profile.json", r#"{ "since": "2026-09-01" }"#);
+    let p = Project::open(r.path()).unwrap();
+    let i = p.input_between(None, Some("2026-09-03")).unwrap();
+    assert_eq!(i.until.as_deref(), Some("2026-09-03"));
+    assert!(i.git_log.contains("F1/2 drugi"), "dan `until` je uključen");
+    assert!(
+        !i.git_log.contains("F1/3 treci"),
+        "tri dana kasnije je izvan rezerve od dva dana"
+    );
 }
