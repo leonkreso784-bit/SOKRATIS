@@ -2,6 +2,8 @@
 //! `clap` derive: struktura JE dokumentacija naredbe (`--help` se generira). `anyhow::Result<i32>`
 //! u `run()`: svaka greška (io ili parse) ide `?`-om do `main`, koji je JEDINO mjesto s
 //! `process::exit` — izlazni kod je ugovor prema preflightu.
+//! (cigla M2/19 — `--until`) `Option<String>` iz `clap`-a postaje `Option<&str>` kroz
+//! `as_deref()`: `report_for` posuđuje niz umjesto da ga kopira, isti obrazac kao `since`.
 mod table;
 
 use clap::{Parser, Subcommand};
@@ -22,11 +24,14 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Cmd {
-    /// Cijeli izvještaj (tempo, vrste, pokazatelji, faze, vizije, docs, signali)
+    /// Cijeli izvještaj (tempo, vrste, pokazatelji, faze, vizije, docs, signali) [--since YYYY-MM-DD] [--until YYYY-MM-DD]
     Report {
         path: Option<PathBuf>,
         #[arg(long)]
         since: Option<String>,
+        /// Gornja granica razdoblja (uključivo, cijeli dan) — zrcalo `--since` (S-011/S-012).
+        #[arg(long)]
+        until: Option<String>,
         /// `conflicts_with`: dva oblika ispisa odjednom su pogrešna uporaba (izlaz 3), a ne
         /// „zadnji pobjeđuje" — prije je `--json --table` tiho ispisao JSON (nalaz M10).
         #[arg(long, conflicts_with = "table")]
@@ -48,10 +53,14 @@ enum Cmd {
     },
 }
 
-fn report_for(path: Option<PathBuf>, since: Option<&str>) -> anyhow::Result<Report> {
+fn report_for(
+    path: Option<PathBuf>,
+    since: Option<&str>,
+    until: Option<&str>,
+) -> anyhow::Result<Report> {
     let path = path.unwrap_or_else(|| PathBuf::from("."));
     let project = Project::open(&path)?;
-    let input = project.input(since)?;
+    let input = project.input_between(since, until)?;
     Ok(build_report(&input, &project.profile)?)
 }
 
@@ -70,10 +79,11 @@ fn run() -> anyhow::Result<i32> {
         Cmd::Report {
             path,
             since,
+            until,
             json,
             table,
         } => {
-            let r = report_for(path, since.as_deref())?;
+            let r = report_for(path, since.as_deref(), until.as_deref())?;
             if json || !table {
                 println!("{}", serde_json::to_string_pretty(&r)?);
             } else {
@@ -82,7 +92,7 @@ fn run() -> anyhow::Result<i32> {
             Ok(0)
         }
         Cmd::Docs { path, json } => {
-            let r = report_for(path, None)?;
+            let r = report_for(path, None, None)?;
             match (&r.docs, json) {
                 (Some(d), true) => println!("{}", serde_json::to_string_pretty(d)?),
                 (Some(d), false) => println!("{}", table::render_docs(d)),
@@ -91,7 +101,7 @@ fn run() -> anyhow::Result<i32> {
             Ok(0)
         }
         Cmd::Signals { path, json } => {
-            let r = report_for(path, None)?;
+            let r = report_for(path, None, None)?;
             if json {
                 println!("{}", serde_json::to_string_pretty(&r.signals)?);
             } else {
