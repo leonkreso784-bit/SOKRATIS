@@ -540,5 +540,6 @@ objava i dalje čekaju Leonov izričit OK; isto brisanje grana/stabala tokova na
   recenziran; paket za recenziju je spreman u ledgeru.
 
 **Što slijedi:** nepromijenjeno — ledger, odjeljak „STANJE ZA NOVU SESIJU". Novo iz S-023: T14 (io-dio
-ograde putanja, I9) ima prednost jer je kod sada javan; licenca ne postoji (BACKLOG). Svaki idući push
-traži Leonov OK (pravilo #1), osim ako on izričito kaže da je odobrenje trajno.
+ograde putanja, I9) ima prednost jer je kod sada javan; licenca ne postoji (BACKLOG). **Leon je isti
+dan dao TRAJNI OK za pusheve** — pravilo #1 u `CLAUDE.md` je prepisano (što orkestrator pusha sam, a
+što i dalje traži izričit OK).

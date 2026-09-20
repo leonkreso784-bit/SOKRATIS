@@ -41,8 +41,10 @@ sati zbog cherry-pickova — se u Sokratisu **ispravlja, ne prenosi** (S-007).
 
 ## ⚠️ KRITIČNA PRAVILA
 1. **Jedna cigla = jedan commit.** Zahvat koji raste preko cigle se reže. Na kraju milestonea **STANI
-   i javi se.** Objava na GitHub i svaki push na `main` (kad remote bude postojao) = **Leonov izričit OK**;
-   nijedno ranije odobrenje se ne proteže na sljedeće.
+   i javi se.** **Push na `origin`: Leon je 2026-09-20 dao TRAJNI OK** — orkestrator sam pusha `main`
+   nakon svakog spajanja toka (tek kad pune brane prođu) i grane tokova na kraju sesije (sigurnosna
+   kopija). **I dalje traži Leonov izričit OK:** force-push, brisanje grane na remoteu, novi remote,
+   promjena vidljivosti, izdanje/tag. Repo je JAVAN (S-023) — tajne se traže PRIJE commita.
 2. **Prije commita:** `cargo fmt --check` · `cargo clippy --all-targets -- -D warnings` · `cargo test`.
    Crveno ne ide u commit.
 3. **Uvijek ažuriraj `docs/`** nakon izmjene: `PROGRESS.md` (sesija) + `CHANGELOG.md` (isporuka) +
@@ -85,9 +87,8 @@ Testovi i brane: `docs/workflow/TESTING.md`.
   Pushani su `main` i tri nespojene grane tokova (`feat/io-m2` · `feat/store` · `feat/ui`). **Svaki
   novi fixture ili dokument je od sada javna objava — tajne se traže PRIJE commita.** io-dio ograde
   putanja (I9, cigla T14) je time dug prema javnom kodu i ima prednost; licence još nema (BACKLOG).
-- **Na Leona i dalje čeka** (ne radi se bez njegova izričitog OK-a): svaki IDUĆI push (pravilo #1 —
-  prvo odobrenje se ne proteže, osim ako Leon izričito kaže da je trajno); brisanje grana i radnih
-  stabala tokova M2 na kraju milestonea. **Tray-znak za T33 je riješen:** Leon je 2026-09-20 odabrao
+- **Na Leona i dalje čeka** (ne radi se bez njegova izričitog OK-a): brisanje grana i radnih stabala
+  tokova M2 na kraju milestonea (lokalno i na remoteu). Pushevi više NE čekaju — trajni OK, pravilo #1. **Tray-znak za T33 je riješen:** Leon je 2026-09-20 odabrao
   da se radi iz `apps/desktop/src/assets/intro/graph.webp` (znak bez lika iz njegove animacije) — ne
   čeka se nikakav novi PNG. Toolchain je pinan (`rust-toolchain.toml`, 1.98.1) i definicije agenata
   su u repou — obje odluke Leon je odobrio 2026-09-18.
