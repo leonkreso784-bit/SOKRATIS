@@ -21,7 +21,13 @@ export function severityClass(s: Severity | null): 'text-ink-2' | 'text-ink-blue
 // projekt koji nešto vapi neka bude prvi u mreži kartica (spec 6.1).
 export function sortProjects(ps: ProjectSummary[]): ProjectSummary[] {
   const rank = (worst: Severity | null): number => (worst === null ? NO_SIGNAL_RANK : SEVERITY_RANK[worst]);
-  return [...ps].sort((a, b) => rank(a.worst) - rank(b.worst) || a.name.localeCompare(b.name));
+  // Krug popravka 1 (recenzija): `'hr'` je OBVEZAN drugi argument, ne kozmetika — `localeCompare`
+  // BEZ njega uzima zadani locale izvršnog konteksta (na ovom stroju Node vraća 'en-CA' i stavlja
+  // "Čokolada" ISPRED "Cvijet"; hrvatska abeceda traži C < Č < D, dakle "Cvijet" prvo). WebView2 i
+  // Node dijele isto ICU/CLDR (oba Chromium), pa je poredak izmjeren u `tests/helpers.test.ts`
+  // ugovor koji ostaje isti bez obzira na jezik operacijskog sustava (isti rizik koji `format.ts`
+  // M2/22 izričito imenuje za brojeve/datume — ovdje je riječ o slaganju imena).
+  return [...ps].sort((a, b) => rank(a.worst) - rank(b.worst) || a.name.localeCompare(b.name, 'hr'));
 }
 
 // CLDR kategorije hrvatske množine (one/few/many): 1 → jedan, 2-4 → few (osim 12-14), ostalo → many.

@@ -24,6 +24,26 @@ describe('sortProjects', () => {
     const ps = [project('Zeta', null), project('Beta', 'warn'), project('Alfa', 'alert'), project('Cazu', 'alert')];
     expect(sortProjects(ps).map((p) => p.name)).toEqual(['Alfa', 'Cazu', 'Beta', 'Zeta']);
   });
+  it('info stoji između warn i bez signala (alert > warn > info > null)', () => {
+    const ps = [project('D', null), project('C', 'info'), project('B', 'warn'), project('A', 'alert')];
+    expect(sortProjects(ps).map((p) => p.name)).toEqual(['A', 'B', 'C', 'D']);
+  });
+  // Krug popravka 1 (recenzija): tie-break po imenu mora koristiti FIKSNI locale ('hr'), ne zadani
+  // locale izvršnog konteksta — na ovom stroju (Node, zadani locale en-CA) `localeCompare` BEZ
+  // drugog argumenta stavlja "Čokolada" ISPRED "Cvijet" (naslijeđeni encoding-poredak dijakritika),
+  // a hrvatska abeceda traži C < Č < D → "Cvijet" prvo. WebView2 dijeli isti ICU/CLDR (Chromium) kao
+  // Node s punim ICU-om, pa je ishod izmjeren OVDJE ugovor koji `'hr'` mora održati posvuda.
+  it('tie-break po imenu koristi hrvatsku abecedu bez obzira na sustavski jezik (dijakritici)', () => {
+    const ps = [project('Dunja', 'warn'), project('Čokolada', 'warn'), project('Cvijet', 'warn')];
+    expect(sortProjects(ps).map((p) => p.name)).toEqual(['Cvijet', 'Čokolada', 'Dunja']);
+  });
+  it('ne mijenja ulazno polje — vraća novo, sortirano', () => {
+    const ps = [project('Zeta', null), project('Alfa', 'alert')];
+    const original = ps.map((p) => p.name);
+    const sorted = sortProjects(ps);
+    expect(ps.map((p) => p.name)).toEqual(original);
+    expect(sorted).not.toBe(ps);
+  });
 });
 
 describe('severityClass', () => {
