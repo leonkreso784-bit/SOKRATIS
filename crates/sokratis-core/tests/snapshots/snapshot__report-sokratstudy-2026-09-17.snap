@@ -191,6 +191,7 @@ expression: r
     {
       "sha": "81665d2",
       "date": "2026-08-29",
+      "author_time": 1787961420,
       "subject": "ALAT-1: css:diff prestaje lagati o seobi markup -> CSS (dug placen PRIJE C4)",
       "kind": "debugging",
       "sub": "gate_or_measure",
@@ -199,6 +200,7 @@ expression: r
     {
       "sha": "26b1cd1",
       "date": "2026-08-29",
+      "author_time": 1787961690,
       "subject": "docs: revizija pred compact (pravilo #6) -- jedan NALOG koji je vec izvrsen i jedna nosiva tvrdnja",
       "kind": "documentation",
       "sub": "other",
@@ -207,6 +209,7 @@ expression: r
     {
       "sha": "80fc83c",
       "date": "2026-08-29",
+      "author_time": 1788000587,
       "subject": "C4a: mrtva povrsina odlazi -- i vodila je pravu ikonu u nevidljivost (spec 10.1)",
       "kind": "polish",
       "sub": "brick",
@@ -215,6 +218,7 @@ expression: r
     {
       "sha": "e1ace64",
       "date": "2026-08-29",
+      "author_time": 1788003604,
       "subject": "Potraga za kvarovima koji se ne vide: 9 mjesta, 2 nove brane (spec 10.2)",
       "kind": "debugging",
       "sub": "other",
@@ -223,6 +227,7 @@ expression: r
     {
       "sha": "8117624",
       "date": "2026-08-29",
+      "author_time": 1788012707,
       "subject": "docs: revizija pred compact (pravilo #6) -- pet nalaza, od toga jedan NALOG i tri brojke",
       "kind": "documentation",
       "sub": "other",
@@ -231,6 +236,7 @@ expression: r
     {
       "sha": "df1d6e2",
       "date": "2026-08-29",
+      "author_time": 1788014937,
       "subject": "C4b/1: browse prelazi na utilityje -- i rez ide po ELEMENTU, ne po datoteci",
       "kind": "polish",
       "sub": "brick",
@@ -239,6 +245,7 @@ expression: r
     {
       "sha": "a4dfc22",
       "date": "2026-08-29",
+      "author_time": 1788016354,
       "subject": "C4b/2: lekcije -- dvije ljestve pragova su se tukle, tri pravila bila mrtva (spec 10.3)",
       "kind": "polish",
       "sub": "brick",
@@ -247,6 +254,7 @@ expression: r
     {
       "sha": "9e39f7c",
       "date": "2026-08-29",
+      "author_time": 1788017218,
       "subject": "docs: zapis uz C4b -- PROGRESS + CLAUDE.md, i jedan inventar manje",
       "kind": "documentation",
       "sub": "other",
@@ -255,6 +263,7 @@ expression: r
     {
       "sha": "369adad",
       "date": "2026-08-29",
+      "author_time": 1788018461,
       "subject": "docs: puna suita potvrdjena -- 529/0, i nalog izlazi iz zapisa dok je svjez",
       "kind": "documentation",
       "sub": "other",
@@ -263,6 +272,7 @@ expression: r
     {
       "sha": "0375fa7",
       "date": "2026-08-29",
+      "author_time": 1788021581,
       "subject": "docs: revizija pred compact (pravilo #6) -- jedna NEISTINA, dva zastarjela naloga, sest brojki",
       "kind": "documentation",
       "sub": "other",
@@ -271,6 +281,7 @@ expression: r
     {
       "sha": "46e7b45",
       "date": "2026-08-30",
+      "author_time": 1788090051,
       "subject": "C5a/1: kromo ucenja -- i tri pravila koja su lagala o sebi (spec 11.1)",
       "kind": "polish",
       "sub": "brick",
@@ -279,6 +290,7 @@ expression: r
     {
       "sha": "1620c56",
       "date": "2026-08-30",
+      "author_time": 1788098343,
       "subject": "C5a/2: kartice i dopune -- a prvi kvar je bio u MJERACU (spec 11.2)",
       "kind": "debugging",
       "sub": "gate_or_measure",
@@ -287,6 +299,7 @@ expression: r
     {
       "sha": "0ce25af",
       "date": "2026-08-30",
+      "author_time": 1788104529,
       "subject": "docs: ADR-031 (MCP je cjevovod) + seoba se suzila na SAMO Supabase",
       "kind": "planning",
       "sub": "other",
@@ -295,6 +308,7 @@ expression: r
     {
       "sha": "396f178",
       "date": "2026-08-30",
+      "author_time": 1788110946,
       "subject": "C5a/3: kviz -- ljestva koja se nikad nije iscrtala (spec 11.3)",
       "kind": "polish",
       "sub": "brick",
@@ -303,6 +317,7 @@ expression: r
     {
       "sha": "e3767ac",
       "date": "2026-08-30",
+      "author_time": 1788112894,
       "subject": "docs: revizija pred compact (pravilo #6) -- jedan STVARAN nalog i cetiri ostarjele tvrdnje",
       "kind": "documentation",
       "sub": "other",
@@ -311,6 +326,7 @@ expression: r
     {
       "sha": "cea250e",
       "date": "2026-08-30",
+      "author_time": 1788116714,
       "subject": "C5a/4a: napredak -- 12 od 32 pravila nije radilo nista (spec 11.4)",
       "kind": "polish",
       "sub": "brick",
@@ -319,6 +335,7 @@ expression: r
     {
       "sha": "54ffb69",
       "date": "2026-08-30",
+      "author_time": 1788119671,
       "subject": "C5a/4b: kontrast, mjera na telefonu -- i 7 od 11 na jednoj odluci (spec 11.4)",
       "kind": "polish",
       "sub": "gate_or_measure",
@@ -327,6 +344,7 @@ expression: r
     {
       "sha": "9275c21",
       "date": "2026-08-30",
+      "author_time": 1788121470,
       "subject": "docs: revizija pred compact (pravilo #6) + MJERA za C5b (spec 12)",
       "kind": "planning",
       "sub": "gate_or_measure",
@@ -335,6 +353,7 @@ expression: r
     {
       "sha": "6cbef10",
       "date": "2026-08-30",
+      "author_time": 1788123536,
       "subject": "docs: obrnuti rizik C5b-a nije \"dva pravila\" nego NULA (spec 12.2)",
       "kind": "documentation",
       "sub": "other",
@@ -343,6 +362,7 @@ expression: r
     {
       "sha": "ff1b87e",
       "date": "2026-08-31",
+      "author_time": 1788127362,
       "subject": "docs: cetiri Leonove odluke -- ADR-032 (ispune), OAuth NE, history plitak, VPS otvoren",
       "kind": "planning",
       "sub": "other",
@@ -351,6 +371,7 @@ expression: r
     {
       "sha": "4a769e5",
       "date": "2026-08-31",
+      "author_time": 1788128163,
       "subject": "docs: seoba ODGODJENA za ~mjesec dana -- zapovijed povucena sa svih mjesta",
       "kind": "documentation",
       "sub": "other",
@@ -359,6 +380,7 @@ expression: r
     {
       "sha": "cf53287",
       "date": "2026-08-31",
+      "author_time": 1788132886,
       "subject": "C5b/0: boje gradiva bile su nevidljive na zadanoj temi (spec 12.7)",
       "kind": "polish",
       "sub": "brick",
@@ -367,6 +389,7 @@ expression: r
     {
       "sha": "e889825",
       "date": "2026-08-31",
+      "author_time": 1788134202,
       "subject": "docs: revizija pred compact (pravilo #6) -- sest tvrdnji koje je C5b/0 ostario",
       "kind": "documentation",
       "sub": "other",
@@ -375,6 +398,7 @@ expression: r
     {
       "sha": "8a9479f",
       "date": "2026-08-31",
+      "author_time": 1788137867,
       "subject": "BUG-042: pouka je bila zapisana u datoteci koju pali spec nije zvao",
       "kind": "debugging",
       "sub": "brick",
@@ -383,6 +407,7 @@ expression: r
     {
       "sha": "9237006",
       "date": "2026-08-31",
+      "author_time": 1788166634,
       "subject": "C5b/1a: exercises.css migriran -- ali mjera je prvo oborila redoslijed cigli",
       "kind": "polish",
       "sub": "gate_or_measure",
@@ -391,6 +416,7 @@ expression: r
     {
       "sha": "8c3e854",
       "date": "2026-08-31",
+      "author_time": 1788168048,
       "subject": "ci: job je OTKAZAN a nijedan test nije pao -- budzet je pojela suita",
       "kind": "debugging",
       "sub": "other",
@@ -399,6 +425,7 @@ expression: r
     {
       "sha": "5b269ce",
       "date": "2026-08-31",
+      "author_time": 1788170462,
       "subject": "C5b/1b: learn-blocks.css migriran; math.css izasao iz opsega MJEROM",
       "kind": "polish",
       "sub": "brick",
@@ -407,6 +434,7 @@ expression: r
     {
       "sha": "b505ebd",
       "date": "2026-08-31",
+      "author_time": 1788172122,
       "subject": "alat: tri rupe iz C5b/1 zatvorene -- prva je bila propust, ne odgoda",
       "kind": "debugging",
       "sub": "gate_or_measure",
@@ -415,6 +443,7 @@ expression: r
     {
       "sha": "ceb994c",
       "date": "2026-08-31",
+      "author_time": 1788176628,
       "subject": "faza MREZA: sanacija dobiva svoj spec -- i brana je morala naucit trece stanje",
       "kind": "planning",
       "sub": "gate_or_measure",
@@ -423,6 +452,7 @@ expression: r
     {
       "sha": "0cc945e",
       "date": "2026-08-31",
+      "author_time": 1788177025,
       "subject": "docs: cold-start pokazuje na MREZU -- i rez je uzet iz duplikata, ne iz praga",
       "kind": "documentation",
       "sub": "other",
@@ -431,6 +461,7 @@ expression: r
     {
       "sha": "6e3ab20",
       "date": "2026-08-31",
+      "author_time": 1788179177,
       "subject": "MREZA A1: baza popravljena na stagingu -- a plan je bio kriv na dva mjesta",
       "kind": "execution",
       "sub": "brick",
@@ -439,6 +470,7 @@ expression: r
     {
       "sha": "0521f5b",
       "date": "2026-08-31",
+      "author_time": 1788179761,
       "subject": "MREZA A1 na PRODUKCIJI: performance 14 WARN -> 0, security 15 -> 11",
       "kind": "execution",
       "sub": "deploy",
@@ -447,6 +479,7 @@ expression: r
     {
       "sha": "ce526f5",
       "date": "2026-08-31",
+      "author_time": 1788180623,
       "subject": "MREZA A2: check:node napisan i dokazan -- ali namjerno jos ne stoji na vratima",
       "kind": "execution",
       "sub": "gate_or_measure",
@@ -455,6 +488,7 @@ expression: r
     {
       "sha": "c7a296b",
       "date": "2026-08-31",
+      "author_time": 1788183989,
       "subject": "MREZA A2 zatvoren: npm audit 15 -> 0, cijeli projekt na Node 24",
       "kind": "polish",
       "sub": "brick",
@@ -463,6 +497,7 @@ expression: r
     {
       "sha": "bda5dd4",
       "date": "2026-08-31",
+      "author_time": 1788186214,
       "subject": "docs: revizija pred compact -- cetiri tvrdnje koje je blok A oborio",
       "kind": "documentation",
       "sub": "other",
@@ -471,6 +506,7 @@ expression: r
     {
       "sha": "3419e2c",
       "date": "2026-08-31",
+      "author_time": 1788190390,
       "subject": "MREZA B1: check:tokens -- var() bez definicije je zakucana vrijednost s ukrasom",
       "kind": "execution",
       "sub": "gate_or_measure",
@@ -479,6 +515,7 @@ expression: r
     {
       "sha": "15e896d",
       "date": "2026-08-31",
+      "author_time": 1788190403,
       "subject": "MREZA B2: check:final imenuje preskocene -- tiho preskakanje nije legitimno",
       "kind": "execution",
       "sub": "gate_or_measure",
@@ -487,6 +524,7 @@ expression: r
     {
       "sha": "cdacd8c",
       "date": "2026-08-31",
+      "author_time": 1788190913,
       "subject": "MREZA B3a: a11y dug izmjeren po WCAG razini -- i mjerenje je oborilo premisu cigle",
       "kind": "execution",
       "sub": "brick",
@@ -495,6 +533,7 @@ expression: r
     {
       "sha": "22b26d6",
       "date": "2026-08-31",
+      "author_time": 1788195691,
       "subject": "docs: revizija pred compact (pravilo #6) -- cetiri tvrdnje koje su B1/B3a oborili",
       "kind": "documentation",
       "sub": "other",
@@ -503,6 +542,7 @@ expression: r
     {
       "sha": "95e4178",
       "date": "2026-08-31",
+      "author_time": 1788197079,
       "subject": "MREZA B3b: a11y brana sudi po WCAG razini (uniji s tezinom) -- macro ulazi u povrsine, osnovica imenuje",
       "kind": "execution",
       "sub": "gate_or_measure",
@@ -511,6 +551,7 @@ expression: r
     {
       "sha": "dba26de",
       "date": "2026-08-31",
+      "author_time": 1788198845,
       "subject": "MREZA B3c: skrolabilne formule i tablice dohvatljive tipkovnicom -- 9 na 0, osnovica opet prazna",
       "kind": "execution",
       "sub": "brick",
@@ -519,6 +560,7 @@ expression: r
     {
       "sha": "9e1517d",
       "date": "2026-08-31",
+      "author_time": 1788199310,
       "subject": "MREZA B4: check:cascade -- tko koga gasi u responsive/* postaje izmjeren popis (23 imenovana)",
       "kind": "execution",
       "sub": "gate_or_measure",
@@ -527,6 +569,7 @@ expression: r
     {
       "sha": "573e0a4",
       "date": "2026-08-31",
+      "author_time": 1788199553,
       "subject": "docs: revizija pred compact (pravilo #6) -- ljestvica brane u prozi dovedena na B3b stanje",
       "kind": "documentation",
       "sub": "other",
@@ -535,6 +578,7 @@ expression: r
     {
       "sha": "8673cc4",
       "date": "2026-08-31",
+      "author_time": 1788203492,
       "subject": "MREZA B5: check:i18n -- zakucani tekst postaje izmjeren razred (421 u 23 datoteke)",
       "kind": "execution",
       "sub": "gate_or_measure",
@@ -543,6 +587,7 @@ expression: r
     {
       "sha": "afb5049",
       "date": "2026-09-01",
+      "author_time": 1788214020,
       "subject": "docs: revizija pred compact (pravilo #6) -- backlog-stavka za check:i18n vise ne ceka",
       "kind": "documentation",
       "sub": "gate_or_measure",
@@ -551,6 +596,7 @@ expression: r
     {
       "sha": "b2e04ba",
       "date": "2026-09-01",
+      "author_time": 1788214742,
       "subject": "docs: ADR-033 -- dvojezicnost se PREVODI, ne gasi; jezik sucelja nikad ne dira predmete (Leon, 2026-09-01)",
       "kind": "planning",
       "sub": "other",
@@ -559,6 +605,7 @@ expression: r
     {
       "sha": "630d134",
       "date": "2026-09-01",
+      "author_time": 1788214750,
       "subject": "MREZA B6: CI shardanje -- 533 testa vise ne zivi u jednom procesu",
       "kind": "execution",
       "sub": "brick",
@@ -567,6 +614,7 @@ expression: r
     {
       "sha": "f8068b0",
       "date": "2026-09-01",
+      "author_time": 1788215260,
       "subject": "fix: emnapi bomba se opet naoruzala -- i gate koji ju je trebao vidjeti je gledao u krivi minor (Kvar 3)",
       "kind": "debugging",
       "sub": "gate_or_measure",
@@ -575,6 +623,7 @@ expression: r
     {
       "sha": "674031f",
       "date": "2026-09-01",
+      "author_time": 1788216235,
       "subject": "docs: B6 ISHOD -- blok B zatvoren; CI zid 11.8 min umjesto 19.4, brze brane 24 s",
       "kind": "documentation",
       "sub": "other",
@@ -583,6 +632,7 @@ expression: r
     {
       "sha": "af465be",
       "date": "2026-09-01",
+      "author_time": 1788219380,
       "subject": "MREZA C1: fatalno 10 -> 0 -- tinta po temi, ne ispuna (ADR-032); tri pravila presudjena mjerom",
       "kind": "planning",
       "sub": "brick",
@@ -591,6 +641,7 @@ expression: r
     {
       "sha": "88b0d4f",
       "date": "2026-09-01",
+      "author_time": 1788221035,
       "subject": "MREZA C2: boja kartice = CIJELA kartica -- tri moda poravnata, inkForTint seli u renderer (EDITOR 1)",
       "kind": "execution",
       "sub": "brick",
@@ -599,6 +650,7 @@ expression: r
     {
       "sha": "ef8bc0a",
       "date": "2026-09-01",
+      "author_time": 1788225489,
       "subject": "MREZA C3+C4: paleta 93 -> 0 -- blago i stara ugaseni; medjunalaz iz palog suita: par tinti nije dosezao AA na vlastitom sjecistu",
       "kind": "polish",
       "sub": "brick",
@@ -607,6 +659,7 @@ expression: r
     {
       "sha": "dd8b8d4",
       "date": "2026-09-01",
+      "author_time": 1788226050,
       "subject": "docs: revizija pred compact (pravilo #6) -- dvije tvrdnje koje je OVA sesija ucinila zastarjelima",
       "kind": "documentation",
       "sub": "other",
@@ -615,6 +668,7 @@ expression: r
     {
       "sha": "0f6cb68",
       "date": "2026-09-01",
+      "author_time": 1788228743,
       "subject": "MREZA D1: inline van -- a krivi zakljucak je srusio klik, ne grep",
       "kind": "polish",
       "sub": "brick",
@@ -623,6 +677,7 @@ expression: r
     {
       "sha": "20828ec",
       "date": "2026-09-01",
+      "author_time": 1788228855,
       "subject": "MREZA D2 (1/2): CSP Report-Only na sve rute -- policy iz izmjerene karte izvora",
       "kind": "execution",
       "sub": "brick",
@@ -631,6 +686,7 @@ expression: r
     {
       "sha": "e60df39",
       "date": "2026-09-01",
+      "author_time": 1788229240,
       "subject": "MREZA D2 (2/2): report procitan na svim rutama -- nula nasih povreda",
       "kind": "execution",
       "sub": "brick",
@@ -639,6 +695,7 @@ expression: r
     {
       "sha": "ac741c2",
       "date": "2026-09-01",
+      "author_time": 1788229385,
       "subject": "MREZA D3: CSP enforce + check:csp na vratima -- prva iduca inline skripta pada kod nas, ne kod korisnika",
       "kind": "execution",
       "sub": "gate_or_measure",
@@ -647,6 +704,7 @@ expression: r
     {
       "sha": "6cd9220",
       "date": "2026-09-01",
+      "author_time": 1788229695,
       "subject": "docs: D3 ISHOD -- enforce ziv, setnja cista; check:csp u preflight tablicama",
       "kind": "documentation",
       "sub": "gate_or_measure",
@@ -655,6 +713,7 @@ expression: r
     {
       "sha": "f62ef4c",
       "date": "2026-09-01",
+      "author_time": 1788229902,
       "subject": "MREZA D4: procurjela lozinka pada u pregledniku -- 0 EUR umjesto Pro plana",
       "kind": "execution",
       "sub": "brick",
@@ -663,6 +722,7 @@ expression: r
     {
       "sha": "8f767df",
       "date": "2026-09-01",
+      "author_time": 1788230003,
       "subject": "docs: D4 ISHOD -- vrijednost cigle nije u danasnjem stanju nego u seobi",
       "kind": "documentation",
       "sub": "other",
@@ -671,6 +731,7 @@ expression: r
     {
       "sha": "3a1f374",
       "date": "2026-09-01",
+      "author_time": 1788231834,
       "subject": "docs: revizija pred compact (pravilo #6) -- dvije tvrdnje koje je blok D ucinio zastarjelima",
       "kind": "documentation",
       "sub": "other",
@@ -679,6 +740,7 @@ expression: r
     {
       "sha": "bf4aa82",
       "date": "2026-09-01",
+      "author_time": 1788233298,
       "subject": "MREZA-E1: analiza je pojela ciglu -- dopune isporucene jos 2026-08-25, spec je prepisao zadatak bez statusa",
       "kind": "execution",
       "sub": "brick",
@@ -687,6 +749,7 @@ expression: r
     {
       "sha": "cd5fe1f",
       "date": "2026-09-01",
+      "author_time": 1788235398,
       "subject": "MREZA-E2: nijedna kartica preko 500 -- selidba je vecinom bila brisanje duplikata learna, a strop sada zivi i u shemi",
       "kind": "execution",
       "sub": "brick",
@@ -695,6 +758,7 @@ expression: r
     {
       "sha": "6f4b00c",
       "date": "2026-09-01",
+      "author_time": 1788235642,
       "subject": "MREZA-E3: 'odluka o 8' se raspala -- jedan je bio zrtva resolvera i sad se PROVJERAVA, sedam zakljucano s obrazlozenjem u brani",
       "kind": "planning",
       "sub": "brick",
@@ -703,6 +767,7 @@ expression: r
     {
       "sha": "45747c4",
       "date": "2026-09-01",
+      "author_time": 1788235729,
       "subject": "docs: paleta-kucica izlaznog uvjeta -- C4 ju je ispunio (0-0-0, potvrdjeno uzivo) a nikad oznacio",
       "kind": "documentation",
       "sub": "other",
@@ -711,6 +776,7 @@ expression: r
     {
       "sha": "b1bfc76",
       "date": "2026-09-01",
+      "author_time": 1788236159,
       "subject": "MREZA-E4: vjezbe i slijepa karta usle u telefon-mjeru (44->52) -- 'cine se ok' postao broj, i broj je nula nalaza",
       "kind": "execution",
       "sub": "brick",
@@ -719,6 +785,7 @@ expression: r
     {
       "sha": "539ab5d",
       "date": "2026-09-01",
+      "author_time": 1788236591,
       "subject": "docs: tracnice na redizajn -- MREZA ⏸️ s deploy-gated izlazom, FRONTEND_REDIZAJN opet aktivan od C5b/2 (Leonova rijec)",
       "kind": "planning",
       "sub": "deploy",
@@ -727,6 +794,7 @@ expression: r
     {
       "sha": "9a7cf57",
       "date": "2026-09-01",
+      "author_time": 1788245249,
       "subject": "C5b/2: blind-map skela u utilityje -- i 4 mrtva pravila koja su cekala igraca kojeg nema (spec 12.12)",
       "kind": "polish",
       "sub": "brick",
@@ -735,6 +803,7 @@ expression: r
     {
       "sha": "8eba0fa",
       "date": "2026-09-01",
+      "author_time": 1788245615,
       "subject": "C5b/3a: #learn razoruzan -- :where() cuva doseg, a utility prvi put prolazi (spec 12.13)",
       "kind": "polish",
       "sub": "brick",
@@ -743,6 +812,7 @@ expression: r
     {
       "sha": "0f84e86",
       "date": "2026-09-01",
+      "author_time": 1788246008,
       "subject": "C5b/3b: learn skela u utilityje -- mjera srezala opseg, C5b time CIJELI zatvoren (spec 12.14)",
       "kind": "polish",
       "sub": "gate_or_measure",
@@ -751,6 +821,7 @@ expression: r
     {
       "sha": "9e7d517",
       "date": "2026-09-01",
+      "author_time": 1788247440,
       "subject": "C6 mjera + C6/1: home-ljestva iz pet datoteka skupljena -- pola je bilo mrtvo (spec 13, 13.6)",
       "kind": "polish",
       "sub": "gate_or_measure",
@@ -759,6 +830,7 @@ expression: r
     {
       "sha": "e060b60",
       "date": "2026-09-01",
+      "author_time": 1788247915,
       "subject": "C6/2: sidebar-ljestva skupljena -- i nalaz da sidebar NITKO ne moze otvoriti (spec 13.7)",
       "kind": "polish",
       "sub": "brick",
@@ -767,6 +839,7 @@ expression: r
     {
       "sha": "1f74143",
       "date": "2026-09-01",
+      "author_time": 1788247990,
       "subject": "docs: CLAUDE.md pod budzet -- pipeline mi je maskirao exit check:docs brane pa je prosli commit otisao crven",
       "kind": "documentation",
       "sub": "gate_or_measure",
@@ -775,6 +848,7 @@ expression: r
     {
       "sha": "0dc1521",
       "date": "2026-09-01",
+      "author_time": 1788248269,
       "subject": "C6/3: about -- mobilna pravila kuci, skela u utilityje (spec 13.8)",
       "kind": "polish",
       "sub": "brick",
@@ -783,6 +857,7 @@ expression: r
     {
       "sha": "c6a787a",
       "date": "2026-09-01",
+      "author_time": 1788275878,
       "subject": "C6/4: profil + auth -- dokaz koji css:diff ne moze dati; C6 ZATVOREN (spec 13.9)",
       "kind": "polish",
       "sub": "brick",
@@ -791,6 +866,7 @@ expression: r
     {
       "sha": "707a892",
       "date": "2026-09-01",
+      "author_time": 1788277262,
       "subject": "C7/1: selektorski mrtvo van -- pola mrtvih gate nije ni vidio (spec 14.1)",
       "kind": "polish",
       "sub": "gate_or_measure",
@@ -799,6 +875,7 @@ expression: r
     {
       "sha": "5bdfdd9",
       "date": "2026-09-01",
+      "author_time": 1788278041,
       "subject": "C7/2: cta-ljestva dosla kuci i zatekla da kuce NEMA -- C2 obrisao zivu bazu (spec 14.2)",
       "kind": "polish",
       "sub": "brick",
@@ -807,6 +884,7 @@ expression: r
     {
       "sha": "c71acd7",
       "date": "2026-09-01",
+      "author_time": 1788279185,
       "subject": "C7/3: css/responsive/* NE POSTOJI -- zive ljestve doseljene bazama, s njima umirovljen i check:cascade (spec 14.3)",
       "kind": "polish",
       "sub": "gate_or_measure",
@@ -815,6 +893,7 @@ expression: r
     {
       "sha": "c224b7d",
       "date": "2026-09-01",
+      "author_time": 1788280549,
       "subject": "C7/4: components raspusten -- mobile-nav je stilizirao samo NEVIDLJIVO (spec 14.4)",
       "kind": "polish",
       "sub": "brick",
@@ -823,6 +902,7 @@ expression: r
     {
       "sha": "0509d19",
       "date": "2026-09-01",
+      "author_time": 1788281358,
       "subject": "C7/5: paleta-most mrtav (990 poziva na tokene); gradivo cuva 2 imena kao UGOVOR -- C7 ZATVOREN (spec 14.5)",
       "kind": "polish",
       "sub": "brick",
@@ -831,6 +911,7 @@ expression: r
     {
       "sha": "6790bee",
       "date": "2026-09-01",
+      "author_time": 1788284713,
       "subject": "docs: seoba OTKAZANA (Leon: Nastavlja Supabase do daljnjeg) + RACUN blok u BACKLOG -- pala jedina blokada OAutha",
       "kind": "documentation",
       "sub": "other",
@@ -839,6 +920,7 @@ expression: r
     {
       "sha": "2e21615",
       "date": "2026-09-01",
+      "author_time": 1788288532,
       "subject": "Dorada iz pregleda: learn u bojama sekcija -- boja je vec bila na kartici, trosio ju je samo rub (spec 15.1)",
       "kind": "execution",
       "sub": "other",
@@ -847,6 +929,7 @@ expression: r
     {
       "sha": "f8bc5cb",
       "date": "2026-09-01",
+      "author_time": 1788294501,
       "subject": "Popravak CI-ja: h3 mix 55->45% -- amber je na 4.41, a SE je bio glasnik, ne uzrok (spec 15.1)",
       "kind": "debugging",
       "sub": "other",
@@ -855,6 +938,7 @@ expression: r
     {
       "sha": "a2d28af",
       "date": "2026-09-01",
+      "author_time": 1788298214,
       "subject": "docs: deploy-zapis -- 🚀 CHANGELOG, kucice §9 MREZE zatvorene, oba speca u arhivu, RACUN.md preuzima 'sto sada'",
       "kind": "planning",
       "sub": "deploy",
@@ -863,6 +947,7 @@ expression: r
     {
       "sha": "6bdd75f",
       "date": "2026-09-01",
+      "author_time": 1788299563,
       "subject": "Birac tema u profilu -- mehanizam je postojao cijelo vrijeme, falio je samo UI",
       "kind": "execution",
       "sub": "other",
@@ -871,6 +956,7 @@ expression: r
     {
       "sha": "6c5a5d8",
       "date": "2026-09-01",
+      "author_time": 1788299866,
       "subject": "Tema paper VAN (Leon uz pregled biraca) -- 10 mjesta, a stari localStorage pada na academic besplatno",
       "kind": "polish",
       "sub": "other",
@@ -879,6 +965,7 @@ expression: r
     {
       "sha": "8f303c1",
       "date": "2026-09-02",
+      "author_time": 1788300190,
       "subject": "docs: 🚀 birac tema na produkciji (6c5a5d8, Leonov OK)",
       "kind": "documentation",
       "sub": "deploy",
@@ -887,6 +974,7 @@ expression: r
     {
       "sha": "1e50d11",
       "date": "2026-09-02",
+      "author_time": 1788307530,
       "subject": "R1/A: dijalog pregradjen u JEDNOM zahvatu -- OAuth ulazi + dvokoracni upitnik (spec RACUN)",
       "kind": "execution",
       "sub": "brick",
@@ -895,6 +983,7 @@ expression: r
     {
       "sha": "555007f",
       "date": "2026-09-02",
+      "author_time": 1788309914,
       "subject": "R1/docs: Google OAuth potvrdjen UZIVO (Leonov krug) -- FB jos ceka Metine kljuceve",
       "kind": "documentation",
       "sub": "brick",
@@ -903,6 +992,7 @@ expression: r
     {
       "sha": "b23c15f",
       "date": "2026-09-02",
+      "author_time": 1788310933,
       "subject": "R1/docs: cetiri Leonova UX-nalaza (brisanje povijesti je dizajnerski samoporazno; studio sekcije; mail redirect; SMTP posiljatelj)",
       "kind": "documentation",
       "sub": "brick",
@@ -911,6 +1001,7 @@ expression: r
     {
       "sha": "921ef08",
       "date": "2026-09-02",
+      "author_time": 1788311330,
       "subject": "R1/U1+U2: brisanje povijesti STVARNO brise (cloud+lokalno+snapshot, bez odjave) + Nova sekcija na dnu panea",
       "kind": "execution",
       "sub": "brick",
@@ -919,6 +1010,7 @@ expression: r
     {
       "sha": "4cd20ea",
       "date": "2026-09-02",
+      "author_time": 1788312156,
       "subject": "docs: 🚀 RACUN R1 na produkciji (921ef08, Leonov OK)",
       "kind": "documentation",
       "sub": "deploy",
@@ -927,6 +1019,7 @@ expression: r
     {
       "sha": "2de0456",
       "date": "2026-09-02",
+      "author_time": 1788313635,
       "subject": "R1/U5: Google prijava bez supabase-domene -- implicit id_token izravno s nase stranice",
       "kind": "execution",
       "sub": "brick",
@@ -935,6 +1028,7 @@ expression: r
     {
       "sha": "3c6c995",
       "date": "2026-09-02",
+      "author_time": 1788313789,
       "subject": "docs/compact-prep: R1-UX statusi (U1+U2 deployani, U5 na grani, U3/U4 Leonove konzole) + RACUN/CLAUDE poravnati",
       "kind": "documentation",
       "sub": "deploy",
@@ -943,6 +1037,7 @@ expression: r
     {
       "sha": "b248107",
       "date": "2026-09-02",
+      "author_time": 1788316569,
       "subject": "docs: 🚀 U5 na produkciji (2de0456, Leonov OK)",
       "kind": "documentation",
       "sub": "deploy",
@@ -951,6 +1046,7 @@ expression: r
     {
       "sha": "9f2977c",
       "date": "2026-09-02",
+      "author_time": 1788317896,
       "subject": "R1: Facebook gumb maknut iz dijaloga (FB_LOGIN=false; ceka Metine kljuceve)",
       "kind": "execution",
       "sub": "brick",
@@ -959,6 +1055,7 @@ expression: r
     {
       "sha": "0656511",
       "date": "2026-09-02",
+      "author_time": 1788331317,
       "subject": "docs: 🚀 FB gumb maknut — na produkciji (9f2977c, Leonov OK)",
       "kind": "documentation",
       "sub": "deploy",
@@ -967,6 +1064,7 @@ expression: r
     {
       "sha": "8e6b452",
       "date": "2026-09-02",
+      "author_time": 1788365996,
       "subject": "docs: U3+U4 zatvoreni (Leonove konzole) + FB odgoda u RACUN/BACKLOG",
       "kind": "documentation",
       "sub": "other",
@@ -975,6 +1073,7 @@ expression: r
     {
       "sha": "5539861",
       "date": "2026-09-03",
+      "author_time": 1788388705,
       "subject": "fix: 5xx bez tijela vise ne ispisuje '{}' u auth statusu (+ regresijski test)",
       "kind": "debugging",
       "sub": "other",
@@ -983,6 +1082,7 @@ expression: r
     {
       "sha": "4e4192c",
       "date": "2026-09-03",
+      "author_time": 1788452090,
       "subject": "R2/mail: brendirani Supabase predlosci (potvrda+dobrodoslica, reset, promjena adrese) + scripts/mail-preview.js",
       "kind": "execution",
       "sub": "brick",
@@ -991,6 +1091,7 @@ expression: r
     {
       "sha": "13669f3",
       "date": "2026-09-04",
+      "author_time": 1788526206,
       "subject": "R2/mail: potpis u podnozju predlozaka (znak u kvadratu + ime + tagline + link)",
       "kind": "execution",
       "sub": "brick",
@@ -999,6 +1100,7 @@ expression: r
     {
       "sha": "123192e",
       "date": "2026-09-04",
+      "author_time": 1788529075,
       "subject": "docs/compact-prep: mail-identitet zatvoren + Leonova dva zadatka za sljedecu sesiju (FOUC teme, tema=izgled maila)",
       "kind": "planning",
       "sub": "other",
@@ -1007,6 +1109,7 @@ expression: r
     {
       "sha": "e4b0eaf",
       "date": "2026-09-04",
+      "author_time": 1788529219,
       "subject": "docs: brzina kao treci zadatak za sljedecu sesiju (izmjereno: 38 skripti / 192.8 KiB od 200 KB budzeta)",
       "kind": "planning",
       "sub": "other",
@@ -1015,6 +1118,7 @@ expression: r
     {
       "sha": "891a1ce",
       "date": "2026-09-04",
+      "author_time": 1788530507,
       "subject": "FOUC: tema se odlucuje u boot.js, prije prvog crtanja (izmjereno 0 ms bljeska)",
       "kind": "execution",
       "sub": "other",
@@ -1023,6 +1127,7 @@ expression: r
     {
       "sha": "6db1c2f",
       "date": "2026-09-04",
+      "author_time": 1788531232,
       "subject": "brzina: znakovi providera su ugradjeni SVG — brands-font (106 KB) vise se ne skida",
       "kind": "execution",
       "sub": "other",
@@ -1031,6 +1136,7 @@ expression: r
     {
       "sha": "d0d5543",
       "date": "2026-09-04",
+      "author_time": 1788531517,
       "subject": "docs: prava dijagnoza sva tri problema (obje ranije bile krive) + zapis dviju zatvorenih cigli",
       "kind": "documentation",
       "sub": "other",
@@ -1039,6 +1145,7 @@ expression: r
     {
       "sha": "69cd297",
       "date": "2026-09-04",
+      "author_time": 1788533112,
       "subject": "docs/compact-prep: izmjerene brojke za dizajn-ciglu + doc-audit (pravilo #6)",
       "kind": "documentation",
       "sub": "other",
@@ -1047,6 +1154,7 @@ expression: r
     {
       "sha": "e42cd90",
       "date": "2026-09-04",
+      "author_time": 1788544326,
       "subject": "ucitavanje po ruti: prvi kadar s 41 skripte na 22",
       "kind": "execution",
       "sub": "other",
@@ -1055,6 +1163,7 @@ expression: r
     {
       "sha": "e8f1651",
       "date": "2026-09-04",
+      "author_time": 1788550570,
       "subject": "docs: suradnik otkazan · RASPORED postaje tekuci spec",
       "kind": "planning",
       "sub": "other",
@@ -1063,6 +1172,7 @@ expression: r
     {
       "sha": "18e5c3e",
       "date": "2026-09-04",
+      "author_time": 1788551745,
       "subject": "F1/1: stranica je dobila boju vlastitog znaka",
       "kind": "execution",
       "sub": "brick",
@@ -1071,6 +1181,7 @@ expression: r
     {
       "sha": "11a366c",
       "date": "2026-09-04",
+      "author_time": 1788553272,
       "subject": "docs: crna tema — mail ima DVIJE palete, a izmjerio sam jednu",
       "kind": "documentation",
       "sub": "other",
@@ -1079,6 +1190,7 @@ expression: r
     {
       "sha": "22c556b",
       "date": "2026-09-04",
+      "author_time": 1788556268,
       "subject": "F1/2: tema `carbon` — tamna polovica maila, na stranici",
       "kind": "execution",
       "sub": "brick",
@@ -1087,6 +1199,7 @@ expression: r
     {
       "sha": "551df3a",
       "date": "2026-09-04",
+      "author_time": 1788557880,
       "subject": "docs/compact-prep: doc-audit (pravilo #6) — sto je danas ostarjelo",
       "kind": "documentation",
       "sub": "other",
@@ -1095,6 +1208,7 @@ expression: r
     {
       "sha": "9307a2b",
       "date": "2026-09-05",
+      "author_time": 1788561720,
       "subject": "F1/3: prvi kadar prati uredjaj -- crno bez klika, kao mail",
       "kind": "execution",
       "sub": "brick",
@@ -1103,6 +1217,7 @@ expression: r
     {
       "sha": "10607f0",
       "date": "2026-09-05",
+      "author_time": 1788561746,
       "subject": "test: kaskada cita `--color-warn-ink` -- `--warning-text` vise ne postoji",
       "kind": "debugging",
       "sub": "gate_or_measure",
@@ -1111,6 +1226,7 @@ expression: r
     {
       "sha": "cbbfd34",
       "date": "2026-09-05",
+      "author_time": 1788563333,
       "subject": "docs: Leonova dva nova -- ljepljivi hover (izmjeren) · Tinder-spil kartica (zapisan)",
       "kind": "documentation",
       "sub": "other",
@@ -1119,6 +1235,7 @@ expression: r
     {
       "sha": "a45796d",
       "date": "2026-09-05",
+      "author_time": 1788564527,
       "subject": "Analiza rada: docs/records/RAD.xlsx + generator scripts/rad-xlsx.py",
       "kind": "execution",
       "sub": "other",
@@ -1127,6 +1244,7 @@ expression: r
     {
       "sha": "8b70c15",
       "date": "2026-09-05",
+      "author_time": 1788568736,
       "subject": "F1/6: sonda za trzanje (jank-probe) + ljepljivi hover izmjeren na WebKitu -- mjerenja, bez popravaka",
       "kind": "execution",
       "sub": "gate_or_measure",
@@ -1135,6 +1253,7 @@ expression: r
     {
       "sha": "e5a93c5",
       "date": "2026-09-05",
+      "author_time": 1788601144,
       "subject": "docs: 🚀 deploy 8b70c15 zapisan (F1/1–F1/3 + F1/6 na produkciji, Leonov OK)",
       "kind": "documentation",
       "sub": "deploy",
@@ -1143,6 +1262,7 @@ expression: r
     {
       "sha": "a27b1b8",
       "date": "2026-09-05",
+      "author_time": 1788609051,
       "subject": "docs: Leonov treci nalaz -- zoom na dodir izmjeren (F1/10), nista popravljano",
       "kind": "documentation",
       "sub": "other",
@@ -1151,6 +1271,7 @@ expression: r
     {
       "sha": "a31a418",
       "date": "2026-09-05",
+      "author_time": 1788610280,
       "subject": "docs/compact-prep: cetiri \"na grani\" tvrdnje → na produkciji · Leonova odluka za sljedecu sesiju (zoom + hover do kraja)",
       "kind": "planning",
       "sub": "deploy",
@@ -1159,6 +1280,7 @@ expression: r
     {
       "sha": "831d905",
       "date": "2026-09-05",
+      "author_time": 1788614940,
       "subject": "F1/10: zoom na dodir -- (pointer: coarse) umjesto nemjerljivog @supports-njuskanja, touch-action u resetu, brana ⑨",
       "kind": "execution",
       "sub": "gate_or_measure",
@@ -1167,6 +1289,7 @@ expression: r
     {
       "sha": "92269c2",
       "date": "2026-09-05",
+      "author_time": 1788620114,
       "subject": "F1/8 ①: `:hover` samo gdje hover postoji -- build-prolaz (lightningcss cita, tekst se prepisuje), check:hover, hover-probe",
       "kind": "execution",
       "sub": "gate_or_measure",
@@ -1175,6 +1298,7 @@ expression: r
     {
       "sha": "11d8729",
       "date": "2026-09-05",
+      "author_time": 1788621878,
       "subject": "docs: Leon na iPhoneu potvrdio F1/8 ① (\"Ne svijetli, odlicno\") · compact-priprema (pravilo #6)",
       "kind": "documentation",
       "sub": "other",
@@ -1183,6 +1307,7 @@ expression: r
     {
       "sha": "c53c28c",
       "date": "2026-09-05",
+      "author_time": 1788623609,
       "subject": "F1/8 ②: hover na misu se naoruza tek prvim pomakom -- pauzirajHover() (navigateTo + browseNaRazinu), prefiks :where(:root:not([data-hover-paused])) u hover-css, sonda prelaz, 28 tvrdnji",
       "kind": "execution",
       "sub": "gate_or_measure",
@@ -1191,6 +1316,7 @@ expression: r
     {
       "sha": "00584f8",
       "date": "2026-09-05",
+      "author_time": 1788626123,
       "subject": "docs: 🚀 deploy c53c28c zapisan (F1/10 + F1/8 ①+② na produkciji, Leonov uvjetni OK, suita 571/0/117)",
       "kind": "documentation",
       "sub": "deploy",
@@ -1199,6 +1325,7 @@ expression: r
     {
       "sha": "d82ba1c",
       "date": "2026-09-05",
+      "author_time": 1788637019,
       "subject": "docs: ADR-034 -- stranica se NE zumira (Leon) → cigla F1/11; compact-priprema",
       "kind": "planning",
       "sub": "other",
@@ -1207,6 +1334,7 @@ expression: r
     {
       "sha": "d1bb543",
       "date": "2026-09-05",
+      "author_time": 1788640683,
       "subject": "F1/11: nista ne zumira -- meta min/max-scale=1 + user-scalable=no na 6 stranica, reset touch-action: pan-x pan-y, ISKLJUCENO_ODLUKOM u axe-gate (ADR-034)",
       "kind": "planning",
       "sub": "gate_or_measure",
@@ -1215,6 +1343,7 @@ expression: r
     {
       "sha": "9139d6f",
       "date": "2026-09-05",
+      "author_time": 1788641547,
       "subject": "F1/7 ①: landing bez `background-attachment: fixed` -- 240 paintova/533 Mpx po prolazu → 0/0, brana no-fixed-background",
       "kind": "execution",
       "sub": "gate_or_measure",
@@ -1223,6 +1352,7 @@ expression: r
     {
       "sha": "07f4ab2",
       "date": "2026-09-05",
+      "author_time": 1788641989,
       "subject": "F1/7 ②: `?bez=` prekidac za A/B na iPhoneu -- css/bez.css + boot.js (data-bez prije crtanja), jank-probe cita modul umjesto vlastite tablice",
       "kind": "execution",
       "sub": "gate_or_measure",
@@ -1231,6 +1361,7 @@ expression: r
     {
       "sha": "4d3962a",
       "date": "2026-09-05",
+      "author_time": 1788644266,
       "subject": "docs/compact-prep: BUG-043 nosi biljesku da je F1/11 zamijenio manipulation s pan-x pan-y (ADR-034)",
       "kind": "planning",
       "sub": "other",
@@ -1239,6 +1370,7 @@ expression: r
     {
       "sha": "a9689e6",
       "date": "2026-09-05",
+      "author_time": 1788645182,
       "subject": "F1/11 ②: js/no-zoom.js -- stipanje s dva prsta gasi JS (gesturestart + touchmove scale), jer Safari metu i touch-action ne slusa",
       "kind": "execution",
       "sub": "brick",
@@ -1247,6 +1379,7 @@ expression: r
     {
       "sha": "eb5b061",
       "date": "2026-09-05",
+      "author_time": 1788645339,
       "subject": "docs: matura = VIZIJA, ne projekt -- VISION.md §8 (Leon: \"mature ne diramo, to je vizija\")",
       "kind": "documentation",
       "sub": "other",
@@ -1255,6 +1388,7 @@ expression: r
     {
       "sha": "cbaf4d2",
       "date": "2026-09-05",
+      "author_time": 1788645427,
       "subject": "rad: dnevni zapis 2026-09-05 (automatski, scripts/rad-dnevno.ps1)",
       "kind": "execution",
       "sub": "other",
@@ -1263,6 +1397,7 @@ expression: r
     {
       "sha": "26e4965",
       "date": "2026-09-05",
+      "author_time": 1788645487,
       "subject": "rad: RAD.xlsx se puni AUTOMATSKI svaki dan 23:45 -- scripts/rad-dnevno.ps1 + Windows Task Scheduler (Leon: \"to treba biti automatski\")",
       "kind": "execution",
       "sub": "other",
@@ -1271,6 +1406,7 @@ expression: r
     {
       "sha": "93b4897",
       "date": "2026-09-06",
+      "author_time": 1788648600,
       "subject": "docs: Leonov odgovor §6/1 -- odjava brise lokalni izbor teme (F2/1); iPhone-nalaz o stipanju opisuje PRODUKCIJU (instalirana app), ne F1/11",
       "kind": "documentation",
       "sub": "other",
@@ -1279,6 +1415,7 @@ expression: r
     {
       "sha": "4d8f19b",
       "date": "2026-09-06",
+      "author_time": 1788652133,
       "subject": "F1/4: popis tema ima JEDNO mjesto -- scripts/teme.js cita tokens.css za sve cetiri brane; a11y-brana prvi put skenira carbon",
       "kind": "execution",
       "sub": "gate_or_measure",
@@ -1287,6 +1424,7 @@ expression: r
     {
       "sha": "0785952",
       "date": "2026-09-06",
+      "author_time": 1788652462,
       "subject": "F1/5: pravne stranice prate uredjaj -- boot.js (sinkron) + data-theme na contact/faq/privacy/terms; legal.spec mjeri iscrtano dark→carbon / light→academic",
       "kind": "execution",
       "sub": "brick",
@@ -1295,6 +1433,7 @@ expression: r
     {
       "sha": "2d45182",
       "date": "2026-09-06",
+      "author_time": 1788653376,
       "subject": "docs: Leonove stavke 06.09. SAMO ZAPISANE -- FAQ/About/kontakt sokrat@sokratstudy.com (F3/1 dopuna, prije prijevoda) · \"uvijek bijela\" = produkcija bez F1/5 · \"Automatic · Carbon\" u biracu = pitanje §6/7",
       "kind": "documentation",
       "sub": "other",
@@ -1303,6 +1442,7 @@ expression: r
     {
       "sha": "a354960",
       "date": "2026-09-06",
+      "author_time": 1788655083,
       "subject": "docs/compact-prep: HISTORY dobiva redak 2026-09-06 (F1/4 + F1/5 bili zalijepljeni na 05.09.) · CLAUDE.md: F1 gotov osim F1/9",
       "kind": "documentation",
       "sub": "other",
@@ -1311,6 +1451,7 @@ expression: r
     {
       "sha": "4cce27b",
       "date": "2026-09-06",
+      "author_time": 1788655131,
       "subject": "docs: CLAUDE.md natrag pod budzet -- dva retka stanja F1 sazeta u jedan (prethodni commit je prosao jer je `| tail` progutao pad check:docs)",
       "kind": "documentation",
       "sub": "gate_or_measure",
@@ -1319,6 +1460,7 @@ expression: r
     {
       "sha": "57e2158",
       "date": "2026-09-06",
+      "author_time": 1788658094,
       "subject": "F1/9: kartice kao Tinder-spil na dodiru -- palac desno = znam, lijevo = ne znam, spil od tri (samo `pointer: coarse`), strelice kao stolni pandan; jedini put upisa ostaju markKnown/markUnknown",
       "kind": "execution",
       "sub": "brick",
@@ -1327,6 +1469,7 @@ expression: r
     {
       "sha": "d1743a8",
       "date": "2026-09-06",
+      "author_time": 1788658125,
       "subject": "docs: HISTORY -- F1 uredjaj: sve cigle isporucene (F1/9 Tinder-spil 57e2158)",
       "kind": "documentation",
       "sub": "other",
@@ -1335,6 +1478,7 @@ expression: r
     {
       "sha": "95e3ba1",
       "date": "2026-09-06",
+      "author_time": 1788659101,
       "subject": "docs: Tinder-KADAR -- mjerenje (BACKLOG §E) + plan F1/12 kadar · F1/13 listanje (RASPORED) · §6/8 kraj spila; bez koda",
       "kind": "planning",
       "sub": "other",
@@ -1343,6 +1487,7 @@ expression: r
     {
       "sha": "182bac3",
       "date": "2026-09-06",
+      "author_time": 1788661195,
       "subject": "docs: Leonovi odgovori za Tinder-kadar -- izbornik na kraju spila · ✕ lijevo / strelica desno i na kompu · sve tipkama (X/Z) · F1/14 tutorial (kasnije, ali predvidjen tablicom akcija)",
       "kind": "documentation",
       "sub": "other",
@@ -1351,6 +1496,7 @@ expression: r
     {
       "sha": "900f142",
       "date": "2026-09-06",
+      "author_time": 1788662448,
       "subject": "docs: anketa -- Leonovih pet odgovora zatvara §6 (sidebar obrisati · vjezbe samo tokeni · Facebook otpao · HR predmeti cekaju F5 recepte · birac samo \"Automatski\")",
       "kind": "documentation",
       "sub": "other",
@@ -1359,6 +1505,7 @@ expression: r
     {
       "sha": "fe1af72",
       "date": "2026-09-06",
+      "author_time": 1788663351,
       "subject": "docs: HR autor-bot zapisan kao KASNIJE (Leon 06.09.) -- sto postoji, sto fali, redoslijed kad dodje na red",
       "kind": "documentation",
       "sub": "other",
@@ -1367,6 +1514,7 @@ expression: r
     {
       "sha": "2d07d00",
       "date": "2026-09-06",
+      "author_time": 1788663498,
       "subject": "docs: HR autor-bot bez API kljuca -- graditelji su Claude Code subagenti, ne Sonnet API (Leon 06.09.)",
       "kind": "documentation",
       "sub": "other",
@@ -1375,6 +1523,7 @@ expression: r
     {
       "sha": "8ec0e18",
       "date": "2026-09-06",
+      "author_time": 1788663828,
       "subject": "docs: HR materijali 1. godine postoje na Driveu (Leon 06.09.) -- izvor za autor-bota, jos nepregledano",
       "kind": "documentation",
       "sub": "other",
@@ -1383,6 +1532,7 @@ expression: r
     {
       "sha": "3bfe40a",
       "date": "2026-09-06",
+      "author_time": 1788664600,
       "subject": "fix(check:docs): gitignoriran artefakt nije duh-datoteka -- brana je padala u svakom svjezem klonu",
       "kind": "debugging",
       "sub": "gate_or_measure",
@@ -1391,6 +1541,7 @@ expression: r
     {
       "sha": "4c9e4f1",
       "date": "2026-09-06",
+      "author_time": 1788664825,
       "subject": "F2/1 (6/7): birac tema -- natpis je samo \"Automatski\", sufiks s temom uredjaja otpada",
       "kind": "execution",
       "sub": "brick",
@@ -1399,6 +1550,7 @@ expression: r
     {
       "sha": "e6ed07d",
       "date": "2026-09-06",
+      "author_time": 1788731112,
       "subject": "rad: dnevni zapis 2026-09-06 (automatski, scripts/rad-dnevno.ps1)",
       "kind": "execution",
       "sub": "other",
@@ -1407,6 +1559,7 @@ expression: r
     {
       "sha": "27d495a",
       "date": "2026-09-07",
+      "author_time": 1788736589,
       "subject": "docs: model monetizacije -- organizacija je najam, firme placaju prve (ADR-036)",
       "kind": "planning",
       "sub": "other",
@@ -1415,6 +1568,7 @@ expression: r
     {
       "sha": "1384f6b",
       "date": "2026-09-07",
+      "author_time": 1788782702,
       "subject": "docs(progress): sesija 07.09. -- model monetizacije zakljucan, cinjenice o inkubatoru provjerene",
       "kind": "documentation",
       "sub": "other",
@@ -1423,6 +1577,7 @@ expression: r
     {
       "sha": "a341880",
       "date": "2026-09-07",
+      "author_time": 1788805000,
       "subject": "Mjerenje aktivacije i povratka: SokratMetrika u consent.js + kuka u switchSection()",
       "kind": "execution",
       "sub": "other",
@@ -1431,6 +1586,7 @@ expression: r
     {
       "sha": "d5377ff",
       "date": "2026-09-07",
+      "author_time": 1788817514,
       "subject": "rad: dnevni zapis 2026-09-07 (automatski, scripts/rad-dnevno.ps1)",
       "kind": "execution",
       "sub": "other",
@@ -1439,6 +1595,7 @@ expression: r
     {
       "sha": "5233a0a",
       "date": "2026-09-06",
+      "author_time": 1788664600,
       "subject": "fix(check:docs): gitignoriran artefakt nije duh-datoteka -- brana je padala u svakom svjezem klonu",
       "kind": "debugging",
       "sub": "gate_or_measure",
@@ -1447,6 +1604,7 @@ expression: r
     {
       "sha": "74eb8ae",
       "date": "2026-09-08",
+      "author_time": 1788903684,
       "subject": "F2/0: traka dobiva dva odredista -- \"Pocni uciti\" obrisan, gore su UGC i profil",
       "kind": "execution",
       "sub": "brick",
@@ -1455,6 +1613,7 @@ expression: r
     {
       "sha": "49101f0",
       "date": "2026-09-08",
+      "author_time": 1788903911,
       "subject": "rad: dnevni zapis 2026-09-08 (automatski, scripts/rad-dnevno.ps1)",
       "kind": "execution",
       "sub": "other",
@@ -1463,6 +1622,7 @@ expression: r
     {
       "sha": "cc01a1b",
       "date": "2026-09-09",
+      "author_time": 1788908134,
       "subject": "F2/0 ②: materials-entry okrenut -- CI je nasao spec koji je moja pretraga promasila",
       "kind": "execution",
       "sub": "brick",
@@ -1471,6 +1631,7 @@ expression: r
     {
       "sha": "6f51b7c",
       "date": "2026-09-09",
+      "author_time": 1788908208,
       "subject": "docs(TESTING): pouka F2/0 -- element sucelja se ne trazi po imenu nego po svemu cime se gada",
       "kind": "documentation",
       "sub": "other",
@@ -1479,6 +1640,7 @@ expression: r
     {
       "sha": "8b79790",
       "date": "2026-09-09",
+      "author_time": 1788908233,
       "subject": "docs(PROGRESS): dnevnik pokazuje na pouku umjesto da je ponavlja (ADR-027)",
       "kind": "planning",
       "sub": "other",
@@ -1487,6 +1649,7 @@ expression: r
     {
       "sha": "1e2d157",
       "date": "2026-09-08",
+      "author_time": 1788827223,
       "subject": "check:docs: budzet CLAUDE.md se mjeri BEZ znaka povratka -- ista datoteka, ista presuda",
       "kind": "planning",
       "sub": "gate_or_measure",
@@ -1495,6 +1658,7 @@ expression: r
     {
       "sha": "4a2b260",
       "date": "2026-09-09",
+      "author_time": 1788910464,
       "subject": "docs(CLAUDE.md): stanje govori danasnji dan -- F1 parkiran u karticama, F2 poceo",
       "kind": "documentation",
       "sub": "other",
@@ -1503,6 +1667,7 @@ expression: r
     {
       "sha": "e6b6515",
       "date": "2026-09-09",
+      "author_time": 1788925401,
       "subject": "F2/3a: profil postaje ZID -- identitet gore, administracija ispod",
       "kind": "execution",
       "sub": "brick",
@@ -1511,6 +1676,7 @@ expression: r
     {
       "sha": "5950c86",
       "date": "2026-09-09",
+      "author_time": 1788927015,
       "subject": "F2/3b: ime i opis dobivaju svoju tablicu -- `role` ostaje zatvoren",
       "kind": "execution",
       "sub": "brick",
@@ -1519,6 +1685,7 @@ expression: r
     {
       "sha": "f670767",
       "date": "2026-09-09",
+      "author_time": 1788964874,
       "subject": "docs: pred-compact revizija -- odluka o bucketu, nova tablica u BACKEND-u, stanje govori danasnji dan",
       "kind": "planning",
       "sub": "other",
@@ -1527,6 +1694,7 @@ expression: r
     {
       "sha": "d9c1f4d",
       "date": "2026-09-12",
+      "author_time": 1789215426,
       "subject": "docs: matura seli u archive/ -- VISION.md §8 je jedino mjesto gdje matura zivi (Leon 12.09.)",
       "kind": "documentation",
       "sub": "other",
@@ -1535,6 +1703,7 @@ expression: r
     {
       "sha": "d54d015",
       "date": "2026-09-12",
+      "author_time": 1789235258,
       "subject": "N5: odbijeni paket se zaboravlja -- drugi poziv paket() ponovno skida, ne vraca staru gresku (BUG-051)",
       "kind": "debugging",
       "sub": "other",
@@ -1543,6 +1712,7 @@ expression: r
     {
       "sha": "5e7e3e3",
       "date": "2026-09-12",
+      "author_time": 1789235342,
       "subject": "N3: snapshot tek nakon uspjelog upisa u pullu -- pali prvi push ceka sljedeci interval, bez laznog \"sinkronizirano\" (BUG-049)",
       "kind": "debugging",
       "sub": "other",
@@ -1551,6 +1721,7 @@ expression: r
     {
       "sha": "c7dea8e",
       "date": "2026-09-12",
+      "author_time": 1789235424,
       "subject": "N2: spajanje nizova koji nisu stringovi = multiskup-maksimum -- [80]+[90] daje oba, ne \"dulje polje\" (BUG-048)",
       "kind": "debugging",
       "sub": "other",
@@ -1559,6 +1730,7 @@ expression: r
     {
       "sha": "6bfb61b",
       "date": "2026-09-12",
+      "author_time": 1789235520,
       "subject": "N4: lokalni napredak ima VLASNIKA -- drugi racun na istom pregledniku ga ne nasljedjuje (BUG-050)",
       "kind": "debugging",
       "sub": "other",
@@ -1567,6 +1739,7 @@ expression: r
     {
       "sha": "86113e7",
       "date": "2026-09-12",
+      "author_time": 1789235757,
       "subject": "N1: naucena kartica se pamti po IDENTITETU, ne po poziciji u promijesanom spilu (BUG-047)",
       "kind": "debugging",
       "sub": "other",
@@ -1575,6 +1748,7 @@ expression: r
     {
       "sha": "fdcb2b3",
       "date": "2026-09-12",
+      "author_time": 1789235885,
       "subject": "bump: cache tokeni + CONTENT_VERSION/SW_VERSION nakon N1-N5 (js/loader, cloud-sync, flashcards, storage, progress, profile)",
       "kind": "execution",
       "sub": "other",
@@ -1583,6 +1757,7 @@ expression: r
     {
       "sha": "a68f154",
       "date": "2026-09-12",
+      "author_time": 1789235954,
       "subject": "docs: BUG-047..051 (pet nalaza vanjske recenzije, svi rijeseni) + CHANGELOG + PROGRESS 12.09.",
       "kind": "documentation",
       "sub": "other",
@@ -1591,6 +1766,7 @@ expression: r
     {
       "sha": "5da7119",
       "date": "2026-09-06",
+      "author_time": 1788664600,
       "subject": "fix(check:docs): gitignoriran artefakt nije duh-datoteka -- brana je padala u svakom svjezem klonu",
       "kind": "debugging",
       "sub": "gate_or_measure",
@@ -1599,6 +1775,7 @@ expression: r
     {
       "sha": "5273ea0",
       "date": "2026-09-12",
+      "author_time": 1789237321,
       "subject": "test(app-state): tvrdnja o naucenim karticama okrenuta na identitete -- includes(0)&&includes(1) je kodirala BUG-047",
       "kind": "debugging",
       "sub": "gate_or_measure",
@@ -1607,6 +1784,7 @@ expression: r
     {
       "sha": "bfb3a50",
       "date": "2026-09-12",
+      "author_time": 1789238822,
       "subject": "docs: BUGS.md razdvojen (BUG-001..038 u BUGS_ARCHIVE.md) + RASPORED §0 SPAJANJE -- karta grana i redoslijed za sljedecu sesiju (Leon 12.09.)",
       "kind": "planning",
       "sub": "other",
@@ -1615,6 +1793,7 @@ expression: r
     {
       "sha": "d8e61be",
       "date": "2026-09-12",
+      "author_time": 1789240206,
       "subject": "merge: NAPREDAK POUZDAN (BUG-047…051) -- identitet kartice, merge = multiskup-max, snapshot tek nakon upserta, vlasnik lokalnog napretka, odbijeni paket se zaboravlja; + check:docs gitignore-fix (3bfe40a)",
       "kind": "debugging",
       "sub": "gate_or_measure",
@@ -1623,6 +1802,7 @@ expression: r
     {
       "sha": "d2aa6b3",
       "date": "2026-09-12",
+      "author_time": 1789240610,
       "subject": "merge: ostatak F1 (F1/4, F1/5, F1/7, F1/9, F1/11) + metrika ucenje/povratak + docs 05.-12.09. (ADR-035/036, matura u archive/) -- feat/mjerenje-aktivacije",
       "kind": "planning",
       "sub": "other",
@@ -1631,6 +1811,7 @@ expression: r
     {
       "sha": "3dc6624",
       "date": "2026-09-13",
+      "author_time": 1789293978,
       "subject": "merge: F2/1 (6/7) birac tema -- natpis samo 'Automatski' (feat/nocna-b)",
       "kind": "execution",
       "sub": "other",
@@ -1639,6 +1820,7 @@ expression: r
     {
       "sha": "1d54700",
       "date": "2026-09-13",
+      "author_time": 1789294029,
       "subject": "merge: F2/0 traka s dva odredista + F2/3a profil = zid + F2/3b identitet (profile_identity + RPC) -- feat/profil-zid",
       "kind": "execution",
       "sub": "other",
@@ -1647,6 +1829,7 @@ expression: r
     {
       "sha": "a34ebf0",
       "date": "2026-09-13",
+      "author_time": 1789294092,
       "subject": "BUG-046: pilula kategorije na obojenoj kartici pada AA -- mijesa se SUPROTNA tinta (cherry-pick 2641834 s parkirane feat/tinder-kadar)",
       "kind": "debugging",
       "sub": "brick",
@@ -1655,6 +1838,7 @@ expression: r
     {
       "sha": "c64a156",
       "date": "2026-09-13",
+      "author_time": 1789294096,
       "subject": "BUG-045: Service Worker nikad nije spremao runtime assete -- res.clone() sinkrono PRIJE caches.open (cherry-pick 3708e2d s parkirane feat/tinder-kadar)",
       "kind": "debugging",
       "sub": "brick",
@@ -1663,6 +1847,7 @@ expression: r
     {
       "sha": "d943a84",
       "date": "2026-09-13",
+      "author_time": 1789294096,
       "subject": "docs(progress, raspored §0): sesija SPAJANJE 12.09. -- svih sest koraka pripremljeno i izmjereno lokalno, nista pushano na main, svaki korak ceka Leonov OK",
       "kind": "planning",
       "sub": "other",
@@ -1671,6 +1856,7 @@ expression: r
     {
       "sha": "2ae9051",
       "date": "2026-09-13",
+      "author_time": 1789304442,
       "subject": "docs(progress, raspored §0): spajanje IZVEDENO 13.09. -- pet koraka na produkciji, §0 ispunjen, F2/2 ide u novom stablu od main-a",
       "kind": "planning",
       "sub": "deploy",
@@ -1679,6 +1865,7 @@ expression: r
     {
       "sha": "3ddf5f2",
       "date": "2026-09-13",
+      "author_time": 1789322926,
       "subject": "F2/2 cigla 1: bucket profile-images (javan, upis samo vlasniku) + RPC set_profile_image + delete-account cisti oba bucketa (STAGING)",
       "kind": "execution",
       "sub": "brick",
@@ -1687,6 +1874,7 @@ expression: r
     {
       "sha": "90dca49",
       "date": "2026-09-13",
+      "author_time": 1789323956,
       "subject": "F2/2 cigla 2: js/profile-images.js — smanjivanje u pregledniku (WebP), upload u vlastiti prefiks, RPC, brisanje stare",
       "kind": "execution",
       "sub": "brick",
@@ -1695,6 +1883,7 @@ expression: r
     {
       "sha": "61c39dd",
       "date": "2026-09-13",
+      "author_time": 1789324415,
       "subject": "F2/2 cigla 3: zid crta profilnu i naslovnu; Promijeni/Ukloni u „Uredi profil\" (i18n, CSS, spec ⑤ klik-put)",
       "kind": "execution",
       "sub": "brick",
@@ -1703,6 +1892,7 @@ expression: r
     {
       "sha": "090bd0c",
       "date": "2026-09-13",
+      "author_time": 1789326372,
       "subject": "docs: 🚀 F2/2 slike profila na produkciji (main 61c39dd, token 20260913203047) — SQL, Edge Function, push; odluke iz ankete; stabla počišćena",
       "kind": "planning",
       "sub": "deploy",

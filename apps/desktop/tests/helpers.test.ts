@@ -149,6 +149,7 @@ describe('kindColor', () => {
 const commitRow = (sha: string, date: string): CommitRow => ({
   sha,
   date,
+  author_time: 0,
   subject: sha,
   kind: 'execution',
   sub: 'other',

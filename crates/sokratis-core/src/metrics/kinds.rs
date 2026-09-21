@@ -7,6 +7,8 @@
 //! `commit_rows` klasificira svaki commit TOČNO JEDNOM (vrsta uz override, podvrsta); `kind_stats`
 //! te redke samo broji, umjesto da opet zove `effective_kind` po vrsti kao prije. `rows.iter().zip(
 //! commits)` spaja dva paralelna niza bez indeksa; nema `[i]` koji bi mogao pasti izvan granica.
+//!
+//! Dopuna (cigla M2/29a): `commit_rows` prepisuje `c.author_time` u redak bez računanja — čisti prijenos.
 use crate::classify::{classify_kind, classify_sub};
 use crate::{Commit, CommitRow, KindStats, Patterns, WorkKind};
 use std::collections::HashMap;
@@ -30,6 +32,7 @@ pub fn commit_rows(
         .map(|c| CommitRow {
             sha: c.sha.clone(),
             date: c.date.clone(),
+            author_time: c.author_time,
             subject: c.subject.clone(),
             kind: effective_kind(c, overrides, p),
             sub: classify_sub(&c.subject, p),
@@ -146,23 +149,29 @@ mod tests {
     fn commit_rows_carry_kind_sub_and_override_flag() {
         let p = Patterns::compile(&Profile::default()).unwrap();
         let commits = vec![
-            row_commit("a1", "F1/1 cigla"),
-            row_commit("b2", "fix: kvar"),
+            Commit {
+                author_time: 1_000,
+                ..row_commit("a1", "F1/1 cigla")
+            },
+            Commit {
+                author_time: 2_000,
+                ..row_commit("b2", "fix: kvar")
+            },
             row_commit("c3", "docs: zapis 🚀 na produkciji"),
         ];
         let mut ov = HashMap::new();
         ov.insert("b2".to_string(), WorkKind::Polish);
         let rows = commit_rows(&commits, &ov, &p);
-        let got: Vec<(&str, WorkKind, SubKind, bool)> = rows
+        let got: Vec<(&str, WorkKind, SubKind, bool, i64)> = rows
             .iter()
-            .map(|r| (r.sha.as_str(), r.kind, r.sub, r.overridden))
+            .map(|r| (r.sha.as_str(), r.kind, r.sub, r.overridden, r.author_time))
             .collect();
         assert_eq!(
             got,
             vec![
-                ("a1", WorkKind::Execution, SubKind::Brick, false),
-                ("b2", WorkKind::Polish, SubKind::Other, true),
-                ("c3", WorkKind::Documentation, SubKind::Deploy, false),
+                ("a1", WorkKind::Execution, SubKind::Brick, false, 1_000),
+                ("b2", WorkKind::Polish, SubKind::Other, true, 2_000),
+                ("c3", WorkKind::Documentation, SubKind::Deploy, false, 0),
             ]
         );
     }
