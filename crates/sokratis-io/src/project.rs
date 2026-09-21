@@ -28,6 +28,11 @@
 //! Cigla M2/14b (potrošač keša): `input_between`/`input_cached` su sad tanke omotnice oko
 //! privatne `input_with`, koja uzima `Option<&dyn CommitCache>` — `None` čita git izravno,
 //! `Some(cache)` ide kroz `cached_log`. Jedna razlika u tijelu, dva javna imena.
+//!
+//! Cigla M2/29b (`common_dir` kao tekst, javni `today()`): `common_dir` prolazi kroz `normalized`
+//! ISTO kao `profile_path` (I5) — usporedba TEKSTA (ne `PathBuf ==`) inače vidi glavno i sporedno
+//! radno stablo kao dva projekta. `today()` postaje slobodna funkcija jer je desktopu treba bez
+//! vlastite ovisnosti o `chrono`.
 use crate::{CommitCache, GitCli, GitSource, IoError, cached_log};
 use sokratis_core::{DocFile, Profile, ReportInput, Vision, WorkKind};
 use std::collections::{BTreeMap, HashMap};
@@ -80,6 +85,13 @@ fn normalized(path: PathBuf) -> PathBuf {
     path.components().collect()
 }
 
+/// Današnji lokalni datum, `YYYY-MM-DD` — jedino mjesto koje ga računa (S-010); `input_with` ga
+/// zove umjesto vlastitog izraza, a DESKTOP (bez izravne ovisnosti o `chrono`) ga zove odavde za
+/// zadani raspon i ključ dnevne snimke (cigla M2/29b).
+pub fn today() -> String {
+    chrono::Local::now().format("%Y-%m-%d").to_string()
+}
+
 /// Piše `text` u `path` atomarno: prvo `.tmp` pored, pa `rename` (na Windowsu zamjenjuje
 /// postojeću). Pad usred pisanja tako nikad ne ostavi pola JSON-a na mjestu datoteke koju git
 /// prati.
@@ -121,7 +133,12 @@ impl Project {
         // podmapu vratio `common_dir` relativan na TU podmapu (npr. `docs/records/../../.git`),
         // pa bi usporedba identiteta projekta (isti `common_dir`) lagala kad se otvori iz podmape.
         let git = GitCli::new(&root);
-        let common_dir = git.common_dir()?;
+        // M2/29b: u glavnom stablu `--git-common-dir` vraća RELATIVNO `.git` (pa `path_of` spoji
+        // `root` s `/` i `join`-ov `\` — razdjelnici se pomiješaju), a u sporednom radnom stablu
+        // vraća APSOLUTNO, čisto `/`. `PathBuf ==` to ne vidi (uspoređuje komponente), ali
+        // `sokratis-store` uspoređuje TEKST — isti `normalized(...)` kao za `profile_path` (I5)
+        // ovdje daje isti tekst iz oba stabla, pa isti projekt ostaje JEDAN (S-015).
+        let common_dir = normalized(git.common_dir()?);
         let profile_path = normalized(root.join(".sokratis").join("profile.json"));
         let profile = match std::fs::read_to_string(&profile_path) {
             Ok(s) => serde_json::from_str(&s).map_err(|source| IoError::Profile {
@@ -299,7 +316,7 @@ impl Project {
                 .duration_since(UNIX_EPOCH)
                 .map(|d| d.as_secs() as i64)
                 .unwrap_or(0),
-            today: chrono::Local::now().format("%Y-%m-%d").to_string(),
+            today: today(),
             since,
             until: until.map(str::to_string),
             branch: label,

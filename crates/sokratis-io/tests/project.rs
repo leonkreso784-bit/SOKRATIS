@@ -10,7 +10,7 @@
 mod common;
 use common::Repo;
 use sokratis_core::WorkKind;
-use sokratis_io::{IoError, Project};
+use sokratis_io::{IoError, Project, today};
 
 fn write(r: &Repo, rel: &str, content: &str) {
     let p = r.path().join(rel);
@@ -157,6 +157,49 @@ fn common_dir_is_the_same_from_root_and_from_a_subdirectory() {
             .components()
             .any(|c| c == std::path::Component::ParentDir),
         "common_dir iz podmape ne smije sadrzavati '..': {from_subdir:?}"
+    );
+}
+
+/// M2/29b: `today()` je jedina slobodna funkcija koju desktop zove za današnji datum (bez vlastite
+/// ovisnosti o `chrono`) — provjerava se oblik, ne konkretan dan (test bi inače ovisio o satu).
+#[test]
+fn today_is_a_valid_calendar_date() {
+    assert!(
+        sokratis_core::civil::is_ymd(&today()),
+        "today() mora vratiti YYYY-MM-DD"
+    );
+}
+
+/// M2/29b (rub I5 dalje): `git rev-parse --git-common-dir` u glavnom stablu vraća RELATIVNO
+/// `.git` (pa `path_of` složi `repo` s `/` + `\.git` iz `join` — mješavina razdjelnika), a u
+/// SPOREDNOM radnom stablu vraća APSOLUTNO `…/.git` (čisto `/`, bez `join`-a). `PathBuf ==` to vidi
+/// kao isto (uspoređuje komponente — I5 dolje to i dokazuje), ali `sokratis-store` uspoređuje
+/// TEKST (`to_string_lossy()`), pa bi isti projekt otvoren iz dva stabla ispao DVA projekta
+/// (krši S-015). Test uspoređuje TEKST, jer to je ono što store zapravo vidi.
+#[test]
+fn common_dir_text_is_identical_from_main_and_from_a_linked_worktree() {
+    let r = Repo::init();
+    r.commit(
+        "js/a.js",
+        "1",
+        "F1/1 prvi",
+        "2026-09-01T10:00:00+02:00",
+        "2026-09-01T10:00:00+02:00",
+    );
+    let side = tempfile::tempdir().unwrap();
+    let wt = side.path().join("wt");
+    r.git(&["worktree", "add", wt.to_str().unwrap(), "-b", "f1"]);
+    let main = Project::open(r.path()).unwrap();
+    let linked = Project::open(&wt).unwrap();
+    assert_eq!(
+        main.common_dir.to_string_lossy(),
+        linked.common_dir.to_string_lossy(),
+        "isti TEKST common_dir bez obzira iz kojeg se stabla otvara (store ga uspoređuje kao tekst)"
+    );
+    assert_eq!(
+        main.main_root().to_string_lossy(),
+        linked.main_root().to_string_lossy(),
+        "main_root() se izvodi iz common_dir, pa nosi istu grešku ako se ne normalizira"
     );
 }
 

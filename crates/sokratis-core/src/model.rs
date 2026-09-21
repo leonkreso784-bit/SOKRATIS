@@ -2,6 +2,9 @@
 //! Sve su strukture `pub` s `pub` poljima i `derive(Serialize, Deserialize)`: to je ugovor
 //! prema CLI-ju i sučelju (JSON). Enumi s `rename_all = "snake_case"` daju `"debugging"`, ne
 //! `"Debugging"` (S-008). `Clone` je namjeran — jezgra radi s podacima koje posjeduje.
+//!
+//! Dopuna (cigla M2/29a): `CommitRow.author_time` nosi `i64` iz `Commit`, ne novi tip — Pregled
+//! računa „prije X" iz istog broja koji tablica već zna, pa nema drugog izvora vremena (S-010).
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -120,6 +123,8 @@ pub struct CommitRow {
     pub sha: String,
     /// `YYYY-MM-DD` autora (kao tablica)
     pub date: String,
+    /// unix sekunde autora (S-007) — Pregled iz njega crta „prije 2 h"
+    pub author_time: i64,
     pub subject: String,
     pub kind: WorkKind,
     pub sub: SubKind,

@@ -40,9 +40,11 @@ export interface KindStats {
 }
 
 // Jedan redak Dnevnika (M2/5): commit s vrstom, podvrstom i oznakom ručnog overridea.
+// M2/29a: author_time (unix sekunde) odmah iza date — Pregled iz njega crta "prije X".
 export interface CommitRow {
   sha: string;
   date: string;
+  author_time: number;
   subject: string;
   kind: WorkKind;
   sub: SubKind;

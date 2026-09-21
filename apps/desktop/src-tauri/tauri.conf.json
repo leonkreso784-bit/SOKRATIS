@@ -18,7 +18,20 @@
         "height": 800,
         "minWidth": 960,
         "minHeight": 600,
-        "visible": true
+        "visible": false
+      },
+      {
+        "label": "splash",
+        "url": "splash.html",
+        "width": 640,
+        "height": 358,
+        "decorations": false,
+        "resizable": false,
+        "center": true,
+        "alwaysOnTop": true,
+        "visible": true,
+        "skipTaskbar": true,
+        "backgroundColor": "#0b1017"
       }
     ],
     "security": {

@@ -4,7 +4,7 @@
 //! `impl` na tipu iz `model.rs` drži ponašanje uz podatak bez traita; `HashMap` po ključu
 //! (pravilo, naslov) daje O(1) usporedbu, a `Severity: Ord` čini `max()` i „najteži" i „pogoršano".
 use crate::{MetricDelta, MetricValue, Report, Severity, Signal, SignalCounts, SnapshotMetrics};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 impl SnapshotMetrics {
     /// Što snimka drži (S-014): 18 pokazatelja s vrstom, docs-ocjena (ako postoji), broj signala
@@ -80,17 +80,25 @@ pub fn worst_severity(signals: &[Signal]) -> Option<Severity> {
 /// (T29/T30) ovo zove da obavijest pošalje SAMO na prijelaz u Alert (S-020), ne na svaki Alert.
 /// Identitet signala je par `(rule, title_key)`: dva signala istog pravila s različitim naslovom
 /// (npr. dvije grane u `unmerged-branches`) su različiti signali, svaki prati svoj prijelaz.
+/// M2/29c: rezultat ne smije ovisiti o redoslijedu ni o duplikatima — ponovljen ključ u `prev`
+/// vrijedi po NAJTEŽOJ težini (ne po zadnjem u nizu), a ponovljen ključ u `cur` izlazi NAJVIŠE
+/// jednom (prva pojava), inače bi isti signal poslao dvije obavijesti OS-a.
 pub fn alerts_raised(prev: &[Signal], cur: &[Signal]) -> Vec<Signal> {
-    let was: HashMap<(&str, &str), Severity> = prev
-        .iter()
-        .map(|s| ((s.rule.as_str(), s.title_key.as_str()), s.severity))
-        .collect();
+    let mut was: HashMap<(&str, &str), Severity> = HashMap::new();
+    for s in prev {
+        let key = (s.rule.as_str(), s.title_key.as_str());
+        was.entry(key)
+            .and_modify(|worst| *worst = (*worst).max(s.severity))
+            .or_insert(s.severity);
+    }
+    let mut seen: HashSet<(&str, &str)> = HashSet::new();
     cur.iter()
         .filter(|s| s.severity == Severity::Alert)
         .filter(|s| {
             was.get(&(s.rule.as_str(), s.title_key.as_str()))
                 .is_none_or(|old| *old < Severity::Alert)
         })
+        .filter(|s| seen.insert((s.rule.as_str(), s.title_key.as_str())))
         .cloned()
         .collect()
 }
@@ -146,6 +154,46 @@ mod tests {
         let raised = alerts_raised(&prev, &cur);
         let got: Vec<&str> = raised.iter().map(|s| s.title_key.as_str()).collect();
         assert_eq!(got, vec!["feat/x", "feat/y"]);
+    }
+
+    /// M2/29c (nošeni Minor M4 iz T7): isti `(rule, title_key)` dvaput u `cur` je do sada davao
+    /// DVIJE obavijesti za isti signal — `alerts_raised` mora svaki ključ vratiti NAJVIŠE jednom.
+    #[test]
+    fn alerts_raised_dedupes_the_same_key_appearing_twice_in_cur() {
+        let cur = vec![
+            sig("unmerged-branches", "feat/x", Severity::Alert),
+            sig("unmerged-branches", "feat/x", Severity::Alert),
+        ];
+        let raised = alerts_raised(&[], &cur);
+        assert_eq!(
+            raised.len(),
+            1,
+            "isti ključ dvaput u cur -> jedna obavijest"
+        );
+    }
+
+    /// M2/29c (nošeni Minor M5 iz T7): isti `(rule, title_key)` dvaput u `prev` s različitom
+    /// težinom je do sada ovisio o REDOSLIJEDU (`HashMap::collect` zadrži zadnji) — vrijedi
+    /// NAJTEŽA težina bez obzira na redoslijed, pa oba poretka daju isti (prazan) rezultat.
+    #[test]
+    fn alerts_raised_prev_duplicate_key_uses_worst_severity_regardless_of_order() {
+        let cur = vec![sig("unmerged-branches", "feat/x", Severity::Alert)];
+        let alert_then_warn = vec![
+            sig("unmerged-branches", "feat/x", Severity::Alert),
+            sig("unmerged-branches", "feat/x", Severity::Warn),
+        ];
+        assert!(
+            alerts_raised(&alert_then_warn, &cur).is_empty(),
+            "već je bio Alert -> nema prijelaza"
+        );
+        let warn_then_alert = vec![
+            sig("unmerged-branches", "feat/x", Severity::Warn),
+            sig("unmerged-branches", "feat/x", Severity::Alert),
+        ];
+        assert!(
+            alerts_raised(&warn_then_alert, &cur).is_empty(),
+            "isti podatak, obrnut redoslijed -> isti (prazan) ishod"
+        );
     }
 
     #[test]
