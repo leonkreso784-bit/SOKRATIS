@@ -169,7 +169,7 @@ Testovi i brane: `docs/workflow/TESTING.md`.
   repou od 2026-09-18; protokol nadzora `docs/workflow/AGENTI.md` (orkestrator = ova sesija, jedini
   spaja u `main`).
 - Što je isporučeno i kada zna `CHANGELOG.md`; tijek sesija `PROGRESS.md`. Ovaj odjeljak to ne ponavlja.
-- **Leonov zapis namjere za izgled, dodatke i put do 1.0.0 (2026-09-21): `docs/plan/PLAN_DESIGNE.md`** —
+- **Leonov zapis namjere za izgled, dodatke i put do 1.0.0 (2026-09-21): `docs/product/PLAN_DESIGNE.md`** —
   NIJE spec; sljedeća sesija iz njega prvo radi **rez za 1.0.0** (do koje cigle), pa tek onda spec/plan.
 
 ## Ključne odluke — samo žive

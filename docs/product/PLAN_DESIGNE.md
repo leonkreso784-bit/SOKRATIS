@@ -2,7 +2,7 @@
 
 > **Status:** 📝 ZAPIS NAMJERE (Leon, 2026-09-21) — **nije spec i nije izvor istine.** Kratko zapisano da se
 > ne izgubi; razrada, odluke (`DECISIONS.md`) i cigle dolaze u sljedećoj sesiji. Aktivni spec je i dalje
-> [`ARHITEKTURA_M2.md`](./ARHITEKTURA_M2.md); što je izgrađeno kaže
+> [`ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md); što je izgrađeno kaže
 > [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md).
 
 ## Odakle ovo
