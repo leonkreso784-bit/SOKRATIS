@@ -512,7 +512,7 @@ podatak govori, kako je izračunat, kako ga čitati — na jeziku sučelja.
 
 ### 13.5 Animacija pokretanja
 
-Bez promjene opsega: §5.2 i cigle T24 (portirana, u `feat/ui`) + T31 (splash-prozor, glavni prozor
+Bez promjene opsega: §5.2 i cigle T24 (portirana, u `main`-u) + T31 (splash-prozor, glavni prozor
 čeka). Leon je 2026-09-21 potvrdio da „nije gotova" znači samo „još nije spojena u pravi prozor".
 
 ### 13.6 Instalater — samo za Leona (S-029)
