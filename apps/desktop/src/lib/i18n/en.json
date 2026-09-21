@@ -133,6 +133,7 @@
   "visions.save": "Save",
   "visions.cancel": "Cancel",
   "visions.delete": "Delete",
+  "visions.deleteConfirm": "Delete this vision?",
   "visions.totals": "by state",
   "visions.empty": "no visions",
   "docs.score": "score",
@@ -154,5 +155,6 @@
   "splash.loading": "reading {name}…",
   "splash.skip": "click or key to skip",
   "common.loading": "loading…",
-  "common.na": "—"
+  "common.na": "—",
+  "common.confirm": "Confirm"
 }

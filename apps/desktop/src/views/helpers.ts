@@ -4,7 +4,7 @@
 // ostaje tanak prikaz koji samo poziva ove funkcije. Množina ide iz rječnika (S-021), ova datoteka
 // samo bira KOJI oblik (jedan/dva-četiri/pet-i-više) — sam tekst nikad nije ovdje ušiven.
 import { translate, type Dict } from '../lib/i18n/t';
-import type { Phase, ProjectSummary, Severity, WorkKind } from '../lib/types';
+import type { CommitRow, Delivery, Phase, ProjectSummary, Severity, WorkKind } from '../lib/types';
 
 const SEVERITY_RANK: Record<Severity, number> = { alert: 0, warn: 1, info: 2 };
 const NO_SIGNAL_RANK = 3;
@@ -86,4 +86,50 @@ const KIND_COLORS: Record<WorkKind, string> = {
 // na neutralnu tintu umjesto pukog `KIND_COLORS[kind]` bez zaštite.
 export function kindColor(kind: WorkKind): string {
   return KIND_COLORS[kind] ?? 'var(--color-ink-2)';
+}
+
+// ── Dnevnik i Isporuke (cigla M2/28) — najnovije prvo, jedan komparator dijele oba pogleda ──
+
+// Datumi su ISO "YYYY-MM-DD": obična niz-usporedba daje ispravan kronološki poredak bez
+// `localeCompare` i bez pitanja o jeziku sustava (za razliku od imena u `sortProjects`, gdje je
+// abeceda jezično osjetljiva). `Array.prototype.sort` je stabilan od ES2019 — isti datum zadržava
+// ulazni redoslijed, zato ga NIJE potrebno posebno kodirati kao tie-break.
+function byDateDesc(a: { date: string }, b: { date: string }): number {
+  if (a.date < b.date) return 1;
+  if (a.date > b.date) return -1;
+  return 0;
+}
+
+export function sortDiary(rows: CommitRow[]): CommitRow[] {
+  return [...rows].sort(byDateDesc);
+}
+
+export function sortDeliveries(rows: Delivery[]): Delivery[] {
+  return [...rows].sort(byDateDesc);
+}
+
+// ZAŠTO OVAKO (cigla M2/28 — kopiranje bez Rust naredbe; odstupanje zapisano u brifu T28 i za T34)
+// `navigator.clipboard.writeText` postoji u WebView2 uz korisničku gestu (klik), pa Tauri naredba
+// `copy_path` iz spec-a §5.1 OVDJE ne nastaje — T34 (TauriApi) ionako ne mijenja ovu funkciju.
+// `typeof navigator === 'undefined'` čuva od okoliša bez DOM-a (Node pod vitestom NEMA
+// `navigator.clipboard`, ali noviji Node ipak definira `navigator` bez njega — provjera oba sloja).
+export async function copyText(text: string): Promise<boolean> {
+  if (typeof navigator === 'undefined' || !navigator.clipboard?.writeText) return false;
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// ZAŠTO OVAKO (cigla M2/28 — sastavljanje apsolutne putanje nalaza dokumentacije, Ruling brifa #5)
+// `Finding.path` je relativan prema korijenu projekta i uvijek dolazi s "/" (jezgra ga čita s gita,
+// S-012 — sučelje ništa ne izmišlja). Spajanje s `root_path` je JEDNA čista funkcija s testom — ne
+// lijepljenje stringova u `Docs.svelte` — jer Windows-put (s "\") je ono što korisnik lijepi u
+// Explorer ili urednik, ne git-put (s "/").
+export function joinRepoPath(rootPath: string, path: string): string {
+  const root = rootPath.replace(/\//g, '\\');
+  const rel = path.replace(/\//g, '\\');
+  return `${root}\\${rel}`;
 }

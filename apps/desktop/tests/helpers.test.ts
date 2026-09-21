@@ -1,13 +1,27 @@
 // ZAŠTO OVAKO (cigla M2/26 — testovi za sortiranje, boju i sažetak signala u Pregledu;
 // dopunjeno M2/27 — `phaseRows`/`bricksPerDay` za pogled Faze; krug popravka 1 — `kindColor`
-// dijeljena mapa boja koju koriste i prsten i legenda u tablici u pogledu Vrste rada)
+// dijeljena mapa boja koju koriste i prsten i legenda u tablici u pogledu Vrste rada;
+// dopunjeno M2/28 — `sortDiary`/`sortDeliveries` (poredak Dnevnika i Isporuka), `copyText`
+// (kopiranje bez Rust naredbe, `vi.stubGlobal` zamjenjuje `navigator` jer Node pod vitestom nema
+// `navigator.clipboard`) i `joinRepoPath` (sastavljanje putanje nalaza dokumentacije))
 // Čiste funkcije, čist test bez DOM-a i bez Svelte runa: `hr.json` uvezen izravno kao `Dict`, isti
 // obrazac kao `tests/format.test.ts` — `signalSummary` tako vidi PRAVI rječnik, ne ručno prepisan
 // tekst (S-010), a hrvatska množina (jedan/dva-četiri/pet i više) se provjerava na stvarnim ključevima.
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import hr from '../src/lib/i18n/hr.json';
-import type { Phase, ProjectSummary, WorkKind } from '../src/lib/types';
-import { bricksPerDay, kindColor, phaseRows, severityClass, signalSummary, sortProjects } from '../src/views/helpers';
+import type { CommitRow, Delivery, Phase, ProjectSummary, WorkKind } from '../src/lib/types';
+import {
+  bricksPerDay,
+  copyText,
+  joinRepoPath,
+  kindColor,
+  phaseRows,
+  severityClass,
+  signalSummary,
+  sortDeliveries,
+  sortDiary,
+  sortProjects,
+} from '../src/views/helpers';
 
 const project = (name: string, worst: ProjectSummary['worst']): ProjectSummary => ({
   id: name.length,
@@ -122,5 +136,79 @@ describe('kindColor', () => {
   });
   it('nepoznata vrsta ne pogađa tiho na krivu boju iz mape — vraća neutralni fallback', () => {
     expect(kindColor('nepostojeca' as WorkKind)).toBe('var(--color-ink-2)');
+  });
+});
+
+// Minimalan redak Dnevnika — polja koja test ne provjerava dobivaju neutralnu vrijednost (isti duh
+// kao `phase()` iznad: prava vrijednost tipa, ne `as CommitRow`).
+const commitRow = (sha: string, date: string): CommitRow => ({
+  sha,
+  date,
+  subject: sha,
+  kind: 'execution',
+  sub: 'other',
+  overridden: false,
+});
+
+describe('sortDiary', () => {
+  it('obrće redoslijed po datumu — najnoviji prvo (Step 1 cigle M2/28)', () => {
+    const rows = [commitRow('a', '2026-01-01'), commitRow('b', '2026-01-02'), commitRow('c', '2026-01-03')];
+    expect(sortDiary(rows).map((r) => r.sha)).toEqual(['c', 'b', 'a']);
+  });
+  it('isti datum zadržava ulazni redoslijed (stabilno sortiranje)', () => {
+    const rows = [commitRow('a', '2026-01-01'), commitRow('b', '2026-01-01'), commitRow('c', '2026-01-02')];
+    expect(sortDiary(rows).map((r) => r.sha)).toEqual(['c', 'a', 'b']);
+  });
+  it('ne mijenja ulazno polje — vraća novo, sortirano', () => {
+    const rows = [commitRow('a', '2026-01-01'), commitRow('b', '2026-01-02')];
+    const original = rows.map((r) => r.sha);
+    const sorted = sortDiary(rows);
+    expect(rows.map((r) => r.sha)).toEqual(original);
+    expect(sorted).not.toBe(rows);
+  });
+});
+
+const delivery = (title: string, date: string): Delivery => ({
+  date,
+  model: '',
+  title,
+  kind: 'execution',
+  deploy: false,
+});
+
+describe('sortDeliveries', () => {
+  it('isti poredak kao sortDiary — najnovije prvo, stabilno za isti datum', () => {
+    const rows = [delivery('a', '2026-01-01'), delivery('b', '2026-01-01'), delivery('c', '2026-01-02')];
+    expect(sortDeliveries(rows).map((r) => r.title)).toEqual(['c', 'a', 'b']);
+  });
+});
+
+describe('joinRepoPath', () => {
+  it('spaja korijen projekta i relativnu putanju nalaza s "\\" razdjelnikom', () => {
+    expect(joinRepoPath('C:\\Users\\leonk\\Documents\\sokratstudy.dev', 'docs/records/DECISIONS.md')).toBe(
+      'C:\\Users\\leonk\\Documents\\sokratstudy.dev\\docs\\records\\DECISIONS.md',
+    );
+  });
+  it('normalizira "/" u korijenu isto kao u putanji nalaza (Finding.path uvijek dolazi s "/")', () => {
+    expect(joinRepoPath('C:/repo', 'docs/a.md')).toBe('C:\\repo\\docs\\a.md');
+  });
+});
+
+describe('copyText', () => {
+  it('vraća false kad navigator.clipboard ne postoji (test okoliš pod vitestom/Nodeom)', async () => {
+    expect(await copyText('nešto')).toBe(false);
+  });
+  it('poziva navigator.clipboard.writeText i vraća true kad postoji (WebView2 uz gestu korisnika)', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal('navigator', { clipboard: { writeText } });
+    expect(await copyText('C:\\put\\do\\datoteke.md')).toBe(true);
+    expect(writeText).toHaveBeenCalledWith('C:\\put\\do\\datoteke.md');
+    vi.unstubAllGlobals();
+  });
+  it('vraća false kad writeText odbije (npr. dopuštenje odbijeno) — ne baca dalje', async () => {
+    const writeText = vi.fn().mockRejectedValue(new Error('denied'));
+    vi.stubGlobal('navigator', { clipboard: { writeText } });
+    expect(await copyText('x')).toBe(false);
+    vi.unstubAllGlobals();
   });
 });

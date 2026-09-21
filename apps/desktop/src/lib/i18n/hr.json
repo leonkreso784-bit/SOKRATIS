@@ -133,6 +133,7 @@
   "visions.save": "Spremi",
   "visions.cancel": "Odustani",
   "visions.delete": "Obriši",
+  "visions.deleteConfirm": "Obrisati ovu viziju?",
   "visions.totals": "po stanju",
   "visions.empty": "nema vizija",
   "docs.score": "ocjena",
@@ -154,5 +155,6 @@
   "splash.loading": "čitam {name}…",
   "splash.skip": "klik ili tipka preskače",
   "common.loading": "učitavam…",
-  "common.na": "—"
+  "common.na": "—",
+  "common.confirm": "Potvrdi"
 }

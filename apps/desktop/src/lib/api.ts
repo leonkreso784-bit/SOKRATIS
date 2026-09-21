@@ -6,6 +6,7 @@
 import snapRaw from '../../../../crates/sokratis-core/tests/snapshots/snapshot__report-sokratstudy-2026-09-17.snap?raw';
 import type {
   CommitRow,
+  DocsHealth,
   ProjectSummary,
   Range,
   Report,
@@ -66,6 +67,30 @@ export class MockApi implements Api {
     },
   ];
 
+  // Dopuna M2/28 (Ruling orkestratora #2): snimka jezgre (M2/17) ima `docs: null` jer je snimljena
+  // NAD PROJEKTOM koji tada nije imao mapu dokumentacije prepoznatu profilom. Bez primjera pogled
+  // Dokumentacija (M2/28) ne bi imao što pokazati u dev-prikazu ni testu osim `docs.na`. Poruke u
+  // nalazima su izričito označene "MOCK" da nitko ne pomisli da je ovo prava ocjena — `TauriApi`
+  // (T34) uvijek vraća pravu `DocsHealth` koju izračuna `core`, ovaj primjer se tad sam prestaje koristiti.
+  private readonly mockDocsHealth: DocsHealth = {
+    score: 82,
+    findings: [
+      {
+        check: 'stale-decision',
+        path: 'docs/records/DECISIONS.md',
+        line: 12,
+        message: 'MOCK primjer: odluka bez datuma zatvaranja (dev-prikaz dok TauriApi ne postoji, T34)',
+      },
+      {
+        check: 'missing-glossary-entry',
+        path: 'docs/workflow/RUST.md',
+        line: null,
+        message: 'MOCK primjer: nov Rust-konstrukt bez unosa u pojmovnik (dev-prikaz dok TauriApi ne postoji, T34)',
+      },
+    ],
+    lag_days: 3,
+  };
+
   async listProjects(): Promise<ProjectSummary[]> {
     const counts = this.countSignalsBySeverity();
     return [
@@ -108,6 +133,7 @@ export class MockApi implements Api {
       commits: this.commitsWithOverrides(),
       visions: this.visions,
       vision_totals: this.visionTotals(),
+      docs: this.docsForReport(),
       signals: this.signalsForReport(),
     };
   }
@@ -183,6 +209,13 @@ export class MockApi implements Api {
   // sebe prestaje koristiti.
   private signalsForReport(): Signal[] {
     return this.report.signals.length > 0 ? this.report.signals : this.mockSignals;
+  }
+
+  // Isti obrazac kao `signalsForReport` iznad, ali za `docs`: snimka ima `null`, mock ga zamijeni
+  // OZNAČENIM primjerom (§ komentar uz `mockDocsHealth`) — grana `docs === null` u `Docs.svelte`
+  // time i dalje ostaje pravi, testiran kôd za projekt koji STVARNO nema mapu dokumentacije.
+  private docsForReport(): DocsHealth | null {
+    return this.report.docs ?? this.mockDocsHealth;
   }
 
   // Info se ne broji u „najgore" — nijedno pravilo (M2) danas ne javlja Info, a i da javi, to nije

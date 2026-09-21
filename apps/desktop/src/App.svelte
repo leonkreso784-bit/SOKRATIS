@@ -1,15 +1,16 @@
 <script lang="ts">
   // ZAŠTO OVAKO (cigla M2/25 — okvir: gornja traka + lijevi izbornik + prostor za poglede;
   // dopunjeno M2/26 — Pregled je prvi stvaran pogled, traka signala sjedi između gornje trake i
-  // retka Sidebar+main)
+  // retka Sidebar+main; dopunjeno M2/28 — svih devet pogleda iz `VIEWS` (`types.ts`) sada ima svoju
+  // komponentu, pa je grana `{:else}` s `common.loading` UKLONJENA jer više nije dostižna ni za
+  // jedan mogući `View`: `app.view` je zatvoren TS-enum, if/else-if lanac ovdje ga pokriva u cijelosti)
   // `onMount` je Svelteov standardni "kad je komponenta u DOM-u" udarac — ovdje je to JEDINO mjesto
   // koje povlači početne postavke i popis projekata (S-010: jedno mjesto pokretanja, ne u svakoj
-  // podkomponenti). Dopunjeno M2/27: Tempo/Vrste rada/Pokazatelji/Faze usmjereni; preostali pogledi
-  // (Dnevnik, Isporuke, Vizije, Dokumentacija — T28) ostaju na `{:else}` dok ne dobiju svoje komponente.
+  // podkomponenti).
   import { onMount } from 'svelte';
   import { api } from './lib/api';
   import { app, applyTheme, loadProjects } from './lib/state.svelte';
-  import { setLang, t } from './lib/i18n/index.svelte';
+  import { setLang } from './lib/i18n/index.svelte';
   import Topbar from './lib/shell/Topbar.svelte';
   import Sidebar from './lib/shell/Sidebar.svelte';
   import SignalBar from './lib/shell/SignalBar.svelte';
@@ -18,6 +19,10 @@
   import Kinds from './views/Kinds.svelte';
   import Indicators from './views/Indicators.svelte';
   import Phases from './views/Phases.svelte';
+  import Diary from './views/Diary.svelte';
+  import Deliveries from './views/Deliveries.svelte';
+  import Visions from './views/Visions.svelte';
+  import Docs from './views/Docs.svelte';
 
   onMount(async () => {
     app.settings = await api.getSettings();
@@ -43,8 +48,14 @@
         <Indicators />
       {:else if app.view === 'phases'}
         <Phases />
-      {:else}
-        <p>{t('common.loading')}</p>
+      {:else if app.view === 'diary'}
+        <Diary />
+      {:else if app.view === 'deliveries'}
+        <Deliveries />
+      {:else if app.view === 'visions'}
+        <Visions />
+      {:else if app.view === 'docs'}
+        <Docs />
       {/if}
     </main>
   </div>

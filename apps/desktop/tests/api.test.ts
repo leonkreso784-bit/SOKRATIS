@@ -1,4 +1,5 @@
-// ZAŠTO OVAKO (cigla M2/25 — MockApi daje jedan projekt iz snimke, override se pamti)
+// ZAŠTO OVAKO (cigla M2/25 — MockApi daje jedan projekt iz snimke, override se pamti;
+// dopunjeno M2/28 — `docs` iz snimke je `null`, mock ga zamjenjuje OZNAČENIM primjerom, Ruling #2)
 // Test ide kroz javno sučelje `Api`, ne kroz privatna polja `MockApi` — isto što bi vidio Pregled
 // i Dnevnik u pregledniku: popis projekata, pa `Report`, pa promjena vrste jednom commitu.
 import { describe, expect, it } from 'vitest';
@@ -16,5 +17,13 @@ describe('MockApi', () => {
       const again = await api.getReport(ps[0]!.id, { preset: 'all' });
       expect(again.commits[0]).toMatchObject({ kind: 'polish', overridden: true });
     }
+  });
+
+  it('docs iz snimke je null, mock ga zamjenjuje označenim primjerom (pogled Dokumentacija, M2/28)', async () => {
+    const api = new MockApi();
+    const ps = await api.listProjects();
+    const r = await api.getReport(ps[0]!.id, { preset: 'all' });
+    expect(r.docs).not.toBeNull();
+    expect(r.docs?.findings.every((f) => f.message.startsWith('MOCK'))).toBe(true);
   });
 });
