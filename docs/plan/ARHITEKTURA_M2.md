@@ -3,7 +3,8 @@
 **Status:** 🟩 AKTIVAN SPEC — napisan 2026-09-18 iz brainstorminga s Leonom i **isti dan odobren**
 („Imaš moj OK", bez izmjena) · plan cigli iz njega:
 [superpowers/plans/2026-09-18-m2-desktop.md](../superpowers/plans/2026-09-18-m2-desktop.md) ·
-jedini aktivni spec u `plan/`
+jedini aktivni spec u `plan/` · **dopunjen 2026-09-21 rezom za 1.0.0** (§13, Leonov OK isti dan,
+S-024…S-031): izlaz iz M2 je verzija **1.0.0**, ne 0.2.0
 
 Što je od M1 stvarno izgrađeno opisuje [architecture/ARCHITECTURE.md](../architecture/ARCHITECTURE.md);
 ispunjeni spec M1 je [archive/ARHITEKTURA_M1.md](../archive/ARHITEKTURA_M1.md); status milestonea
@@ -297,8 +298,9 @@ opsegu.
 Gornja traka + lijevi izbornik; uzor su `css/topbar.css` · `sidebar.css` · `study-chrome.css` Sokrat
 Studyja (prenose se **mjere i ponašanje**, ne klase — Sokrat Study se ne dira). Gornja traka: mali
 `S◍KRATIS` lockup · birač projekta · **birač raspona** (7 dana · 30 dana · ovaj mjesec · cijeli
-projekt = `profile.since` · vlastiti; pamti se po projektu) · gumb Osvježi · tema · HR/EN. Lijevo:
-pogledi projekta. Bez odabranog projekta sadržaj je Pregled.
+projekt = `profile.since` · vlastiti; pamti se po projektu) · gumb Osvježi. Lijevo:
+pogledi projekta. Bez odabranog projekta sadržaj je Pregled. *(Tema i HR/EN su do 2026-09-21 stajale
+u gornjoj traci i tako su izgrađene u M2/25; sele u pogled Postavke — §13.2, S-028.)*
 
 ### 6.2 Pogledi — svih 8 + Pregled
 
@@ -315,7 +317,8 @@ pogledi projekta. Bez odabranog projekta sadržaj je Pregled.
 | Dokumentacija | ocjena · kašnjenje · nalazi `datoteka:redak` (klik kopira putanju; otvaranje u editoru je M3) | — |
 
 Signali projekta stoje u **zaglavlju projekta** (traka s dokazom na klik), ne kao deseti pogled —
-Pregled ih ionako nosi.
+Pregled ih ionako nosi. Deseti pogled je **Postavke** (globalan, dopuna §13.2); „formula na klik" u
+Pokazateljima postaje kartica s objašnjenjem koja vrijedi za sve poglede (§13.4).
 
 ### 6.3 Oblikovanje — jedan modul, s testom (rješava dug M3)
 
@@ -418,9 +421,9 @@ mijenja sustav) — i ona, kao u M0 za M1, čeka **Leonov OK** prije prve cigle 
 
 ---
 
-## 11 · Izlazni uvjet Milestonea 2 — verzija 0.2.0
+## 11 · Izlazni uvjet Milestonea 2 — verzija 1.0.0 (S-024; do 2026-09-21 se zvala 0.2.0)
 
-Gotovo kad Leon može:
+Gotovo kad Leon može sve ispod **i** sve iz §13 (dopuna rezom za 1.0.0):
 
 1. **pokrenuti Sokratis** (autostart ili klik), vidjeti animaciju do kraja, i dobiti **Pregled** sa
    Sokrat Studyjem (**pet stabala = jedan projekt**) i Sokratisom, sa signalima u boji;
@@ -443,7 +446,94 @@ izgrađeno, piše se spec za M3.
 
 ## 12 · Izvan opsega M2 (ostaje u BACKLOG-u, nijedno skriveno)
 
-instalater (MSI/NSIS) · nova pravila signala · GitHub/Vercel adapteri · otvaranje datoteke u editoru
-(samo kopiranje putanje) · natpisi CLI-tablice · `include_unmerged` · vektorizacija znaka · README EN,
-licenca, objava · push/remote (čeka Leonov izričit OK; javna objava tek nakon I9, koji ovaj spec zatvara).
+potpisan i objavljen instalater, MSI, automatsko ažuriranje (NSIS samo za Leona je od 2026-09-21 **u**
+opsegu — §13.6, S-029) · nova pravila signala · GitHub/Vercel adapteri · otvaranje datoteke u editoru
+(samo kopiranje putanje) · natpisi CLI-tablice · `include_unmerged` · vektorizacija znaka · licenca,
+objava (README na engleskom je od 2026-09-21 gotov — S-030) · sve iz zapisa namjere što nije u §13:
+[BACKLOG.md](../records/BACKLOG.md) „Druga verzija" i „Kasnije" · push/remote (čeka Leonov izričit OK;
+javna objava tek nakon I9, koji ovaj spec zatvara).
 *(Pretečeno 2026-09-20: Leon je repo objavio javno prije kraja M2 — `DECISIONS.md` S-023; I9 i dalje zatvara ovaj spec, ciglom T14.)*
+
+---
+
+## 13 · Dopuna 2026-09-21 — rez za 1.0.0 (S-024…S-031)
+
+Leon je sučelje vidio uživo i zapisao namjeru ([archive/PLAN_DESIGNE.md](../archive/PLAN_DESIGNE.md));
+iz nje je **u 1.0.0** ušlo ono što stoji ovdje, a ostalo je u
+[BACKLOG.md](../records/BACKLOG.md) („Druga verzija", „Kasnije"). Zašto baš ova crta: S-025.
+
+### 13.1 Redoslijed — tri etape (S-025)
+
+| etapa | cigle | na kraju |
+|---|---|---|
+| **1 · funkcija** | T28 → spajanje SUČELJA u `main` → DESKTOP T29–T33 → T34 → §13.7 → §13.6 | Leon instalira **„1.0.0-pre"** (bez taga) i mjeri Sokrat Study i Sokratis |
+| **2 · izgled** | §13.2 → §13.3 (dvije cigle) → §13.4 (dvije cigle) | 1.0.0-pre nadgleda gradnju vlastitog izgleda |
+| **3 · izdanje** | T35 (mjerenja, verzija 1.0.0) → završna recenzija → jedan krug popravaka → §13.8 → čuvar izdanja | **1.0.0**; tag uz Leonov izričit OK |
+
+### 13.2 Pogled Postavke (S-028)
+
+Deseti pogled, **globalan** (ne ovisi o odabranom projektu), na dnu lijevog izbornika. Četiri postavke:
+tema (četiri palete iz §6.5) · jezik (HR/EN) · autostart · animacije (uključene/isključene).
+`Settings` u `src/lib/types.ts` dobiva četvrto polje `motion: boolean` (zadano `true`); pohrana je
+postojeći par ključ–vrijednost iz M2/16 — **shema baze se ne mijenja**. `ThemeSwitch` i `LangSwitch`
+sele iz `Topbar`-a u pogled; gornja traka ih više nema. Tray zadržava kvačicu autostarta (§5.3) — isti
+ključ u `store`-u, pa se dva mjesta ne mogu razići.
+**Gotovo kad:** Leon promijeni sve četiri postavke u Postavkama, zatvori i ponovno pokrene Sokratis i
+nađe ih kako ih je ostavio; gornja traka nema ni temu ni jezik.
+
+### 13.3 Animacije (S-026)
+
+Dvije cigle. **(a) Ulaz grafova:** `Bars` rastu od osi, `Line` i `Sparkline` se iscrtaju
+(`stroke-dashoffset`), `Ring` se ispuni — jednom pri prikazu pogleda, i pri prvom prikazu nakon
+splasha. **(b) Prijelaz pogleda + prekidač:** promjena pogleda u izborniku daje kratak prijelaz
+sadržaja; atribut `data-motion="off"` na `<html>` (piše ga `state.svelte.ts`, kao `data-theme`) gasi
+**sve** animacije sučelja — postavlja ga `Settings.motion = false` **ili** `prefers-reduced-motion`.
+Sve traje **≤ 250 ms**, čisti CSS/SVG, bez nove ovisnosti. Splash (§5.2) nije dio ovoga.
+**Gotovo kad:** svaki od četiri grafa se otvara animirano; svaki prelazak pogleda ima prijelaz; s
+ugašenim prekidačem nema nijedne animacije; vitest tvrdi da `data-motion="off"` postoji kad treba, a
+brana u `app.css` (jedno pravilo pod tim atributom) svodi trajanja na nulu.
+
+### 13.4 Kartica s objašnjenjem (S-027)
+
+Dvije cigle. **(a) Mehanizam + Pokazatelji:** komponenta `Explain` (kartica uz element; otvara je klik
+ili Enter/Space, zatvara Esc i klik izvan; `role="dialog"`, fokus se vraća na okidač) i akcija/omotač
+kojim se bilo koji graf ili brojka označi kao objašnjiv po `id`-u; 18 pokazatelja dobiva sadržaj, a
+dotadašnja „formula na klik" (§6.2) postaje ta kartica. **(b) Ostali pogledi + pokrivenost:** Pregled
+(brojevi po težini, zadnji commit) · Tempo · Vrste rada · Faze · Dnevnik · Isporuke · Vizije ·
+Dokumentacija · traka signala.
+Sadržaj su ključevi `explain.<id>.what` · `.how` · `.read` u `hr.json` i `en.json`. **Test pokrivenosti**
+drži popis objašnjivih `id`-eva na jednom mjestu i tvrdi da svaki ima sva tri ključa u oba jezika i da
+je svaki ključ `explain.*` nečiji. Odlomak `.how` opisuje kod jezgre i piše se uz otvoren izvor
+(`crates/sokratis-core/src/metrics/`); recenzent uspoređuje tekst s kodom.
+**Gotovo kad:** Leon klikne bilo koji graf ili brojku u bilo kojem pogledu i dobije tri odlomka — što
+podatak govori, kako je izračunat, kako ga čitati — na jeziku sučelja.
+
+### 13.5 Animacija pokretanja
+
+Bez promjene opsega: §5.2 i cigle T24 (portirana, u `feat/ui`) + T31 (splash-prozor, glavni prozor
+čeka). Leon je 2026-09-21 potvrdio da „nije gotova" znači samo „još nije spojena u pravi prozor".
+
+### 13.6 Instalater — samo za Leona (S-029)
+
+`npm run tauri build` → NSIS. Nepotpisan, neobjavljen, bez automatskog ažuriranja. Verzija dolazi iz
+jednog mjesta (workspace `Cargo.toml` → `tauri.conf.json` je čita), „1.0.0-pre" na kraju etape 1,
+„1.0.0" na kraju etape 3.
+**Gotovo kad:** Leon pokrene instalater, Sokratis se pojavi u izborniku Start, autostart nakon
+ponovnog pokretanja Windowsa diže **instalirani** exe, drugo pokretanje podiže postojeći prozor, a baza
+u `%LOCALAPPDATA%\sokratis\` preživi reinstalaciju.
+
+### 13.7 Repo bez konvencija Sokrat Studyja
+
+Leon će uz Sokrat Study i Sokratis pratiti još najmanje dva projekta za koje se ne zna drže li se
+konvencija (dnevnik, plan, faze, cigle). Zadani profil (S-005) nad takvim repoom ne smije lagati.
+**Gotovo kad:** repo bez `docs/`, bez dnevnika i bez `.sokratis/` daje brojke koje dolaze iz gita
+(commiti, dani, sati, vrste rada po poruci) i **prazna stanja** za sve što traži konvenciju („nema
+dnevnika" · „nema faza" · „nema isporuka"), bez greške i bez izmišljene brojke — fixture + test u
+`io`/`core` ako ga M1 već nema, i ručna provjera u sučelju zapisana u izvještaju cigle.
+
+### 13.8 Dokumentacija točna i manja (S-031)
+
+Jedna cigla čuvara prije izdanja; što točno radi piše u S-031. **Gotovo kad:** `ARCHITECTURE.md` je
+provjeren tvrdnju po tvrdnju prema kodu · `PROGRESS.md` drži samo M2, M1 je u `archive/` · ovaj spec i
+plan M2 su u `archive/` s pečatom · `CLAUDE.md` „Stanje" stane u desetak redaka · `sokratis docs .`
+100/100 · korijenski README (engleski, S-030) opisuje 1.0.0.

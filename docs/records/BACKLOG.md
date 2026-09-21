@@ -13,13 +13,40 @@
 | Vercel adapter: deployi umjesto `🚀` u dnevniku | M3 (opcionalno) | mreža |
 | HR/EN natpisi u **sučelju** | → spec M2 [§6.4](../plan/ARHITEKTURA_M2.md) (S-021) | samo pointer |
 | HR/EN natpisi u **CLI tablici** | M3 | jezgra je već engleska (S-008); tablica je pomoć za terminal |
-| README na engleskom · LICENCA (MIT kao Sokrat Study — potvrditi) · GitHub Actions | M3 | prije objave |
-| Instalater (Tauri bundler, MSI/NSIS) | M3 | |
+| LICENCA · GitHub Actions | M4 (objava) | README na engleskom je gotov 2026-09-21 (S-030). Licenca je **neodlučena**: Leon ne isključuje prodaju (2026-09-21), pa „MIT kao Sokrat Study“ više nije pretpostavka; do odluke sva prava pridržana |
+| Instalater NSIS samo za Leona | → spec M2 [§13.6](../plan/ARHITEKTURA_M2.md) (S-029) | samo pointer |
+| Potpisan i objavljen instalater · MSI · automatsko ažuriranje | M4 (objava) | S-029 |
 | `sokratis docs .` mjeri samo korijen i `docs_dir`; `.md` pod `apps/desktop` (npr. budući README sučelja) nitko ne provjerava | M3 (profil: više `docs_dir`-ova ili `extra_docs_dirs`) | nalaz čuvara 2026-09-18 |
 | „Klasifikacija jednom" (spec §3.2) nije dovršena: `metrics/kinds.rs::commit_rows`/`kind_stats` (M2/5) klasificiraju svaki commit jednom za `Report.commits`, ali `metrics/indicators.rs:31` (`kind_count`) i dalje zove `effective_kind` odvojeno za `debugging_commits`/`docs_share` — commit se klasificira više od jednom | M2, odluka na završnoj recenziji | nalaz recenzije M2/5 (2026-09-18); stanje koda: `ARCHITECTURE.md` §11 |
 | `sokratis report --table` u zaglavlju ispisuje samo „od {since}" — `until` se u tabličnom ispisu ne vidi iako je prozor ograničen (JSON je točan) | M2, završni krug popravaka | nalaz recenzije M2/19 (2026-09-20); `table.rs` nema presedan za uvjetno dodavanje polja u zaglavlje |
 | Keširani put (`cached_log`, M2/14b) ne broji `touched.skipped_lines` iz PRVOG čitanja commita — keš pamti `Commit`-e (strukturu), ne sirovi tekst git loga | M2, desktop (T29) ili odluka da nije bitno | poznato ograničenje ugrađeno u zaglavlje `io/src/cache.rs`; ne utječe na commite/redak-brojke, samo na broj preskočenih redaka pri parsiranju |
 | Ključ keša sirovih commita je kratki SHA (`%h`) — ako git jednog dana produlji zadanu duljinu kratice, keš se jednom puni iznova (jednokratni trošak, ne kvar) | M2, desktop (T29) ili odluka da nije bitno | poznato ograničenje ugrađeno u zaglavlje `io/src/cache.rs`; točnost brojki ne strada |
+
+## Druga verzija (M3) — iz Leonova zapisa namjere 2026-09-21
+
+Rez: S-025. Što je od zapisa namjere ušlo u 1.0.0 stoji u specu M2 §13; ovdje je ostatak. Druga verzija
+dobiva **svoj spec** (brainstorming → spec → plan) tek kad je 1.0.0 u uporabi — Leon želi da prva
+verzija nadgleda gradnju druge, pa se redoslijed ispod još može promijeniti iz stvarne uporabe.
+
+| stavka | bilješka |
+|---|---|
+| **Ocjena projekta F− … A+** u boji (crveno → zeleno), vidljiva odmah na otvaranju; temelji se na izradi i cijelom radu projekta prema dokumentaciji | nova mjera u jezgri — nema uzora u `RAD.xlsx`, traži definiciju (od čega se sastoji, kako se važe) i test; docs-ocjena 0–100 već postoji i vjerojatno je jedan od ulaza |
+| **Omjer popravaka** (popravci prema novom radu) | Leonova želja; vrste rada već postoje (`debugging` …), treba definirati omjer i po čemu se dijeli (dan · faza · projekt) |
+| Još statistike i grafova | kandidati orkestratora, neodlučeno: udio commita s AI-koautorom (`Co-Authored-By`) · toplinska karta dan × sat · trajanje cigle |
+| **Postavke s vlastitim dodacima** | Leon želi sve četvero; redoslijed po cijeni: vlastiti pragovi i pravila signala → vlastiti pokazatelj (formula nad postojećim brojkama) → slaganje Pregleda → pravi pluginovi (kod) zadnji |
+| Kartica s objašnjenjem **s dokazom** — commiti ili dani iz kojih je broj nastao | 1.0.0 ima statičnu karticu (S-027) |
+| Punjenje trenda iz git-povijesti | u 1.0.0 trend kreće prazan od dana instalacije (Leon, 2026-09-21); tempo i commiti se mogu izračunati unatrag (`--until` po danu), docs-ocjena ne bez skupog čitanja starih stabala |
+| Izvoz u CSV / xlsx | „bit će potrebno u novijim verzijama“; do tada je izvoz `sokratis report --json` |
+| Izgled u iOS stilu, blago „glossy“ | Leon: „nije toliko bitno još“; tokeni (S-017) su mjesto gdje se to mijenja |
+
+## Kasnije — zasebnim planom
+
+| stavka | bilješka |
+|---|---|
+| **Timovi:** razrada po autoru u jednom repou · dijeljeni rad preko korisnikova **vlastitog** Supabasea, servera ili čega drugog | sudara se s PRD §5 „sve lokalno“ i s retkom „Oblak / računi / Supabase“ u „Odbijeno“ niže — to odbijanje vrijedi za 1.0.0 i drugu verziju; timovi ga ponovno otvaraju tek vlastitom odlukom i specom |
+| **Ne samo git:** mape bez gita · Issues/Linear · time-tracker kao izvor | `GitSource` je već trait (S-003) — drugi izvor je nova implementacija, ali `Report` danas pretpostavlja commite |
+| Prodaja kao proizvod | Leon: „moguće kasnije, sad ne ulazi u priču“; veže se na licencu (gore) |
+| Treći i četvrti projekt pod nadzorom (dva Leonova projekta izvan ovog repoa; imena se ne zapisuju u javni repo) | ne zna se drže li se konvencija Sokrat Studyja → spec M2 §13.7 jamči da brojke ne lažu; profil za tuđe projekte je redak u „Čeka milestone“ |
 
 ## Iz završne recenzije M1 (nalazi koji nisu popravljeni u M1)
 
@@ -79,6 +106,6 @@ Ovdje ostaju samo dvije stavke koje M2 **ne** uzima:
 | C++ | S-001: ekosustav, UTF-8 na Windowsu, ljuska |
 | Rust GUI (Dioxus, Slint, egui) | S-006: tokeni i teme su CSS; isti izgled je cilj |
 | Electron | RAM i veličina za aplikaciju koja radi cijeli dan; jezgra bi svejedno bila ista |
-| Oblak / računi / Supabase | PRD §5: sve lokalno |
+| Oblak / računi / Supabase | PRD §5: sve lokalno. *(2026-09-21: vrijedi za 1.0.0 i drugu verziju; timovi preko korisnikova vlastitog servera su u „Kasnije“)* |
 | Štoperica za sate | PRD §5: sati ostaju git-proxy, označen kao proxy |
 | Dnevni zadatak koji „bilježi" (kao `rad-dnevno.ps1`) | git je izvor istine; izvodi se na zahtjev |

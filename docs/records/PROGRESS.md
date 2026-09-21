@@ -744,3 +744,41 @@ putu. Redoslijed gradnje nakon odobrenog reza ostaje onaj iz plana M2: T28 → s
 PROFIL · STORE · IO · CLI) su gotovi i u `main`-u; SUČELJE je jedini nespojeni tok. Ledger:
 `.superpowers/sdd/2026-09-18-m2-desktop/progress.md`, odjeljak „▶▶▶ STANJE ZA NOVU SESIJU" na dnu, i
 `NOVA-SESIJA-PROMPT.md` pored njega.
+
+---
+
+## 2026-09-21 (FABLE) — Planiranje: rez za 1.0.0 (S-024…S-031), dopuna speca M2 §13
+
+**Sesija planiranja, bez ijedne cigle koda.** Brainstorming s Leonom iz njegova zapisa namjere
+(`PLAN_DESIGNE.md`): devetnaest pitanja u jednoj poruci (Leon je tražio sva odjednom), prijedlog
+crte, Leonov OK („super je sve možeš krenuti“).
+
+- **Rez:** izlaz iz M2 je **1.0.0**, 0.2.0 se preskače (S-024). Orkestratorova preporuka je bila
+  najmanja crta (ništa iz zapisa namjere); **Leon je odlučio** da u 1.0.0 ulaze kartica s
+  objašnjenjem, tema i jezik u Postavkama te animacije grafova i pogleda. Crta, tri etape
+  (funkcija → izgled → izdanje) i „1.0.0-pre“ nakon prve: S-025. Pojedinačne odluke: S-026 animacije
+  · S-027 kartica · S-028 Postavke · S-029 instalater · S-030 README engleski · S-031 dokumentacija.
+- **Spec M2 dopunjen, ne zamijenjen** (`plan/` smije imati jedan aktivni spec): nov §13 s osam stavki
+  i „gotovo kad“ za svaku; §6.1, §6.2, §11 i §12 pokazuju na njega.
+- **Druga verzija i kasnije** su u `BACKLOG.md` (dva nova odjeljka): ocjena projekta F−…A+, omjer
+  popravaka, vlastiti dodaci, kartica s dokazom, punjenje trenda, izvoz, iOS izgled · timovi, ne samo
+  git, prodaja. Zabilježen je sudar „timovi preko vlastitog Supabasea“ s PRD §5 „sve lokalno“.
+- **`PLAN_DESIGNE.md` je ispunio svrhu i preseljen u `archive/`** s pečatom (S-031) — nije postao
+  treći izvor istine pored speca i odluka.
+- **README preveden na engleski** (S-030). Rečenica o engleskom koja je u drugoj sesiji stigla unutar
+  rezultata alata time je zatvorena: Leon ju je potvrdio izravnom porukom, i to samo za README.
+- **Grane i stabla pet spojenih tokova obrisani** (jezgra · profil · store · io · cli; lokalno i tri
+  grane na remoteu), nakon provjere da su potpuno spojeni i čisti. Leon je dao trajno dopuštenje za
+  takve grane — `CLAUDE.md` pravilo #1 je dopunjeno. Na disku su `main` i `sokratis.ui`.
+- **Točnost dokumentacije:** iz `CLAUDE.md`, `ROADMAP.md`, `docs/README.md` i `AGENTI.md` izbačene
+  su tvrdnje koje su ovom sesijom postale netočne („sedam stabala“, „sljedeća sesija je planiranje“,
+  „push traži izričit OK“, „kasnije open-source“) i kronologija koju drugi dokument već drži.
+  Veliko čišćenje (PROGRESS po milestoneu, ARCHITECTURE tvrdnju po tvrdnju) je cigla §13.8.
+- Brane: samo dokumentacija — `sokratis docs .` i `signals .` prije pusha.
+
+### Što slijedi
+**Prva sesija izvedbe etape 1: T28 (Dnevnik · Isporuke · Vizije · Dokumentacija) → recenzija i
+vizualna provjera → spajanje SUČELJA (T20–T28) u `main` → pune brane → push → STANI.** Zatim, svaka
+u svojoj kratkoj sesiji: DESKTOP T29–T33 · T34 + repo bez konvencija + instalater („1.0.0-pre“) ·
+izgled (pet cigli) · izdanje. Ledger: `.superpowers/sdd/2026-09-18-m2-desktop/progress.md` i
+`NOVA-SESIJA-PROMPT.md` pored njega.

@@ -1,9 +1,9 @@
 # PLAN_DESIGNE — zapis namjere: izgled, dodaci i put do verzije 1.0.0
 
-> **Status:** 📝 ZAPIS NAMJERE (Leon, 2026-09-21) — **nije spec i nije izvor istine.** Kratko zapisano da se
-> ne izgubi; razrada, odluke (`DECISIONS.md`) i cigle dolaze u sljedećoj sesiji. Aktivni spec je i dalje
-> [`ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md); što je izgrađeno kaže
-> [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md).
+> **Status:** ✅ ISPUNJEN 2026-09-21 — **referenca, ne izvor istine.** Leonov zapis namjere je istog dana
+> pretvoren u rez za 1.0.0: odluke **S-024…S-031** ([DECISIONS.md](../records/DECISIONS.md)), dopuna aktivnog
+> speca ([ARHITEKTURA_M2.md §13](../plan/ARHITEKTURA_M2.md)) i stavke za drugu verziju i kasnije
+> ([BACKLOG.md](../records/BACKLOG.md)). Tekst ispod je ostavljen kako ga je Leon zapisao.
 
 ## Odakle ovo
 

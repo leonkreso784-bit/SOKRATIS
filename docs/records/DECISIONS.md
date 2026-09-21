@@ -259,3 +259,98 @@ kodu** — alat koji netko skine smije čitati samo unutar repoa koji mjeri, pa 
 Licenca, README na engleskom i instalater ostaju M3; dok licence nema, kod je javno vidljiv ali **nije
 licenciran za tuđu uporabu** (BACKLOG). Svaki novi fixture iz tuđeg ili privatnog repozitorija od sada
 je javna objava — pregledava se na tajne PRIJE commita, ne prije pusha.
+
+## S-024 — izlaz iz M2 je verzija 1.0.0; 0.2.0 se preskače (2026-09-21)
+
+**Kontekst:** spec M2 je izlazni uvjet zvao 0.2.0. Leon je 2026-09-21 zapisao namjeru
+([archive/PLAN_DESIGNE.md](../archive/PLAN_DESIGNE.md)): prva verzija mora **što prije** zamijeniti
+`RAD.xlsx` nad Sokrat Studyjem i nad samim Sokratisom, pa njome nadgleda gradnju druge verzije.
+**Odluka:** desktop koji ispuni spec M2 (s dopunom §13) izlazi kao **1.0.0**. Međuizdanja 0.2.0 nema —
+završna recenzija, krug popravaka i čuvar izdanja rade **jednom**. Popravci iz stvarne uporabe su
+`1.0.x`. Tag i izdanje na GitHubu i dalje traže Leonov izričit OK.
+**Posljedice:** ROADMAP: M2 = 1.0.0, M3 = „Druga verzija", objava tuđim korisnicima (potpisan
+instalater · licenca · GitHub Actions) postaje M4; `CHANGELOG.md` `[Unreleased]` se pri izdanju
+zatvara kao 1.0.0.
+
+## S-025 — crta reza za 1.0.0: ostatak M2 + izgled koji Leon traži; redoslijed funkcija → izgled → izdanje (2026-09-21)
+
+**Kontekst:** preostalih osam cigli M2 (T28–T35) nije ukras — T28 nosi override (jedino ručno što
+`RAD.xlsx` ima), T29/T30/T34 su žice, T31 je Leonova animacija, T32 je ono čime se nadgleda. Rez se
+zato ne dobiva rezanjem M2 nego odlukom što iz zapisa namjere ulazi. Orkestratorova preporuka je bila
+„ništa"; **Leon je odlučio da u 1.0.0 ulaze** kartica s objašnjenjem, tema i jezik u Postavkama te
+animacije grafova i pogleda.
+**Odluka:** 1.0.0 = T28–T35 + osam novih cigli (Postavke · animacija grafova · prijelaz pogleda s
+prekidačem · kartica s objašnjenjem ×2 · instalater · repo bez konvencija · dokumentacija točna i
+manja). Opseg i „gotovo kad": spec [§13](../plan/ARHITEKTURA_M2.md). Gradi se u tri etape:
+**(1) funkcija** — T28 → spajanje SUČELJA → DESKTOP T29–T33 → T34 → repo bez konvencija → instalater;
+Leon instalira **„1.0.0-pre"** (bez taga, nije izdanje) i počinje mjeriti Sokrat Study i Sokratis ·
+**(2) izgled** — pet cigli sučelja, dok 1.0.0-pre već nadgleda tu gradnju · **(3) izdanje** — T35,
+završna recenzija, jedan krug popravaka, cigla dokumentacije, čuvar izdanja.
+**Posljedice:** redoslijed ne košta ništa (iste cigle), a uporaba počinje na pola puta; cijena
+Leonova izbora je ~5 cigli više od najmanje crte. Sve ostalo iz zapisa namjere je u
+[BACKLOG.md](./BACKLOG.md) („Druga verzija", „Kasnije").
+
+## S-026 — animacije: najviše 250 ms, bez biblioteke, gase se prekidačem i `prefers-reduced-motion` (2026-09-21)
+
+**Kontekst:** Leon želi da se grafovi otvaraju animirano i da svaki prelazak pogleda animirano učita
+sadržaj. Alat se otvara dvadesetak puta dnevno — animacija koja traje postaje smetnja.
+**Odluka:** svaka animacija sučelja traje **≤ 250 ms**; izvedba je CSS/SVG (prijelazi, `stroke-dashoffset`,
+`transform`) — **nijedna nova ovisnost** (pravilo #6, isto kao S-018). Jedan atribut na korijenu
+(`data-motion="off"`, uzor `data-theme`) gasi sve; postavlja ga prekidač u Postavkama **ili**
+`prefers-reduced-motion: reduce`. Splash (S-019) ostaje zaseban: 4,2 s, jednom po pokretanju, preskočiv.
+**Posljedice:** komponente grafova dobivaju ulaznu animaciju bez promjene API-ja; test tvrdi da s
+ugašenim pokretom nijedno trajanje nije veće od nule.
+
+## S-027 — kartica s objašnjenjem je statična: što govori · kako je izračunato · kako čitati (2026-09-21)
+
+**Kontekst:** Leon želi da klik na graf, broj ili znamenku otvori karticu koja objašnjava podatak.
+Ponuđeno je dvoje: statičan tekst ili tekst + dokaz (commiti iz kojih je broj nastao). Leon je odabrao
+statičan tekst.
+**Odluka:** jedna komponenta kartice; sadržaj su i18n ključevi `explain.<id>.what|how|read` u `hr.json`
+i `en.json` (S-021). Pokriva svaki graf i svaku brojku u svim pogledima; „formula na klik" iz speca
+§6.2 (Pokazatelji) postaje ta ista kartica. Test tvrdi da svaki objašnjivi `id` ima sva tri ključa u
+oba jezika. Tekst „kako je izračunato" **opisuje** kod jezgre i piše se uz otvoren izvor
+(`metrics/*.rs`) — definira i dalje kod (S-010).
+**Posljedice:** ~30 objašnjenja × 3 odlomka × 2 jezika je glavnina cijene; promjena formule u jezgri od
+sada traži i promjenu teksta (recenzent to provjerava). Dokaz po commitu je druga verzija (BACKLOG).
+
+## S-028 — tema, jezik, autostart i prekidač animacija žive u pogledu Postavke; gornja traka ostaje čista (2026-09-21)
+
+**Kontekst:** spec §6.1 je temu i HR/EN držao u gornjoj traci, a autostart samo u izborniku traya.
+**Odluka:** nov pogled **Postavke** (globalan, ne po projektu) s četiri postavke: tema · jezik ·
+autostart · animacije. Gornja traka gubi temu i HR/EN; tray zadržava kvačicu autostarta (isti izvor
+istine — `sokratis-store`, postavke iz M2/16). Izbor preživi ponovno pokretanje.
+**Posljedice:** Postavke su u 1.0.0 namjerno male; „vlastiti dodaci" (pragovi i pravila → vlastiti
+pokazatelj → slaganje Pregleda → pluginovi) su druga verzija i dobivaju svoj spec.
+
+## S-029 — instalater (NSIS) ulazi u 1.0.0, samo za Leona: nepotpisan i neobjavljen (2026-09-21)
+
+**Kontekst:** spec §12 je instalater držao izvan M2. Autostart i „koristim svaki dan" traže stalnu
+putanju izvršne datoteke; `tauri dev` to nije.
+**Odluka:** `npm run tauri build` daje NSIS instalater koji Leon pokreće na svom stroju. Ne potpisuje
+se, ne objavljuje na GitHubu, nema automatskog ažuriranja. Ista cigla služi za „1.0.0-pre" na kraju
+etape 1 i za 1.0.0 na kraju etape 3.
+**Posljedice:** SmartScreen upozorenje je očekivano i prihvaćeno; potpisivanje, objava instalatera i
+MSI ostaju M4 (objava).
+
+## S-030 — korijenski README je na engleskom; `docs/` ostaje na hrvatskom (2026-09-21)
+
+**Kontekst:** repo je javan (S-023). Rečenica „README i sve ubuduće na engleskom" stigla je u drugoj
+sesiji izvedbe **unutar rezultata alata**, pa po njoj nije postupljeno. Leon je 2026-09-21 izravnom
+porukom potvrdio: README treba biti na engleskom da ga svi mogu koristiti.
+**Odluka:** `README.md` u korijenu je engleski. Dokumentacija u `docs/`, `CLAUDE.md`, poruke commita i
+zaglavlja „zašto Rust ovako" ostaju hrvatski — autor ih čita i iz njih uči (pravilo #5).
+**Posljedice:** README se osvježava pri izdanju 1.0.0; prijevod ostatka dokumentacije nije planiran.
+
+## S-031 — dokumentacija: točnost se čuva smanjivanjem; ispunjeno ide u `archive/` (2026-09-21)
+
+**Kontekst:** Leonova ocjena nakon dvije sesije izvedbe: problem dokumentacije je **točnost**, a
+količina je uzrok — u kratkom vremenu je izgrađeno i zapisano puno. `sokratis docs .` mjeri strukturu
+(poveznice, indeks, jedan plan, kašnjenje), ne istinitost tvrdnji.
+**Odluka:** (1) `CLAUDE.md` „Stanje" drži samo što vrijedi sad, bez povijesti; (2) dokument koji je
+ispunio svrhu seli u `archive/` isti dan, s pečatom — prvi je zapis namjere `PLAN_DESIGNE.md`;
+(3) prije izdanja 1.0.0 jedna cigla čuvara: svaka tvrdnja `ARCHITECTURE.md` provjerena prema kodu,
+`PROGRESS.md` drži samo tekući milestone (zatvoreni sele u `archive/`), spec i plan M2 u `archive/`,
+„Gdje smo" u ROADMAP-u bez kronologije. Imena dokumenata govore ulogu.
+**Posljedice:** manje teksta koji može zastarjeti; povijest ostaje dostupna, ali odvojena od onoga što
+vrijedi sad (S-010).

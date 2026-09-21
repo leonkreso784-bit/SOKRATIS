@@ -16,7 +16,7 @@ Model je preuzet iz Sokrat Studyja; uzeto je samo ono što ovom projektu treba.
 | **`architecture/`** | **ŠTO JE IZGRAĐENO** — sustav kakav stoji u `crates/`, bez kronologije | kad kod pomakne granicu |
 | **`workflow/`** | **KAKO RADIMO** — testiranje, Rust-konvencije i pojmovnik | povremeno |
 | **`records/`** | **POVIJEST** — dnevnik, changelog, odluke, backlog | stalno |
-| **`archive/`** | **ISPUNJENI SPECOVI** — referenca, **nikad izvor istine** | kad milestone završi |
+| **`archive/`** | **ISPUNJENO** (specovi, zapisi namjere) — referenca, **nikad izvor istine** | isti dan kad dokument ispuni svrhu (S-031) |
 | **`superpowers/plans/`** | planovi implementacije (cigla po cigla) za aktivni spec | po milestoneu |
 
 **Što još NE postoji i kad nastaje:** `records/BUGS.md` s prvim bugom · `records/HISTORY.md` kad
@@ -53,22 +53,18 @@ redak u backlogu.
 | Dokument | Svrha |
 |---|---|
 | [PRD.md](./product/PRD.md) | Što gradimo, za koga, opseg po milestoneima, ne-ciljevi, rječnik |
-| [PLAN_DESIGNE.md](./product/PLAN_DESIGNE.md) | 📝 **zapis namjere** (Leon, 2026-09-21) — NIJE spec: animirano otvaranje grafova i pogleda, kartica s objašnjenjem na klik, tema i jezik u Postavke, više statistike, kasnije timovi i ne-samo-git; **rez za 1.0.0** pa 1.0.0 nadgleda gradnju druge verzije i Sokrat Study |
 
 ## `plan/` — što sada
 
 Spec Milestonea 1 je **ispunjen i arhiviran** ([archive/ARHITEKTURA_M1.md](./archive/ARHITEKTURA_M1.md));
-**jedini aktivni spec je M2** (desktop) — napisan i odobren 2026-09-18, plan cigli iz njega je u
-`superpowers/plans/`. Šest od devet tokova (KOSTUR, JEZGRA, PROFIL, STORE, IO, CLI) su spojeni u
-`main`; SUČELJE je vizualno potvrđeno do M2/27 u svom stablu, M2/28 nije započeta, ništa od sučelja
-još nije spojeno; DESKTOP i INTEGRACIJA čekaju sučelje. Sesija je stala zbog iscrpljenog usagea, ne
-kraja milestonea — sljedeća sesija je najprije **planiranje** iz Leonova zapisa namjere
-[PLAN_DESIGNE.md](./product/PLAN_DESIGNE.md) (`../records/PROGRESS.md`).
+**jedini aktivni spec je M2** (desktop) — odobren 2026-09-18, **dopunjen 2026-09-21 rezom za 1.0.0**
+(§13; odluke S-024…S-031). Gdje je izvedba stala i što je sljedeće kaže `plan/ROADMAP.md` („Gdje smo“)
+— ovaj indeks to ne ponavlja.
 
 | Dokument | Svrha |
 |---|---|
-| [ROADMAP.md](./plan/ROADMAP.md) | 🟩 **živ** — milestonei M0–M3, status, što je sljedeće |
-| [ARHITEKTURA_M2.md](./plan/ARHITEKTURA_M2.md) | 🟩 **AKTIVAN SPEC** — desktop: granice (`store`, `desktop` bez logike), Tauri ugovor (`Report` nepromijenjen), SQLite shema, watcher, 8 pogleda, teme i znak, splash, ovisnosti, dug M1 koji preuzima, testovi, M0 alati, izlazni uvjet 0.2.0 |
+| [ROADMAP.md](./plan/ROADMAP.md) | 🟩 **živ** — milestonei M0–M4, status, što je sljedeće |
+| [ARHITEKTURA_M2.md](./plan/ARHITEKTURA_M2.md) | 🟩 **AKTIVAN SPEC** — desktop: granice (`store`, `desktop` bez logike), Tauri ugovor (`Report` nepromijenjen), SQLite shema, watcher, pogledi, teme i znak, splash, ovisnosti, dug M1 koji preuzima, testovi, M0 alati, izlazni uvjet **1.0.0** (§11) i **dopuna rezom za 1.0.0** (§13: etape · Postavke · animacije · kartica s objašnjenjem · instalater · repo bez konvencija · dokumentacija) |
 
 ## `architecture/` — što je izgrađeno
 
@@ -93,7 +89,7 @@ kraja milestonea — sljedeća sesija je najprije **planiranje** iz Leonova zapi
 | [DECISIONS.md](./records/DECISIONS.md) | Odluke S-001… i zašto |
 | [BACKLOG.md](./records/BACKLOG.md) | Parkiralište: što čeka, što je odbijeno i zašto |
 
-## `archive/` — ispunjeni specovi
+## `archive/` — ispunjeni specovi i zapisi
 
 **Nikad izvor istine.** Ovdje se čita zašto je nešto bilo zamišljeno; što danas stoji u kodu govori
 `architecture/`, a što vrijedi sada `../CLAUDE.md`.
@@ -101,6 +97,7 @@ kraja milestonea — sljedeća sesija je najprije **planiranje** iz Leonova zapi
 | Dokument | Svrha |
 |---|---|
 | [ARHITEKTURA_M1.md](./archive/ARHITEKTURA_M1.md) | ✅ ISPUNJEN 2026-09-17 — spec arhitekture i opsega Milestonea 1 (jezgra · io · CLI) |
+| [PLAN_DESIGNE.md](./archive/PLAN_DESIGNE.md) | ✅ ISPUNJEN 2026-09-21 — Leonov zapis namjere (izgled, dodaci, put do 1.0.0); pretvoren u rez S-024…S-031, spec M2 §13 i stavke u `records/BACKLOG.md` |
 
 ## `superpowers/plans/` — planovi implementacije
 

@@ -7,6 +7,7 @@ Isporuka = ono što je u `main`-u; sesije su u `PROGRESS.md`.
 
 **Milestone 2 (desktop) je u izvedbi** po odobrenom specu
 [`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md) (odluke S-012…S-022) i planu od 35 cigli.
+**Ovaj odjeljak izlazi kao 1.0.0, ne 0.2.0** (S-024; rez i dopuna speca §13 od 2026-09-21).
 Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek sesije:
 [`PROGRESS.md`](./PROGRESS.md).
 
@@ -163,6 +164,8 @@ Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek sesije:
   --all-targets -- -D warnings` OK · `cargo test --workspace` **136 testova, 0 padova, 1 ignoriran**
   (mjerni test) · `sokratis signals .` = nema signala. Tok IO je time **gotov u cijelosti** (T10–T14 +
   M2/14b u `main`-u).
+- **README na engleskom (2026-09-21, S-030).** Korijenski `README.md` je preveden i osvježen da ga
+  može pročitati svatko tko otvori javni repo; `docs/` ostaje na hrvatskom. Koda nije dirano.
 
 ## [0.1.0] — 2026-09-17 — Jezgra i CLI (Milestone 1)
 

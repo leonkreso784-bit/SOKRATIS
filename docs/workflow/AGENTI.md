@@ -46,16 +46,12 @@ vlasništvo po tokovima" (S-010 — ovdje se ne prepisuju). Novo u M2: tok SUČE
 pa su mu brane `npm run check` umjesto `cargo`; tokovi SUČELJE i DESKTOP nakon `git worktree add` pokreću
 `npm ci` u svom stablu (`node_modules` je git-ignoriran). **T1 je cijel u `main`-u:** koraci 1–12 kao
 `M2/1a`, korak 13 (`npm install` uz Leonov OK → ikone iz Leonova loga → desktop crate natrag u `members`)
-kao `M2/1b`. **Sedam stabala su otvorena** (`git worktree list`): `sokratis.jezgra` (`feat/core-m2`) ·
-`sokratis.profil` (`feat/core-profile`) · `sokratis.io` (`feat/io-m2`) · `sokratis.store`
-(`feat/store`) · `sokratis.cli` (`feat/cli-m2`) · `sokratis.ui` (`feat/ui`). **JEZGRA, PROFIL, STORE,
-IO i CLI su gotovi u cijelosti i spojeni u `main`** (T2–T7, T8–T9, T15–T18, T10–T14+M2/14b, T19) — svi
-preduvjeti za DESKTOP osim sučelja su ispunjeni. **SUČELJE je jedino nespojeno**: M2/20–M2/27 su
-vizualno potvrđene u pregledniku (M2/26 i M2/27 uz po jedan krug popravka), **M2/28 (Dnevnik ·
-Isporuke · Vizije · Dokumentacija) nije započeta**. Sesija je stala zbog iscrpljenog usagea, ne kraja
-milestonea; stanje po cigli i sljedeći koraci su u ledgeru
-`.superpowers/sdd/2026-09-18-m2-desktop/progress.md`, odjeljak „STANJE ZA NOVU SESIJU". Stabla
-DESKTOP/INTEGRACIJA otvaraju se kasnije po ovisnostima iz plana (`git worktree list`).
+kao `M2/1b`. **Koja su stabla otvorena kaže `git worktree list`, a koji je tok dokle stigao
+`plan/ROADMAP.md`** — ovdje se to ne prepisuje (S-010). Stabla i grane tokova koji su **potpuno spojeni u
+pushani `main`** orkestrator briše sam (Leonovo dopuštenje 2026-09-21, `CLAUDE.md` pravilo #1); tako su
+2026-09-21 obrisana stabla JEZGRE, PROFILA, STOREA, IO-a i CLI-ja. Cigle iz dopune reza za 1.0.0
+(spec M2 §13) idu istim protokolom; stanje po cigli je u ledgeru
+`.superpowers/sdd/2026-09-18-m2-desktop/progress.md` (izvan gita).
 
 ## 3 · Protokol po cigli
 
