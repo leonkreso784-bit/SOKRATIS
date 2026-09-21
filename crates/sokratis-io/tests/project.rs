@@ -130,6 +130,58 @@ fn cli_since_older_than_the_profile_widens_the_fetch_window() {
     assert_eq!(wider.since, "2026-07-01");
 }
 
+/// Spec M2 §13.7: repo koji ne zna ni za jednu konvenciju Sokrat Studyja (nema `docs/`, dnevnika,
+/// plana ni `.sokratis/`) daje brojke koje dolaze iz gita i PRAZNA stanja za sve ostalo — bez
+/// greške i bez izmišljene brojke. Zadani profil (S-005) nad tuđim repoom ne smije lagati.
+#[test]
+fn repo_without_conventions_reports_git_numbers_and_empty_states() {
+    let r = Repo::init();
+    r.commit(
+        "src/a.txt",
+        "1\n",
+        "feat: prvi",
+        "2026-09-01T10:00:00+02:00",
+        "2026-09-01T10:00:00+02:00",
+    );
+    r.commit(
+        "src/a.txt",
+        "1\n2\n",
+        "fix: drugi",
+        "2026-09-01T11:00:00+02:00",
+        "2026-09-01T11:00:00+02:00",
+    );
+    r.commit(
+        "src/b.txt",
+        "x\n",
+        "treci bez prefiksa",
+        "2026-09-02T09:00:00+02:00",
+        "2026-09-02T09:00:00+02:00",
+    );
+
+    let p = Project::open(r.path()).unwrap();
+    let input = p.input(Some("2026-09-01")).unwrap();
+    assert!(input.diary.is_none(), "nema dnevnika");
+    assert!(input.plan.is_none(), "nema plana");
+    assert!(input.docs.is_empty(), "nema docs/");
+
+    let report = sokratis_core::build_report(&input, &p.profile).unwrap();
+    assert_eq!(report.touched.commits, 3);
+    assert_eq!(report.commits.len(), 3);
+    assert_eq!(report.days.len(), 2);
+    assert!(report.phases.is_empty(), "bez plana nema faza");
+    assert!(report.deliveries.is_empty(), "bez dnevnika nema isporuka");
+    assert!(report.visions.is_empty(), "bez .sokratis/ nema vizija");
+    assert!(report.docs.is_none(), "bez docs/ ocjena je None, ne 0");
+    for i in &report.indicators {
+        assert!(
+            i.value.is_finite(),
+            "pokazatelj {} nije konačan broj: {}",
+            i.id,
+            i.value
+        );
+    }
+}
+
 #[test]
 fn common_dir_is_the_same_from_root_and_from_a_subdirectory() {
     let r = Repo::init();
@@ -355,6 +407,41 @@ fn profile_path_outside_repo_is_rejected_at_open_with_field_name() {
         cause.contains("profil.docs_dir") && cause.contains("../.."),
         "{cause}"
     );
+}
+
+/// M2/36 dopuna (R17, rub koji Step 3 sam stvara): repo s TOČNO jednim praznim commitom (nula
+/// datoteka, nula redaka) — oblik u kojem „Dodaj projekt" prvi put donese repo koji korisnik tek
+/// inicijalizirao. Ako igdje postoji dijeljenje s nulom (npr. `lines_changed.max(1.0)` bez
+/// `.max`, ili prosjek nad praznim popisom faza), ovdje bi puklo u NaN/Infinity.
+#[test]
+fn repo_with_single_empty_commit_has_finite_numbers() {
+    let r = Repo::init();
+    r.commit_empty(
+        "prvi",
+        "2026-09-01T10:00:00+02:00",
+        "2026-09-01T10:00:00+02:00",
+    );
+
+    let p = Project::open(r.path()).unwrap();
+    let input = p.input(None).unwrap();
+    let report = sokratis_core::build_report(&input, &p.profile).unwrap();
+
+    assert_eq!(report.touched.commits, 1);
+    assert!(
+        report.phases.is_empty(),
+        "bez plana i bez pogotka nema faza"
+    );
+    assert!(report.deliveries.is_empty(), "bez dnevnika nema isporuka");
+    assert!(report.visions.is_empty(), "bez .sokratis/ nema vizija");
+    assert!(report.docs.is_none(), "bez docs/ ocjena je None, ne 0");
+    for i in &report.indicators {
+        assert!(
+            i.value.is_finite(),
+            "pokazatelj {} nije konačan broj: {}",
+            i.id,
+            i.value
+        );
+    }
 }
 
 /// `input_between` prosljeđuje `until` i u `ReportInput.until` (jezgra ga presuđuje) i gitu (kao
