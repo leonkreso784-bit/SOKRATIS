@@ -11,19 +11,14 @@ use std::path::PathBuf;
 use std::sync::{Mutex, mpsc::Receiver};
 
 /// Dijeljeno stanje aplikacije: registar (`store`), zadnji izračunati izvještaj po projektu
-/// (`reports`, puni ga SAMO `refresh` — vidi `commands.rs`), i tri polja koje T30 (motor, watcher)
-/// tek počinje koristiti (`watcher`, `queue`, `rx`) — ovdje su prazna, da `manage(...)` u `lib.rs`
-/// ne mora čekati sljedeću ciglu.
+/// (`reports`, puni ga motor — `engine::refresh_project`, vidi `engine.rs`), watcher datoteka i
+/// red čekanja (`watcher`, `queue`) te primatelj događaja koji nit motora vadi iz `rx` (`take()`)
+/// prije blokirajuće petlje `recv()` (M2/30).
 pub struct AppState {
     pub store: Mutex<Store>,
     pub reports: Mutex<HashMap<i64, Report>>,
-    // Ova cigla (M2/29) ih samo NAPUNI praznima — nijedna naredba iz T29 ih još ne čita. `clippy`
-    // bi to bez `allow` prijavio kao mrtav kod; T30 (motor, watcher) ih čita i piše.
-    #[allow(dead_code)]
     pub watcher: Mutex<Option<Watcher>>,
-    #[allow(dead_code)]
     pub queue: Mutex<RefreshQueue>,
-    #[allow(dead_code)]
     pub rx: Mutex<Option<Receiver<WatchEvent>>>,
 }
 

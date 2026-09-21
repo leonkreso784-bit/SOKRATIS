@@ -2,7 +2,8 @@
 //! `#[tauri::command]` pretvara običnu funkciju u RPC koji sučelje zove kroz `invoke(ime, args)`;
 //! `Result<T, String>` je ugovor Tauri IPC-a (obrazložen uz `state::text`). Zajednička „računica"
 //! (izračun izvještaja) živi u `compute`/`compute_input` niže — naredbe SAMO posuđuju stanje i
-//! pozivaju je.
+//! pozivaju je. (M2/30: `set_override`/`save_visions`/`refresh` sad zovu `engine::refresh_project`
+//! umjesto da same diraju `state.reports` — detalj uz svaku naredbu niže.)
 use crate::cache::StoreCache;
 use crate::state::{AppState, text};
 use crate::summary::{ProjectSummary, summarize};
@@ -71,8 +72,13 @@ pub struct Settings {
 const SETTING_KEYS: [&str; 3] = ["theme", "lang", "autostart"];
 
 /// Jedan ključ postavke, sa zadanom vrijednošću ako nikad nije zapisan — dodavanje četvrtog ključa
-/// (`motion`, T38) će u `get_settings` biti JEDAN redak koji ovo zove.
-fn setting_or(store: &sokratis_store::Store, key: &str, default: &str) -> Result<String, String> {
+/// (`motion`, T38) će u `get_settings` biti JEDAN redak koji ovo zove. `pub(crate)`: motor
+/// (`engine.rs`) je zove za `lang` prije obavijesti OS-a.
+pub(crate) fn setting_or(
+    store: &sokratis_store::Store,
+    key: &str,
+    default: &str,
+) -> Result<String, String> {
     Ok(store
         .setting(key)
         .map_err(text)?
@@ -83,8 +89,9 @@ fn setting_or(store: &sokratis_store::Store, key: &str, default: &str) -> Result
 
 /// Izračun jednog izvještaja: registar → otvoren projekt → raspon → keširani log → jezgra;
 /// `Report` izlazi iz `build_report` NEPROMIJENJEN (S-012), ova funkcija ništa ne preslaguje. NE
-/// piše u `state.reports` — to radi SAMO naredba `refresh` (T30 uzima `reports[id]` kao „prošli"
-/// izvještaj za `alerts_raised`, pa izračun nad kraćim rasponom ne smije tu mapu prljati, S-020).
+/// piše u `state.reports` — to radi SAMO motor (`engine::refresh_project`, koji `compute` poziva
+/// iznutra s `Range::All`), jer uzima `reports[id]` kao „prošli" izvještaj za `alerts_raised` — a
+/// izračun nad kraćim rasponom (`get_report`) tu mapu ne smije prljati (S-020).
 pub(crate) fn compute(
     state: &AppState,
     id: i64,
@@ -172,7 +179,8 @@ fn track_project(state: &AppState, dir: &Path) -> Result<ProjectSummary, String>
 }
 
 /// Sada, unix sekunde — desktop smije `std::time` izravno (isti obrazac kao `Project::input_with`).
-fn now_unix() -> i64 {
+/// `pub(crate)`: motor (`engine.rs`) je zove za `record_profile` (dopuna T30 #2).
+pub(crate) fn now_unix() -> i64 {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map(|d| d.as_secs() as i64)
@@ -188,7 +196,10 @@ pub async fn add_project(
         return Ok(None);
     };
     let dir = picked.into_path().map_err(text)?;
-    track_project(&state, &dir).map(Some)
+    let summary = track_project(&state, &dir)?;
+    // N5: nov projekt još nema nadzor — `engine::watch` ga prvi put registrira.
+    crate::engine::watch(&app, summary.id);
+    Ok(Some(summary))
 }
 
 #[tauri::command]
@@ -206,7 +217,11 @@ pub fn rename_project(
 }
 
 #[tauri::command]
-pub fn remove_project(state: tauri::State<'_, AppState>, id: i64) -> Result<(), String> {
+pub fn remove_project(
+    app: tauri::AppHandle,
+    state: tauri::State<'_, AppState>,
+    id: i64,
+) -> Result<(), String> {
     state
         .store
         .lock()
@@ -214,6 +229,7 @@ pub fn remove_project(state: tauri::State<'_, AppState>, id: i64) -> Result<(), 
         .remove_project(id)
         .map_err(text)?;
     state.reports.lock().map_err(text)?.remove(&id);
+    crate::engine::unwatch(&app, id);
     Ok(())
 }
 
@@ -253,9 +269,12 @@ pub fn get_trend(
 
 // ── ručni podaci ─────────────────────────────────────────────────────────────────────────────────
 
+/// Ručni upis (`write_override`/`write_visions`) potiskuje vlastiti odjek u watcheru PRIJE pisanja
+/// (S-016), ponovno registrira nadzor (N1 — `.sokratis` je možda BAŠ SADA nastao) i odmah osvježava
+/// izvještaj kroz motor umjesto da samo prazni `state.reports` i čeka sljedeći `get_report` (T29).
 #[tauri::command]
 pub fn set_override(
-    _app: tauri::AppHandle,
+    app: tauri::AppHandle,
     state: tauri::State<'_, AppState>,
     id: i64,
     sha: String,
@@ -268,14 +287,17 @@ pub fn set_override(
         .project(id)
         .map_err(text)?;
     let project = Project::open(&rec.root_path).map_err(text)?;
+    let path = project.main_root().join(".sokratis").join("overrides.json");
+    crate::engine::suppress(&app, &path);
     project.write_override(&sha, kind).map_err(text)?;
-    state.reports.lock().map_err(text)?.remove(&id);
-    Ok(())
+    crate::engine::watch(&app, id);
+    crate::engine::refresh_project(&app, id)
 }
 
+/// Isti obrazac kao `set_override` iznad — potisni, upiši, ponovno nadziri, osvježi.
 #[tauri::command]
 pub fn save_visions(
-    _app: tauri::AppHandle,
+    app: tauri::AppHandle,
     state: tauri::State<'_, AppState>,
     id: i64,
     visions: Vec<Vision>,
@@ -287,16 +309,18 @@ pub fn save_visions(
         .project(id)
         .map_err(text)?;
     let project = Project::open(&rec.root_path).map_err(text)?;
+    let path = project.main_root().join(".sokratis").join("visions.json");
+    crate::engine::suppress(&app, &path);
     project.write_visions(&visions).map_err(text)?;
-    state.reports.lock().map_err(text)?.remove(&id);
-    Ok(())
+    crate::engine::watch(&app, id);
+    crate::engine::refresh_project(&app, id)
 }
 
 // ── osvježavanje ─────────────────────────────────────────────────────────────────────────────────
 
 #[tauri::command]
 pub fn refresh(
-    _app: tauri::AppHandle,
+    app: tauri::AppHandle,
     state: tauri::State<'_, AppState>,
     id: Option<i64>,
 ) -> Result<(), String> {
@@ -313,8 +337,7 @@ pub fn refresh(
         }
     };
     for id in ids {
-        let report = compute(&state, id, &Range::All)?;
-        state.reports.lock().map_err(text)?.insert(id, report);
+        crate::engine::refresh_project(&app, id)?;
     }
     Ok(())
 }

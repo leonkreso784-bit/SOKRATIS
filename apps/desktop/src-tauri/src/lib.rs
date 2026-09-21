@@ -6,8 +6,11 @@
 //! ZAŠTO RUST OVAKO (cigla M2/29 — stanje, registar i izvještaj kao naredbe)
 //! `manage(AppState { .. })` predaje dijeljeno stanje Tauriju PRIJE `run()`; svaka naredba ga
 //! poslije dohvati kao `State<'_, AppState>` (posudba, ne vlasništvo). Detalj uz oba poziva niže.
+//! `setup` niže pokreće motor (`engine::start`) TEK NAKON `manage`, jer motor odmah čita `AppState`
+//! (M2/30).
 mod cache;
 mod commands;
+mod engine;
 mod state;
 mod summary;
 
@@ -51,6 +54,12 @@ pub fn run() {
             get_settings,
             set_setting
         ])
+        // Motor (nadzor datoteka + prvi izračun) kreće OVDJE, nakon `manage` — `engine::start` čita
+        // `AppState` čim se pozove (M2/30).
+        .setup(|app| {
+            engine::start(app.handle());
+            Ok(())
+        })
         .run(tauri::generate_context!())
         .expect("Tauri se nije pokrenuo");
 }
