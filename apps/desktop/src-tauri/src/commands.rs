@@ -4,6 +4,7 @@
 //! (izračun izvještaja) živi u `compute`/`compute_input` niže — naredbe SAMO posuđuju stanje i
 //! pozivaju je. (M2/30: `set_override`/`save_visions`/`refresh` sad zovu `engine::request_refresh`
 //! umjesto da same diraju `state.reports` — detalj uz svaku naredbu niže.)
+//! (M2/32: `refresh(None)` petlju sad radi `engine::refresh_all` — i tray je zove, iz zasebne niti.)
 use crate::cache::StoreCache;
 use crate::state::{AppState, text};
 use crate::summary::{ProjectSummary, summarize};
@@ -325,26 +326,13 @@ pub fn save_visions(
 
 /// `request_refresh` (ne `engine::refresh_project` izravno) — isti red kao watcher (S-010), pa gumb
 /// „Osvježi" i vanjska promjena datoteke nikad ne računaju isti projekt istodobno (Ruling R10).
+/// Petlja „svi projekti" je `engine::refresh_all` (dopuna T32 #5) — tray je zove iz zasebne niti,
+/// pa ta petlja ne smije postojati na dva mjesta (S-010).
 #[tauri::command]
-pub fn refresh(
-    app: tauri::AppHandle,
-    state: tauri::State<'_, AppState>,
-    id: Option<i64>,
-) -> Result<(), String> {
-    let ids: Vec<i64> = match id {
-        Some(id) => vec![id],
-        None => {
-            let store = state.store.lock().map_err(text)?;
-            store
-                .list_projects()
-                .map_err(text)?
-                .iter()
-                .map(|p| p.id)
-                .collect()
-        }
-    };
-    for id in ids {
-        crate::engine::request_refresh(&app, id);
+pub fn refresh(app: tauri::AppHandle, id: Option<i64>) -> Result<(), String> {
+    match id {
+        Some(id) => crate::engine::request_refresh(&app, id),
+        None => crate::engine::refresh_all(&app),
     }
     Ok(())
 }
@@ -361,15 +349,21 @@ pub fn get_settings(state: tauri::State<'_, AppState>) -> Result<Settings, Strin
     })
 }
 
+/// Autostart ima DVA učinka (registracija u OS-u preko plugina + zapis u bazu) na JEDNOM mjestu,
+/// `tray::set_autostart` (dopuna T32 #2) — tray-kvačica zove ISTU funkciju, pa baza nikad ne prođe
+/// mimo plugina. Ostale postavke idu ravno u bazu, kao i do sada.
 #[tauri::command]
 pub fn set_setting(
-    _app: tauri::AppHandle,
+    app: tauri::AppHandle,
     state: tauri::State<'_, AppState>,
     key: String,
     value: String,
 ) -> Result<(), String> {
     if !SETTING_KEYS.contains(&key.as_str()) {
         return Err(format!("nepoznata postavka '{key}'"));
+    }
+    if key == "autostart" {
+        return crate::tray::set_autostart(&app, value == "on");
     }
     state
         .store

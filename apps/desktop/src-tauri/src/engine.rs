@@ -105,8 +105,8 @@ pub fn start(app: &AppHandle) {
 /// Izračun je SERIJSKI po projektu (spec §3.3, t. 3): dok jedan traje, novi zahtjev ZAMJENJUJE
 /// čekanje umjesto da uđe u red (`RefreshQueue`, `crates/sokratis-io/src/watch.rs`). Jedan red za
 /// SVE pozivatelje (S-010) — nit watchera, prvi izračun pri pokretanju, naredbe `refresh`/
-/// `set_override`/`save_visions`, uskoro i tray (T32+) — nijedan ne smije mimoići red i računati
-/// isti projekt usporedno s nekim drugim (recenzija, krug 1).
+/// `set_override`/`save_visions` i tray (M2/32, `refresh_all` niže) — nijedan ne smije mimoići red
+/// i računati isti projekt usporedno s nekim drugim (recenzija, krug 1).
 pub fn request_refresh(app: &AppHandle, id: i64) {
     let should_run = match app.state::<AppState>().queue.lock() {
         Ok(mut q) => q.on_event(id),
@@ -136,6 +136,29 @@ pub fn request_refresh(app: &AppHandle, id: i64) {
             Some(next) => current = next,
             None => break,
         }
+    }
+}
+
+/// „Osvježi sve" (dopuna T32 #5): petlja „svi projekti iz registra → `request_refresh`" na JEDNOM
+/// mjestu (S-010) — do sada je postojala samo u naredbi `refresh(None)`; sad je zovu i naredba i
+/// tray, pa ne smije postojati dvaput. NE zove `refresh_project` izravno ni za jedan projekt —
+/// svaki `id` i dalje ide kroz `request_refresh`, isti red kao watcher.
+pub(crate) fn refresh_all(app: &AppHandle) {
+    let state = app.state::<AppState>();
+    let ids: Vec<i64> = match state
+        .store
+        .lock()
+        .map_err(text)
+        .and_then(|s| s.list_projects().map_err(text))
+    {
+        Ok(list) => list.iter().map(|p| p.id).collect(),
+        Err(e) => {
+            eprintln!("motor: popis projekata nije dostupan: {e}");
+            Vec::new()
+        }
+    };
+    for id in ids {
+        request_refresh(app, id);
     }
 }
 

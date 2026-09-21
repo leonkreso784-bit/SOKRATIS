@@ -9,12 +9,17 @@
 //! `setup` niže pokreće motor (`engine::start`) TEK NAKON `manage`, jer motor odmah čita `AppState`
 //! (M2/30). Splash (`splash::arm`, M2/31) kreće PRIJE motora iz istog razloga — motorova nit zove
 //! `splash::loaded`, koji bi panicirao da `SplashState` još nije managed.
+//!
+//! ZAŠTO RUST OVAKO (cigla M2/32 — tray, zatvaranje, jedna instanca)
+//! `single-instance` je PRVI plugin (Tauri to zahtijeva); tray sam (`tray::build`) i X→hide
+//! (`on_window_event` niže) su odvojeni od ovog gradilišta jer nijedan drugi modul ih ne treba.
 mod cache;
 mod commands;
 mod engine;
 mod splash;
 mod state;
 mod summary;
+mod tray;
 
 use commands::{
     add_project, get_report, get_settings, get_trend, list_projects, refresh, remove_project,
@@ -23,11 +28,21 @@ use commands::{
 use state::AppState;
 use std::collections::HashMap;
 use std::sync::Mutex;
+use tauri_plugin_autostart::MacosLauncher;
 
 pub fn run() {
     tauri::Builder::default()
+        // `single-instance` MORA biti prvi plugin (dopuna T32 #7) — drugo pokretanje ne otvara nov
+        // proces nego samo podigne postojeći glavni prozor (isti pomoćnik kao tray i splash).
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            splash::show_main(app);
+        }))
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_autostart::init(
+            MacosLauncher::LaunchAgent,
+            None,
+        ))
         .manage(AppState {
             // Drugi `expect` u ovoj funkciji je namjeran iz istog razloga kao onaj na `run()`
             // niže: bez registra projekata nema što raditi, pa je pad odmah, s jasnom porukom,
@@ -56,13 +71,28 @@ pub fn run() {
             get_settings,
             set_setting
         ])
+        // X sakriva SAMO glavni prozor (S-020) — watcher i tray rade dalje, izlaz je izričit kroz
+        // "Izađi" u tray-izborniku (`tray.rs`, `app.exit(0)`). `splash` se zatvara normalno, jer
+        // uvjet niže gleda samo prozor s labelom "main".
+        .on_window_event(|window, event| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event
+                && window.label() == "main"
+            {
+                api.prevent_close();
+                if let Err(e) = window.hide() {
+                    eprintln!("glavni prozor: hide() nije uspio: {e}");
+                }
+            }
+        })
         // Splash se naoružava PRIJE motora (M2/31) — `engine::start` odmah otvara nit koja na
         // kraju zove `splash::loaded`, pa `SplashState` mora biti managed prije toga. Motor
         // (nadzor datoteka + prvi izračun) kreće nakon `manage` — `engine::start` čita `AppState`
-        // čim se pozove (M2/30).
+        // čim se pozove (M2/30). Tray (M2/32) se gradi zadnji — treba `AppState` za trenutnu
+        // postavku jezika/autostarta pri gradnji izbornika.
         .setup(|app| {
             splash::arm(app.handle());
             engine::start(app.handle());
+            tray::build(app.handle())?;
             Ok(())
         })
         .run(tauri::generate_context!())
