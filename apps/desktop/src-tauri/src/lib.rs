@@ -7,10 +7,12 @@
 //! `manage(AppState { .. })` predaje dijeljeno stanje Tauriju PRIJE `run()`; svaka naredba ga
 //! poslije dohvati kao `State<'_, AppState>` (posudba, ne vlasništvo). Detalj uz oba poziva niže.
 //! `setup` niže pokreće motor (`engine::start`) TEK NAKON `manage`, jer motor odmah čita `AppState`
-//! (M2/30).
+//! (M2/30). Splash (`splash::arm`, M2/31) kreće PRIJE motora iz istog razloga — motorova nit zove
+//! `splash::loaded`, koji bi panicirao da `SplashState` još nije managed.
 mod cache;
 mod commands;
 mod engine;
+mod splash;
 mod state;
 mod summary;
 
@@ -54,9 +56,12 @@ pub fn run() {
             get_settings,
             set_setting
         ])
-        // Motor (nadzor datoteka + prvi izračun) kreće OVDJE, nakon `manage` — `engine::start` čita
-        // `AppState` čim se pozove (M2/30).
+        // Splash se naoružava PRIJE motora (M2/31) — `engine::start` odmah otvara nit koja na
+        // kraju zove `splash::loaded`, pa `SplashState` mora biti managed prije toga. Motor
+        // (nadzor datoteka + prvi izračun) kreće nakon `manage` — `engine::start` čita `AppState`
+        // čim se pozove (M2/30).
         .setup(|app| {
+            splash::arm(app.handle());
             engine::start(app.handle());
             Ok(())
         })

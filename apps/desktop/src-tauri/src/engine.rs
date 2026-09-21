@@ -2,6 +2,7 @@
 //! `AppHandle` je klon-jeftin ključ do stanja i događaja iz bilo koje niti; `app.emit` šalje JSON
 //! svim prozorima; nit watchera živi koliko i proces jer `rx` ostaje u `AppState`.
 use crate::commands::{Range, compute, now_unix, setting_or};
+use crate::splash;
 use crate::state::{AppState, text};
 use serde::Serialize;
 use sokratis_core::{Profile, Report, Severity, Signal, SnapshotMetrics, alerts_raised};
@@ -76,7 +77,9 @@ pub fn start(app: &AppHandle) {
                 eprintln!("motor: prvi izračun za projekt {id} nije uspio: {e}");
             }
         }
-        // T31: splash::loaded
+        // Drugi uvjet splasha (S-019, M2/31): prvi izračun SVIH projekata je gotov bez obzira na
+        // to je li koji od njih vratio grešku — "gotovo" znači da je petlja iznad prošla do kraja.
+        splash::loaded(&app);
 
         // `rx` se VADI iz `AppState` (`take()`) PRIJE blokirajućeg `recv()` — brava se ne smije
         // držati preko čekanja, inače bi svaka druga nit koja treba `AppState` čekala zauvijek.
