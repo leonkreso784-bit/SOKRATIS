@@ -483,11 +483,13 @@ nađe ih kako ih je ostavio; gornja traka nema ni temu ni jezik.
 
 ### 13.3 Animacije (S-026)
 
-Dvije cigle. **(a) Ulaz grafova:** `Bars` rastu od osi, `Line` i `Sparkline` se iscrtaju
-(`stroke-dashoffset`), `Ring` se ispuni — jednom pri prikazu pogleda, i pri prvom prikazu nakon
-splasha. **(b) Prijelaz pogleda + prekidač:** promjena pogleda u izborniku daje kratak prijelaz
-sadržaja; atribut `data-motion="off"` na `<html>` (piše ga `state.svelte.ts`, kao `data-theme`) gasi
-**sve** animacije sučelja — postavlja ga `Settings.motion = false` **ili** `prefers-reduced-motion`.
+Dvije cigle, a **prekidač dolazi prije njih, s Postavkama (§13.2)** — pravilo koje gasi animacije mora
+postojati prije prve animacije: atribut `data-motion="off"` na `<html>` (piše ga `state.svelte.ts`, kao
+`data-theme`) gasi **sve** animacije sučelja; postavlja ga `Settings.motion = false` **ili**
+`prefers-reduced-motion`. **(a) Ulaz grafova:** `Bars` rastu od osi, `Line` i `Sparkline` se iscrtaju
+(`stroke-dashoffset`), `Ring` se otkrije — jednom pri prikazu pogleda, i pri prvom prikazu nakon
+splasha. **(b) Prijelaz pogleda + animirano učitavanje:** promjena pogleda daje kratak ulaz sadržaja;
+dok novi izvještaj stiže stari je prigušen, a pri prvom učitavanju projekta stoji kostur.
 Sve traje **≤ 250 ms**, čisti CSS/SVG, bez nove ovisnosti. Splash (§5.2) nije dio ovoga.
 **Gotovo kad:** svaki od četiri grafa se otvara animirano; svaki prelazak pogleda ima prijelaz; s
 ugašenim prekidačem nema nijedne animacije; vitest tvrdi da `data-motion="off"` postoji kad treba, a

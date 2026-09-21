@@ -774,6 +774,9 @@ crte, Leonov OK („super je sve možeš krenuti“).
   su tvrdnje koje su ovom sesijom postale netočne („sedam stabala“, „sljedeća sesija je planiranje“,
   „push traži izričit OK“, „kasnije open-source“) i kronologija koju drugi dokument već drži.
   Veliko čišćenje (PROGRESS po milestoneu, ARCHITECTURE tvrdnju po tvrdnju) je cigla §13.8.
+- **Plan cigli dopunjen** (`docs/superpowers/plans/2026-09-18-m2-desktop.md`, T36–T43): repo bez konvencija ·
+  instalater · Postavke s prekidačem pokreta · ulaz grafova · prijelaz pogleda · kartica ×2 · dokumentacija; T35 sada
+  postavlja verziju 1.0.0. Pri pisanju plana prekidač pokreta je preseljen uz Postavke (spec §13.3 usklađen).
 - Brane: samo dokumentacija — `sokratis docs .` i `signals .` prije pusha.
 
 ### Što slijedi
