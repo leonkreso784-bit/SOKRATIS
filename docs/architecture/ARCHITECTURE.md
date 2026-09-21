@@ -1,13 +1,17 @@
 # ARCHITECTURE — što je izgrađeno
 
 **Status:** ✅ opisuje kod koji je u `main`-u — Milestone 1 (verzija 0.1.0, uključujući krug popravaka
-nakon završne recenzije) **plus kostur M2, cijel** (`M2/1a`+`M2/1b`: ugovor tipova, crate
-`sokratis-store`, `apps/desktop` s ikonama i `npm install`, desktop crate u workspaceu) **plus tok
-JEZGRA, gotov** (M2/2…M2/7): snapshot ugovora `Report`-a, `until` kao gornja granica, zbroj vizija,
-redci commita/isporuke u `Report`-u, aktivne faze preko `phase_tag` iz profila, `SnapshotMetrics`/
-`diff`/`alerts_raised` **plus tok PROFIL, gotov** (M2/8, M2/9): ograda putanja i `test_path_exclude`
-— što od kostura još stoji deklarirano bez ponašanja (ili bez potrošača) je u §11 ·
-**Zadnja provjera:** 2026-09-18
+nakon završne recenzije) **plus šest od devet tokova M2, svi gotovi i spojeni**: KOSTUR (`M2/1a`+
+`M2/1b`: ugovor tipova, crate `sokratis-store`, `apps/desktop` s ikonama i `npm install`, desktop crate
+u workspaceu) · JEZGRA (M2/2…M2/7: snapshot ugovora `Report`-a, `until` kao gornja granica, zbroj
+vizija, redci commita/isporuke, aktivne faze preko `phase_tag`, `SnapshotMetrics`/`diff`/
+`alerts_raised`) · PROFIL (M2/8, M2/9: `validate_paths`, `test_path_exclude`) · STORE (M2/15…M2/18:
+registar, postavke, snimke, keš sirovih commita) · IO (M2/10…M2/14 + M2/14b izvan plana: atomarno
+pisanje, manje git-procesa, detached HEAD, watcher, ograda putanja pri otvaranju — **dug I9 zatvoren u
+cijelosti** — i potrošač keša) · CLI (M2/19: `report --until`). **SUČELJE je jedini nespojeni tok**
+(u grani `feat/ui`, ne opisan ovdje — §11); DESKTOP i INTEGRACIJA čekaju sučelje. Što od gotovih tokova
+još stoji bez pozivatelja u aplikaciji je u §11 ·
+**Zadnja provjera:** 2026-09-21
 
 > **Što ovaj dokument JEST:** opis sustava kakav stoji u `crates/` i `apps/` — granice između crateova, tok
 > podataka, formati koje čita i ugovori prema korisniku CLI-ja. **Što NIJE:** kronologija (to su
@@ -42,18 +46,48 @@ apps/desktop/               # ljuska M2: Svelte/Vite datoteke + crate `sokratis-
 | `sokratis-cli` | ispisati JSON ili tablicu i vratiti izlazni kod | računati bilo što | `src/main.rs`, `src/table.rs` |
 | `sokratis-desktop` (`apps/desktop/src-tauri`) | pokrenuti Tauri ljusku: prozori, plugini, kasnije naredbe | držati išta što bi se htjelo testirati (S-013) | `src/main.rs`, `src/lib.rs` |
 
-**Što `store` danas radi:** `Store::open(path)` / `Store::open_in_memory()` otvore vezu, primijene
+**Što `store` danas radi:** `Store::open(path)` / `Store::open_in_memory()` otvore vezu i primijene
 migraciju `src/migrations/0001_init.sql` (sedam tablica: `project` · `project_worktree` · `setting` ·
-`project_setting` · `profile_seen` · `snapshot` · `commit_cache`) i javljaju `schema_version()`.
-Nijedan redak se još ne piše ni čita: registar projekata, postavke i snimke dolaze s ciglama
-M2/15–M2/17, keš tek ako ga mjerenje zatraži (S-014). Baza će živjeti u `%LOCALAPPDATA%\sokratis\`;
-0.1.0 je ne stvara — CLI `store` ne koristi.
+`project_setting` · `profile_seen` · `snapshot` · `commit_cache`). Iznad toga rade četiri „posla", svaki
+u vlastitoj datoteci (S-010: jedna cjelina, jedno mjesto):
+
+| datoteka | što drži | ključni obrazac |
+|---|---|---|
+| `registry.rs` | registar projekata i radnih stabala; identitet projekta je `git_common_dir`, ne putanja (S-015) — dva radna stabla istog repozitorija dijele jedan zapis | `add_project`/`list_projects`/`rename_project`/`remove_project`/`touch_project`/`set_worktrees` |
+| `settings.rs` | globalne postavke i postavke po projektu (tema, jezik, autostart, raspon, zadnji pogled) | SQL upsert `INSERT … ON CONFLICT … DO UPDATE` |
+| `snapshots.rs` | dnevna snimka 18 pokazatelja + docs-ocjene + broja signala, profil kao kanonski JSON (S-014), trend | `save_snapshot` je CJELOVITA ZAMJENA dana (`DELETE` pa `INSERT` u jednoj transakciji) |
+| `cache.rs` | sirovi commiti po SHA — **nikad klasifikacija** (S-014) | `INSERT OR IGNORE` u jednoj transakciji, `newest_cached_commit_date` za inkrementalno dovlačenje |
+
+Svaki posao ima jedinične testove nad `:memory:` bazom. **Ništa od ovoga još nema pozivatelja u
+aplikaciji** — ni CLI ni desktop ne ovise o `sokratis-store` (§11). Baza će živjeti u
+`%LOCALAPPDATA%\sokratis\`; CLI je ne stvara.
 
 **`sokratis-desktop` je u `[workspace] members` i builda se** (`M2/1b`, 2026-09-18): `npm install`
 uz Leonov OK (80 paketa, 0 ranjivosti) i `npm run tauri icon` iz Leonova loga popunili su
 `src-tauri/icons/`, pa `tauri-build` ima što tražiti. Prvi `cargo build -p sokratis-desktop` je
 trajao ~3 min. `cargo test --workspace` dotiče crate; `apps/desktop` ima `node_modules` i `npm run
-check`/`npm run build` rade (`dist/` s `index.html` i `splash.html`).
+check`/`npm run build` rade (`dist/` s `index.html` i `splash.html`); crate sam pokreće praznu Tauri
+ljusku (splash + glavni prozor bez sadržaja, §11).
+
+**Što `io` danas radi** (`crates/sokratis-io/src/`): `Project::open` čita `.sokratis/profile.json`
+(ili `Profile::default()`) i odmah zove `validate_paths()` — putanja izvan repoa je
+`IoError::ProfileInvalid` prije nego se ijedna putanja pročita s diska (M2/14, dug I9 zatvoren u
+cijelosti). `write_override`/`write_visions` pišu kroz `.tmp` pa `rename` (atomarno) u GLAVNO stablo
+(`main_root`, ne radno stablo iz kojeg je pozvano — S-015). `input()`/`input_between()` traže manje
+git-procesa po izvještaju nego prije M2/11 (dug M11; brojke: `CHANGELOG.md`, ne ovdje — S-010).
+Detached HEAD (grana ne postoji, commit postoji) daje `Report.branch = "HEAD@<sha>"` umjesto lažnog
+„nema commita" (M2/12). `Watcher` (`watch.rs`) gleda `.git`, `docs_dir` i `.sokratis`, javlja najviše
+jedan `WatchEvent` po projektu 600 ms nakon zadnje promjene, potiskuje vlastite upise i serijalizira
+preklapajuće izračune (`RefreshQueue`, S-016) — **nema pozivatelja u `main`-u** (§11). `window_args`
+(`git.rs`) gradi prozor s rezervom zone (dan unatrag za `since`, dva dana unaprijed za `until`) i šalje
+ga i `log`-u i `rev_list`-u istom funkcijom, da se dva prozora ne mogu razići. **Potrošač keša** (M2/14b,
+cigla izvan plana): `Project::input_cached` poziva `cached_log` (`cache.rs`) — `GitSource::rev_list`
+kaže što je DOSTIŽNO SADA, trait `CommitCache` (ugovor bez ovisnosti o `sokratis-store`, S-013) vraća
+poznate commite, `git log --no-walk --stdin` (`log_commits`) dovlači SAMO nedostajuće; `commit --amend`/
+`reset --hard` time ne ostavljaju stari SHA u brojkama iako ostaju u kešu. Greška keša je vidljiva
+(`IoError::Cache`/`CacheIncomplete`), nema tihog povratka na puni log. **`input_cached` nema pozivatelja
+u `main`-u** — CLI (T19, `report_for`) i dalje zove `input_between`, BEZ keša; adapter (implementacija
+`CommitCache` nad `sokratis-store`) dolazi u desktopu (T29, §11).
 
 **Granica S-002:** jezgra ne zna odakle su podaci došli. Sve što joj treba dolazi u jednoj strukturi
 (`ReportInput`: `git_log` kao tekst, dnevnik i plan kao tekst, docs, grane, ručni podaci, `now`,
@@ -85,8 +119,9 @@ Korak po korak, redoslijed je u `core/src/report.rs` (`build_report`) i nigdje d
    repoa): `inside_root` razlaže putanju kroz `std::path::Component` i s `matches!` odbija sve osim
    `Normal`/`CurDir` (dakle `..`, apsolutnu putanju, `C:\…`, `\\server\share`), bez ijednog diranja
    diska (S-002) → `ParseError::PathOutsideRoot { field, value }` imenuje prvo pogođeno od osam
-   polja (M2/8, jezgreni dio duga I9). Io-dio ograde — provjera pri `Project::open`, prije nego se
-   ijedna putanja pročita s diska — dolazi u T14 (§11).
+   polja (M2/8, jezgreni dio duga I9). Io-dio ograde — `io::Project::open` zove `validate_paths()`
+   odmah nakon učitavanja profila, prije nego se ijedna putanja pročita s diska (M2/14) — **dug I9 je
+   time zatvoren u cijelosti** (§1).
 2. `parse_git_log` — tekst loga → `Vec<Commit>` + broj preskočenih redaka.
 3. filtar `since`: ostaju commiti s `commit_date >= since` (S-011 — isti kriterij kao `git log --since`).
 4. `parse_diary` — naslovi dnevnika → `Vec<Delivery>`; `parse_plan` — redovi plana → faze.
@@ -130,20 +165,22 @@ potrošača da sučelje i snapshot ugovora (S-022) ne mijenjaju oblik svakom cig
 **CLI-tablica (`cli/src/table.rs`) ova tri polja još ne ispisuje** — korisnik CLI-ja zato ne vidi
 ništa novo; podaci postoje u JSON-u i čekaju sučelje M2 (§11).
 
-**`until` (M2/3) je iznimka istog oblika — jezgra ga puni i njime filtrira, ali mu nitko još ne šalje
-pravu vrijednost.** `ReportInput.until: Option<String>` prolazi istu provjeru oblika kao `since`
+**`until` (M2/3) je gornja granica razdoblja, istog oblika kao `since` — i jezgra i njezini pozivatelji
+je danas šalju.** `ReportInput.until: Option<String>` prolazi istu provjeru oblika kao `since`
 (`ParseError::BadDate { field: "until", .. }`, let-chain u `build_report`) i filtrira commite i
 isporuke tako da ostane samo `commit_date`/`date <= until` (gornja granica uključuje cijeli dan,
-S-011). `civil::next_day` postoji za rezervu zone, isto zrcalo `prev_day`-a. U svakom stvarnom pozivu
-danas je vrijednost i dalje `null`/`None`: `io` ga tako šalje (`--until` prema gitu i ograda pri
-učitavanju su IO T14), a CLI nema `--until` (T19) — tek ti potrošači daju prozoru stvarnu gornju
-granicu. Snimka ugovora (`snapshot.rs`) zato i dalje ima `until: null`.
+S-011). `civil::next_day` je rezerva zone, zrcalo `prev_day`-a. `io` šalje stvarnu vrijednost od M2/14
+(`Project::input_between`, `GitSource::log`/`rev_list` dobivaju `until`), CLI od M2/19 (`sokratis
+report --until YYYY-MM-DD`, §9); `docs` i `signals` i dalje šalju `None`. Snapshot ugovora
+(`snapshot.rs`) i dalje ima `until: null` jer fixture pariteta ne prosljeđuje `--until` — svojstvo
+fixturea, ne jezgre.
 
 **`core/src/snapshot.rs` više nije prazan modul** (M2/7): `SnapshotMetrics::from_report`, `diff`,
 `SignalCounts::from_signals`, `worst_severity`, `alerts_raised` postoje i imaju testove — pune se
 tipovi `SignalCounts`, `MetricValue { id, value, kind }`, `SnapshotMetrics`, `MetricDelta` iz
-`model.rs`. Potrošača (snimke, STORE M2/17; obavijesti na prijelaz u Alert, DESKTOP T29/T30) još
-nema — detalji u §11.
+`model.rs`. `sokratis-store::save_snapshot`/`latest_snapshot`/`trend` (M2/17) znaju spremiti i čitati
+ove tipove i imaju teste, ali ih ništa u `main`-u ne zove (§11); obavijest na prijelaz u Alert
+(DESKTOP T29/T30) također nema pozivatelja.
 
 **`touched` je mjerač mjerača** — koliko je izvještaj stvarno dotaknuo (`core/src/report.rs`):
 
@@ -392,41 +429,43 @@ preuzeo M2 u [`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md) §8 i plan
   `kind_stats` broji iz tih redaka — ali `metrics/indicators.rs:31` (`kind_count`, pokazatelji
   `debugging_commits` i `docs_share`) i dalje zove `effective_kind` odvojeno. Nalaz recenzije M2/5
   (2026-09-18), otvoren do završne recenzije M2: [`../records/BACKLOG.md`](../records/BACKLOG.md).
-- **Detached HEAD:** `git branch --show-current` je prazan i kad repo ima commite, pa takav radni
-  primjerak dobiva poruku `repozitorij nema commita` — kriva poruka u rubnom stanju koje CLI ne cilja.
 - **Tablični ispis (`cli/src/table.rs`) nije dovršen kao sučelje:** udjeli su goli razlomci
   (`0.589`) dok VRSTE RADA imaju procente, stanje faze ide kroz `{:?}` pa u hrvatskoj tablici stoji
   `Closed`/`Running`/`Planned` bez prijevoda (S-008: natpise daje sučelje), prazan naslov „FAZE"
-  ostaje bez ijednog retka, a ime faze dulje od 50 znakova prelije stupac. JSON je ugovor i on je
-  točan; tablica je pomoć za terminal.
-- **Cijena su procesi, ne parsiranje:** izvještaj nad Sokrat Studyjem traje ~3,2 s jer se zove
-  `git log -1` za **svaku** `.md` datoteku (56) i `rev-list --count` za **svaku** granu (31) — uz to
-  jezgra dio commita klasificira više puta (gore). Nad Sokratisom je to 0,7 s. Mjerljivo, ne
-  pogađano. **Tok IO (M2/11, izvan `main`-a) ovaj git-trošak već mjeri i smanjuje**: 92 → 6 procesa,
-  3318–3822 ms → 1479,71 ms nad Sokrat Studyjem (release, topli keš) — ulazi u `main` s tim tokom.
-- **SQLite snimke, watcher i popis projekata** su M2 (S-009); 0.1.x sve računa na zahtjev i ne piše
-  ništa osim onoga što korisnik sam stavi u `.sokratis/`.
+  ostaje bez ijednog retka, ime faze dulje od 50 znakova prelije stupac, a zaglavlje ne pokazuje
+  `until` (§9). JSON je ugovor i on je točan; tablica je pomoć za terminal.
+- **Cijena su procesi, ne parsiranje — i keš koji bi to riješio nema pozivatelja.** M2/11 je smanjio
+  broj git-procesa po `input()` (dug M11; brojke, ne ovdje — `CHANGELOG.md`, S-010) i taj dobitak
+  vrijedi za svaki poziv CLI-ja. Ostatak cijene (git log koji svaki put šeta cijelu dostižnu povijest)
+  rješava keš sirovih commita (STORE M2/18) kroz `Project::input_cached`/`cached_log` (IO M2/14b) —
+  ali **CLI ga ne zove** (§1: `report_for` i dalje poziva `input_between`). Izmjereni dobitak keširanog
+  puta (topao ulaz + izvještaj ispod 500 ms) postoji samo u testu (`SOKRATIS_PERF_REPO`,
+  `#[ignore]`); korisnik CLI-ja ga danas ne osjeća. Adapter koji `sokratis-store` ožiči kao
+  `CommitCache` dolazi u desktopu (T29).
+- **SQLite (registar, postavke, snimke, keš) i watcher postoje u `main`-u, ali bez ijednog
+  pozivatelja iz aplikacije** (§1) — CLI i dalje sve računa na zahtjev i ne piše ništa osim onoga što
+  korisnik sam stavi u `.sokratis/`; S-009 se ostvaruje tek kad DESKTOP (T29/T30) ožiči `sokratis-store`
+  i `Watcher`.
+- **`Signal.title_key` (`core/src/model.rs`) nema par u i18n-rječniku sučelja** — rječnik živi u
+  `apps/desktop/src` (grana `feat/ui`, još nije u `main`-u), pa danas nigdje ne postoji prijevod
+  natpisa signala.
 
-**Kostur M2 (`M2/1a`+`M2/1b`) — deklarirano, bez ponašanja; tok JEZGRA (M2/2…M2/7) i tok PROFIL
-(M2/8, M2/9) su ponašanje već dodali, oba gotova.** Cigla je namjerno unijela ugovor prije potrošača
-(jedna zajednička točka, pa se tokovi poslije ne sudaraju); dio i dalje stoji u kodu bez potrošača ili
-čeka drugi tok:
+**Šest od devet tokova M2 su gotovi i spojeni** (KOSTUR, JEZGRA, PROFIL, STORE, IO uklj. M2/14b, CLI —
+popis u zaglavlju ovog dokumenta). Ono što je time izgrađeno, a **još nema pozivatelja u aplikaciji**
+jer čeka SUČELJE/DESKTOP (gornje tri točke ih detaljnije objašnjavaju, ovo je popis, §1 daje kod):
 
-- **`until` validira i filtrira jezgra (M2/3); `io` i CLI mu sad šalju stvarnu vrijednost** (`io` od
-  M2/14, CLI od M2/19: `report --until`) — §3;
-- **`Profile::validate_paths` i `test_path_exclude` više nisu stub/prazni** (M2/8, M2/9) — rade ono
-  što ime kaže; io-dio ograde (`Project::open` zove `validate_paths` pri otvaranju, tok IO M2/14) je
-  ušao 2026-09-20 — dug I9 je time zatvoren u cijelosti — §2, §4, §11 gore;
-- **`core/src/snapshot.rs` više nije prazan modul** (M2/7): `SnapshotMetrics::from_report`, `diff`,
-  `SignalCounts::from_signals`, `worst_severity`, `alerts_raised` rade i imaju testove; `CommitRow` i
-  `VisionTotal` već imaju potrošača (`Report.commits`/`vision_totals`, M2/4–M2/5), ali
-  `SnapshotMetrics`/`MetricValue`/`MetricDelta`/`SignalCounts` još nemaju — čekaju STORE (snimke,
-  M2/17) i DESKTOP (obavijest na prijelaz u Alert, T29/T30) — §1, §3;
-- **`sokratis-store` zna otvoriti bazu i migrirati shemu, ali ga nitko ne zove**: ni CLI ni desktop
-  nemaju tu ovisnost, pa baza nastaje samo u testu (registar M2/15, postavke M2/16, snimke M2/17) — §1;
-- **ovisnost bez potrošača:** `notify` u `io` (watcher M2/13) — pinana u `M2/1a` s obrazloženjem
-  ([`../workflow/RUST.md`](../workflow/RUST.md) §2), a ne nuspojava. `insta` više nije na ovom popisu:
-  od M2/2 stvarno testira (`crates/sokratis-core/tests/snapshot.rs`, S-022);
-- **`apps/desktop` se builda, ali ne radi ništa:** crate `sokratis-desktop` je u workspaceu i pokreće
-  praznu Tauri ljusku (splash + glavni prozor bez sadržaja) — nijedna naredba prema jezgri ili
-  `sokratis-store` još ne postoji, te dolaze s ciglama STORE/SUČELJE/DESKTOP — §1.
+- `sokratis-store` u cijelosti — registar, postavke, snimke, keš (§1);
+- `io::CommitCache`/`cached_log`/`Project::input_cached` (M2/14b) i `io::Watcher` (M2/13) (§1);
+  poznata ograničenja keša kad dobije pozivatelja: `touched.skipped_lines` ne broji retke preskočene
+  pri PRVOM čitanju commita (keš pamti `Commit`-e, ne sirovi tekst gita); ključ keša je kratki SHA
+  (`%h`) — ako git jednog dana produlji zadanu duljinu kratice, keš se jednom puni iznova
+  (`docs/records/BACKLOG.md`);
+- `core/src/snapshot.rs` tipovi (`SnapshotMetrics`/`MetricValue`/`MetricDelta`/`SignalCounts`) i
+  `sokratis-store::save_snapshot`/`latest_snapshot`/`trend` (M2/17) — postoje i imaju teste na obje
+  strane, ali ih ništa u `main`-u ne spaja (§3);
+- `apps/desktop`: crate `sokratis-desktop` se builda i pokreće praznu Tauri ljusku (splash + glavni
+  prozor bez sadržaja) — nijedna naredba prema jezgri ili `sokratis-store` još ne postoji (§1).
+
+**Sučelje (`apps/desktop/src`) je u grani `feat/ui` (stablo `sokratis.ui`), NIJE u `main`-u.**
+M2/20–M2/27 su vizualno potvrđene u pregledniku, M2/28 (Dnevnik · Isporuke · Vizije · Dokumentacija)
+nije započeta — ovaj dokument ga zato ne opisuje kao izgrađeno; dobiva svoj odjeljak kad se spoji.

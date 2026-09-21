@@ -708,8 +708,39 @@ dokumentacije koji u njoj radi, novim odlomkom „Nastavak iste sesije", ne novi
   B je piše cijelu za IO/STORE/CLI na kraju sesije). `cargo run -q -p sokratis-cli -- docs .` provjeren
   prije i poslije izmjena.
 
+**Nastavak iste sesije — M2/26 i M2/27 vizualno potvrđeni, sesija stala zbog usagea, PLAN_DESIGNE.md zapisan.**
+
+- **Orkestrator je vizualno provjerio SUČELJE u pregledniku** (`npm run dev`): M2/25 (okvir), **M2/26**
+  (Pregled — kartice projekata) i **M2/27** (Tempo · Vrste rada · Pokazatelji · Faze) su potvrđene, uz
+  po jedan krug popravka za M2/26 (`54aff7d`: `sortProjects` s fiksnim localeom) i M2/27 (`5da6d9e`:
+  prsten vrsta rada ograničen i uz tablicu s legendom — prije je zauzimao cijeli zaslon bez legende).
+  **M2/28 (Dnevnik · Isporuke · Vizije · Dokumentacija) NIJE započeta.** Ništa od SUČELJA nije spojeno
+  u `main` — spajanje, DESKTOP (T29–T33), INTEGRACIJA (T34–T35) i završna recenzija M2 ostaju otvoreni.
+- **Leon je izravnom porukom zatražio da mu se otvori sučelje** (dev-poslužitelj + preglednik); ocjena:
+  „odlično, ali na izgledu i dodacima treba još dosta rada", i da se **pripazi na dokumentaciju** jer je
+  u kratkom vremenu izgrađeno puno. Iz toga je nastao **`docs/product/PLAN_DESIGNE.md`** (2026-09-21,
+  `e570e9e`, preseljen u `product/` ciglom `685def0` jer je u `plan/` rušio branu jednog aktivnog speca)
+  — Leonov ZAPIS NAMJERE, ne spec: animirano otvaranje grafova i pogleda, kartica s objašnjenjem na
+  klik, tema i jezik u Postavke, više statistike, kasnije timovi i ne-samo-git, i **rez za 1.0.0**.
+- **Sesija je stala jer je Leonu ponestalo usagea (~92%) — ne zato što je tok gotov ili je milestone
+  stigao do dogovorenog zastanka.** Opseg druge sesije (Leonova odluka: sve osim DESKTOP-a i
+  INTEGRACIJE) time NIJE ispunjen — nedostaje T28, spajanje SUČELJA i čuvar B.
+- **Ovaj zapis (čuvar B, sonnet — Leonov usage pri kraju, opus-prolaz ARCHITECTURE-a ostaje za izdanje):**
+  `PROGRESS.md` (ovaj odlomak), `CLAUDE.md` („Stanje — TRENUTNO", „Agenti" — bitno sažeto, CLAUDE.md
+  drži samo što vrijedi SAD), `docs/architecture/ARCHITECTURE.md` (STORE/IO/CLI/M2/14b dobivaju
+  opis „što danas radi" i pošten §11 bez zastarjelih tvrdnji — „until je iznimka", „bez potrošača",
+  Detached HEAD kao otvoren rub), `docs/README.md` (odjeljak „plan/ — što sada"),
+  `docs/workflow/AGENTI.md` §2, `docs/workflow/TESTING.md` (store-red), `docs/plan/ROADMAP.md`
+  („Gdje smo", status M2), `README.md` (korijen). **NOVA-SESIJA-PROMPT.md je prepisan 2026-09-21**
+  (izvan ovog čuvarova djelokruga, `.superpowers/` nije `docs/`): sljedeća sesija je **PLANIRANJE**
+  (rez za 1.0.0 iz PLAN_DESIGNE, odluke u `DECISIONS.md`, tek onda spec/plan), ne nastavak T28.
+  `cargo run -q -p sokratis-cli -- docs .` i `signals .` provjereni prije i poslije izmjena.
+
 ### Što slijedi
-Spajanje SUČELJA (nakon M2/27–M2/28, uz krug popravka Ring-a) je jedino što još stoji između `main`-a i
-DESKTOP-a; tokovi KOSTUR · PROFIL · JEZGRA · STORE · IO · CLI su svi gotovi i u `main`-u. DESKTOP
-(T29–T33), INTEGRACIJA (T34–T35) i završna recenzija cijelog M2 su **treća sesija** (Leonova odluka).
-Ledger: `.superpowers/sdd/2026-09-18-m2-desktop/progress.md`, odjeljak „STANJE ZA NOVU SESIJU".
+**Sljedeća sesija je PLANIRANJE, ne nastavak gradnje:** rez za 1.0.0 iz `docs/product/PLAN_DESIGNE.md`
+(do koje cigle se zatvara verzija 1.0.0), odluke u `DECISIONS.md`, tek onda spec/plan po uobičajenom
+putu. Redoslijed gradnje nakon odobrenog reza ostaje onaj iz plana M2: T28 → spajanje SUČELJA u `main`
+→ DESKTOP (T29–T33) → INTEGRACIJA (T34–T35) → završna recenzija M2. Šest tokova (KOSTUR · JEZGRA ·
+PROFIL · STORE · IO · CLI) su gotovi i u `main`-u; SUČELJE je jedini nespojeni tok. Ledger:
+`.superpowers/sdd/2026-09-18-m2-desktop/progress.md`, odjeljak „▶▶▶ STANJE ZA NOVU SESIJU" na dnu, i
+`NOVA-SESIJA-PROMPT.md` pored njega.

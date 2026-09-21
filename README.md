@@ -7,9 +7,9 @@ s dokazom. Za više projekata odjednom.
 > 🚧 **U gradnji (rujan 2026).** Milestone 1 je zatvoren (2026-09-18) — verzija 0.1.0:
 > `core`/`io`/`cli` rade nad pravom git-povijesti (paritet s `RAD.xlsx` je test, ne tvrdnja).
 > **Milestone 2 (desktop) je u izvedbi** po odobrenom specu
-> [docs/plan/ARHITEKTURA_M2.md](./docs/plan/ARHITEKTURA_M2.md); aplikacije još nema (kostur i jezgrina
-> nadogradnja su u `main`-u, ostali tokovi rade u svojim granama). Objava na GitHub i push čekaju
-> autorov izričit OK. Ulaz u dokumentaciju:
+> [docs/plan/ARHITEKTURA_M2.md](./docs/plan/ARHITEKTURA_M2.md); repo je javan na GitHubu od
+> 2026-09-20. Šest od devet tokova (kostur, jezgra, profil, io, store, cli) su u `main`-u; sučelje
+> gradi se u zasebnoj grani, aplikacije još nema. Ulaz u dokumentaciju:
 > [docs/README.md](./docs/README.md) · milestonei: [docs/plan/ROADMAP.md](./docs/plan/ROADMAP.md) ·
 > isporučeno: [docs/records/CHANGELOG.md](./docs/records/CHANGELOG.md).
 

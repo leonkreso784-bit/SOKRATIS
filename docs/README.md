@@ -59,9 +59,11 @@ redak u backlogu.
 
 Spec Milestonea 1 je **ispunjen i arhiviran** ([archive/ARHITEKTURA_M1.md](./archive/ARHITEKTURA_M1.md));
 **jedini aktivni spec je M2** (desktop) — napisan i odobren 2026-09-18, plan cigli iz njega je u
-`superpowers/plans/`, kostur (T1) je cijel u `main`-u; od pet otvorenih tokova su JEZGRA i PROFIL
-spojeni u `main`, IO/STORE/SUČELJE su recenzirani do svoje zadnje cigle u svojim stablima, još nespojeni
-(`../records/PROGRESS.md`).
+`superpowers/plans/`. Šest od devet tokova (KOSTUR, JEZGRA, PROFIL, STORE, IO, CLI) su spojeni u
+`main`; SUČELJE je vizualno potvrđeno do M2/27 u svom stablu, M2/28 nije započeta, ništa od sučelja
+još nije spojeno; DESKTOP i INTEGRACIJA čekaju sučelje. Sesija je stala zbog iscrpljenog usagea, ne
+kraja milestonea — sljedeća sesija je najprije **planiranje** iz Leonova zapisa namjere
+[PLAN_DESIGNE.md](./product/PLAN_DESIGNE.md) (`../records/PROGRESS.md`).
 
 | Dokument | Svrha |
 |---|---|

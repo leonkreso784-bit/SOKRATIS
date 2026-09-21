@@ -11,7 +11,7 @@
 | **jedinični (core)** | `crates/sokratis-core/src/**` uz kod (`#[cfg(test)]`) i `tests/` | parser vraća točno ove strukture; metrika daje točno ovu brojku; pravilo daje točno ovaj signal s dokazom | **tekst fixture** — nikad živi git |
 | **integracijski (io)** | `crates/sokratis-io/tests/` | git-proces, radna stabla, profil, ručni podaci | **privremeni repo** stvoren u testu |
 | **izlazni kodovi (cli)** | `crates/sokratis-cli/tests/cli.rs` | ugovor prema preflightu: **0** (nema signala) i **2** (Alert) nad repoom s poznatom poviješću, **3** za pogrešnu uporabu i za putanju koja nije repozitorij, **0** za `--help`/`--version` | **privremeni repo** (`tests/common/mod.rs`) |
-| **pohrana (store)** — *od M2* | `crates/sokratis-store/src/**` (`#[cfg(test)]`) | migracije se primijene od prazne baze; kasnije registar, postavke i snimke (M2/15–17) | **`:memory:` baza** (`Store::open_in_memory`) — bez gita i bez datoteka |
+| **pohrana (store)** — *od M2* | `crates/sokratis-store/src/**` (`#[cfg(test)]`) | migracije se primijene od prazne baze; registar, postavke, snimke i keš sirovih commita (M2/15–18) rade, ali nemaju pozivatelja izvan testova (`docs/architecture/ARCHITECTURE.md` §11) | **`:memory:` baza** (`Store::open_in_memory`) — bez gita i bez datoteka |
 | **sučelje (TS/Svelte)** — *od M2* | `apps/desktop/tests/**`, uz komponente | oblikovanje brojki, i18n ključevi, kontrast tokena, grafovi s praznim ulazom | `npm run check` u `apps/desktop`: danas `svelte-check` + `vitest`; brane za i18n i kontrast dolaze s ciglama M2/20–21 |
 
 **Test-prvo** (CLAUDE.md #7): fixture → očekivano → implementacija. Rub koji prepoznaš odmah dobiva test.
