@@ -1,6 +1,7 @@
 //! ZAŠTO RUST OVAKO (cigla M2/30 — motor osvježavanja)
 //! `AppHandle` je klon-jeftin ključ do stanja i događaja iz bilo koje niti; `app.emit` šalje JSON
-//! svim prozorima; nit watchera živi koliko i proces jer `rx` ostaje u `AppState`.
+//! svim prozorima; nit watchera živi koliko i proces jer `Sender` ostaje u `Watcher`-u (u
+//! `state.watcher`), pa `rx.recv()` nikad ne vrati `Disconnected`.
 use crate::commands::{Range, compute, now_unix, setting_or};
 use crate::splash;
 use crate::state::{AppState, text};
@@ -70,12 +71,11 @@ pub fn start(app: &AppHandle) {
 
     let app = app.clone();
     std::thread::spawn(move || {
-        // Prvi izračun svih projekata ide U OVOJ niti, PRIJE petlje čekanja (dopuna T30 #9) — tako
-        // `setup` ne čeka na git/SQLite, a prozor ipak dobije brojke bez ijednog vanjskog događaja.
+        // Prvi izračun svih projekata ide kroz `request_refresh`, isti red kao naredbe i watcher
+        // (Ruling R10, spec §3.3 t. 3) — naredba koja stigne DOK se aplikacija tek diže tako ne
+        // pokrene drugi usporedni izračun istog projekta, nego samo produži red.
         for id in &ids {
-            if let Err(e) = refresh_project(&app, *id) {
-                eprintln!("motor: prvi izračun za projekt {id} nije uspio: {e}");
-            }
+            request_refresh(&app, *id);
         }
         // Drugi uvjet splasha (S-019, M2/31): prvi izračun SVIH projekata je gotov bez obzira na
         // to je li koji od njih vratio grešku — "gotovo" znači da je petlja iznad prošla do kraja.
@@ -97,46 +97,56 @@ pub fn start(app: &AppHandle) {
         while let Ok(event) = rx.recv() {
             // N2: `event.reason` je razlog ZADNJEG sirovog događaja u prozoru — motor ga ne koristi
             // za odluku, izračun je uvijek pun (`Range::All` u `refresh_project`).
-            let should_run = match app.state::<AppState>().queue.lock() {
-                Ok(mut q) => q.on_event(event.project_id),
-                Err(e) => {
-                    eprintln!("motor: brava reda čekanja: {e}");
-                    continue;
-                }
-            };
-            if !should_run {
-                continue;
-            }
-            let mut id = event.project_id;
-            loop {
-                if let Err(e) = refresh_project(&app, id) {
-                    eprintln!("motor: osvježavanje projekta {id} nije uspjelo: {e}");
-                }
-                // `queue.on_done` se zove BEZ OBZIRA na ishod gornjeg poziva — inače bi projekt
-                // čiji izračun padne zauvijek ostao "u tijeku" i nikad se više ne bi osvježio.
-                let again = match app.state::<AppState>().queue.lock() {
-                    Ok(mut q) => q.on_done(id),
-                    Err(e) => {
-                        eprintln!("motor: brava reda čekanja: {e}");
-                        None
-                    }
-                };
-                match again {
-                    Some(next) => id = next,
-                    None => break,
-                }
-            }
+            request_refresh(&app, event.project_id);
         }
     });
+}
+
+/// Izračun je SERIJSKI po projektu (spec §3.3, t. 3): dok jedan traje, novi zahtjev ZAMJENJUJE
+/// čekanje umjesto da uđe u red (`RefreshQueue`, `crates/sokratis-io/src/watch.rs`). Jedan red za
+/// SVE pozivatelje (S-010) — nit watchera, prvi izračun pri pokretanju, naredbe `refresh`/
+/// `set_override`/`save_visions`, uskoro i tray (T32+) — nijedan ne smije mimoići red i računati
+/// isti projekt usporedno s nekim drugim (recenzija, krug 1).
+pub fn request_refresh(app: &AppHandle, id: i64) {
+    let should_run = match app.state::<AppState>().queue.lock() {
+        Ok(mut q) => q.on_event(id),
+        Err(e) => {
+            eprintln!("motor: brava reda čekanja: {e}");
+            return;
+        }
+    };
+    if !should_run {
+        return;
+    }
+    let mut current = id;
+    loop {
+        if let Err(e) = refresh_project(app, current) {
+            eprintln!("motor: osvježavanje projekta {current} nije uspjelo: {e}");
+        }
+        // `queue.on_done` se zove BEZ OBZIRA na ishod gornjeg poziva — inače bi projekt čiji
+        // izračun padne zauvijek ostao "u tijeku" i nikad se više ne bi osvježio.
+        let again = match app.state::<AppState>().queue.lock() {
+            Ok(mut q) => q.on_done(current),
+            Err(e) => {
+                eprintln!("motor: brava reda čekanja: {e}");
+                None
+            }
+        };
+        match again {
+            Some(next) => current = next,
+            None => break,
+        }
+    }
 }
 
 /// Jedan prolaz motora za projekt `id`, uvijek nad CIJELIM projektom (dopuna T30 #1 — dnevna
 /// snimka mora biti isto mjerilo iz dana u dan). Redoslijed: `compute` (T29, jedini izračun) →
 /// dnevna snimka (best-effort) → `reports.insert` (vraća STARI izvještaj kao `prev`) →
 /// `report_updated` → nove obavijesti SAMO ako je `prev` postojao. Jedina greška koja se vraća
-/// pozivatelju je greška SAMOG izračuna; snimka, slanje događaja i obavijest OS-a su
-/// best-effort (zapišu se na `stderr`, ne prekidaju osvježavanje).
-pub fn refresh_project(app: &AppHandle, id: i64) -> Result<(), String> {
+/// pozivatelju (`request_refresh`, JEDINI pozivatelj — izvan `engine.rs` se ovo ne zove, S-010) je
+/// greška SAMOG izračuna; snimka, slanje događaja i obavijest OS-a su best-effort (zapišu se na
+/// `stderr`, ne prekidaju osvježavanje).
+fn refresh_project(app: &AppHandle, id: i64) -> Result<(), String> {
     let state = app.state::<AppState>();
     let report = compute(&state, id, &Range::All)?;
 

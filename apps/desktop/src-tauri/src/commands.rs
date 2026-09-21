@@ -2,7 +2,7 @@
 //! `#[tauri::command]` pretvara običnu funkciju u RPC koji sučelje zove kroz `invoke(ime, args)`;
 //! `Result<T, String>` je ugovor Tauri IPC-a (obrazložen uz `state::text`). Zajednička „računica"
 //! (izračun izvještaja) živi u `compute`/`compute_input` niže — naredbe SAMO posuđuju stanje i
-//! pozivaju je. (M2/30: `set_override`/`save_visions`/`refresh` sad zovu `engine::refresh_project`
+//! pozivaju je. (M2/30: `set_override`/`save_visions`/`refresh` sad zovu `engine::request_refresh`
 //! umjesto da same diraju `state.reports` — detalj uz svaku naredbu niže.)
 use crate::cache::StoreCache;
 use crate::state::{AppState, text};
@@ -89,9 +89,10 @@ pub(crate) fn setting_or(
 
 /// Izračun jednog izvještaja: registar → otvoren projekt → raspon → keširani log → jezgra;
 /// `Report` izlazi iz `build_report` NEPROMIJENJEN (S-012), ova funkcija ništa ne preslaguje. NE
-/// piše u `state.reports` — to radi SAMO motor (`engine::refresh_project`, koji `compute` poziva
-/// iznutra s `Range::All`), jer uzima `reports[id]` kao „prošli" izvještaj za `alerts_raised` — a
-/// izračun nad kraćim rasponom (`get_report`) tu mapu ne smije prljati (S-020).
+/// piše u `state.reports` — to radi SAMO motor (`engine::refresh_project`, pozvan kroz
+/// `request_refresh`, koji `compute` poziva iznutra s `Range::All`), jer uzima `reports[id]` kao
+/// „prošli" izvještaj za `alerts_raised` — a izračun nad kraćim rasponom (`get_report`) tu mapu ne
+/// smije prljati (S-020).
 pub(crate) fn compute(
     state: &AppState,
     id: i64,
@@ -270,8 +271,10 @@ pub fn get_trend(
 // ── ručni podaci ─────────────────────────────────────────────────────────────────────────────────
 
 /// Ručni upis (`write_override`/`write_visions`) potiskuje vlastiti odjek u watcheru PRIJE pisanja
-/// (S-016), ponovno registrira nadzor (N1 — `.sokratis` je možda BAŠ SADA nastao) i odmah osvježava
-/// izvještaj kroz motor umjesto da samo prazni `state.reports` i čeka sljedeći `get_report` (T29).
+/// (S-016), ponovno registrira nadzor (N1 — `.sokratis` je možda BAŠ SADA nastao) i odmah traži
+/// osvježavanje kroz `request_refresh` — isti red kao watcher, pa se ne računa usporedno s njim
+/// (Ruling R10, spec §3.3 t. 3). Greška SAMOG izračuna ide na `stderr`, ne ovamo (sučelje je svejedno
+/// vidi na svom sljedećem `get_report`); greška UPISA i dalje ide van kao tekst.
 #[tauri::command]
 pub fn set_override(
     app: tauri::AppHandle,
@@ -291,10 +294,11 @@ pub fn set_override(
     crate::engine::suppress(&app, &path);
     project.write_override(&sha, kind).map_err(text)?;
     crate::engine::watch(&app, id);
-    crate::engine::refresh_project(&app, id)
+    crate::engine::request_refresh(&app, id);
+    Ok(())
 }
 
-/// Isti obrazac kao `set_override` iznad — potisni, upiši, ponovno nadziri, osvježi.
+/// Isti obrazac kao `set_override` iznad — potisni, upiši, ponovno nadziri, zatraži osvježavanje.
 #[tauri::command]
 pub fn save_visions(
     app: tauri::AppHandle,
@@ -313,11 +317,14 @@ pub fn save_visions(
     crate::engine::suppress(&app, &path);
     project.write_visions(&visions).map_err(text)?;
     crate::engine::watch(&app, id);
-    crate::engine::refresh_project(&app, id)
+    crate::engine::request_refresh(&app, id);
+    Ok(())
 }
 
 // ── osvježavanje ─────────────────────────────────────────────────────────────────────────────────
 
+/// `request_refresh` (ne `engine::refresh_project` izravno) — isti red kao watcher (S-010), pa gumb
+/// „Osvježi" i vanjska promjena datoteke nikad ne računaju isti projekt istodobno (Ruling R10).
 #[tauri::command]
 pub fn refresh(
     app: tauri::AppHandle,
@@ -337,7 +344,7 @@ pub fn refresh(
         }
     };
     for id in ids {
-        crate::engine::refresh_project(&app, id)?;
+        crate::engine::request_refresh(&app, id);
     }
     Ok(())
 }
