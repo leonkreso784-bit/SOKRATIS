@@ -4,7 +4,7 @@
 // ostaje tanak prikaz koji samo poziva ove funkcije. Množina ide iz rječnika (S-021), ova datoteka
 // samo bira KOJI oblik (jedan/dva-četiri/pet-i-više) — sam tekst nikad nije ovdje ušiven.
 import { translate, type Dict } from '../lib/i18n/t';
-import type { CommitRow, Delivery, Phase, ProjectSummary, Severity, WorkKind } from '../lib/types';
+import type { CommitRow, Delivery, Phase, ProjectSummary, Severity, Vision, WorkKind } from '../lib/types';
 
 const SEVERITY_RANK: Record<Severity, number> = { alert: 0, warn: 1, info: 2 };
 const NO_SIGNAL_RANK = 3;
@@ -132,4 +132,14 @@ export function joinRepoPath(rootPath: string, path: string): string {
   const root = rootPath.replace(/\//g, '\\');
   const rel = path.replace(/\//g, '\\');
   return `${root}\\${rel}`;
+}
+
+// ZAŠTO OVAKO (dopuna cigle M2/28 — uređivanje vizije: spec 6.2 "dodaj · uredi · promijeni stanje")
+// `Vision` nema `id` u `types.ts` (ni u `model.rs`: `title/source/state/percent/note`) — identitet
+// retka je INDEKS u `report.visions`, isti obrazac kao `confirmDeleteIndex` u `Visions.svelte`.
+// `.map` gradi NOV niz bez mutacije ulaza (S-010 duh: `saveVisions` uvijek šalje cijeli popis, pa
+// pozivatelj mora dobiti pravi novi niz, ne izmijenjen stari) — indeks izvan raspona jednostavno ne
+// pogodi nijedan element (`i === index` nikad `true`), pa se popis vrati nepromijenjenog SADRŽAJA.
+export function replaceVisionAt(visions: Vision[], index: number, updated: Vision): Vision[] {
+  return visions.map((v, i) => (i === index ? updated : v));
 }

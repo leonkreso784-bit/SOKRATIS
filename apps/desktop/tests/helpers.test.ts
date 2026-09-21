@@ -3,19 +3,21 @@
 // dijeljena mapa boja koju koriste i prsten i legenda u tablici u pogledu Vrste rada;
 // dopunjeno M2/28 — `sortDiary`/`sortDeliveries` (poredak Dnevnika i Isporuka), `copyText`
 // (kopiranje bez Rust naredbe, `vi.stubGlobal` zamjenjuje `navigator` jer Node pod vitestom nema
-// `navigator.clipboard`) i `joinRepoPath` (sastavljanje putanje nalaza dokumentacije))
+// `navigator.clipboard`) i `joinRepoPath` (sastavljanje putanje nalaza dokumentacije);
+// dopuna M2/28 (uređivanje vizije) — `replaceVisionAt` (spec 6.2 "dodaj · uredi · promijeni stanje")
 // Čiste funkcije, čist test bez DOM-a i bez Svelte runa: `hr.json` uvezen izravno kao `Dict`, isti
 // obrazac kao `tests/format.test.ts` — `signalSummary` tako vidi PRAVI rječnik, ne ručno prepisan
 // tekst (S-010), a hrvatska množina (jedan/dva-četiri/pet i više) se provjerava na stvarnim ključevima.
 import { describe, expect, it, vi } from 'vitest';
 import hr from '../src/lib/i18n/hr.json';
-import type { CommitRow, Delivery, Phase, ProjectSummary, WorkKind } from '../src/lib/types';
+import type { CommitRow, Delivery, Phase, ProjectSummary, Vision, WorkKind } from '../src/lib/types';
 import {
   bricksPerDay,
   copyText,
   joinRepoPath,
   kindColor,
   phaseRows,
+  replaceVisionAt,
   severityClass,
   signalSummary,
   sortDeliveries,
@@ -210,5 +212,38 @@ describe('copyText', () => {
     vi.stubGlobal('navigator', { clipboard: { writeText } });
     expect(await copyText('x')).toBe(false);
     vi.unstubAllGlobals();
+  });
+});
+
+// Minimalna vizija — polja koja test ne provjerava dobivaju neutralnu vrijednost (isti duh kao
+// `phase()`/`commitRow()` iznad: prava vrijednost tipa, ne `as Vision`).
+const vision = (title: string, state: string): Vision => ({
+  title,
+  source: 'test',
+  state,
+  percent: null,
+  note: '',
+});
+
+describe('replaceVisionAt', () => {
+  it('zamjenjuje viziju na danom indeksu, ostale ostaju netaknute (dopuna cigle M2/28 — uređivanje)', () => {
+    const visions = [vision('a', 'planned'), vision('b', 'planned'), vision('c', 'planned')];
+    const updated = vision('b', 'done');
+    const result = replaceVisionAt(visions, 1, updated);
+    expect(result.map((v) => v.state)).toEqual(['planned', 'done', 'planned']);
+    expect(result[1]).toBe(updated);
+  });
+  it('ne mijenja ulazno polje — vraća novo', () => {
+    const visions = [vision('a', 'planned')];
+    const original = visions.map((v) => v.state);
+    const result = replaceVisionAt(visions, 0, vision('a', 'done'));
+    expect(visions.map((v) => v.state)).toEqual(original);
+    expect(result).not.toBe(visions);
+  });
+  it('indeks izvan raspona ostavlja sadržaj nepromijenjen (svejedno nova referenca)', () => {
+    const visions = [vision('a', 'planned')];
+    const result = replaceVisionAt(visions, 5, vision('x', 'done'));
+    expect(result).toEqual(visions);
+    expect(result).not.toBe(visions);
   });
 });
