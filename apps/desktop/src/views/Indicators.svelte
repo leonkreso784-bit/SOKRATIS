@@ -5,7 +5,7 @@
   // prati preko čitanja `app.report`/`app.currentId`/`app.range` unutar efekta. `requestToken` čuva
   // od utrke: ako korisnik promijeni raspon dok stari poziv još čeka, kasni odgovor se baci umjesto
   // da pregazi noviji (Ruling orkestratora M2/27 #6).
-  import { app } from '../lib/state.svelte';
+  import { app, setError } from '../lib/state.svelte';
   import { api } from '../lib/api';
   import { getLang, t } from '../lib/i18n/index.svelte';
   import { hours, num, percent } from '../lib/format';
@@ -29,13 +29,17 @@
 
   async function loadTrends(projectId: number, range: Range, ids: string[]): Promise<void> {
     const token = ++requestToken;
-    const results = await Promise.all(ids.map((id) => api.getTrend(projectId, id, range)));
-    if (token !== requestToken) return; // stigao je noviji zahtjev u međuvremenu — ovaj odgovor je star
-    const next: Record<string, TrendPoint[]> = {};
-    ids.forEach((id, i) => {
-      next[id] = results[i] ?? [];
-    });
-    trends = next;
+    try {
+      const results = await Promise.all(ids.map((id) => api.getTrend(projectId, id, range)));
+      if (token !== requestToken) return; // stigao je noviji zahtjev u međuvremenu — ovaj odgovor je star
+      const next: Record<string, TrendPoint[]> = {};
+      ids.forEach((id, i) => {
+        next[id] = results[i] ?? [];
+      });
+      trends = next;
+    } catch (e) {
+      if (token === requestToken) setError(e);
+    }
   }
 
   // Jedini izbor OBLIKA prikaza — `Indicator.value` je onakav kakav jezgra izračuna, sučelje ga

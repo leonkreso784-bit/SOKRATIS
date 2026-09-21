@@ -3,7 +3,7 @@
   // Samo dvije vrijednosti postoje (S-021) — gumb po jeziku je jednostavniji za klik i čitljiviji
   // za a11y (`aria-pressed`) nego `<select>` s dvije stavke. `setLang` mijenja `document.documentElement
   // .lang` (u `i18n/index.svelte.ts`), a `app.settings.lang` prati istu vrijednost radi `getSettings`.
-  import { app } from '../state.svelte';
+  import { app, setError } from '../state.svelte';
   import { api } from '../api';
   import { setLang, t } from '../i18n/index.svelte';
   import type { Lang } from '../types';
@@ -13,7 +13,11 @@
   async function choose(lang: Lang): Promise<void> {
     app.settings = { ...app.settings, lang };
     setLang(lang);
-    await api.setSetting('lang', lang);
+    try {
+      await api.setSetting('lang', lang);
+    } catch (e) {
+      setError(e);
+    }
   }
 </script>
 

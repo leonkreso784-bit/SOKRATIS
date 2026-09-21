@@ -13,7 +13,7 @@
   // ikona (●) + kratak gumb (↺) umjesto pune riječi + punog teksta gumba — isto značenje, manje px.
   // "naslov" je JEDINI stupac bez zadane širine (uzima cijeli ostatak, CSS `table-layout:fixed`) i
   // smije se lomiti u dva retka (`line-clamp-2`) umjesto da se odreže na jedan.
-  import { app, loadReport } from '../lib/state.svelte';
+  import { app, loadReport, setError } from '../lib/state.svelte';
   import { api } from '../lib/api';
   import { getDict, getLang, t } from '../lib/i18n/index.svelte';
   import { kindLabel, subLabel, ymd } from '../lib/format';
@@ -36,6 +36,8 @@
     try {
       await api.setOverride(id, commit.sha, kind);
       await loadReport();
+    } catch (e) {
+      setError(e);
     } finally {
       writing = false;
     }
@@ -48,6 +50,8 @@
     try {
       await api.setOverride(id, commit.sha, null);
       await loadReport();
+    } catch (e) {
+      setError(e);
     } finally {
       writing = false;
     }

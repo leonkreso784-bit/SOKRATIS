@@ -20,7 +20,7 @@
   // bilješka fiksna i uža). `parsePercent` je preseljen u `views/helpers.ts` s testom (nalaz
   // recenzije koda: čista funkcija s rubovima bez testa) — `percentText` ostaje ovdje jer je samo
   // poziv `format.ts#percent()`.
-  import { app, loadReport } from '../lib/state.svelte';
+  import { app, loadReport, setError } from '../lib/state.svelte';
   import { api } from '../lib/api';
   import { getLang, t } from '../lib/i18n/index.svelte';
   import { num, percent } from '../lib/format';
@@ -85,6 +85,8 @@
       await api.saveVisions(id, next);
       await loadReport();
       formTarget = null;
+    } catch (e) {
+      setError(e);
     } finally {
       writing = false;
     }
@@ -107,6 +109,8 @@
       await api.saveVisions(id, remaining);
       await loadReport();
       confirmDeleteIndex = null;
+    } catch (e) {
+      setError(e);
     } finally {
       writing = false;
     }

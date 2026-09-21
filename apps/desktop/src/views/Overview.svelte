@@ -1,30 +1,17 @@
 <script lang="ts">
-  // ZAŠTO OVAKO (cigla M2/26 — Pregled: kartice projekata sa signalima)
+  // ZAŠTO OVAKO (cigla M2/26 — Pregled: kartice projekata sa signalima; dopunjeno M2/34 — pretplata
+  // na `report_updated` je preseljena u `App.svelte`, globalno za CIJELI okvir, ne samo ovaj pogled —
+  // vidi zaglavlje ondje)
   // Prvi pogled (spec §6.1) čita `app.projects` izravno iz globalne rune (S-010: `state.svelte.ts`
   // je jedini izvor) i samo ga sortira/oblikuje za prikaz — `helpers.ts` nosi tu logiku odvojeno da
   // je vitest testira bez Svelte runtimea. `prompt()`/`confirm()` su WebView2-ovi ugrađeni dijalozi
-  // (brief T26) — dovoljni dok T34 ne donese pravi Tauri dijalog za preimenovanje/uklanjanje.
-  import { onDestroy, onMount } from 'svelte';
+  // (brief T26) — dovoljni dok pravi Tauri dijalog za preimenovanje/uklanjanje ne postane potreban.
   import { api } from '../lib/api';
-  import { app, loadProjects, selectProject } from '../lib/state.svelte';
+  import { app, loadProjects, selectProject, setError } from '../lib/state.svelte';
   import { getDict, t } from '../lib/i18n/index.svelte';
   import { relative } from '../lib/format';
   import { severityClass, signalSummary, sortProjects } from './helpers';
   import type { ProjectSummary } from '../lib/types';
-
-  let unsubscribe: (() => void) | null = null;
-
-  onMount(() => {
-    // Popis se osvježava sam kad stiže nov izvještaj (npr. pozadinski watcher, M2/16) — bez ove
-    // pretplate kartica bi ostala sa starim brojem signala dok korisnik ručno ne osvježi stranicu.
-    unsubscribe = api.onReportUpdated(() => {
-      void loadProjects();
-    });
-  });
-
-  onDestroy(() => {
-    unsubscribe?.();
-  });
 
   function lastCommitText(project: ProjectSummary): string {
     if (!project.last_commit) return t('overview.noReport');
@@ -33,21 +20,33 @@
   }
 
   async function addProject(): Promise<void> {
-    const added = await api.addProject();
-    if (added) await loadProjects();
+    try {
+      const added = await api.addProject();
+      if (added) await loadProjects();
+    } catch (e) {
+      setError(e);
+    }
   }
 
   async function onRename(project: ProjectSummary): Promise<void> {
     const name = prompt(t('overview.renamePrompt', { name: project.name }), project.name);
     if (!name || !name.trim() || name.trim() === project.name) return;
-    await api.renameProject(project.id, name.trim());
-    await loadProjects();
+    try {
+      await api.renameProject(project.id, name.trim());
+      await loadProjects();
+    } catch (e) {
+      setError(e);
+    }
   }
 
   async function onRemove(project: ProjectSummary): Promise<void> {
     if (!confirm(t('overview.removeConfirm', { name: project.name }))) return;
-    await api.removeProject(project.id);
-    await loadProjects();
+    try {
+      await api.removeProject(project.id);
+      await loadProjects();
+    } catch (e) {
+      setError(e);
+    }
   }
 </script>
 

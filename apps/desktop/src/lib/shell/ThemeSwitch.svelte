@@ -4,7 +4,7 @@
   // "chalk" mora ostati tamnog izgleda i dok je aktivna "academic" tema), pa Tailwind za njih ne
   // gradi utility-klase. `var(--theme-swatch-{tema}-bg)` je i dalje boja SAMO iz tokena (S-017),
   // samo primijenjena inline stilom jer se ime tokena mijenja po krugu u petlji.
-  import { app, applyTheme } from '../state.svelte';
+  import { app, applyTheme, setError } from '../state.svelte';
   import { api } from '../api';
   import { t } from '../i18n/index.svelte';
   import type { Theme } from '../types';
@@ -14,7 +14,11 @@
   async function choose(theme: Theme): Promise<void> {
     app.settings = { ...app.settings, theme };
     applyTheme(theme);
-    await api.setSetting('theme', theme);
+    try {
+      await api.setSetting('theme', theme);
+    } catch (e) {
+      setError(e);
+    }
   }
 </script>
 
