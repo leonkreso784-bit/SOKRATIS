@@ -823,3 +823,77 @@ započet.
 ### Što slijedi
 **S2 = DESKTOP T29–T33** u novom stablu `sokratis.desktop`, grana `feat/desktop` iz `main`-a. Karta
 preostalih sesija je u ledgeru/planu (`CLAUDE.md` „Tri etape").
+
+---
+
+## 2026-09-21 (FABLE) — Izvedba S2: DESKTOP (T29–T33 + tri pred-cigle) spojeno u `main`
+
+**Druga od pet kratkih sesija izvedbe nakon reza za 1.0.0.** Opseg: DESKTOP T29–T33, serijski (jedno
+stablo, cigle dijele iste datoteke). Leon je usred sesije poručio „Imaš moj izričit OK za sve" — OK
+vrijedi za opseg S2; tag/izdanje/LICENCA/force-push ostaju izvan i dalje se ne diraju.
+
+- **Stablo `sokratis.desktop`, grana `feat/desktop` iz `ce8a6f8`.** Pre-flight scan (parovi cigli koji
+  dijele datoteku ili sučelje, provjereni protiv plana i speca prije prve cigle) otkrio je devet
+  stvarnih rupa i sukoba — presuđeni rulinzima R1–R12, od kojih su najvažniji: mapa `reports` drži
+  SAMO izračun nad cijelim rasponom, `get_report` u nju ne piše (R2, spec §5.1 protiv teksta plana);
+  motor ne čita spremljeni raspon iz postavki, uvijek računa `all` (R3); teret oba događaja ide po
+  specu, ne po planu (R4); dnevna snimka se piše pri SVAKOM izračunu, ne samo prvom (R9); naredbe i
+  tray idu kroz ISTI red čekanja kao watcher, `request_refresh` (R10 — otvoren tek u recenziji T30,
+  krug popravka); `tray@2x.png` se ne pravi jer Windows tray sam skalira (R11).
+- **Tri pred-cigle IZVAN vlasništva DESKTOP-a** (tokovi JEZGRA/IO su zatvoreni; plan T29 sam imenuje
+  prvi lijek): **M2/29a** `178ee34` `CommitRow.author_time` (namjeran snapshot, +190 redaka, SAMO to
+  polje, S-022) · **M2/29b** `c218ef6` `sokratis_io::today()` javno + `common_dir` normaliziran
+  (S-015 — dva radna stabla istog repozitorija su prije bila dva projekta u registru, tekstualna
+  usporedba putanje se razlikovala u velikom/malom slovu diska i završnom `\`) · **M2/29c** `6753f74`
+  `alerts_raised` determinističan (duplikat u `cur` se javlja jednom, u `prev` vrijedi najteža
+  težina). Recenzija: SPOJIVO, 2 Minor odgođena.
+- **T29** (`2363735` → popravak `2f772ad`): `AppState` (pet polja iza `Mutex`), `StoreCache` (adapter
+  `CommitCache`), `ProjectSummary`/`summarize`, jedanaest naredbi, `Range`/`Settings`. Recenzija je
+  prvo vratila ciglu — `add_project` je upisivao stablo iz kojeg je dijalog otvoren umjesto GLAVNOG
+  stabla (`main_root`, S-015: projekt bi ovisio o opstanku sporednog stabla); popravljeno, ponovna
+  recenzija SPOJIVO.
+- **T30** (`f39e418`, krug popravka `3d42a77`): `engine.rs` — motor osvježavanja. Recenzija je otvorila
+  **Ruling R10**: naredbe su zvale `refresh_project` MIMO reda čekanja, pa su watcher i naredba mogle
+  računati isti projekt istodobno — spec §3.3 t. 3 je obvezujući; popravak je uveo `request_refresh`
+  kao JEDINI ulaz (nit watchera, prvi izračun pri pokretanju, tri naredbe, tray). Ponovna recenzija
+  SPOJIVO.
+- **T31** (`70501dc`): `splash.rs` — tri `AtomicBool` (animacija, prvi izračun, već prikazano),
+  `Ordering::SeqCst` potvrđen NUŽAN (dvije zastavice se čitaju/pišu unakrsno iz dvije niti, Dekkerov
+  obrazac), rezerva 10 s. Recenzija: SPOJIVO bez nalaza.
+- **T32** (`9dab7e6`): `tray.rs` — izbornik (Otvori · Osvježi sve · Autostart · Izađi), `single-instance`
+  prvi plugin, X sakriva glavni prozor, autostart kroz plugin (baza se mijenja SAMO ako plugin uspije).
+  Recenzija: SPOJIVO uz **Ruling R12 parked** — ako plugin autostarta uspije a upis u bazu padne,
+  kvačica privremeno laže dok se ponovno ne klikne; stvaran rub, ali dokaz bi tražio stvarno
+  uključivanje autostarta na ovom stroju (Leonova uputa: ne u S2) — ide u krug popravaka S5.
+- **T33** (`f315861`): tray-ikona bez lika, izrezana iz `graph.webp` (Leonov izvor, odabran
+  2026-09-20). Orkestrator provjerio gledanjem na stvarnim 16×16 i 32×32 (uvećano 10×): na 32 px
+  prsten/stupci/linija razlučivi, na 16 px lik se stapa (očekivano, zato je izbačen).
+- **Spajanje: `cc74bb8` `merge: DESKTOP (T29-T33)`** (`--no-ff`). Pretraga tajni/imena/putanja nad
+  `main...feat/desktop` (19 datoteka, +1669/−17): ništa nađeno. Pune brane na `main`-u: `cargo fmt
+  --check` OK · `cargo clippy --workspace --all-targets -- -D warnings` OK · **142 testa, 1
+  ignoriran, 0 palo** (136 + 2 io + 2 jezgra + 2 desktop `Range`) · `npm run check` (i18n 160 hr=en ·
+  kontrast 4/4 · vitest 66/66) · `npm run build` OK · `sokratis docs .` 100/100 · `signals .` nema
+  signala. Pushano (`ce8a6f8..cc74bb8`), `main` = `origin/main`.
+- **Dimni test `npm run tauri dev`, U STABLU PRIJE SPAJANJA** (`LOCALAPPDATA` preusmjeren u
+  scratchpad, da razvoj ne dira Leonovu pravu bazu — T37 tek odvaja razvojnu bazu): splash vidljiv dok
+  je glavni skriven (t≈1,6 s) → glavni vidljiv t≈7,2 s (≈5,6 s animacija + učitavanje) → tray stvoren
+  → druga instanca izlazi sama, kod 0 → X sakriva glavni (proces živi) → ponovno pokretanje `.exe`-a
+  podiže skriveni prozor. Baza je nastala samo u scratchpadu; Leonov pravi `%LOCALAPPDATA%\sokratis`
+  nije dirnut. **NIJE provjereno u S2** (ide na ručnu listu T34): izgled ikone u pravom trayu na
+  100 %/200 %, desni klik → izbornik, kvačica autostarta ↔ `HKCU\…\Run`, obavijest na prijelaz u
+  Alert, preskok splasha klikom, `prefers-reduced-motion`.
+- **Stablo `sokratis.desktop` i grana `feat/desktop` obrisani** nakon provjere (`--merged main` da,
+  `merge-base --is-ancestor` da, stablo bez izmjena; grana nikad nije bila na remoteu). **Na disku je
+  JEDNO stablo (`main`), jedina grana `main`.**
+- **Poznata ograničenja otvorena ovom sesijom** (u `ARCHITECTURE.md` §11, jedno mjesto): sučelje do
+  T34 radi SAMO nad `MockApi` (naredbe postoje, ništa ih još ne zove); klik na obavijest ne otvara
+  projekt (plugin na Windowsu nema povratni poziv); autostart R12 (gore); natpisi traya se ne
+  mijenjaju s jezikom do ponovnog pokretanja; druga instanca otvori bazu prije nego što je
+  `single-instance` odbije (bezopasno, SQLite je idempotentan); `project_worktree.branch` se puni
+  praznim tekstom (`io::worktrees()` ne daje granu); do T37 `tauri dev` piše na PRAVU putanju baze.
+
+### Što slijedi
+**S3 = INTEGRACIJA T34 → T36 → T37** u novom stablu `sokratis.int`, grana `feat/integration` iz
+`main`-a — `TauriApi` (sučelje prestaje raditi nad `MockApi`), repo bez konvencija, instalater NSIS;
+nakon T34 Leon instalira „1.0.0-pre" (S-025, prva etapa). Ledger:
+`.superpowers/sdd/2026-09-18-m2-desktop/progress.md` i `NOVA-SESIJA-PROMPT.md` pored njega.

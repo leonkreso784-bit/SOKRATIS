@@ -16,7 +16,9 @@ opseg i „gotovo kad“: [ARHITEKTURA_M2.md §13](./ARHITEKTURA_M2.md). Gradi s
 gradnje. Što je ostalo za drugu verziju i kasnije: [records/BACKLOG.md](../records/BACKLOG.md).
 
 **Prva sesija izvedbe je gotova: T28 → SUČELJE (T20–T28) spojeno u `main`** (merge `da77f90`,
-2026-09-21). **Sljedeća sesija je DESKTOP (T29–T33)**, novo stablo `sokratis.desktop`.
+2026-09-21). **Druga sesija izvedbe je gotova: DESKTOP (T29–T33 + tri pred-cigle) spojen u `main`**
+(merge `cc74bb8`, 2026-09-21). **Sljedeća sesija je INTEGRACIJA (T34 → T36 → T37)**, novo stablo
+`sokratis.int`.
 
 **M0 gotov. M1 je zatvoren — verzija 0.1.0.** Sve cigle T1–T22 su u `main`-u: KOSTUR (T1), FIXTURE
 (T2, T2b, T2c), PARSE (T3–T6), METRIKE (T7–T11), DOCS+PRAVILA (T12–T14), IO (T15–T17), CLI (T18–T19),
@@ -94,10 +96,24 @@ pariteta ključeva), `format.ts`, vlastiti SVG grafovi, splash (4,2 s, preskoči
 sučelje samo prikazuje (S-012). Što je izgrađeno i što još ne radi (nema `TauriApi`, radi samo u
 pregledniku): `architecture/ARCHITECTURE.md` §11.
 
-**Time su svi tokovi osim DESKTOP-a i INTEGRACIJE gotovi i u `main`-u** (KOSTUR · PROFIL · JEZGRA ·
-STORE · IO · CLI · SUČELJE). Grane i stabla šest spojenih tokova (JEZGRA · PROFIL · STORE · IO · CLI ·
-SUČELJE) su obrisani 2026-09-21 (Leonovo dopuštenje za potpuno spojene grane) — **na disku je jedno
-stablo, `main`**. Tijek sesija: `records/PROGRESS.md`; nastavak gradnje: ledger
+**Tok DESKTOP je gotov** (M2/29a–c + T29–T33, merge `cc74bb8`, 2026-09-21, druga sesija izvedbe):
+`AppState` i jedanaest naredbi kroz koje sučelje smije zvati jezgru/`io`/`store` (`Report`
+nepromijenjen, S-012) — registar, izvještaj i trend po rasponu, ručni podaci, postavke, ručno
+osvježavanje. Motor osvježavanja (`engine.rs`): watcher, naredbe i tray dijele JEDAN red čekanja po
+projektu (spec §3.3 t. 3); izračun je uvijek nad cijelim rasponom, dnevna snimka se piše pri svakom
+izračunu, obavijest OS-a stiže SAMO na prijelaz u Alert. Splash čeka animaciju i prvi izračun svih
+projekata (S-019), tray i autostart kroz plugin, jedna instanca (S-020). Tri pred-cigle izvan
+vlasništva toka: `CommitRow.author_time` (S-022), `io::today()` + normaliziran `common_dir` (S-015),
+determinističan `alerts_raised`. Sučelje i dalje radi SAMO nad `MockApi` — naredbe postoje, ali ih
+`apps/desktop/src` još ne zove (T34). Brane na `main`-u: `cargo fmt --check` OK · `cargo clippy
+--workspace --all-targets -- -D warnings` OK · **142 testa, 1 ignoriran** · `npm run check` (i18n
+160 hr=en · kontrast 4/4 · vitest 66/66) · `npm run build` OK · `sokratis signals .` 0. `main` pushan
+na `origin`. Što je izgrađeno i što još ne radi: `architecture/ARCHITECTURE.md` §11.
+
+**Time su svi tokovi osim INTEGRACIJE gotovi i u `main`-u** (KOSTUR · PROFIL · JEZGRA · STORE · IO ·
+CLI · SUČELJE · DESKTOP). Grane i stabla sedam spojenih tokova (JEZGRA · PROFIL · STORE · IO · CLI ·
+SUČELJE · DESKTOP) su obrisani 2026-09-21 (Leonovo dopuštenje za potpuno spojene grane) — **na disku
+je jedno stablo, `main`**. Tijek sesija: `records/PROGRESS.md`; nastavak gradnje: ledger
 `.superpowers/sdd/2026-09-18-m2-desktop/progress.md` (izvan gita) i `NOVA-SESIJA-PROMPT.md` pored njega.
 
 ## Milestonei
@@ -106,7 +122,7 @@ stablo, `main`**. Tijek sesija: `records/PROGRESS.md`; nastavak gradnje: ledger
 |---|---|---|---|---|
 | **M0** | **Toolchain** | Visual Studio Build Tools (workload „Desktop development with C++") · rustup s MSVC targetom · `cargo --version` · workspace koji se builda | …pokrenuti `cargo test` u ovom folderu i dobiti zeleno na praznom testu | ✅ gotovo (2026-09-17) |
 | **M1** | **Jezgra + CLI** | `core` · `io` (git-proces, profil, ručni podaci) · `cli` · paritet s `RAD.xlsx` · ispravak sati · docs-ocjena · signali `unmerged-branches` i `docs-lag` | …nad Sokrat Studyjem iz terminala dobiti iste brojke kao u tablici, ispravne sate, ocjenu docs-a i dva signala s dokazom; staviti `sokratis signals` u preflight | ✅ **zatvoren 2026-09-18** (0.1.0, T1–T22 + krug popravaka u `main`; grane i stabla tokova obrisani uz Leonov OK) |
-| **M2** | **Desktop — verzija 1.0.0** | Tauri 2 · Svelte 5 · tokeni Sokrat Studyja (4 teme, `brand-*` iz loga) · `sokratis-store` (SQLite: registar · snimke · keš) · watcher · tray · autostart · obavijesti · 8 pogleda s uređivanjem + Postavke · HR/EN · znak i animacija pokretanja · **dopuna rezom 2026-09-21:** animacije grafova i pogleda · kartica s objašnjenjem · instalater za Leona · repo bez konvencija · dokumentacija točna i manja — sve u [ARHITEKTURA_M2.md](./ARHITEKTURA_M2.md) (§11 + §13) | …instalirati Sokratis, vidjeti animaciju, Pregled sa Sokrat Studyjem (pet stabala = jedan projekt) i Sokratisom, sve poglede s brojkama istim kao CLI, osvježenje bez klika, obavijest na Alert iz traya, objašnjenje svake brojke na klik — i prestati otvarati `RAD.xlsx` | 🟨 **u izvedbi** — u `main`-u: KOSTUR · PROFIL · JEZGRA · STORE · IO (+ M2/14b) · CLI · SUČELJE (T20–T28); nije započeto: DESKTOP (T29–T33) · INTEGRACIJA (T34–T35) · osam cigli iz §13. Etape: funkcija → izgled → izdanje (S-025) |
+| **M2** | **Desktop — verzija 1.0.0** | Tauri 2 · Svelte 5 · tokeni Sokrat Studyja (4 teme, `brand-*` iz loga) · `sokratis-store` (SQLite: registar · snimke · keš) · watcher · tray · autostart · obavijesti · 8 pogleda s uređivanjem + Postavke · HR/EN · znak i animacija pokretanja · **dopuna rezom 2026-09-21:** animacije grafova i pogleda · kartica s objašnjenjem · instalater za Leona · repo bez konvencija · dokumentacija točna i manja — sve u [ARHITEKTURA_M2.md](./ARHITEKTURA_M2.md) (§11 + §13) | …instalirati Sokratis, vidjeti animaciju, Pregled sa Sokrat Studyjem (pet stabala = jedan projekt) i Sokratisom, sve poglede s brojkama istim kao CLI, osvježenje bez klika, obavijest na Alert iz traya, objašnjenje svake brojke na klik — i prestati otvarati `RAD.xlsx` | 🟨 **u izvedbi** — u `main`-u: KOSTUR · PROFIL · JEZGRA · STORE · IO (+ M2/14b) · CLI · SUČELJE · DESKTOP (T29–T33); nije započeto: INTEGRACIJA (T34–T35) · osam cigli iz §13. Etape: funkcija → izgled → izdanje (S-025) |
 | **M3** | **Druga verzija** | iz stvarne uporabe 1.0.0: ocjena projekta F−…A+ · omjer popravaka i nova statistika · Postavke s vlastitim dodacima · kartica s dokazom · punjenje trenda iz povijesti · izvoz · izgled u iOS stilu — popis u [BACKLOG.md](../records/BACKLOG.md), spec se piše kad 1.0.0 bude u uporabi | …(određuje spec M3) | 📋 planirano |
 | **M4** | **Objava** | ostala pravila · profil za tuđe projekte · potpisan instalater · licenca · GitHub Actions; kasnije zasebnim planom: timovi · ne samo git | …instalirati Sokratis s GitHuba na čist stroj i priključiti tuđi repo | 📋 planirano |
 

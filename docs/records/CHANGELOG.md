@@ -178,6 +178,29 @@ Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek sesije:
   Brane: `cargo test --workspace` **136 testova, 1 ignoriran** · `npm run check` (svelte-check,
   i18n-parnost, kontrast, 66 vitest testova) · `npm run build` OK · `sokratis docs .` 100/100 ·
   `signals .` 0.
+- **DESKTOP (T29–T33 + tri pred-cigle) u `main`-u (2026-09-21).** Korisnik prvi put dobiva PRAVU
+  Tauri ljusku umjesto praznog prozora: `apps/desktop/src-tauri` (crate `sokratis-desktop`) sad ima
+  `AppState` i jedanaest naredbi kroz koje sučelje zove pravu jezgru — `Report` prolazi nepromijenjen
+  (S-012) — registar projekata (`list_projects`/`add_project`/`rename_project`/`remove_project`),
+  izvještaj i trend po rasponu (`get_report`/`get_trend`, četiri gotova presjeka ili vlastiti raspon),
+  ručni podaci (`set_override`/`save_visions`), postavke (`get_settings`/`set_setting`) i ručno
+  osvježavanje (`refresh`). Adapter (`cache.rs`) spaja keš sirovih commita (M2/18) sa storeom; na
+  grešku keša ponovi bez keša umjesto da naredba padne. Motor osvježavanja (`engine.rs`): watcher,
+  naredbe i tray dijele JEDAN red čekanja po projektu (`request_refresh`, spec §3.3 t. 3) — izračun je
+  uvijek nad cijelim rasponom, piše dnevnu snimku pri svakom izračunu i javlja
+  `report_updated { project_id }`; `signal_raised { project_id, rule, severity }` + obavijest OS-a
+  stiže SAMO na prijelaz u Alert, nikad pri prvom izračunu nakon pokretanja (S-020). Splash prozor
+  čeka animaciju I prvi izračun svih projekata, prikazuje glavni prozor točno jednom uz rezervu od
+  10 s (S-019). Tray (Otvori · Osvježi sve · Autostart ✓ · Izađi), X sakriva samo glavni prozor,
+  autostart kroz plugin, jedna instanca podiže postojeći prozor. Tray-ikona je znak bez lika
+  (`graph.webp`, izabrao Leon). Tri pred-cigle izvan toka: `CommitRow.author_time` (namjeran
+  snapshot, S-022), `io::today()` + normaliziran `common_dir` (S-015 — dva radna stabla istog
+  projekta se više ne dupliciraju u registru), determinističan `alerts_raised`. Sučelje i dalje radi
+  SAMO nad `MockApi` (T34) — instalabilne aplikacije još nema.
+  Brane nakon spajanja (merge `cc74bb8`): `cargo fmt --check` OK · `cargo clippy --workspace
+  --all-targets -- -D warnings` OK · `cargo test --workspace` **142 testa, 1 ignoriran, 0 palo** ·
+  `npm run check` (i18n 160 hr=en · kontrast 4/4 · vitest 66/66) · `npm run build` OK · `sokratis
+  docs .` 100/100 · `signals .` nema signala. Tok DESKTOP je time **gotov** (T29–T33 u `main`-u).
 
 ## [0.1.0] — 2026-09-17 — Jezgra i CLI (Milestone 1)
 

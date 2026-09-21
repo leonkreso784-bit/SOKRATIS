@@ -72,15 +72,15 @@ pogrešna uporaba**; `--help`/`--version` = 0) — sve rade nad pravim repozitor
 Sokrat Studyjem).
 Testovi i brane: `docs/workflow/TESTING.md`.
 
-## Stanje — TRENUTNO (2026-09-21 — SUČELJE spojeno; sljedeća sesija je DESKTOP: T29–T33)
+## Stanje — TRENUTNO (2026-09-21 — DESKTOP spojen; sljedeća sesija je INTEGRACIJA: T34 → T36 → T37)
 - **M0 gotov. M1 zatvoren** (0.1.0): `sokratis report/docs/signals` rade nad pravim repozitorijem,
   paritet s `RAD.xlsx` je test. Što je izgrađeno i **što još ne radi**: `ARCHITECTURE.md` (§11).
 - **M2 izlazi kao verzija 1.0.0** (S-024; 0.2.0 se preskače). Spec `docs/plan/ARHITEKTURA_M2.md`
   (§11 izlazni uvjet + **§13 dopuna rezom**), plan cigli `docs/superpowers/plans/2026-09-18-m2-desktop.md`.
-- **U `main`-u:** KOSTUR · JEZGRA · PROFIL · STORE · IO (+ M2/14b) · CLI · SUČELJE (T20–T28, merge
-  `da77f90`, 2026-09-21). **Nespojeno:** ništa. **Nije započeto:** DESKTOP T29–T33 · INTEGRACIJA
-  T34–T35 · osam cigli iz §13.
-- **Tri etape (S-025):** (1) funkcija — T28 ✅ → spajanje SUČELJA ✅ → DESKTOP → T34 → repo bez
+- **U `main`-u:** KOSTUR · JEZGRA · PROFIL · STORE · IO (+ M2/14b) · CLI · SUČELJE · DESKTOP
+  (T29–T33 + tri pred-cigle, merge `cc74bb8`, 2026-09-21). **Nespojeno:** ništa. **Nije započeto:**
+  INTEGRACIJA T34–T35 · osam cigli iz §13.
+- **Tri etape (S-025):** (1) funkcija — T28 ✅ → spajanje SUČELJA ✅ → DESKTOP ✅ → T34 → repo bez
   konvencija → instalater → Leon instalira „1.0.0-pre“ · (2) izgled — Postavke · animacije · kartica
   s objašnjenjem · (3) izdanje — T35 · završna recenzija · krug popravaka · cigla dokumentacije ·
   čuvar izdanja. **Sesije su kratke, s dogovorenim stajanjem** (Leonov usage je ograničen).
@@ -115,9 +115,8 @@ hrvatski · **S-031** dokumentacija: točnost se čuva smanjivanjem, ispunjeno i
 Uloge i protokol: `docs/workflow/AGENTI.md`. Graditelj radi **jednu ciglu u svom stablu**, recenzent presuđuje
 u dva prolaza, čuvar dokumentacije piše zapise; **samo orkestrator spaja u `main`**. Nakon compacta stanje se
 čita iz gita (`git log --oneline -15` · `git worktree list`), ne iz sjećanja. Nijedno stablo toka nije
-otvoreno; stablo za DESKTOP (`sokratis.desktop`, grana `feat/desktop`) otvara se sljedeće, INTEGRACIJA
-poslije po ovisnostima iz plana, a potpuno spojena se brišu (pravilo #1). Popis tokova i vlasništvo
-datoteka su u planu M2, ne ovdje.
+otvoreno; stablo za INTEGRACIJU (`sokratis.int`, grana `feat/integration`) otvara se sljedeće, a
+potpuno spojena se brišu (pravilo #1). Popis tokova i vlasništvo datoteka su u planu M2, ne ovdje.
 
 ## Dokumentacija — ulaz je SAMO `docs/README.md`
 Složena **po ulozi dokumenta** (kao Sokrat Study): `product/` ŠTO · `plan/` ŠTO SADA (najviše **jedan**

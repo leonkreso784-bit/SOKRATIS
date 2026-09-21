@@ -11,8 +11,9 @@
 | **jedinični (core)** | `crates/sokratis-core/src/**` uz kod (`#[cfg(test)]`) i `tests/` | parser vraća točno ove strukture; metrika daje točno ovu brojku; pravilo daje točno ovaj signal s dokazom | **tekst fixture** — nikad živi git |
 | **integracijski (io)** | `crates/sokratis-io/tests/` | git-proces, radna stabla, profil, ručni podaci | **privremeni repo** stvoren u testu |
 | **izlazni kodovi (cli)** | `crates/sokratis-cli/tests/cli.rs` | ugovor prema preflightu: **0** (nema signala) i **2** (Alert) nad repoom s poznatom poviješću, **3** za pogrešnu uporabu i za putanju koja nije repozitorij, **0** za `--help`/`--version` | **privremeni repo** (`tests/common/mod.rs`) |
-| **pohrana (store)** — *od M2* | `crates/sokratis-store/src/**` (`#[cfg(test)]`) | migracije se primijene od prazne baze; registar, postavke, snimke i keš sirovih commita (M2/15–18) rade, ali nemaju pozivatelja izvan testova (`docs/architecture/ARCHITECTURE.md` §11) | **`:memory:` baza** (`Store::open_in_memory`) — bez gita i bez datoteka |
+| **pohrana (store)** — *od M2* | `crates/sokratis-store/src/**` (`#[cfg(test)]`) | migracije se primijene od prazne baze; registar, postavke, snimke i keš sirovih commita (M2/15–18) rade; od DESKTOP-a (T29–T30) imaju pravog pozivatelja u aplikaciji, ali test i dalje ostaje nad `:memory:` bazom (`docs/architecture/ARCHITECTURE.md` §1) | **`:memory:` baza** (`Store::open_in_memory`) — bez gita i bez datoteka |
 | **sučelje (TS/Svelte)** — *od M2* | `apps/desktop/tests/**`, uz komponente | oblikovanje brojki, i18n ključevi, kontrast tokena, grafovi s praznim ulazom | `npm run check` u `apps/desktop`: danas `svelte-check` + `vitest`; brane za i18n i kontrast dolaze s ciglama M2/20–21 |
+| **ljuska (desktop)** — *od M2* | `apps/desktop/src-tauri/src/commands.rs` (`#[cfg(test)]`) | S-013: crate nema logike, pa je jedini jedinični test pretvorba birača raspona (`Range::to_dates`) u datume | 2 testa nad fiksnim „danas" |
 
 **Test-prvo** (CLAUDE.md #7): fixture → očekivano → implementacija. Rub koji prepoznaš odmah dobiva test.
 
@@ -84,8 +85,16 @@ danas piše [`../records/CHANGELOG.md`](../records/CHANGELOG.md) — brojka prep
 
 ## 5 · Što se NE testira testom
 
-- **Ljuska i izgled** — `sokratis-desktop` po S-013 nema logike, pa nema ni jediničnih testova: splash
-  do kraja i preskočen, `prefers-reduced-motion`, tray, autostart, druga instanca i obavijest na Alert
-  idu kao **ručna lista provjere sa snimkama** u izvještaju cigle (spec M2 §9).
+- **Ljuska i izgled** — `sokratis-desktop` po S-013 gotovo nema logike (jedini test: pretvorba
+  `Range`, §1). Dokaz da se ljuska stvarno pokreće je **dimni test** `npm run tauri dev`, ručno
+  pokrenut prije spajanja svake DESKTOP-cigle (spec M2 §9): splash prikazan i zatvoren točno jednom,
+  glavni prozor se pojavi tek nakon animacije I prvog izračuna svih projekata, tray postoji i njegov
+  izbornik radi, druga instanca podigne postojeći prozor umjesto da otvori novi, X sakriva umjesto da
+  zatvori, ponovno pokretanje `.exe`-a vraća skriveni prozor. `prefers-reduced-motion`, autostart u
+  `HKCU\…\Run` i obavijest na prijelaz u Alert su i dalje na ručnoj listi (`docs/architecture/
+  ARCHITECTURE.md` §11 — nisu provjereni u sesiji koja je DESKTOP spojila). `LOCALAPPDATA` se pri
+  dimnom testu preusmjerava (varijabla okoline) da razvoj ne piše u Leonovu pravu
+  `%LOCALAPPDATA%\sokratis\sokratis.db` — T37 tek razdvaja razvojnu bazu od prave; do tada `npm run
+  tauri dev` BEZ preusmjeravanja piše na PRAVU putanju (poznato ograničenje, `ARCHITECTURE.md` §11).
 - **Performanse** — danas se ne testiraju; M2/11 prvo **mjeri** (brojač git-procesa po izvještaju) i
   tek to mjerenje nosi brojku u test; `gix` je odgovor koji i dalje čeka pitanje.
