@@ -5,12 +5,7 @@
 //!
 //! ZAŠTO RUST OVAKO (cigla M2/29 — stanje, registar i izvještaj kao naredbe)
 //! `manage(AppState { .. })` predaje dijeljeno stanje Tauriju PRIJE `run()`; svaka naredba ga
-//! poslije dohvati kao `State<'_, AppState>` (posudba, ne vlasništvo). Drugi `expect` u ovoj
-//! funkciji (otvaranje baze) je namjeran iz istog razloga kao onaj na `run()`: bez registra
-//! projekata nema što raditi, pa je pad odmah, s jasnom porukom, bolji od tihog rada bez pohrane.
-//! `invoke_handler(generate_handler![...])` je makro koji NA KOMPAJLIRANJU provjeri da svako ime iz
-//! popisa postoji i ima ispravan potpis — tipfeler u imenu naredbe je greška prevoditelja, ne
-//! runtime iznenađenje kad ga sučelje jednom pozove.
+//! poslije dohvati kao `State<'_, AppState>` (posudba, ne vlasništvo). Detalj uz oba poziva niže.
 mod cache;
 mod commands;
 mod state;
@@ -29,6 +24,9 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
         .manage(AppState {
+            // Drugi `expect` u ovoj funkciji je namjeran iz istog razloga kao onaj na `run()`
+            // niže: bez registra projekata nema što raditi, pa je pad odmah, s jasnom porukom,
+            // bolji od tihog rada bez pohrane.
             store: Mutex::new(
                 sokratis_store::Store::open(&state::db_path()).expect("baza u %LOCALAPPDATA%"),
             ),
@@ -37,6 +35,9 @@ pub fn run() {
             queue: Mutex::new(sokratis_io::RefreshQueue::default()),
             rx: Mutex::new(None),
         })
+        // `generate_handler!` je makro koji NA KOMPAJLIRANJU provjeri da svako ime iz popisa
+        // postoji i ima ispravan potpis — tipfeler u imenu naredbe je greška prevoditelja, ne
+        // runtime iznenađenje kad ga sučelje jednom pozove.
         .invoke_handler(tauri::generate_handler![
             list_projects,
             add_project,

@@ -1,10 +1,8 @@
 //! ZAŠTO RUST OVAKO (cigla M2/29 — jedanaest Tauri naredbi kao tanki pozivatelji)
 //! `#[tauri::command]` pretvara običnu funkciju u RPC koji sučelje zove kroz `invoke(ime, args)`;
-//! povratna vrijednost mora biti `Result<T, String>` jer Tauri grešku šalje preko granice procesa
-//! kao TEKST, ne kao Rustov `Error`-trait (`Report` iz `get_report` prolazi kroz `build_report`
-//! NEPROMIJENJEN — S-012). Zajednička „računica" (izračun izvještaja) živi u `compute`/
-//! `compute_input`, ne u svakoj naredbi posebno (S-013: desktop bez logike osim pretvorbe raspona)
-//! — naredbe SAMO posuđuju stanje i pozivaju je.
+//! `Result<T, String>` je ugovor Tauri IPC-a (obrazložen uz `state::text`). Zajednička „računica"
+//! (izračun izvještaja) živi u `compute`/`compute_input` niže — naredbe SAMO posuđuju stanje i
+//! pozivaju je.
 use crate::cache::StoreCache;
 use crate::state::{AppState, text};
 use crate::summary::{ProjectSummary, summarize};
@@ -83,8 +81,9 @@ fn setting_or(store: &sokratis_store::Store, key: &str, default: &str) -> Result
 
 // ── zajednički izračun (dopuna orkestratora, T29 #2) ──────────────────────────────────────────────
 
-/// Izračun jednog izvještaja: registar → otvoren projekt → raspon → keširani log → jezgra. NE piše
-/// u `state.reports` — to radi SAMO naredba `refresh` (T30 uzima `reports[id]` kao „prošli"
+/// Izračun jednog izvještaja: registar → otvoren projekt → raspon → keširani log → jezgra;
+/// `Report` izlazi iz `build_report` NEPROMIJENJEN (S-012), ova funkcija ništa ne preslaguje. NE
+/// piše u `state.reports` — to radi SAMO naredba `refresh` (T30 uzima `reports[id]` kao „prošli"
 /// izvještaj za `alerts_raised`, pa izračun nad kraćim rasponom ne smije tu mapu prljati, S-020).
 pub(crate) fn compute(
     state: &AppState,
@@ -150,15 +149,19 @@ pub fn list_projects(state: tauri::State<'_, AppState>) -> Result<Vec<ProjectSum
 /// bilježi radna stabla; naredba `add_project` niže je samo tanki pozivatelj oko ovoga.
 fn track_project(state: &AppState, dir: &Path) -> Result<ProjectSummary, String> {
     let project = Project::open(dir).map_err(text)?;
-    let name = project
-        .main_root()
+    // `root_path` u registru je GLAVNO stablo (`main_root`), ne stablo koje je dijalog otvorio
+    // (`project.root`, može biti sporedno radno stablo) — identitet projekta je `common_dir`
+    // (S-015), ali `list_projects`/`compute` otvaraju `Project` PO `root_path`, pa ta putanja mora
+    // preživjeti brisanje bilo kojeg sporednog stabla (nalaz recenzije, krug 1).
+    let main_root = project.main_root();
+    let name = main_root
         .file_name()
         .map(|n| n.to_string_lossy().to_string())
-        .unwrap_or_else(|| dir.to_string_lossy().to_string());
+        .unwrap_or_else(|| main_root.to_string_lossy().to_string());
     let now = now_unix();
     let store = state.store.lock().map_err(text)?;
     let rec = store
-        .add_project(&name, &project.root, &project.common_dir, now)
+        .add_project(&name, &main_root, &project.common_dir, now)
         .map_err(text)?;
     // `io` daje samo putanje stabala, ne granu (Ruling orkestratora, T29 #5) — sučelje crta samo
     // BROJ stabala, pa je grana ovdje prazan tekst.
