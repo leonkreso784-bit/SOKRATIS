@@ -72,21 +72,21 @@ pogrešna uporaba**; `--help`/`--version` = 0) — sve rade nad pravim repozitor
 Sokrat Studyjem).
 Testovi i brane: `docs/workflow/TESTING.md`.
 
-## Stanje — TRENUTNO (2026-09-21 — rez za 1.0.0 odlučen; sljedeća sesija je IZVEDBA: T28 → spajanje SUČELJA)
+## Stanje — TRENUTNO (2026-09-21 — SUČELJE spojeno; sljedeća sesija je DESKTOP: T29–T33)
 - **M0 gotov. M1 zatvoren** (0.1.0): `sokratis report/docs/signals` rade nad pravim repozitorijem,
   paritet s `RAD.xlsx` je test. Što je izgrađeno i **što još ne radi**: `ARCHITECTURE.md` (§11).
 - **M2 izlazi kao verzija 1.0.0** (S-024; 0.2.0 se preskače). Spec `docs/plan/ARHITEKTURA_M2.md`
   (§11 izlazni uvjet + **§13 dopuna rezom**), plan cigli `docs/superpowers/plans/2026-09-18-m2-desktop.md`.
-- **U `main`-u:** KOSTUR · JEZGRA · PROFIL · STORE · IO (+ M2/14b) · CLI. **Nespojeno:** samo SUČELJE
-  (stablo `sokratis.ui`, grana `feat/ui`) — M2/20–M2/27 potvrđene u pregledniku, **M2/28 nije započeta**.
-  **Nije započeto:** DESKTOP T29–T33 · INTEGRACIJA T34–T35 · osam cigli iz §13.
-- **Tri etape (S-025):** (1) funkcija — T28 → spajanje SUČELJA → DESKTOP → T34 → repo bez konvencija →
-  instalater → Leon instalira „1.0.0-pre“ · (2) izgled — Postavke · animacije · kartica s objašnjenjem
-  · (3) izdanje — T35 · završna recenzija · krug popravaka · cigla dokumentacije · čuvar izdanja.
-  **Sesije su kratke, s dogovorenim stajanjem** (Leonov usage je ograničen).
+- **U `main`-u:** KOSTUR · JEZGRA · PROFIL · STORE · IO (+ M2/14b) · CLI · SUČELJE (T20–T28, merge
+  `da77f90`, 2026-09-21). **Nespojeno:** ništa. **Nije započeto:** DESKTOP T29–T33 · INTEGRACIJA
+  T34–T35 · osam cigli iz §13.
+- **Tri etape (S-025):** (1) funkcija — T28 ✅ → spajanje SUČELJA ✅ → DESKTOP → T34 → repo bez
+  konvencija → instalater → Leon instalira „1.0.0-pre“ · (2) izgled — Postavke · animacije · kartica
+  s objašnjenjem · (3) izdanje — T35 · završna recenzija · krug popravaka · cigla dokumentacije ·
+  čuvar izdanja. **Sesije su kratke, s dogovorenim stajanjem** (Leonov usage je ograničen).
 - Druga verzija (M3) i kasnije: `docs/records/BACKLOG.md`. Zapis namjere iz kojeg je rez nastao:
   `docs/archive/PLAN_DESIGNE.md` (ispunjen, nije izvor istine).
-- Na disku su dva stabla (`main` · `sokratis.ui`); LICENCE i taga nema. Prva radnja sesije:
+- **Na disku je jedno stablo (`main`)**; LICENCE i taga nema. Prva radnja sesije:
   `git log --oneline -15` · `git worktree list`, pa ledger
   `.superpowers/sdd/2026-09-18-m2-desktop/progress.md` (zadnji odjeljak) i `NOVA-SESIJA-PROMPT.md` pored njega.
 - Brane, brojke i tijek sesija: `PROGRESS.md`; isporuke: `CHANGELOG.md`. Ovaj odjeljak to ne ponavlja.
@@ -114,9 +114,10 @@ hrvatski · **S-031** dokumentacija: točnost se čuva smanjivanjem, ispunjeno i
 ## Agenti — više grana, jedan orkestrator
 Uloge i protokol: `docs/workflow/AGENTI.md`. Graditelj radi **jednu ciglu u svom stablu**, recenzent presuđuje
 u dva prolaza, čuvar dokumentacije piše zapise; **samo orkestrator spaja u `main`**. Nakon compacta stanje se
-čita iz gita (`git log --oneline -15` · `git worktree list`), ne iz sjećanja. Otvoreno je jedno stablo toka
-(`sokratis.ui`); stabla za DESKTOP i INTEGRACIJU otvaraju se po ovisnostima iz plana, a potpuno spojena se
-brišu (pravilo #1). Popis tokova i vlasništvo datoteka su u planu M2, ne ovdje.
+čita iz gita (`git log --oneline -15` · `git worktree list`), ne iz sjećanja. Nijedno stablo toka nije
+otvoreno; stablo za DESKTOP (`sokratis.desktop`, grana `feat/desktop`) otvara se sljedeće, INTEGRACIJA
+poslije po ovisnostima iz plana, a potpuno spojena se brišu (pravilo #1). Popis tokova i vlasništvo
+datoteka su u planu M2, ne ovdje.
 
 ## Dokumentacija — ulaz je SAMO `docs/README.md`
 Složena **po ulozi dokumenta** (kao Sokrat Study): `product/` ŠTO · `plan/` ŠTO SADA (najviše **jedan**

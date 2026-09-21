@@ -785,3 +785,41 @@ vizualna provjera → spajanje SUČELJA (T20–T28) u `main` → pune brane → 
 u svojoj kratkoj sesiji: DESKTOP T29–T33 · T34 + repo bez konvencija + instalater („1.0.0-pre“) ·
 izgled (pet cigli) · izdanje. Ledger: `.superpowers/sdd/2026-09-18-m2-desktop/progress.md` i
 `NOVA-SESIJA-PROMPT.md` pored njega.
+
+## 2026-09-21 (FABLE) — Izvedba S1: T28 + spajanje SUČELJA (T20–T28) u `main`
+
+**Prva od pet kratkih sesija izvedbe nakon reza za 1.0.0.** Opseg: T28 + spajanje. DESKTOP nije
+započet.
+
+- **Cigla M2/28** (tri commita u `feat/ui`): `3e6355d` četiri preostala pogleda — Dnevnik s
+  overrideom u mjestu (`<select>` pet vrsta → `setOverride` → `loadReport`, oznaka „ručno" +
+  vraćanje klasifikatora), Isporuke (iz `report.deliveries`, najnovije prvo, 🚀 za deploy), Vizije
+  (pilule `vision_totals`, dodaj/obriši s potvrdom u retku), Dokumentacija (`docs === null` →
+  `docs.na`, ocjena/100, kašnjenje, nalazi, klik na putanju kopira) · `893fef1` uređivanje postojeće
+  vizije istim obrascem kao dodavanje (spec §5 traži „dodaj · uredi · promijeni stanje", brif je
+  imao samo dodaj/obriši — orkestratorov Ruling) · `f666503` širine stupaca za najuži prozor
+  (`minWidth: 960`): naslov commita u Dnevniku imao je 17 px na 960×600, `<select>` je rezao
+  „vođenje dokumentacije" — nađeno ORKESTRATOROVIM MJERENJEM u pregledniku, ne recenzijom koda
+  (pouka T27 potvrđena drugi put: širine se mjere na najužem dopuštenom prozoru, ne samo na 1280).
+- Nove čiste funkcije u `apps/desktop/src/views/helpers.ts`, sve test-prvo: `sortDiary`,
+  `sortDeliveries`, `copyText`, `joinRepoPath`, `replaceVisionAt`, `parsePercent`. `App.svelte`
+  usmjerava svih devet pogleda.
+- Svjesno odstupanje od speca §5.1: nema Rust naredbe `copy_path` — kopiranje ide kroz
+  `navigator.clipboard.writeText` (`copyText`), WebView2 je ima uz korisničku gestu (zapisano u
+  planu, T28 i T34).
+- **Spajanje: `da77f90` `merge: SUCELJE (T20-T28)`.** Pune brane na `main`-u nakon spajanja: `cargo
+  fmt --check` OK · `cargo clippy --workspace --all-targets -- -D warnings` OK · **136 Rust testova,
+  1 ignoriran** · `npm run check` u `apps/desktop` (svelte-check 207 datoteka/0 grešaka ·
+  check:i18n 160 ključeva hr=en · check:contrast 4/4 teme · vitest 66 testova u 9 datoteka) ·
+  `npm run build` OK · `sokratis docs .` 100/100 · `signals .` 0. Pushano.
+- **Stabla i grane:** `sokratis.ui`/`feat/ui` obrisani (lokalno i na remoteu) čim je merge potvrđen
+  potpuno spojen — isto dopuštenje kao za JEZGRU/PROFIL/STORE/IO/CLI 2026-09-21. **Na disku je JEDNO
+  stablo (`main`), nespojenih grana nema.**
+- Poznata ograničenja koja SUČELJE otkriva, zapisana u `ARCHITECTURE.md` §11 (jedno mjesto): tihe
+  greške u sučelju bez stanja greške (rješava T34), `Vision.state` slobodan tekst bez prijevoda,
+  potvrda brisanja vizije viri 13 px preko ruba tablice (kozmetika), stupac `model` u Isporukama
+  ponekad nosi ostatak zaglavlja dnevnika (parser isporuka u jezgri).
+
+### Što slijedi
+**S2 = DESKTOP T29–T33** u novom stablu `sokratis.desktop`, grana `feat/desktop` iz `main`-a. Karta
+preostalih sesija je u ledgeru/planu (`CLAUDE.md` „Tri etape").

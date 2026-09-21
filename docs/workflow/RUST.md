@@ -206,3 +206,4 @@ uvode idu u ovu tablicu — **ne** u §4, koji je Rust.
 | runa `$state` | M2/1a (`src/App.svelte`) | vrijednost označena runom je reaktivna — promjena sama osvježi svaki prikaz koji je čita, bez `store`-a i bez `$:` |
 | dva ulaza u Viteu (`index.html` + `splash.html`) | M2/1a (`vite.config.ts`) | jedan build daje dvije HTML stranice; Tauri ih otvara kao dva prozora (splash i glavni, S-019) |
 | `svelte-check` | M2/1a (`package.json`, `npm run check:svelte`) | tipovi se provjeravaju i **unutar** `.svelte` datoteka, ne samo u `.ts` — to je TS-ekvivalent `cargo clippy` brane |
+| `{#snippet}` | M2/28 (`views/Visions.svelte`, `visionForm`) | Svelte 5 blok markupa koji se poziva na više mjesta (ovdje: iznad tablice za dodavanje, unutar retka za uređivanje) bez kopiranja — isti obrazac, jedan izvor |

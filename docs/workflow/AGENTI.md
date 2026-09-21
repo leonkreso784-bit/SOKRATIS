@@ -49,9 +49,9 @@ pa su mu brane `npm run check` umjesto `cargo`; tokovi SUČELJE i DESKTOP nakon 
 kao `M2/1b`. **Koja su stabla otvorena kaže `git worktree list`, a koji je tok dokle stigao
 `plan/ROADMAP.md`** — ovdje se to ne prepisuje (S-010). Stabla i grane tokova koji su **potpuno spojeni u
 pushani `main`** orkestrator briše sam (Leonovo dopuštenje 2026-09-21, `CLAUDE.md` pravilo #1); tako su
-2026-09-21 obrisana stabla JEZGRE, PROFILA, STOREA, IO-a i CLI-ja. Cigle iz dopune reza za 1.0.0
-(spec M2 §13) idu istim protokolom; stanje po cigli je u ledgeru
-`.superpowers/sdd/2026-09-18-m2-desktop/progress.md` (izvan gita).
+2026-09-21 obrisana stabla JEZGRE, PROFILA, STOREA, IO-a, CLI-ja i (nakon merga T20–T28) SUČELJA — na
+disku ostaje jedno stablo, `main`. Cigle iz dopune reza za 1.0.0 (spec M2 §13) idu istim protokolom;
+stanje po cigli je u ledgeru `.superpowers/sdd/2026-09-18-m2-desktop/progress.md` (izvan gita).
 
 ## 3 · Protokol po cigli
 

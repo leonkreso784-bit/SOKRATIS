@@ -1,16 +1,17 @@
 # ARCHITECTURE — što je izgrađeno
 
 **Status:** ✅ opisuje kod koji je u `main`-u — Milestone 1 (verzija 0.1.0, uključujući krug popravaka
-nakon završne recenzije) **plus šest od devet tokova M2, svi gotovi i spojeni**: KOSTUR (`M2/1a`+
+nakon završne recenzije) **plus sedam od devet tokova M2, svi gotovi i spojeni**: KOSTUR (`M2/1a`+
 `M2/1b`: ugovor tipova, crate `sokratis-store`, `apps/desktop` s ikonama i `npm install`, desktop crate
 u workspaceu) · JEZGRA (M2/2…M2/7: snapshot ugovora `Report`-a, `until` kao gornja granica, zbroj
 vizija, redci commita/isporuke, aktivne faze preko `phase_tag`, `SnapshotMetrics`/`diff`/
 `alerts_raised`) · PROFIL (M2/8, M2/9: `validate_paths`, `test_path_exclude`) · STORE (M2/15…M2/18:
 registar, postavke, snimke, keš sirovih commita) · IO (M2/10…M2/14 + M2/14b izvan plana: atomarno
 pisanje, manje git-procesa, detached HEAD, watcher, ograda putanja pri otvaranju — **dug I9 zatvoren u
-cijelosti** — i potrošač keša) · CLI (M2/19: `report --until`). **SUČELJE je jedini nespojeni tok**
-(u grani `feat/ui`, ne opisan ovdje — §11); DESKTOP i INTEGRACIJA čekaju sučelje. Što od gotovih tokova
-još stoji bez pozivatelja u aplikaciji je u §11 ·
+cijelosti** — i potrošač keša) · CLI (M2/19: `report --until`) · **SUČELJE** (T20–M2/28: Svelte 5 +
+Tailwind v4 nad `Report`-om, devet pogleda — §1). **DESKTOP i INTEGRACIJA nisu započeti** (T29–T35).
+Što od gotovih tokova još stoji bez PRAVOG pozivatelja u aplikaciji (SUČELJE danas crta samo
+`MockApi`, ne pravu Tauri-ljusku) je u §11 ·
 **Zadnja provjera:** 2026-09-21
 
 > **Što ovaj dokument JEST:** opis sustava kakav stoji u `crates/` i `apps/` — granice između crateova, tok
@@ -68,6 +69,28 @@ uz Leonov OK (80 paketa, 0 ranjivosti) i `npm run tauri icon` iz Leonova loga po
 trajao ~3 min. `cargo test --workspace` dotiče crate; `apps/desktop` ima `node_modules` i `npm run
 check`/`npm run build` rade (`dist/` s `index.html` i `splash.html`); crate sam pokreće praznu Tauri
 ljusku (splash + glavni prozor bez sadržaja, §11).
+
+**`apps/desktop/src` (SUČELJE, T20–M2/28, spojeno 2026-09-21) je Svelte 5 + Tailwind v4 nad
+`Report`-om — ne računa ništa, samo prikazuje (S-012):**
+
+| dio | što radi |
+|---|---|
+| `styles/tokens.css` | četiri teme (zadana „Akademsko plavo"), `brand-*` izmjeren iz Leonova loga (S-017); `scripts/check-contrast.mjs` brani kontrast na sve četiri |
+| `lib/i18n/` (`hr.json`, `en.json`, `t.ts`, `index.svelte.ts`) | HR/EN rječnik (S-021); `scripts/check-i18n.mjs` brani da oba jezika imaju isti skup ključeva |
+| `lib/format.ts` | jedino mjesto oblikovanja brojki, datuma i postotaka za sučelje |
+| `lib/charts/` (`Bars`, `Line`, `Ring`, `Sparkline`, `scale.ts`) | vlastiti SVG grafovi (S-018), bez biblioteke |
+| `splash/` (`Splash.svelte`, `intro.ts`) | animacija pokretanja, 4,2 s, preskočiva (S-019); zaseban Vite-ulaz `splash.html` |
+| `lib/api.ts` | sučelje `Api` (osam metoda); `MockApi` čita insta snapshot jezgre kroz Viteov `?raw` uvoz — dev-prikaz i vitest vide TOČNO brojke koje bi jezgra izračunala, ne ručno prepisanu kopiju (S-010) |
+| `lib/types.ts` | TS zrcalo `Report`-a; `tests/types.test.ts` ga veže na isti insta snapshot da se oblik ne razmine s Rustom |
+| `lib/state.svelte.ts` | Svelte 5 rune (`$state`) drže odabrani projekt, raspon, postavke, izvještaj |
+| `views/` (devet pogleda) + `views/helpers.ts` | Pregled, Tempo, Vrste rada, Pokazatelji, Faze, Dnevnik, Isporuke, Vizije, Dokumentacija; `helpers.ts` drži čiste funkcije testirane odvojeno od komponenata (sortiranje, boja po vrsti/težini, i18n-množina, kopiranje i spajanje putanje, zamjena vizije po indeksu) |
+
+Dnevnik uređuje vrstu rada po commitu (`setOverride`, oznaka „ručno"); Vizije se dodaju, uređuju i
+brišu u mjestu istim obrascem (Svelte 5 `{#snippet}`, `saveVisions` uvijek šalje cijeli popis, ne
+samo izmijenjeni redak). **`MockApi` je danas JEDINA izvedba `Api`-ja** — `createApi()` uvijek vraća
+mock, pa sučelje radi samo u pregledniku (`npm run dev`), nije vezano ni na jednu Tauri naredbu;
+`TauriApi` dolazi u T34. Brane su `npm run check` (`svelte-check` + `check:i18n` + `check:contrast` +
+`vitest`) i `npm run build` u `apps/desktop`, ne `cargo` ([`TESTING.md`](../workflow/TESTING.md) §1).
 
 **Što `io` danas radi** (`crates/sokratis-io/src/`): `Project::open` čita `.sokratis/profile.json`
 (ili `Profile::default()`) i odmah zove `validate_paths()` — putanja izvan repoa je
@@ -446,13 +469,14 @@ preuzeo M2 u [`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md) §8 i plan
   pozivatelja iz aplikacije** (§1) — CLI i dalje sve računa na zahtjev i ne piše ništa osim onoga što
   korisnik sam stavi u `.sokratis/`; S-009 se ostvaruje tek kad DESKTOP (T29/T30) ožiči `sokratis-store`
   i `Watcher`.
-- **`Signal.title_key` (`core/src/model.rs`) nema par u i18n-rječniku sučelja** — rječnik živi u
-  `apps/desktop/src` (grana `feat/ui`, još nije u `main`-u), pa danas nigdje ne postoji prijevod
-  natpisa signala.
+- **`Signal.title_key` (`core/src/model.rs`) nema par u i18n-rječniku sučelja** — `hr.json`/`en.json`
+  imaju `signals.*` (naslov trake, brojevi po težini), ali nijedan `signal.<rule>` ključ po pravilu
+  (npr. `signal.unmerged_branches`); prijevod natpisa pojedinog signala zato danas nigdje ne postoji.
 
-**Šest od devet tokova M2 su gotovi i spojeni** (KOSTUR, JEZGRA, PROFIL, STORE, IO uklj. M2/14b, CLI —
-popis u zaglavlju ovog dokumenta). Ono što je time izgrađeno, a **još nema pozivatelja u aplikaciji**
-jer čeka SUČELJE/DESKTOP (gornje tri točke ih detaljnije objašnjavaju, ovo je popis, §1 daje kod):
+**Sedam od devet tokova M2 su gotovi i spojeni** (KOSTUR, JEZGRA, PROFIL, STORE, IO uklj. M2/14b, CLI,
+SUČELJE — popis u zaglavlju ovog dokumenta). Ono što je time izgrađeno, a **još nema PRAVOG
+pozivatelja u aplikaciji** jer čeka DESKTOP (gornje točke ih detaljnije objašnjavaju, ovo je popis, §1
+daje kod):
 
 - `sokratis-store` u cijelosti — registar, postavke, snimke, keš (§1);
 - `io::CommitCache`/`cached_log`/`Project::input_cached` (M2/14b) i `io::Watcher` (M2/13) (§1);
@@ -464,8 +488,17 @@ jer čeka SUČELJE/DESKTOP (gornje tri točke ih detaljnije objašnjavaju, ovo j
   `sokratis-store::save_snapshot`/`latest_snapshot`/`trend` (M2/17) — postoje i imaju teste na obje
   strane, ali ih ništa u `main`-u ne spaja (§3);
 - `apps/desktop`: crate `sokratis-desktop` se builda i pokreće praznu Tauri ljusku (splash + glavni
-  prozor bez sadržaja) — nijedna naredba prema jezgri ili `sokratis-store` još ne postoji (§1).
+  prozor bez sadržaja); `apps/desktop/src` (SUČELJE, §1) crta devet pogleda, ali samo nad `MockApi` —
+  nijedna Tauri naredba prema jezgri ili `sokratis-store` još ne postoji (T29–T34).
 
-**Sučelje (`apps/desktop/src`) je u grani `feat/ui` (stablo `sokratis.ui`), NIJE u `main`-u.**
-M2/20–M2/27 su vizualno potvrđene u pregledniku, M2/28 (Dnevnik · Isporuke · Vizije · Dokumentacija)
-nije započeta — ovaj dokument ga zato ne opisuje kao izgrađeno; dobiva svoj odjeljak kad se spoji.
+**Sučelje je u `main`-u, ali bez prave pozadine (T34):**
+
+- **Tihe greške.** `loadReport`/`selectProject`/`addProject` i slične radnje u `state.svelte.ts` nemaju
+  stanje greške — neuspio poziv `Api`-ja danas nema gdje izaći na ekran; rješava ga T34 uz `TauriApi`.
+- **`Vision.state` je slobodan tekst** (`model.rs`: `state: String`, ne enum) — obrazac u `Visions.svelte`
+  ga uzima izravno iz korisničkog unosa, sučelje ga ne prevodi ni ograničava kroz i18n.
+- **Potvrda brisanja vizije viri 13 px preko ruba tablice** na najužem prozoru (960 px) — kozmetički
+  nalaz vizualne provjere M2/28, odgođen.
+- **Stupac „model" u pogledu Isporuke ponekad nosi ostatak zaglavlja dnevnika**, ne samo ime modela —
+  uzrok je parser isporuka u jezgri (`core/src/parse/diary.rs`, tok PARSE), ne sučelje; nalaz otkriven
+  gradnjom pogleda Isporuke (M2/28), popravak čeka ciglu u `core`.

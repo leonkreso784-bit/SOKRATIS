@@ -166,6 +166,18 @@ Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek sesije:
   M2/14b u `main`-u).
 - **README na engleskom (2026-09-21, S-030).** Korijenski `README.md` je preveden i osvježen da ga
   može pročitati svatko tko otvori javni repo; `docs/` ostaje na hrvatskom. Koda nije dirano.
+- **SUČELJE (T20–T28) u `main`-u (2026-09-21).** Korisnik dobiva prvi put PRIKAZ `Report`-a: Svelte
+  5 + Tailwind v4 sučelje s `tokens.css` (četiri teme, zadana „Akademsko plavo", brana kontrasta),
+  HR/EN rječnikom (brana pariteta ključeva), vlastitim SVG grafovima i splash animacijom (4,2 s,
+  preskočiva) — devet pogleda: Pregled, Tempo, Vrste rada, Pokazatelji, Faze, **Dnevnik** (vrsta
+  rada po commitu se uređuje `<select>`-om, oznaka „ručno"), **Isporuke** (najnovije prvo, 🚀 za
+  deploy), **Vizije** (pilule po stanju, dodaj/uredi/obriši u mjestu) i **Dokumentacija** (ocjena,
+  nalazi, klik na putanju kopira). Mjerenje ostaje u jezgri, sučelje samo prikazuje (S-012). Sučelje
+  **radi zasad samo u pregledniku** (`npm run dev` u `apps/desktop`) — jedina izvedba `Api`-ja je
+  `MockApi` nad snimkom jezgre; prava Tauri-ljuska i pravi podaci dolaze s DESKTOP-om (T29–T34).
+  Brane: `cargo test --workspace` **136 testova, 1 ignoriran** · `npm run check` (svelte-check,
+  i18n-parnost, kontrast, 66 vitest testova) · `npm run build` OK · `sokratis docs .` 100/100 ·
+  `signals .` 0.
 
 ## [0.1.0] — 2026-09-17 — Jezgra i CLI (Milestone 1)
 

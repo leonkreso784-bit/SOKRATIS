@@ -7,8 +7,9 @@ heading — always with evidence. Built to watch several projects at once.
 > 🚧 **Work in progress (September 2026).** Milestone 1 is closed — version 0.1.0: `core`, `io` and
 > `cli` run against real git history, and parity with the spreadsheet it replaces is a test, not a
 > claim. **Milestone 2 (the desktop app) is being built and will ship as 1.0.0.** The Rust side
-> (core, profile, io, store, cli) is in `main`; the Svelte interface lives in its own branch and the
-> Tauri shell is next, so there is no installable app yet. Where things stand:
+> (core, profile, io, store, cli) and the Svelte interface are both in `main`, but the interface only
+> runs in a browser (`npm run dev`) against mock data so far — the real Tauri shell is next, so there
+> is no installable app yet. Where things stand:
 > [docs/plan/ROADMAP.md](./docs/plan/ROADMAP.md) · what has shipped:
 > [docs/records/CHANGELOG.md](./docs/records/CHANGELOG.md).
 
