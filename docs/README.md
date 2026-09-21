@@ -64,6 +64,7 @@ spojeni u `main`, IO/STORE/SUČELJE su recenzirani do svoje zadnje cigle u svoji
 
 | Dokument | Svrha |
 |---|---|
+| [PLAN_DESIGNE.md](./plan/PLAN_DESIGNE.md) | 📝 **zapis namjere** (Leon, 2026-09-21) — NIJE spec: animirano otvaranje grafova i pogleda, kartica s objašnjenjem na klik, tema i jezik u Postavke, više statistike, kasnije timovi i ne-samo-git; **rez za 1.0.0** pa 1.0.0 nadgleda gradnju druge verzije i Sokrat Study |
 | [ROADMAP.md](./plan/ROADMAP.md) | 🟩 **živ** — milestonei M0–M3, status, što je sljedeće |
 | [ARHITEKTURA_M2.md](./plan/ARHITEKTURA_M2.md) | 🟩 **AKTIVAN SPEC** — desktop: granice (`store`, `desktop` bez logike), Tauri ugovor (`Report` nepromijenjen), SQLite shema, watcher, 8 pogleda, teme i znak, splash, ovisnosti, dug M1 koji preuzima, testovi, M0 alati, izlazni uvjet 0.2.0 |
 
