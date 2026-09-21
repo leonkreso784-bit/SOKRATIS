@@ -122,6 +122,7 @@
   "deliveries.date": "datum",
   "deliveries.model": "model",
   "deliveries.title": "naslov",
+  "deliveries.kind": "vrsta",
   "deliveries.deploy": "deploy",
   "deliveries.empty": "nema isporuka u razdoblju",
   "visions.title": "naslov",

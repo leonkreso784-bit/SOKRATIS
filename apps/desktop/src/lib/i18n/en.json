@@ -122,6 +122,7 @@
   "deliveries.date": "date",
   "deliveries.model": "model",
   "deliveries.title": "title",
+  "deliveries.kind": "kind",
   "deliveries.deploy": "deploy",
   "deliveries.empty": "no deliveries in range",
   "visions.title": "title",

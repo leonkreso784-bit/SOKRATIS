@@ -4,7 +4,9 @@
 // dopunjeno M2/28 — `sortDiary`/`sortDeliveries` (poredak Dnevnika i Isporuka), `copyText`
 // (kopiranje bez Rust naredbe, `vi.stubGlobal` zamjenjuje `navigator` jer Node pod vitestom nema
 // `navigator.clipboard`) i `joinRepoPath` (sastavljanje putanje nalaza dokumentacije);
-// dopuna M2/28 (uređivanje vizije) — `replaceVisionAt` (spec 6.2 "dodaj · uredi · promijeni stanje")
+// dopuna M2/28 (uređivanje vizije) — `replaceVisionAt` (spec 6.2 "dodaj · uredi · promijeni stanje");
+// krug popravka 1 — `parsePercent` izdvojen iz `Visions.svelte` (nalaz recenzije koda: čista funkcija
+// s rubovima bez testa)
 // Čiste funkcije, čist test bez DOM-a i bez Svelte runa: `hr.json` uvezen izravno kao `Dict`, isti
 // obrazac kao `tests/format.test.ts` — `signalSummary` tako vidi PRAVI rječnik, ne ručno prepisan
 // tekst (S-010), a hrvatska množina (jedan/dva-četiri/pet i više) se provjerava na stvarnim ključevima.
@@ -16,6 +18,7 @@ import {
   copyText,
   joinRepoPath,
   kindColor,
+  parsePercent,
   phaseRows,
   replaceVisionAt,
   severityClass,
@@ -245,5 +248,24 @@ describe('replaceVisionAt', () => {
     const result = replaceVisionAt(visions, 5, vision('x', 'done'));
     expect(result).toEqual(visions);
     expect(result).not.toBe(visions);
+  });
+});
+
+describe('parsePercent', () => {
+  it('prazan (ili sam razmak) string -> null — "nepoznato", ne nula (krug popravka 1)', () => {
+    expect(parsePercent('')).toBeNull();
+    expect(parsePercent('   ')).toBeNull();
+  });
+  it('nevaljan unos (nije broj) -> null', () => {
+    expect(parsePercent('abc')).toBeNull();
+  });
+  it('valjan broj unutar 0-100 prolazi nepromijenjen', () => {
+    expect(parsePercent('45')).toBe(45);
+    expect(parsePercent('0')).toBe(0);
+    expect(parsePercent('100')).toBe(100);
+  });
+  it('izvan raspona 0-100 se steže — <input min/max> su samo UI-nagovještaj, ne brana', () => {
+    expect(parsePercent('150')).toBe(100);
+    expect(parsePercent('-5')).toBe(0);
   });
 });

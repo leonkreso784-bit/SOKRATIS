@@ -15,11 +15,16 @@
   // (`views/helpers.ts`) čisto zamjenjuje jedan redak bez mutacije ulaza. Brisanje NE koristi
   // `window.confirm` (Ruling brifa #6 — WebView2/Playwright ga loše podnose): dvokoračni gumb u
   // retku ("Obriši" → "Potvrdi"/"Odustani") ostaje unutar iste tablice.
+  // Krug popravka 1: mjerenje u pregledniku je našlo "naslov" na 192 px dok je "bilješka" (manje
+  // važan podatak) bez zadane širine grabila 320 px — zamijenjeno (naslov je sad FLEKSIBILAN stupac,
+  // bilješka fiksna i uža). `parsePercent` je preseljen u `views/helpers.ts` s testom (nalaz
+  // recenzije koda: čista funkcija s rubovima bez testa) — `percentText` ostaje ovdje jer je samo
+  // poziv `format.ts#percent()`.
   import { app, loadReport } from '../lib/state.svelte';
   import { api } from '../lib/api';
   import { getLang, t } from '../lib/i18n/index.svelte';
   import { num, percent } from '../lib/format';
-  import { replaceVisionAt } from './helpers';
+  import { parsePercent, replaceVisionAt } from './helpers';
   import type { Vision } from '../lib/types';
 
   // `null` = nijedan obrazac otvoren; `'new'` = dodavanje; broj = indeks retka koji se uređuje.
@@ -52,15 +57,6 @@
 
   function closeForm(): void {
     formTarget = null;
-  }
-
-  // `Vision.percent` je `Option<u8>` u jezgri — cijeli broj 0-100, ne razlomak 0-1. Prazno polje
-  // znači "nepoznato" (`null`), ne nula.
-  function parsePercent(text: string): number | null {
-    const trimmed = text.trim();
-    if (trimmed === '') return null;
-    const n = Number(trimmed);
-    return Number.isNaN(n) ? null : n;
   }
 
   // `percent()` (`format.ts`) očekuje razlomak 0-1 (isti obrazac kao `KindStats.share`); pretvorba
@@ -229,17 +225,18 @@
     {#if app.report.visions.length === 0}
       <p class="text-sm text-ink-2">{t('visions.empty')}</p>
     {:else}
-      <!-- `table-fixed` (#9): "bilješka" bez zadane širine uzima preostali prostor; dugačak tekst se
-           reže elipsom uz `title` za cijeli sadržaj na hover. -->
+      <!-- `table-fixed` (#9): "naslov" je GLAVNI podatak (krug popravka 1) pa je JEDINI stupac bez
+           zadane širine — uzima preostali prostor umjesto "bilješke" (sad fiksna i uža). Dugačak
+           tekst u svakom fiksnom stupcu se reže elipsom uz `title` za cijeli sadržaj na hover. -->
       <table class="w-full table-fixed text-left text-sm">
         <thead>
           <tr class="text-ink-2">
-            <th scope="col" class="w-48 py-1 pr-3">{t('visions.title')}</th>
-            <th scope="col" class="w-32 py-1 pr-3">{t('visions.source')}</th>
-            <th scope="col" class="w-28 py-1 pr-3">{t('visions.state')}</th>
-            <th scope="col" class="w-20 py-1 pr-3">{t('visions.percent')}</th>
-            <th scope="col" class="py-1 pr-3">{t('visions.note')}</th>
-            <th scope="col" class="w-48 py-1 pr-3">
+            <th scope="col" class="py-1 pr-3">{t('visions.title')}</th>
+            <th scope="col" class="w-[88px] py-1 pr-3">{t('visions.source')}</th>
+            <th scope="col" class="w-[88px] py-1 pr-3">{t('visions.state')}</th>
+            <th scope="col" class="w-[72px] py-1 pr-3">{t('visions.percent')}</th>
+            <th scope="col" class="w-[110px] py-1 pr-3">{t('visions.note')}</th>
+            <th scope="col" class="w-[130px] py-1 pr-3">
               <span class="sr-only">{t('visions.edit')} / {t('visions.delete')}</span>
             </th>
           </tr>

@@ -1,10 +1,14 @@
 <script lang="ts">
-  // ZAŠTO OVAKO (cigla M2/28 — Dokumentacija: ocjena, kašnjenje, nalazi s kopiranjem putanje)
+  // ZAŠTO OVAKO (cigla M2/28 — Dokumentacija: ocjena, kašnjenje, nalazi s kopiranjem putanje; krug
+  // popravka 1 — recenzija koda je našla da `aria-label` gumba nosi samo `finding.path`, dok vidljivi
+  // tekst dodaje `:line`)
   // `docs === null` znači da projekt nema mapu dokumentacije koju profil prepoznaje — jezgra je to
   // već utvrdila (S-012, sučelje ne pogađa) i pogled to MORA reći umjesto praznih brojki (spec 6.2,
   // Ruling brifa #2 drži ovu granu dostižnom i kad mock daje primjer). `copyText`/`joinRepoPath`
   // (`views/helpers.ts`) su jedini put do clipboarda i do apsolutne putanje — ništa se ne lijepi
   // izravno ovdje. Velika ocjena koristi rem-veličinu fonta (ne postotak širine, pouka #9).
+  // `findingLabel` je JEDNO mjesto koje zna oblik "path:line" (S-010) — vidljivi tekst, `title` i
+  // `aria-label` gumba ga sad sva tri čitaju odavde, umjesto da svaki ponovi istu ternarnu logiku.
   import { app } from '../lib/state.svelte';
   import { getLang, t } from '../lib/i18n/index.svelte';
   import { num } from '../lib/format';
@@ -18,6 +22,11 @@
   const currentProject = $derived<ProjectSummary | null>(
     app.projects.find((p) => p.id === app.currentId) ?? null,
   );
+
+  // "path:line" kad nalaz ima redak, inače samo "path" — jedina definicija tog oblika u datoteci.
+  function findingLabel(finding: Finding): string {
+    return finding.line !== null ? `${finding.path}:${finding.line}` : finding.path;
+  }
 
   async function onCopyPath(finding: Finding): Promise<void> {
     if (!currentProject) return;
@@ -67,12 +76,12 @@
                 <button
                   type="button"
                   class="max-w-full truncate text-left font-mono text-xs text-ink-blue underline decoration-dotted hover:text-ink-0 disabled:cursor-default disabled:no-underline disabled:opacity-60"
-                  title={finding.path}
-                  aria-label={`${t('docs.copy')}: ${finding.path}`}
+                  title={findingLabel(finding)}
+                  aria-label={`${t('docs.copy')}: ${findingLabel(finding)}`}
                   disabled={!currentProject}
                   onclick={() => void onCopyPath(finding)}
                 >
-                  {finding.path}{finding.line !== null ? ':' + finding.line : ''}
+                  {findingLabel(finding)}
                 </button>
               </div>
               <p class="break-words text-ink-1">{finding.message}</p>

@@ -143,3 +143,18 @@ export function joinRepoPath(rootPath: string, path: string): string {
 export function replaceVisionAt(visions: Vision[], index: number, updated: Vision): Vision[] {
   return visions.map((v, i) => (i === index ? updated : v));
 }
+
+// ZAŠTO OVAKO (krug popravka 1 cigle M2/28 — `parsePercent` izdvojen iz `Visions.svelte` s testom;
+// nalaz recenzije koda: čista funkcija s rubovima bez testa)
+// `Vision.percent` je `Option<u8>` u jezgri — cijeli broj 0-100, ne razlomak 0-1 (vidi `percentText`
+// u `Visions.svelte`, koji ostaje ondje jer je samo poziv `format.ts#percent()`). Prazno polje znači
+// "nepoznato" (`null`), ne nula. `<input type="number" min="0" max="100">` su SAMO UI-nagovještaj —
+// preglednik ne odbija ručno utipkan tekst mimo strelica (npr. zalijepljen "150"), pa `Math.min`/
+// `Math.max` steže na valjani raspon umjesto da tiho pošalje besmislenu vrijednost jezgri.
+export function parsePercent(text: string): number | null {
+  const trimmed = text.trim();
+  if (trimmed === '') return null;
+  const n = Number(trimmed);
+  if (Number.isNaN(n)) return null;
+  return Math.min(100, Math.max(0, n));
+}
