@@ -5,15 +5,17 @@
   // po sebi osvježi kad se promijene drugdje (Topbar, RangePicker) — nema potrebe za propsima.
   // Devet stavki iz `VIEWS` su skrivene bez odabranog projekta (spec 6.1): nema izvještaj, nema što
   // gledati; `settings` (deseti, globalni pogled — NIJE u `VIEWS`, vidi `types.ts`) ostaje vidljiv,
-  // odvojen razmakom `mt-auto` na dno, jer Postavke ne ovise o izvještaju.
+  // odvojen razmakom `mt-auto` na dno, jer Postavke ne ovise o izvještaju. Dopunjeno M2/38 (R29,
+  // dimni test) — `overview` je i sam popis projekata (globalan kao `settings`), pa ostaje vidljiv
+  // i bez odabranog projekta da klik na Postavke ne zarobi korisnika bez puta natrag.
   import { app } from '../state.svelte';
   import { t } from '../i18n/index.svelte';
   import { VIEWS } from '../types';
 </script>
 
 <nav class="flex w-56 shrink-0 flex-col gap-1 border-r border-line bg-surface-1 p-2" aria-label={t('nav.overview')}>
-  {#if app.currentId !== null}
-    {#each VIEWS as view (view)}
+  {#each VIEWS as view (view)}
+    {#if view === 'overview' || app.currentId !== null}
       <button
         type="button"
         class="rounded-md px-3 py-2 text-left text-sm {app.view === view
@@ -24,8 +26,8 @@
       >
         {t(`nav.${view}`)}
       </button>
-    {/each}
-  {/if}
+    {/if}
+  {/each}
   <button
     type="button"
     class="mt-auto rounded-md px-3 py-2 text-left text-sm {app.view === 'settings'

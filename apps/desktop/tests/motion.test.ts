@@ -1,8 +1,8 @@
-// ZAŠTO OVAKO (cigla M2/38): vitest ovdje nema DOM, pa se pokret čuva na dva mjesta koja se DAJU
-// testirati — čista odluka `motionOff` i sam tekst `motion.css`. ODSTUPANJE OD BRIFA: `?raw` na
-// `.css` pod `@tailwindcss/vite` vraća prazan modul (isti nalaz kao `read-tokens.mjs`, M2/20), pa
-// čitanje ide kroz `scripts/read-motion.mjs` (node:fs). Pravila niže vrijede i za T39–T41 dodatke u
-// istu datoteku.
+// ZAŠTO OVAKO (cigla M2/38, dopunjeno R30): vitest ovdje nema DOM, pa se pokret čuva na dva mjesta
+// koja se DAJU testirati — čista odluka `motionOff` i sam tekst `motion.css`. ODSTUPANJE OD BRIFA:
+// `?raw` na `.css` pod `@tailwindcss/vite` vraća prazan modul (isti nalaz kao `read-tokens.mjs`,
+// M2/20), pa čitanje ide kroz `scripts/read-motion.mjs` (node:fs); regex niže NE traži `^` na
+// početku retka jer su deklaracije u istom retku sa selektorom (`.chart-bar { … animation: …; }`).
 import { describe, expect, it } from 'vitest';
 import { motionOff } from '../src/lib/motion';
 import { motionCss as css } from '../scripts/read-motion.mjs';
@@ -20,7 +20,13 @@ describe('pokret', () => {
     expect(Number(m![1])).toBeLessThanOrEqual(250);
   });
   it('svaka animacija i prijelaz u motion.css troše --motion-dur', () => {
-    const decls = [...css.matchAll(/^\s*(?:animation|transition):\s*([^;]+);/gm)].map((d) => d[1]!);
+    // Bez `^\s*` (R30, recenzija T40): deklaracije žive u istom retku sa selektorom
+    // (`.chart-bar { … animation: …; }`), pa bi sidro na početak retka dalo 0 pogodaka i test bi
+    // prolazio prazan. `[^;}]+` hvata i zadnju deklaraciju bez `;` prije `}`. Dvotočka odmah iza
+    // `animation`/`transition` ne pogađa `animation-duration:`/`transition-duration:` iz
+    // `data-motion="off"` bloka (provjereno nizom ispod).
+    const decls = [...css.matchAll(/(?:animation|transition):\s*([^;}]+)/g)].map((d) => d[1]!);
+    expect(decls.length).toBeGreaterThanOrEqual(6);
     for (const d of decls) expect(d, d).toContain('var(--motion-dur)');
   });
   it('data-motion="off" svodi sva trajanja na nulu', () => {
