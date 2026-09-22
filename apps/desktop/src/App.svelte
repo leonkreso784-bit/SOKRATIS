@@ -5,14 +5,30 @@
   // komponentu, pa je grana `{:else}` s `common.loading` UKLONJENA jer više nije dostižna ni za
   // jedan mogući `View`: `app.view` je zatvoren TS-enum, if/else-if lanac ovdje ga pokriva u cijelosti;
   // dopunjeno M2/34 — pretplata na `report_updated` je OVDJE, ne u `Overview.svelte`: promjena u
-  // repou mora osvježiti pogled u kojem korisnik TRENUTNO stoji, ne samo Pregled)
+  // repou mora osvježiti pogled u kojem korisnik TRENUTNO stoji, ne samo Pregled; dopunjeno M2/38 —
+  // `syncMotion` sluša `prefers-reduced-motion` odmah nakon `applyTheme`, a ruta `settings` je deseti,
+  // globalni pogled koji `Sidebar` crta i bez odabranog projekta (R22); dopunjeno M2/39 — `{#key
+  // app.epoch}` oko lanca pogleda tjera Svelte da poglede DEMONTIRA i ponovno MONTIRA kad `epoch`
+  // poraste s 0 na 1, pa se ulazna animacija grafova (S-026) odigra tek tad, ne dok je glavni prozor
+  // još skriven iza splasha (T31). Dva NEOVISNA čuvara javljaju taj trenutak jer nijedan sam nije
+  // pouzdan u WebView2: `visibilitychange` prati `document.visibilityState`, koji Windows/WebView2
+  // zna držati na "visible" i za skriveni HWND, pa se ne mora nikad promijeniti; `onFocusChanged`
+  // prati stvarni fokus prozora, koji Rust postavlja u `splash.rs` (`main.show()` + `main.set_focus()`)
+  // TOČNO kad se splash zatvori. Oba su idempotentna (`if (app.epoch === 0)`) pa koji god okine prvi
+  // pobjeđuje, a drugi ne radi ništa.
   // `onMount` je Svelteov standardni "kad je komponenta u DOM-u" udarac — ovdje je to JEDINO mjesto
   // koje povlači početne postavke i popis projekata (S-010: jedno mjesto pokretanja, ne u svakoj
   // podkomponenti). Umotan u `try/catch` (dopuna T34): pad `getSettings` (npr. baza nedostupna) više
   // ne smije ostaviti prazan prozor bez ijedne poruke — greška ide u traku ispod.
+  // Dopunjeno M2/40 — ključ `{#key}` sada nosi i `app.view`: promjena pogleda dobiva isti ulaz
+  // (`view-enter`) kao promjena `epoch`, `is-loading` prigušuje stari sadržaj dok raspon učitava
+  // novi, a `Skeleton` zamjenjuje poglede SAMO dok prvi izvještaj još nije stigao.
+  // Dopunjeno M2/41 — `<ExplainCard />` sjedi IZVAN `{#key}`, na dnu korijenskog `<div>`: promjena
+  // pogleda ne smije remontirati karticu s objašnjenjem dok se ona sama zatvara.
   import { onDestroy, onMount } from 'svelte';
+  import { getCurrentWindow } from '@tauri-apps/api/window';
   import { api } from './lib/api';
-  import { app, applyTheme, dismissError, loadProjects, loadReport, setError } from './lib/state.svelte';
+  import { app, applyTheme, dismissError, loadProjects, loadReport, setError, syncMotion } from './lib/state.svelte';
   import { setLang, t } from './lib/i18n/index.svelte';
   import Topbar from './lib/shell/Topbar.svelte';
   import Sidebar from './lib/shell/Sidebar.svelte';
@@ -26,13 +42,28 @@
   import Deliveries from './views/Deliveries.svelte';
   import Visions from './views/Visions.svelte';
   import Docs from './views/Docs.svelte';
+  import Settings from './views/Settings.svelte';
+  import Skeleton from './lib/shell/Skeleton.svelte';
+  import ExplainCard from './lib/explain/ExplainCard.svelte';
 
   let unsubscribeReportUpdated: (() => void) | null = null;
+  let motionQuery: MediaQueryList | undefined;
+  let unlistenFocus: (() => void) | null = null;
+
+  // Prvi čuvar (svugdje, uklj. preglednik): dokument je vidljiv od početka u `npm run dev`, pa
+  // `epoch` odmah pređe na 1 i animacija se vidi pri montiranju — to je ispravno ondje gdje splash
+  // ne postoji.
+  const onVisible = () => {
+    if (document.visibilityState === 'visible' && app.epoch === 0) app.epoch = 1;
+  };
 
   onMount(async () => {
     try {
       app.settings = await api.getSettings();
       applyTheme(app.settings.theme);
+      syncMotion();
+      motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+      motionQuery.addEventListener('change', syncMotion);
       setLang(app.settings.lang);
       await loadProjects();
     } catch (e) {
@@ -44,10 +75,27 @@
       void loadProjects();
       if (id === app.currentId) void loadReport();
     });
+
+    document.addEventListener('visibilitychange', onVisible);
+    // Drugi čuvar, SAMO unutar Taurija (isti test kao `api.ts`/`Splash.svelte`): `onFocusChanged`
+    // stiže sa `splash.rs` `main.show()` + `main.set_focus()`, neovisno o tome je li WebView2 uopće
+    // okinuo `visibilitychange` za dotad skriveni prozor.
+    if ('__TAURI_INTERNALS__' in window) {
+      void getCurrentWindow()
+        .onFocusChanged(({ payload }) => {
+          if (payload && app.epoch === 0) app.epoch = 1;
+        })
+        .then((off) => {
+          unlistenFocus = off;
+        });
+    }
   });
 
   onDestroy(() => {
     unsubscribeReportUpdated?.();
+    motionQuery?.removeEventListener('change', syncMotion);
+    document.removeEventListener('visibilitychange', onVisible);
+    unlistenFocus?.();
   });
 </script>
 
@@ -73,25 +121,34 @@
   <div class="flex min-h-0 flex-1">
     <Sidebar />
     <main class="flex-1 overflow-auto p-4">
-      {#if app.view === 'overview'}
-        <Overview />
-      {:else if app.view === 'tempo'}
-        <Tempo />
-      {:else if app.view === 'kinds'}
-        <Kinds />
-      {:else if app.view === 'indicators'}
-        <Indicators />
-      {:else if app.view === 'phases'}
-        <Phases />
-      {:else if app.view === 'diary'}
-        <Diary />
-      {:else if app.view === 'deliveries'}
-        <Deliveries />
-      {:else if app.view === 'visions'}
-        <Visions />
-      {:else if app.view === 'docs'}
-        <Docs />
-      {/if}
+      {#key `${app.epoch}:${app.view}`}
+        <div class="view-enter" class:is-loading={app.loading && app.report !== null}>
+          {#if app.loading && app.report === null && app.currentId !== null}
+            <Skeleton />
+          {:else if app.view === 'overview'}
+            <Overview />
+          {:else if app.view === 'tempo'}
+            <Tempo />
+          {:else if app.view === 'kinds'}
+            <Kinds />
+          {:else if app.view === 'indicators'}
+            <Indicators />
+          {:else if app.view === 'phases'}
+            <Phases />
+          {:else if app.view === 'diary'}
+            <Diary />
+          {:else if app.view === 'deliveries'}
+            <Deliveries />
+          {:else if app.view === 'visions'}
+            <Visions />
+          {:else if app.view === 'docs'}
+            <Docs />
+          {:else if app.view === 'settings'}
+            <Settings />
+          {/if}
+        </div>
+      {/key}
     </main>
   </div>
+  <ExplainCard />
 </div>

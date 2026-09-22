@@ -1,5 +1,6 @@
 <script lang="ts">
-  // ZAŠTO OVAKO (cigla M2/25 — gornja traka: znak, birač projekta, raspon, osvježi, tema, jezik)
+  // ZAŠTO OVAKO (cigla M2/25 — gornja traka: znak, birač projekta, raspon, osvježi; dopunjeno M2/38 —
+  // `ThemeSwitch`/`LangSwitch` sele u pogled Postavke, gornja traka ih više ne crta, R23)
   // `<Topbar>` čita/piše izravno globalnu runu `app` (`state.svelte.ts`) — bez callback-propsa kao
   // u starijem Svelteu: promjena `app.currentId` ovdje se odmah vidi u `<Sidebar>` i `<main>`.
   import markUrl from '../../assets/intro/mark.webp';
@@ -7,8 +8,6 @@
   import { api } from '../api';
   import { t } from '../i18n/index.svelte';
   import RangePicker from './RangePicker.svelte';
-  import ThemeSwitch from './ThemeSwitch.svelte';
-  import LangSwitch from './LangSwitch.svelte';
 
   function onProjectChange(e: Event & { currentTarget: HTMLSelectElement }): void {
     const id = Number(e.currentTarget.value);
@@ -52,7 +51,5 @@
     <button type="button" class="rounded-md px-2 py-1 text-xs text-ink-1 hover:bg-surface-2" onclick={() => void refresh()}>
       {t('top.refresh')}
     </button>
-    <ThemeSwitch />
-    <LangSwitch />
   </div>
 </header>

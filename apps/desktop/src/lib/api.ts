@@ -7,6 +7,8 @@
 // pravog Tauri prozora. `createApi()` bira izvedbu po `'__TAURI_INTERNALS__' in window` (isti test
 // kao `Splash.svelte`) — `typeof window === 'undefined'` čuva vitest (Node, bez DOM-a) da uvijek
 // dobije `MockApi`, jer ovaj modul konstruira `api` ODMAH pri uvozu (zadnji redak datoteke).
+// Dopunjeno M2/38 — `TauriApi.setSetting` pretvara `boolean` u `"on"`/`"off"` PO TIPU, ne po ključu:
+// `motion` je isti slučaj kao `autostart`, jedan mehanizam za oba (S-010).
 import snapRaw from '../../../../crates/sokratis-core/tests/snapshots/snapshot__report-sokratstudy-2026-09-17.snap?raw';
 import { invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
@@ -166,7 +168,7 @@ export class MockApi implements Api {
   }
 
   async getSettings(): Promise<Settings> {
-    return { theme: 'academic', lang: 'hr', autostart: false };
+    return { theme: 'academic', lang: 'hr', autostart: false, motion: true };
   }
 
   async setSetting(_key: keyof Settings, _value: Settings[keyof Settings]): Promise<void> {
@@ -293,10 +295,12 @@ export class TauriApi implements Api {
     return invoke<Settings>('get_settings');
   }
 
-  // Baza drži TEKST po ključu — `autostart` je u `Api`-ju `boolean`, ovdje se pretvara u `"on"`/
-  // `"off"`; `theme`/`lang` su već tekst (Rust `Theme`/`Lang` su i tamo `String`), idu kakvi jesu.
+  // Baza drži TEKST po ključu — `boolean` polja (`autostart`, `motion`) postaju `"on"`/`"off"` PO
+  // TIPU vrijednosti, ne po imenu ključa (M2/38, S-010: jedan mehanizam koji vrijedi i za idući
+  // boolean koji dođe, bez novog `key === '…'` uvjeta za svaki); `theme`/`lang` su već tekst (Rust
+  // `Theme`/`Lang` su i tamo `String`), idu kakvi jesu.
   async setSetting<K extends keyof Settings>(key: K, value: Settings[K]): Promise<void> {
-    const text = key === 'autostart' ? (value ? 'on' : 'off') : String(value);
+    const text = typeof value === 'boolean' ? (value ? 'on' : 'off') : String(value);
     await invoke<void>('set_setting', { key, value: text });
   }
 

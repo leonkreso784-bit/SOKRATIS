@@ -6,11 +6,15 @@
   // je jedini izvor) i samo ga sortira/oblikuje za prikaz — `helpers.ts` nosi tu logiku odvojeno da
   // je vitest testira bez Svelte runtimea. `prompt()`/`confirm()` su WebView2-ovi ugrađeni dijalozi
   // (brief T26) — dovoljni dok pravi Tauri dijalog za preimenovanje/uklanjanje ne postane potreban.
+  // Dopunjeno M2/42 — kartica projekta gubi ugniježđene gumbe (R26): gumb odabira sad omata SAMO
+  // naslov, a tri crte (stabla · zadnji commit · signali) su mu sestre, svaka u vlastitom
+  // `<Explainable>` — `<button>` unutar `<button>` je nevaljan HTML.
   import { api } from '../lib/api';
   import { app, loadProjects, selectProject, setError } from '../lib/state.svelte';
   import { getDict, t } from '../lib/i18n/index.svelte';
   import { relative } from '../lib/format';
   import { severityClass, signalSummary, sortProjects } from './helpers';
+  import Explainable from '../lib/explain/Explainable.svelte';
   import type { ProjectSummary } from '../lib/types';
 
   function lastCommitText(project: ProjectSummary): string {
@@ -70,20 +74,24 @@
         <div class="relative flex flex-col gap-2 rounded-lg border border-line bg-surface-1 p-4 shadow-e1">
           <button
             type="button"
-            class="flex flex-1 flex-col gap-1 pr-6 text-left"
+            class="w-full pr-6 text-left"
             aria-label={project.name}
             onclick={() => void selectProject(project.id)}
           >
             <h2 class="text-lg font-semibold text-ink-0">{project.name}</h2>
-            <p class="text-sm text-ink-1">{t('overview.worktrees', { n: project.worktrees })}</p>
-            <p class="text-sm text-ink-2">{lastCommitText(project)}</p>
-            <p class="text-sm font-medium {severityClass(project.worst)}">
-              {signalSummary(project.signals, getDict())}
-            </p>
-            {#if project.error}
-              <p class="text-sm text-danger-ink">{t('overview.error', { msg: project.error })}</p>
-            {/if}
           </button>
+          <p class="text-sm text-ink-1">
+            <Explainable id="overview.worktrees">{t('overview.worktrees', { n: project.worktrees })}</Explainable>
+          </p>
+          <p class="text-sm text-ink-2">
+            <Explainable id="overview.last_commit">{lastCommitText(project)}</Explainable>
+          </p>
+          <p class="text-sm font-medium {severityClass(project.worst)}">
+            <Explainable id="overview.signals">{signalSummary(project.signals, getDict())}</Explainable>
+          </p>
+          {#if project.error}
+            <p class="text-sm text-danger-ink">{t('overview.error', { msg: project.error })}</p>
+          {/if}
 
           <details class="absolute right-2 top-2">
             <summary

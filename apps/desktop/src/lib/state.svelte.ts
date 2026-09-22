@@ -1,10 +1,16 @@
 // ZAŠTO OVAKO (cigla M2/25 — stanje aplikacije kao Svelte 5 runa; dopunjeno M2/34 — greška vidljiva
-// korisniku umjesto tihog odbijenog Promisea, i "zadnji zahtjev pobjeđuje" za `getReport`)
+// korisniku umjesto tihog odbijenog Promisea, i "zadnji zahtjev pobjeđuje" za `getReport`; dopunjeno
+// M2/38 — `applyMotion`/`syncMotion` pišu `data-motion` isto kao `applyTheme` piše `data-theme`;
+// `syncMotion` je OVDJE, ne u `App.svelte`, jer `Settings.svelte` treba istu odluku bez pristupa
+// lokalnoj `MediaQueryList` iz tuđeg `onMount`; dopunjeno M2/39 — `epoch` broji koliko je puta
+// glavni prozor postao vidljiv korisniku; `App.svelte` njime omata poglede u `{#key}` da se ulazna
+// animacija grafova (S-026) prikaže tek kad ima tko gledati, ne dok je prozor skriven iza splasha)
 // `$state` izvan komponente treba nastavak `.svelte.ts` da ga kompajler prepozna kao rune-modul
 // (isti obrazac kao `src/lib/i18n/index.svelte.ts`). Jedan objekt `app` je jedini izvor istine za
 // okvir — Topbar/Sidebar/pogledi ga čitaju izravno, bez proslijeđivanja kroz propse; promjena jednog
 // polja sama osvježi svaku komponentu koja ga čita (S-012: sučelje samo drži ono što `Api` vrati).
 import { api } from './api';
+import { motionOff } from './motion';
 import type { ProjectSummary, Range, Report, Settings, Theme, View } from './types';
 
 export const app = $state({
@@ -13,9 +19,10 @@ export const app = $state({
   view: 'overview' as View,
   range: { preset: 'all' } as Range,
   report: null as Report | null,
-  settings: { theme: 'academic', lang: 'hr', autostart: false } as Settings,
+  settings: { theme: 'academic', lang: 'hr', autostart: false, motion: true } as Settings,
   loading: false,
   error: null as string | null,
+  epoch: 0,
 });
 
 // `TauriApi` odbija Promise s golim tekstom (Rust `Err(String)`, ne `Error` objektom); `MockApi`/
@@ -37,6 +44,21 @@ export function dismissError(): void {
 // Piše `data-theme` na `<html>` — `tokens.css` sluša taj atribut za sve četiri palete (S-017).
 export function applyTheme(theme: Theme): void {
   document.documentElement.dataset.theme = theme;
+}
+
+// Piše `data-motion` na `<html>` — `motion.css` sluša taj atribut i svodi svaki `--motion-dur` na 0
+// kad je `"off"` (S-026). Čista upisna funkcija (bez odluke) da je `motionOff` (`./motion`) jedino
+// mjesto koje odlučuje JE LI pokret ugašen — ovdje se ta odluka samo primjenjuje.
+export function applyMotion(off: boolean): void {
+  document.documentElement.dataset.motion = off ? 'off' : 'on';
+}
+
+// Jedno mjesto koje spaja postavku korisnika i postavku OS-a (`prefers-reduced-motion`) u odluku —
+// zove ga `App.svelte` pri pokretanju i na svaku promjenu OS-postavke, te `Settings.svelte` nakon
+// svakog upisa prekidača `motion` (R24): oboje moraju vidjeti ISTU odluku, ne dvije kopije iste
+// logike.
+export function syncMotion(): void {
+  applyMotion(motionOff(app.settings.motion, window.matchMedia('(prefers-reduced-motion: reduce)').matches));
 }
 
 // Popis projekata za birač u gornjoj traci — poziva se jednom pri pokretanju (`App.svelte onMount`)

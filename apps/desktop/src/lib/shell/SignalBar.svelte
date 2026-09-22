@@ -4,9 +4,12 @@
   // traka čita `app.report` izravno (globalna runa, S-010) pa se sama osvježi čim `state.svelte.ts`
   // postavi nov izvještaj. `<details>` je izvorni HTML disclosure: dokaz se otvara/zatvara
   // tipkovnicom bez ručnog `aria-expanded` stanja koje bismo morali sami pamtiti.
+  // Dopunjeno M2/42 — natpis težine dobiva `<Explainable id="signals.severity">`, JEDAN po signalu
+  // (isti id se ponavlja, isti obrazac kao "jedan po stanju" u Vizijama — dopuna T42).
   import { app } from '../state.svelte';
   import { t } from '../i18n/index.svelte';
   import { severityClass } from '../../views/helpers';
+  import Explainable from '../explain/Explainable.svelte';
 </script>
 
 {#if app.currentId !== null && app.report}
@@ -18,7 +21,7 @@
         {#each app.report.signals as signal, i (signal.rule + '-' + i)}
           <li class="flex flex-wrap items-baseline gap-2">
             <span class="text-sm font-semibold {severityClass(signal.severity)}">
-              {t('sev.' + signal.severity)}
+              <Explainable id="signals.severity">{t('sev.' + signal.severity)}</Explainable>
             </span>
             <span class="text-sm text-ink-1">{t('rule.' + signal.rule)}</span>
             <details class="text-xs">

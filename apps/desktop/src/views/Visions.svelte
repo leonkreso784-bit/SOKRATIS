@@ -20,11 +20,15 @@
   // bilješka fiksna i uža). `parsePercent` je preseljen u `views/helpers.ts` s testom (nalaz
   // recenzije koda: čista funkcija s rubovima bez testa) — `percentText` ostaje ovdje jer je samo
   // poziv `format.ts#percent()`.
+  // Dopunjeno M2/42 — zbroj po stanju dobiva `<Explainable id="visions.totals">` PO STANJU (isti
+  // obrazac kao traka signala: jedan po retku, dijele id), zaglavlje "postotak" svoj
+  // `<Explainable id="visions.percent">` (dopuna T42).
   import { app, loadReport, setError } from '../lib/state.svelte';
   import { api } from '../lib/api';
   import { getLang, t } from '../lib/i18n/index.svelte';
   import { num, percent } from '../lib/format';
   import { parsePercent, replaceVisionAt } from './helpers';
+  import Explainable from '../lib/explain/Explainable.svelte';
   import type { Vision } from '../lib/types';
 
   // `null` = nijedan obrazac otvoren; `'new'` = dodavanje; broj = indeks retka koji se uređuje.
@@ -207,7 +211,7 @@
       <div class="flex flex-wrap gap-2" role="list" aria-label={t('visions.totals')}>
         {#each app.report.vision_totals as vt (vt.state)}
           <span role="listitem" class="rounded-full border border-line bg-surface-1 px-3 py-1 text-xs text-ink-1">
-            {vt.state}: {num(vt.count, getLang())}
+            <Explainable id="visions.totals">{vt.state}: {num(vt.count, getLang())}</Explainable>
           </span>
         {/each}
       </div>
@@ -238,7 +242,7 @@
             <th scope="col" class="py-1 pr-3">{t('visions.title')}</th>
             <th scope="col" class="w-[88px] py-1 pr-3">{t('visions.source')}</th>
             <th scope="col" class="w-[88px] py-1 pr-3">{t('visions.state')}</th>
-            <th scope="col" class="w-[72px] py-1 pr-3">{t('visions.percent')}</th>
+            <th scope="col" class="w-[72px] py-1 pr-3"><Explainable id="visions.percent">{t('visions.percent')}</Explainable></th>
             <th scope="col" class="w-[110px] py-1 pr-3">{t('visions.note')}</th>
             <th scope="col" class="w-[130px] py-1 pr-3">
               <span class="sr-only">{t('visions.edit')} / {t('visions.delete')}</span>
