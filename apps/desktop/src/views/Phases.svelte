@@ -3,10 +3,13 @@
   // `phaseRows` (`views/helpers.ts`) samo razvrstava `Report.phases` po `state` — jezgra već zna
   // stanje svake faze. `bricksPerDay` je JEDINI izračun ovdje koji jezgra još ne daje (dug prema
   // `core`, zapisano u helpers.ts i izvještaju M2/27 kao odstupanje od S-012).
+  // Dopunjeno M2/42 — zaglavlja "dana", "commita", "cigle/dan" dobivaju vlastiti `<Explainable>`
+  // (dopuna T42); "cigle" i raspon datuma nemaju id pa ostaju bez kartice.
   import { app } from '../lib/state.svelte';
   import { getDict, getLang, t } from '../lib/i18n/index.svelte';
   import { num, phaseState, ymd } from '../lib/format';
   import { bricksPerDay, phaseRows } from './helpers';
+  import Explainable from '../lib/explain/Explainable.svelte';
   import type { Phase, PhaseState } from '../lib/types';
 
   // Redoslijed odjeljaka prati oblik koji `phaseRows` vraća (brief M2/27): zatvorene → u tijeku →
@@ -38,9 +41,11 @@
               <tr class="text-ink-2">
                 <th scope="col" class="py-1 pr-3">{t('nav.phases')}</th>
                 <th scope="col" class="py-1 pr-3">{t('phases.bricks')}</th>
-                <th scope="col" class="py-1 pr-3">{t('phases.days')}</th>
-                <th scope="col" class="py-1 pr-3">{t('phases.commits')}</th>
-                <th scope="col" class="py-1 pr-3">{t('phases.bricks_per_day')}</th>
+                <th scope="col" class="py-1 pr-3"><Explainable id="phases.days">{t('phases.days')}</Explainable></th>
+                <th scope="col" class="py-1 pr-3"><Explainable id="phases.commits">{t('phases.commits')}</Explainable></th>
+                <th scope="col" class="py-1 pr-3">
+                  <Explainable id="phases.bricks_per_day">{t('phases.bricks_per_day')}</Explainable>
+                </th>
                 <th scope="col" class="py-1 pr-3">{t('phases.from')}–{t('phases.to')}</th>
               </tr>
             </thead>

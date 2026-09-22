@@ -13,11 +13,15 @@
   // ikona (●) + kratak gumb (↺) umjesto pune riječi + punog teksta gumba — isto značenje, manje px.
   // "naslov" je JEDINI stupac bez zadane širine (uzima cijeli ostatak, CSS `table-layout:fixed`) i
   // smije se lomiti u dva retka (`line-clamp-2`) umjesto da se odreže na jedan.
+  // Dopunjeno M2/42 — zaglavlje "vrsta" dobiva `<Explainable id="diary.kind">` (objašnjava i
+  // podvrstu i oznaku "ručno"); NE svaka ćelija (190 gumba u ovoj tablici bi bio šum, ne
+  // pristupačnost — dopuna T42).
   import { app, loadReport, setError } from '../lib/state.svelte';
   import { api } from '../lib/api';
   import { getDict, getLang, t } from '../lib/i18n/index.svelte';
   import { kindLabel, subLabel, ymd } from '../lib/format';
   import { sortDiary } from './helpers';
+  import Explainable from '../lib/explain/Explainable.svelte';
   import type { CommitRow, WorkKind } from '../lib/types';
 
   // Isti pet vrsta koje `format.ts`/`kind.*` ključevi poznaju (S-021) — `<option>` se generira iz
@@ -76,7 +80,9 @@
           <th scope="col" class="w-[72px] py-1 pl-1 pr-3">{t('diary.sha')}</th>
           <th scope="col" class="w-[92px] py-1 pr-3">{t('diary.date')}</th>
           <th scope="col" class="py-1 pr-3">{t('diary.subject')}</th>
-          <th scope="col" class="w-[140px] py-1 pr-3 lg:w-[224px]">{t('diary.kind')}</th>
+          <th scope="col" class="w-[140px] py-1 pr-3 lg:w-[224px]">
+            <Explainable id="diary.kind">{t('diary.kind')}</Explainable>
+          </th>
           <th scope="col" class="w-[100px] py-1 pr-3 lg:w-[140px]">{t('diary.sub')}</th>
           <th scope="col" class="w-[64px] py-1 pr-3">{t('diary.overridden')}</th>
         </tr>

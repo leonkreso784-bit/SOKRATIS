@@ -8,11 +8,14 @@
   // `Ring.svelte` crta `class="w-full"` (SVG bez vlastite širine), pa ga OGRANIČAVA omotač ovdje —
   // `Ring.svelte` se ne dira. `kindColor` (`views/helpers.ts`) je JEDNA mapa boja koju čitaju i
   // segment prstena i oznaka u retku tablice — legenda je tablica sama, ne druga kopija (S-010).
+  // Dopunjeno M2/42 — prsten dobiva `<Explainable block>` (S-027), zaglavlje stupca udjela svoj
+  // `<Explainable>` (dopuna T42): ostala zaglavlja (vrsta, commita, redaka) nemaju vlastiti id.
   import { app } from '../lib/state.svelte';
   import { getDict, getLang, t } from '../lib/i18n/index.svelte';
   import { kindLabel, num, percent } from '../lib/format';
   import { kindColor } from './helpers';
   import Ring from '../lib/charts/Ring.svelte';
+  import Explainable from '../lib/explain/Explainable.svelte';
 
   const kinds = $derived(app.report?.kinds ?? []);
   const segments = $derived(
@@ -36,7 +39,7 @@
          ostati vidljiva bez pomicanja pri 1280×900 (vizualna provjera, krug popravka 1). -->
     <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
       <div class="w-[260px] shrink-0">
-        <Ring {segments} label={t('kinds.title')} />
+        <Explainable id="kinds.ring" block><Ring {segments} label={t('kinds.title')} /></Explainable>
       </div>
 
       <table class="min-w-0 flex-1 text-left text-sm">
@@ -44,7 +47,7 @@
           <tr class="text-ink-2">
             <th scope="col" class="py-1 pr-3">{t('nav.kinds')}</th>
             <th scope="col" class="py-1 pr-3">{t('kinds.commits')}</th>
-            <th scope="col" class="py-1 pr-3">{t('kinds.share')}</th>
+            <th scope="col" class="py-1 pr-3"><Explainable id="kinds.share">{t('kinds.share')}</Explainable></th>
             <th scope="col" class="py-1 pr-3">{t('kinds.lines')}</th>
           </tr>
         </thead>

@@ -36,4 +36,22 @@ describe('kartica s objašnjenjem', () => {
   it('popis nema duplikata', () => {
     expect(new Set(EXPLAIN_IDS).size).toBe(EXPLAIN_IDS.length);
   });
+  // Dopunjeno M2/42 — svaki pogled (i traka signala) mora imati barem jedan objašnjivi id;
+  // prefiks bez pogotka znači da je pogled ostao bez kartice, a to je nalaz recenzije, ne detalj.
+  it('svaki pogled ima barem jedno objašnjenje', () => {
+    for (const prefix of [
+      'overview.',
+      'tempo.',
+      'kinds.',
+      'phases.',
+      'diary.',
+      'deliveries.',
+      'visions.',
+      'docs.',
+      'signals.',
+      'ind.',
+    ]) {
+      expect(EXPLAIN_IDS.some((id) => id.startsWith(prefix)), prefix).toBe(true);
+    }
+  });
 });

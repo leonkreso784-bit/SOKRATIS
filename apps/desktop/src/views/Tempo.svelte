@@ -4,11 +4,15 @@
   // koji stupac `DayStats` ide u `Bars` — ništa se ovdje ne zbraja ni ne dijeli. Kumulativna linija
   // crta `d.commits_cumulative` izravno: to polje jezgra već izračuna (S-012), sučelje ga NE
   // ponovno zbraja preko `cumulative()` iz `scale.ts` (Ruling orkestratora M2/27 #2).
+  // Dopunjeno M2/42 — oba grafa dobivaju `<Explainable block>` (S-027), a zaglavlje stupca sati u
+  // tablici svoj `<Explainable>` (jedini stupac tablice s vlastitim mjerenjem koje pokazatelj ne
+  // ponavlja negdje drugdje — ostala zaglavlja nemaju id pa se ne omataju, dopuna T42).
   import { app } from '../lib/state.svelte';
   import { getLang, t } from '../lib/i18n/index.svelte';
   import { hours, num, ymd } from '../lib/format';
   import Bars from '../lib/charts/Bars.svelte';
   import Line from '../lib/charts/Line.svelte';
+  import Explainable from '../lib/explain/Explainable.svelte';
 
   let mode = $state<'commits' | 'hours'>('commits');
 
@@ -45,8 +49,8 @@
       </button>
     </div>
 
-    <Bars values={barValues} labels={barLabels} label={t(`tempo.${mode}`)} />
-    <Line values={cumulativeValues} label={t('tempo.cumulative')} />
+    <Explainable id="tempo.bars" block><Bars values={barValues} labels={barLabels} label={t(`tempo.${mode}`)} /></Explainable>
+    <Explainable id="tempo.cumulative" block><Line values={cumulativeValues} label={t('tempo.cumulative')} /></Explainable>
 
     <table class="w-full text-left text-sm">
       <thead>
@@ -55,7 +59,7 @@
           <th scope="col" class="py-1 pr-3">{t('tempo.commits')}</th>
           <th scope="col" class="py-1 pr-3">{t('tempo.cumulative')}</th>
           <th scope="col" class="py-1 pr-3">{t('tempo.lines')}</th>
-          <th scope="col" class="py-1 pr-3">{t('tempo.hours')}</th>
+          <th scope="col" class="py-1 pr-3"><Explainable id="tempo.hours">{t('tempo.hours')}</Explainable></th>
           <th scope="col" class="py-1 pr-3">{t('tempo.deliveries')}</th>
           <th scope="col" class="py-1 pr-3">{t('tempo.deploys')}</th>
           <th scope="col" class="py-1 pr-3">{t('tempo.testLines')}</th>

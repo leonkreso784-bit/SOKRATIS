@@ -7,10 +7,13 @@
   // ne govori ništa čitaču ekrana bez teksta. `model`/`vrsta` nemaju `truncate` na `vrsta` (lomi se u
   // dva retka umjesto da tiho reže) i imaju `truncate`+`title` na `model` (slobodan tekst, katkad dug
   // — "FABLE, SESIJA F2/2 U STABLU `SOKRATSTUDY.F22`"), pa suženje ne gubi podatak, samo ga skraćuje.
+  // Dopunjeno M2/42 — zaglavlje "naslov" nosi `<Explainable id="deliveries.list">` (objašnjava
+  // odakle cijela tablica dolazi, ne samo stupac; dopuna T42).
   import { app } from '../lib/state.svelte';
   import { getDict, getLang, t } from '../lib/i18n/index.svelte';
   import { kindLabel, ymd } from '../lib/format';
   import { sortDeliveries } from './helpers';
+  import Explainable from '../lib/explain/Explainable.svelte';
 
   const rows = $derived(sortDeliveries(app.report?.deliveries ?? []));
 </script>
@@ -30,7 +33,7 @@
         <tr class="text-ink-2">
           <th scope="col" class="w-[92px] py-1 pr-3">{t('deliveries.date')}</th>
           <th scope="col" class="w-[112px] py-1 pr-3">{t('deliveries.model')}</th>
-          <th scope="col" class="py-1 pr-3">{t('deliveries.title')}</th>
+          <th scope="col" class="py-1 pr-3"><Explainable id="deliveries.list">{t('deliveries.title')}</Explainable></th>
           <th scope="col" class="w-[112px] py-1 pr-3">{t('deliveries.kind')}</th>
           <th scope="col" class="w-[56px] py-1 pr-3">{t('deliveries.deploy')}</th>
         </tr>

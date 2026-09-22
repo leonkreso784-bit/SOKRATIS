@@ -9,10 +9,13 @@
   // izravno ovdje. Velika ocjena koristi rem-veličinu fonta (ne postotak širine, pouka #9).
   // `findingLabel` je JEDNO mjesto koje zna oblik "path:line" (S-010) — vidljivi tekst, `title` i
   // `aria-label` gumba ga sad sva tri čitaju odavde, umjesto da svaki ponovi istu ternarnu logiku.
+  // Dopunjeno M2/42 — ocjena, redak kašnjenja i naslov nalaza dobivaju svoj `<Explainable>`
+  // (tekst/brojka omotana, ne `<p>`/`<h2>` sam — dopuna T42).
   import { app } from '../lib/state.svelte';
   import { getLang, t } from '../lib/i18n/index.svelte';
   import { num } from '../lib/format';
   import { copyText, joinRepoPath } from './helpers';
+  import Explainable from '../lib/explain/Explainable.svelte';
   import type { Finding, ProjectSummary } from '../lib/types';
 
   let copiedPath = $state<string | null>(null);
@@ -55,16 +58,20 @@
       <div class="flex flex-col items-start gap-1 rounded-lg border border-line bg-surface-1 p-4 shadow-e1">
         <span class="text-xs text-ink-2">{t('docs.score')}</span>
         <p class="text-5xl font-semibold leading-none text-ink-0">
-          {num(docs.score, getLang())}<span class="text-lg text-ink-2">/100</span>
+          <Explainable id="docs.score">{num(docs.score, getLang())}</Explainable><span class="text-lg text-ink-2">/100</span>
         </p>
       </div>
       {#if docs.lag_days !== null}
-        <p class="text-sm text-warn-ink">{t('docs.lag', { n: docs.lag_days })}</p>
+        <p class="text-sm text-warn-ink">
+          <Explainable id="docs.lag">{t('docs.lag', { n: docs.lag_days })}</Explainable>
+        </p>
       {/if}
     </div>
 
     <section class="flex flex-col gap-2">
-      <h2 class="text-lg font-semibold text-ink-0">{t('docs.findings')}</h2>
+      <h2 class="text-lg font-semibold text-ink-0">
+        <Explainable id="docs.findings">{t('docs.findings')}</Explainable>
+      </h2>
       {#if docs.findings.length === 0}
         <p class="text-sm text-ink-2">{t('docs.none')}</p>
       {:else}
