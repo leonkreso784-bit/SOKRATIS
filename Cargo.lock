@@ -3622,7 +3622,7 @@ dependencies = [
 
 [[package]]
 name = "sokratis-cli"
-version = "0.1.0"
+version = "1.0.0-pre.1"
 dependencies = [
  "anyhow",
  "clap",
@@ -3634,7 +3634,7 @@ dependencies = [
 
 [[package]]
 name = "sokratis-core"
-version = "0.1.0"
+version = "1.0.0-pre.1"
 dependencies = [
  "insta",
  "regex",
@@ -3645,7 +3645,7 @@ dependencies = [
 
 [[package]]
 name = "sokratis-desktop"
-version = "0.1.0"
+version = "1.0.0-pre.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -3662,7 +3662,7 @@ dependencies = [
 
 [[package]]
 name = "sokratis-io"
-version = "0.1.0"
+version = "1.0.0-pre.1"
 dependencies = [
  "chrono",
  "notify",
@@ -3674,7 +3674,7 @@ dependencies = [
 
 [[package]]
 name = "sokratis-store"
-version = "0.1.0"
+version = "1.0.0-pre.1"
 dependencies = [
  "rusqlite",
  "serde",
