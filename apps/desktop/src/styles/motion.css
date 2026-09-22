@@ -4,7 +4,10 @@
    koji Svelte piše za svoje prijelaze.
    Dopunjeno M2/39 — ulazne animacije grafova (`chart-*`) žive OVDJE, ne u pojedinim komponentama:
    isti `--motion-dur` ih gasi kad je pokret isključen, bez posebne provjere u svakom grafu.
-   Dopunjeno M2/40 — prijelaz pogleda (`view-*`) i kostur učitavanja (`skeleton-*`) iz istog razloga. */
+   Dopunjeno M2/40 — prijelaz pogleda (`view-*`) i kostur učitavanja (`skeleton-*`) iz istog razloga.
+   Dopunjeno M2/41 — ulaz kartice s objašnjenjem (`explain-*`) isto ovdje: `<ExplainCard />` je jedan
+   primjerak koji se pojavljuje/nestaje s `{#if}`, ne Svelteovim direktivom za prijelaze, pa treba
+   istu `--motion-dur` klasu kao ostali `*-enter` obrasci. */
 :root { --motion-dur: 250ms; }
 :root[data-motion="off"] { --motion-dur: 0ms; }
 :root[data-motion="off"] *, :root[data-motion="off"] *::before, :root[data-motion="off"] *::after {
@@ -24,3 +27,6 @@
 .view-enter { animation: view-in var(--motion-dur) ease-out both; }
 .is-loading { opacity: .6; transition: opacity var(--motion-dur) ease-out; }
 .skeleton   { background: var(--color-surface-2); border-radius: 8px; animation: skeleton-pulse calc(var(--motion-dur) * 4) ease-in-out infinite; }
+
+@keyframes explain-in { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: none; } }
+.explain-enter { transform-origin: top left; animation: explain-in var(--motion-dur) ease-out both; }

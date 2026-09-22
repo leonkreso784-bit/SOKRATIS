@@ -5,11 +5,15 @@
   // prati preko čitanja `app.report`/`app.currentId`/`app.range` unutar efekta. `requestToken` čuva
   // od utrke: ako korisnik promijeni raspon dok stari poziv još čeka, kasni odgovor se baci umjesto
   // da pregazi noviji (Ruling orkestratora M2/27 #6).
+  // Dopunjeno M2/41 — prekidač formule (`<details>`) je zamijenjen karticom s objašnjenjem: vrijednost
+  // svake kartice je `Explainable`, a `Indicator.formula` (polje koje jezgra izračuna) ide u karticu
+  // kao dodatni redak, ne kao vlastiti prikaz.
   import { app, setError } from '../lib/state.svelte';
   import { api } from '../lib/api';
   import { getLang, t } from '../lib/i18n/index.svelte';
   import { hours, num, percent } from '../lib/format';
   import Sparkline from '../lib/charts/Sparkline.svelte';
+  import Explainable from '../lib/explain/Explainable.svelte';
   import type { Indicator, Range, TrendPoint } from '../lib/types';
 
   let trends = $state<Record<string, TrendPoint[]>>({});
@@ -66,17 +70,13 @@
             <h2 class="text-sm font-semibold text-ink-0">{t('ind.' + ind.id)}</h2>
             <span class="shrink-0 text-xs text-ink-2">{t('ind.' + ind.kind)}</span>
           </div>
-          <p class="text-2xl font-semibold text-ink-0">{indicatorValueText(ind)}</p>
+          <p class="text-2xl font-semibold text-ink-0">
+            <Explainable id={`ind.${ind.id}`} extra={ind.formula}>{indicatorValueText(ind)}</Explainable>
+          </p>
           <Sparkline
             points={(trends[ind.id] ?? []).map((p) => ({ value: p.value, marked: p.profile_changed }))}
             label={t('ind.trend') + ': ' + t('ind.' + ind.id)}
           />
-          <details>
-            <summary class="cursor-pointer text-xs text-ink-2 underline decoration-dotted">
-              {t('ind.formula')}
-            </summary>
-            <p class="mt-1 text-xs text-ink-1">{ind.formula}</p>
-          </details>
         </div>
       {/each}
     </div>

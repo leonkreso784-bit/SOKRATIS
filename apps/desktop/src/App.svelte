@@ -23,6 +23,8 @@
   // Dopunjeno M2/40 — ključ `{#key}` sada nosi i `app.view`: promjena pogleda dobiva isti ulaz
   // (`view-enter`) kao promjena `epoch`, `is-loading` prigušuje stari sadržaj dok raspon učitava
   // novi, a `Skeleton` zamjenjuje poglede SAMO dok prvi izvještaj još nije stigao.
+  // Dopunjeno M2/41 — `<ExplainCard />` sjedi IZVAN `{#key}`, na dnu korijenskog `<div>`: promjena
+  // pogleda ne smije remontirati karticu s objašnjenjem dok se ona sama zatvara.
   import { onDestroy, onMount } from 'svelte';
   import { getCurrentWindow } from '@tauri-apps/api/window';
   import { api } from './lib/api';
@@ -42,6 +44,7 @@
   import Docs from './views/Docs.svelte';
   import Settings from './views/Settings.svelte';
   import Skeleton from './lib/shell/Skeleton.svelte';
+  import ExplainCard from './lib/explain/ExplainCard.svelte';
 
   let unsubscribeReportUpdated: (() => void) | null = null;
   let motionQuery: MediaQueryList | undefined;
@@ -147,4 +150,5 @@
       {/key}
     </main>
   </div>
+  <ExplainCard />
 </div>
