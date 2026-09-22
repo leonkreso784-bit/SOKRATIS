@@ -222,6 +222,21 @@ Isporuka = ono što je u `main`-u; sesije su u `PROGRESS.md`.
   `npm run check` (svelte-check 212 datoteka/0 · i18n **162** ključa hr=en · kontrast 4/4 ·
   **vitest 82**) · `npm run build` OK · `sokratis docs .` 100/100 · `signals .` nema signala. Time je
   **etapa 1 „funkcija" (S-025) cjelovita u kodu** — preostaje da Leon instalira „1.0.0-pre".
+- **SUČELJE-2 (T38–T42) u `main`-u (2026-09-23).** Korisnik dobiva **deseti pogled, Postavke**
+  (S-028): tema · jezik · autostart · animacije, u JEDNOM mjestu — gornja traka više nema temu ni
+  jezik. **Animacije** (S-026, `data-motion` na `<html>`, gasi ih prekidač ili
+  `prefers-reduced-motion`): grafovi se otvaraju pri prvom prikazu (stupci rastu, linije i sparkline
+  se iscrtavaju, prsten se otkriva), prijelaz pogleda traje 250 ms, stari sadržaj se prigušuje dok
+  novi izvještaj stiže, a kostur stoji pri prvom učitavanju projekta. **Kartica s objašnjenjem**
+  (S-027): klik na bilo koji graf ili brojku u bilo kojem od devet pogleda i u traci signala (37
+  id-eva) otvara što podatak govori, kako je izračunat i kako ga čitati — „formula na klik" u
+  Pokazateljima je time zamijenjena. Pregled je sad vidljiv i bez odabranog projekta (kao Postavke).
+  Brane nakon spajanja (merge `6947189`): `cargo fmt --check` OK · `cargo clippy --workspace
+  --all-targets -- -D warnings` OK · `cargo test --workspace` **145 testova, 1 ignoriran, 0 palo**
+  (nepromijenjeno — Rust dirnut samo u `commands.rs`) · `npm run check` (svelte-check 235 datoteka/0 ·
+  i18n **283** ključa hr=en, bilo 162 · kontrast 4/4 · **vitest 93**, 13 datoteka, bilo 82) ·
+  `npm run build` OK (main.js 208,57 kB / gzip 53,66) · `sokratis docs .` 100/100 · `signals .` nema
+  signala. Time je **etapa 2 „izgled" (S-025) cjelovita u kodu** — preostaje etapa 3 „izdanje" (S5).
 
 ## [0.1.0] — 2026-09-17 — Jezgra i CLI (Milestone 1)
 

@@ -11,15 +11,18 @@ pisanje, manje git-procesa, detached HEAD, watcher, ograda putanja pri otvaranju
 cijelosti** — i potrošač keša) · CLI (M2/19: `report --until`) · SUČELJE (T20–M2/28: Svelte 5 +
 Tailwind v4 nad `Report`-om, devet pogleda) · DESKTOP (M2/29a–c + T29–T33: `AppState` i jedanaest
 naredbi, adapter keša, motor osvježavanja, splash, tray, autostart, jedna instanca) ·
-**INTEGRACIJA** (T34, T36, T37, spojeno 2026-09-22, merge `b560f7c`): sučelje sad zove PRAVE naredbe
+INTEGRACIJA (T34, T36, T37, spojeno 2026-09-22, merge `b560f7c`): sučelje sad zove PRAVE naredbe
 (`TauriApi`, ne `MockApi`), repo bez konvencija Sokrat Studyja daje brojke iz gita umjesto lažnih faza
 (Ruling R21), instalater NSIS postoji, verzija ima jedan izvor (`1.0.0-pre.1`), razvojna baza je
-odvojena od instalirane — §1, §11.
-**Time je etapa 1 „funkcija" (S-025) cjelovita u kodu**; preostaju T35 (mjerenja, verzija 1.0.0) i pet
-cigli etape 2 „izgled" (§13.2–§13.4: Postavke, animacije, kartica s objašnjenjem) prije završne
-recenzije i izdanja — [`../plan/ROADMAP.md`](../plan/ROADMAP.md), [`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md) §13.
+odvojena od instalirane · **SUČELJE-2** (T38–T42, spojeno 2026-09-23, merge `6947189`): **deseti
+pogled Postavke** (tema · jezik · autostart · animacije, S-028), **animacije** (S-026: `data-motion`
+gasi ulaz grafova, prijelaz pogleda i kostur učitavanja preko jedne varijable), **kartica s
+objašnjenjem** (S-027: 37 objašnjivih `id`-eva u svih devet pogleda i traci signala) — §1, §11.
+**Time je etapa 2 „izgled" (S-025) cjelovita u kodu**; preostaje T35 (mjerenja, verzija 1.0.0) i etapa
+3 „izdanje" (završna recenzija, krug popravaka, §13.8) — [`../plan/ROADMAP.md`](../plan/ROADMAP.md),
+[`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md) §13.
 Što od koda još stoji bez pokrića ili s poznatim rubom je u §11 ·
-**Zadnja provjera:** 2026-09-22
+**Zadnja provjera:** 2026-09-23
 
 > **Što ovaj dokument JEST:** opis sustava kakav stoji u `crates/` i `apps/` — granice između crateova, tok
 > podataka, formati koje čita i ugovori prema korisniku CLI-ja. **Što NIJE:** kronologija (to su
@@ -62,7 +65,7 @@ u vlastitoj datoteci (S-010: jedna cjelina, jedno mjesto):
 | datoteka | što drži | ključni obrazac |
 |---|---|---|
 | `registry.rs` | registar projekata i radnih stabala; identitet projekta je `git_common_dir`, ne putanja (S-015) — dva radna stabla istog repozitorija dijele jedan zapis | `add_project`/`list_projects`/`rename_project`/`remove_project`/`touch_project`/`set_worktrees` |
-| `settings.rs` | globalne postavke i postavke po projektu (tema, jezik, autostart, raspon, zadnji pogled) | SQL upsert `INSERT … ON CONFLICT … DO UPDATE` |
+| `settings.rs` | globalne postavke i postavke po projektu (tema, jezik, autostart, animacije, raspon, zadnji pogled) | SQL upsert `INSERT … ON CONFLICT … DO UPDATE` |
 | `snapshots.rs` | dnevna snimka 18 pokazatelja + docs-ocjene + broja signala, profil kao kanonski JSON (S-014), trend | `save_snapshot` je CJELOVITA ZAMJENA dana (`DELETE` pa `INSERT` u jednoj transakciji) |
 | `cache.rs` | sirovi commiti po SHA — **nikad klasifikacija** (S-014) | `INSERT OR IGNORE` u jednoj transakciji, `newest_cached_commit_date` za inkrementalno dovlačenje |
 
@@ -123,27 +126,31 @@ prvi redak dokaza).
 `{"preset":"7d"}` · `{"preset":"30d"}` · `{"preset":"month"}` ·
 `{"preset":"custom","since":…,"until":…}` — `to_dates(today)` vraća `(Option<String>,
 Option<String>)` bez `chrono` u desktopu (S-013, kroz `sokratis_core::civil::prev_day`).
-`Settings { theme, lang, autostart: bool }` — baza drži autostart kao tekst (`"on"`/`"off"`), naredba
-`set_setting` i dalje prima tekst (TS strana stringificira bool, T34).
+`Settings { theme, lang, autostart: bool, motion: bool }` (četvrto polje `motion`, M2/38, S-028) —
+baza drži i autostart i pokret kao tekst (`"on"`/`"off"`), `SETTING_KEYS: [&str; 4]`; naredba
+`set_setting` i dalje prima tekst (TS strana `TauriApi.setSetting` prevodi SVAKI `boolean` u
+`"on"`/`"off"` po TIPU vrijednosti, ne po imenu ključa, T34+M2/38).
 
 `cargo test --workspace` dotiče crate s 2 testa (`Range::to_dates`, jedini test koji S-013 dopušta).
 Dokaz da se ljuska stvarno pokreće je **dimni test** (`npm run tauri dev`, ručna provjera opisana u
 [`TESTING.md`](../workflow/TESTING.md) §5), ne `cargo test`.
 
-**`apps/desktop/src` (SUČELJE, T20–M2/28 + T34, spojeno 2026-09-21/22) je Svelte 5 + Tailwind v4 nad
-`Report`-om — ne računa ništa, samo prikazuje (S-012):**
+**`apps/desktop/src` (SUČELJE, T20–M2/28 + T34 + SUČELJE-2 T38–T42, spojeno 2026-09-21/23) je Svelte 5
++ Tailwind v4 nad `Report`-om — ne računa ništa, samo prikazuje (S-012):**
 
 | dio | što radi |
 |---|---|
 | `styles/tokens.css` | četiri teme (zadana „Akademsko plavo"), `brand-*` izmjeren iz Leonova loga (S-017); `scripts/check-contrast.mjs` brani kontrast na sve četiri |
+| `styles/motion.css` | **jedino mjesto pokreta sučelja** (S-026): `--motion-dur: 250ms`, `:root[data-motion="off"]` svodi svaku `animation-`/`transition-duration` na `0s !important`; `lib/motion.ts::motionOff` je čista odluka bez DOM-a, `state.svelte.ts::syncMotion` je upisuje kao `data-motion` na `<html>` — isti obrazac kao `data-theme` |
 | `lib/i18n/` (`hr.json`, `en.json`, `t.ts`, `index.svelte.ts`) | HR/EN rječnik (S-021); `scripts/check-i18n.mjs` brani da oba jezika imaju isti skup ključeva |
 | `lib/format.ts` | jedino mjesto oblikovanja brojki, datuma i postotaka za sučelje |
-| `lib/charts/` (`Bars`, `Line`, `Ring`, `Sparkline`, `scale.ts`) | vlastiti SVG grafovi (S-018), bez biblioteke |
+| `lib/charts/` (`Bars`, `Line`, `Ring`, `Sparkline`, `scale.ts`) | vlastiti SVG grafovi (S-018), bez biblioteke; ulaze animirano (M2/39, §11 niže) |
+| `lib/explain/` (`ids.ts`, `explain.svelte.ts`, `Explainable.svelte`, `ExplainCard.svelte`) | **kartica s objašnjenjem** (S-027, M2/41–42): `EXPLAIN_IDS` (37) + `explainKeys(id)` → ključevi `explain.<id>.what\|how\|read`; `Explainable` je okidač (`<button aria-haspopup="dialog">`), `ExplainCard` (`role="dialog" aria-modal="false"`) prikazuje tekst; test pokrivenosti veže popis na OBA rječnika u oba smjera i na 18 id-eva pokazatelja iz prave snimke jezgre |
 | `splash/` (`Splash.svelte`, `intro.ts`) | animacija pokretanja, 4,2 s, preskočiva (S-019); zaseban Vite-ulaz `splash.html` |
 | `lib/api.ts` | sučelje `Api`; `MockApi` čita insta snapshot jezgre kroz Viteov `?raw` uvoz — dev-prikaz i vitest vide TOČNO brojke koje bi jezgra izračunala, ne ručno prepisanu kopiju (S-010); `TauriApi` (T34) svaku metodu prevodi u `invoke('<naredba>', {…})` prema `commands.rs`, `onReportUpdated`/`onSignalRaised` idu preko `listen()`; `createApi()` bira izvedbu po `'__TAURI_INTERNALS__' in window` |
 | `lib/types.ts` | TS zrcalo `Report`-a; `tests/types.test.ts` ga veže na isti insta snapshot da se oblik ne razmine s Rustom |
-| `lib/state.svelte.ts` | Svelte 5 rune (`$state`) drže odabrani projekt, raspon, postavke, izvještaj |
-| `views/` (devet pogleda) + `views/helpers.ts` | Pregled, Tempo, Vrste rada, Pokazatelji, Faze, Dnevnik, Isporuke, Vizije, Dokumentacija; `helpers.ts` drži čiste funkcije testirane odvojeno od komponenata (sortiranje, boja po vrsti/težini, i18n-množina, kopiranje i spajanje putanje, zamjena vizije po indeksu) |
+| `lib/state.svelte.ts` | Svelte 5 rune (`$state`) drže odabrani projekt, raspon, postavke, izvještaj, `epoch` (0 → 1 jednom kad glavni prozor prvi put postane vidljiv, M2/39) |
+| `views/` (**deset** pogleda) + `views/helpers.ts` | Pregled, Tempo, Vrste rada, Pokazatelji, Faze, Dnevnik, Isporuke, Vizije, Dokumentacija — svih devet traže odabran projekt — i **Postavke** (M2/38, S-028): tema · jezik · autostart · animacije, jedini pogled koji NE čita `app.report`, radi i bez projekta; `helpers.ts` drži čiste funkcije testirane odvojeno od komponenata (sortiranje, boja po vrsti/težini, i18n-množina, kopiranje i spajanje putanje, zamjena vizije po indeksu) |
 
 Dnevnik uređuje vrstu rada po commitu (`setOverride`, oznaka „ručno"); Vizije se dodaju, uređuju i
 brišu u mjestu istim obrascem (Svelte 5 `{#snippet}`, `saveVisions` uvijek šalje cijeli popis, ne
@@ -152,7 +159,12 @@ samo izmijenjeni redak). **Od T34 (2026-09-22) `createApi()` bira `TauriApi` u p
 DESKTOP-a (gore). Pretplata na `report_updated` je JEDNA globalna, u `App.svelte`: osvježi popis
 projekata i, ako je odabrani projekt taj koji se promijenio, i trenutačni izvještaj. Svaki poziv
 `api.*` hvata grešku i piše je u `app.error` (traka greške, `role="alert"`); `loadReport` čuva
-`reportRequestToken`, pa zastarjeli odgovor (uspjeh ili greška) ne dira stanje. Brane su `npm run
+`reportRequestToken`, pa zastarjeli odgovor (uspjeh ili greška) ne dira stanje.
+**Od SUČELJE-2 (T38–T42, 2026-09-23) prva ulazna animacija čeka da korisnik prozor stvarno vidi:**
+`{#key \`${app.epoch}:${app.view}\`}` oko lanca pogleda tjera Svelte da ih demontira/remontira kad
+`epoch` poraste 0→1; okidač je `getCurrentWindow().onFocusChanged` (fokus stiže iz `splash.rs`), NE
+`document.visibilitychange` — WebView2 javlja prozor vidljivim i dok je iza splasha skriven, pa taj
+događaj nikad ne okine (Ruling R25, izmjereno u `tauri dev`). Brane su `npm run
 check` (`svelte-check` + `check:i18n` + `check:contrast` + `vitest`) i `npm run build` u
 `apps/desktop`, ne `cargo` ([`TESTING.md`](../workflow/TESTING.md) §1).
 
@@ -553,6 +565,11 @@ preuzeo M2 u [`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md) §8 i plan
   ijedan commit s pripadnom oznakom (npr. tipfeler u `tag_pattern`), razlika prema „ova faza nikad
   nije ni postojala u profilu" se gubi — obje izgledaju kao da faze nema. `active_phases` čita cijeli
   `input.plan` tog repoa i ovim filtrom nije pogođen (aktivne faze se ne filtriraju).
+- **`closed_phases_in_range` (`metrics/indicators.rs:80-83`) gleda samo `since`, ne `until`** —
+  pokazatelj „zatvorenih faza u razdoblju" broji i faze zatvorene NAKON `until` ako je raspon
+  ograničen gornjom granicom. Nalaz recenzije M2/42 (2026-09-23, kartica s objašnjenjem): tekst
+  kartice to danas istinito opisuje („od početka razdoblja nadalje"); popravak jezgre čeka krug
+  popravaka S5 (snimka ima `until: null`, pa se namjerno ne mijenja dok test ne dokaže popravak).
 
 **Svih devet tokova M2 su gotovi i spojeni** (KOSTUR, JEZGRA, PROFIL, STORE, IO uklj. M2/14b, CLI,
 SUČELJE, DESKTOP, INTEGRACIJA — popis u zaglavlju ovog dokumenta). Ono što je DESKTOP-om (T29–T33,

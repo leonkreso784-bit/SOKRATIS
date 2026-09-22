@@ -12,12 +12,17 @@
 | **integracijski (io)** | `crates/sokratis-io/tests/` | git-proces, radna stabla, profil, ručni podaci | **privremeni repo** stvoren u testu |
 | **izlazni kodovi (cli)** | `crates/sokratis-cli/tests/cli.rs` | ugovor prema preflightu: **0** (nema signala) i **2** (Alert) nad repoom s poznatom poviješću, **3** za pogrešnu uporabu i za putanju koja nije repozitorij, **0** za `--help`/`--version` | **privremeni repo** (`tests/common/mod.rs`) |
 | **pohrana (store)** — *od M2* | `crates/sokratis-store/src/**` (`#[cfg(test)]`) | migracije se primijene od prazne baze; registar, postavke, snimke i keš sirovih commita (M2/15–18) rade; od DESKTOP-a (T29–T30) imaju pravog pozivatelja u aplikaciji, ali test i dalje ostaje nad `:memory:` bazom (`docs/architecture/ARCHITECTURE.md` §1) | **`:memory:` baza** (`Store::open_in_memory`) — bez gita i bez datoteka |
-| **sučelje (TS/Svelte)** — *od M2* | `apps/desktop/tests/**`, uz komponente | oblikovanje brojki, i18n ključevi, kontrast tokena, grafovi s praznim ulazom, ugovor `TauriApi` prema `commands.rs` (`tests/tauri-api.test.ts`, lažni `invoke`/`listen`), verzija iz jednog izvora (`tests/version.test.ts`) | `npm run check` u `apps/desktop`: `svelte-check` + `vitest` (**82** testa, 11 datoteka) |
+| **sučelje (TS/Svelte)** — *od M2* | `apps/desktop/tests/**`, uz komponente | oblikovanje brojki, i18n ključevi, kontrast tokena, grafovi s praznim ulazom, ugovor `TauriApi` prema `commands.rs` (`tests/tauri-api.test.ts`, lažni `invoke`/`listen`), verzija iz jednog izvora (`tests/version.test.ts`), pokret bez DOM-a (`tests/motion.test.ts`, čita `motion.css` kroz `scripts/read-motion.mjs`), pokrivenost kartice s objašnjenjem (`tests/explain.test.ts` — svaki `id` ima sva tri ključa u oba jezika, svaki ključ `explain.*` ima svoj `id`, 18 id-eva pokazatelja iz prave snimke jezgre) | `npm run check` u `apps/desktop`: `svelte-check` + `vitest` (**93** testa, 13 datoteka) |
 | **ljuska (desktop)** — *od M2* | `apps/desktop/src-tauri/src/commands.rs` (`#[cfg(test)]`) | S-013: crate nema logike, pa je jedini jedinični test pretvorba birača raspona (`Range::to_dates`) u datume | 2 testa nad fiksnim „danas" |
 
-Stanje brana nakon spajanja INTEGRACIJE (`b560f7c`, 2026-09-22, dokaz metode, ne tekuća brojka —
+Stanje brana nakon spajanja SUČELJA-2 (`6947189`, 2026-09-23, dokaz metode, ne tekuća brojka —
 kanonska je u [`../records/CHANGELOG.md`](../records/CHANGELOG.md), S-010): `cargo test --workspace`
-**145 testova + 1 ignoriran**, `check:i18n` **162** ključa hr=en.
+**145 testova + 1 ignoriran** (nepromijenjeno — Rust dirnut samo u `commands.rs`), svelte-check
+**235** datoteka/0, `check:i18n` **283** ključa hr=en.
+
+`scripts/read-motion.mjs` čita `motion.css` kroz `node:fs` umjesto Viteova `?raw` uvoza — isti razlog
+kao `scripts/read-tokens.mjs` (M2/20): `@tailwindcss/vite` hvata svaki `.css` uvoz i vraća prazan
+modul kad datoteka nema vlastiti `@import "tailwindcss"`.
 
 **Test-prvo** (CLAUDE.md #7): fixture → očekivano → implementacija. Rub koji prepoznaš odmah dobiva test.
 
@@ -101,8 +106,14 @@ danas piše [`../records/CHANGELOG.md`](../records/CHANGELOG.md) — brojka prep
   je unatoč tome i dalje preusmjeravao `LOCALAPPDATA` (dodatna sigurnost) i čitao prozor kroz Chrome
   DevTools Protocol (`--remote-debugging-port`, nad vlastitim webviewom) umjesto snimke ekrana
   (`PrintWindow`, obrazac iz S2) — provjera DOM-a je pouzdanija od piksela.
+- **Dimni test S4 (SUČELJE-2, T38–T42, 2026-09-23)** je prvi koji je morao raditi UZ instaliranu
+  aplikaciju: `tauri dev --config identifier=dev.sokratis.app.dev` dobiva vlastiti identifikator, pa
+  `single-instance` ne sudara dvije aplikacije; `LOCALAPPDATA` preusmjeren u scratchpad, CDP nad
+  vlastitim webviewom (kao u S3). Dijalog za mapu bira PRVI proces imenom `sokratis-desktop` (a to je
+  instalirana, ne dev) — pomoćna skripta odabire proces po PID-u kad oba rade istodobno.
 - **Na ručnoj listi za Leona ostaju** (`docs/architecture/ARCHITECTURE.md` §11 — nisu provjereni ni u
-  S2 ni u S3): tray-ikona na 100 %/200 %, autostart u `HKCU\…\Run`, obavijest na prijelaz u Alert,
-  preskok splasha, `prefers-reduced-motion`, osvježenje bez klika (sa štopericom), četiri teme.
+  S2 ni u S3 ni u S4): tray-ikona na 100 %/200 %, autostart u `HKCU\…\Run`, obavijest na prijelaz u
+  Alert, preskok splasha, `prefers-reduced-motion`, osvježenje bez klika (sa štopericom), četiri teme,
+  kartica s objašnjenjem vizualno (S4 ju je provjerio samo testovima i strukturom).
 - **Performanse** — danas se ne testiraju; M2/11 prvo **mjeri** (brojač git-procesa po izvještaju) i
   tek to mjerenje nosi brojku u test; `gix` je odgovor koji i dalje čeka pitanje.

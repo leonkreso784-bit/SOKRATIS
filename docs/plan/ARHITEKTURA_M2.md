@@ -467,12 +467,12 @@ iz nje je **u 1.0.0** ušlo ono što stoji ovdje, a ostalo je u
 | etapa | cigle | na kraju |
 |---|---|---|
 | **1 · funkcija** ✅ 2026-09-22 (`main` `b560f7c`) | T28 → spajanje SUČELJA u `main` → DESKTOP T29–T33 → T34 → §13.7 (T36) → §13.6 (T37) | **cjelovita u kodu**; Leon instalira **„1.0.0-pre"** (bez taga) i mjeri Sokrat Study i Sokratis |
-| **2 · izgled** — sljedeća sesija (S4, T38–T42, stablo `sokratis.ui2`) | §13.2 → §13.3 (dvije cigle) → §13.4 (dvije cigle) | 1.0.0-pre nadgleda gradnju vlastitog izgleda |
-| **3 · izdanje** — S5 | T35 (mjerenja, verzija 1.0.0) → završna recenzija → jedan krug popravaka → §13.8 → čuvar izdanja | **1.0.0**; tag uz Leonov izričit OK |
+| **2 · izgled** ✅ 2026-09-23 (`main` `6947189`, stablo `sokratis.ui2` obrisano) | §13.2 (T38) → §13.3 (T39, T40) → §13.4 (T41, T42) | **cjelovita u kodu**; 1.0.0-pre nadgleda gradnju vlastitog izgleda |
+| **3 · izdanje** — sljedeća sesija (S5) | T35 (mjerenja, verzija 1.0.0) → završna recenzija → jedan krug popravaka → §13.8 → čuvar izdanja | **1.0.0**; tag uz Leonov izričit OK |
 
 ### 13.2 Pogled Postavke (S-028)
 
-Deseti pogled, **globalan** (ne ovisi o odabranom projektu), na dnu lijevog izbornika. Četiri postavke:
+**Kod gotov (T38, `main` `6947189`, 2026-09-23).** Deseti pogled, **globalan** (ne ovisi o odabranom projektu), na dnu lijevog izbornika. Četiri postavke:
 tema (četiri palete iz §6.5) · jezik (HR/EN) · autostart · animacije (uključene/isključene).
 `Settings` u `src/lib/types.ts` dobiva četvrto polje `motion: boolean` (zadano `true`); pohrana je
 postojeći par ključ–vrijednost iz M2/16 — **shema baze se ne mijenja**. `ThemeSwitch` i `LangSwitch`
@@ -483,7 +483,7 @@ nađe ih kako ih je ostavio; gornja traka nema ni temu ni jezik.
 
 ### 13.3 Animacije (S-026)
 
-Dvije cigle, a **prekidač dolazi prije njih, s Postavkama (§13.2)** — pravilo koje gasi animacije mora
+**Kod gotov (T39, T40, `main` `6947189`, 2026-09-23).** Dvije cigle, a **prekidač dolazi prije njih, s Postavkama (§13.2)** — pravilo koje gasi animacije mora
 postojati prije prve animacije: atribut `data-motion="off"` na `<html>` (piše ga `state.svelte.ts`, kao
 `data-theme`) gasi **sve** animacije sučelja; postavlja ga `Settings.motion = false` **ili**
 `prefers-reduced-motion`. **(a) Ulaz grafova:** `Bars` rastu od osi, `Line` i `Sparkline` se iscrtaju
@@ -497,8 +497,11 @@ brana u `app.css` (jedno pravilo pod tim atributom) svodi trajanja na nulu.
 
 ### 13.4 Kartica s objašnjenjem (S-027)
 
-Dvije cigle. **(a) Mehanizam + Pokazatelji:** komponenta `Explain` (kartica uz element; otvara je klik
-ili Enter/Space, zatvara Esc i klik izvan; `role="dialog"`, fokus se vraća na okidač) i akcija/omotač
+**Kod gotov (T41, T42, `main` `6947189`, 2026-09-23; komponenta se zove `ExplainCard.svelte`, ne
+`Explain` — Ruling R31, Windows datotečni sustav bi je sudario s `explain.svelte.ts` u istoj mapi;
+37 id-eva, ne 18+9 — R28/R26.)** Dvije cigle. **(a) Mehanizam + Pokazatelji:** komponenta `Explain`
+(kartica uz element; otvara je klik ili Enter/Space, zatvara Esc i klik izvan; `role="dialog"`, fokus
+se vraća na okidač) i akcija/omotač
 kojim se bilo koji graf ili brojka označi kao objašnjiv po `id`-u; 18 pokazatelja dobiva sadržaj, a
 dotadašnja „formula na klik" (§6.2) postaje ta kartica. **(b) Ostali pogledi + pokrivenost:** Pregled
 (brojevi po težini, zadnji commit) · Tempo · Vrste rada · Faze · Dnevnik · Isporuke · Vizije ·

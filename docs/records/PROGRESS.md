@@ -943,3 +943,52 @@ kartica s objašnjenjem §13.4) u novom stablu `sokratis.ui2`, grana `feat/ui-2`
 (mjerenja, verzija 1.0.0) → završna recenzija → jedan krug popravaka → §13.8 (čuvar izdanja) → STANI,
 tag traži Leonov izričit OK. Ledger: `.superpowers/sdd/2026-09-18-m2-desktop/progress.md` i
 `NOVA-SESIJA-PROMPT.md` pored njega.
+
+## 2026-09-23 (FABLE) — Izvedba S4: SUČELJE-2 (T38–T42) spojena u `main`, etapa 2 „izgled" gotova
+
+**Četvrta od pet kratkih sesija izvedbe.** Opseg: SUČELJE-2 T38 → T39 → T40 → T41 → T42, serijski u
+jednom stablu (`sokratis.ui2`, grana `feat/ui-2` iz `e5f5e51`). Time je **etapa 2 „izgled" (S-025)
+cjelovita u kodu** — preostaje etapa 3 „izdanje" (S5).
+
+- **T38 — pogled Postavke** (`bcf092f` + popravci `808c33d`, `b097acc`): deseti, globalni pogled
+  (tema · jezik · autostart · animacije); `Settings.motion: bool` (Rust `SETTING_KEYS` postaje 4);
+  `data-motion` na `<html>` gasi sav pokret preko jedne varijable `--motion-dur`. Dva nalaza dimnog
+  testa: Sidebar je bez odabranog projekta prikazivao SAMO Postavke (R29 — `overview` sad uvijek
+  vidljiv) i test trajanja nikad nije stvarno pogađao CSS-deklaracije (R30, popravljen regex).
+- **T39 — ulaz grafova** (`a75089d`): stupci rastu, linije i sparkline se iscrtavaju
+  (`stroke-dashoffset`), prsten se otkriva SVG-maskom (`$props.id()` drži `id` maske jedinstvenim po
+  instanci). **R25, izmjereno u `tauri dev`:** WebView2 javlja prozor vidljivim i dok je skriven iza
+  splasha, pa `visibilitychange` NIKAD ne okida — `onFocusChanged` (fokus stiže iz `splash.rs`) je
+  pravi okidač prve animacije; oba čuvara ostaju u kodu, idempotentna.
+- **T40 — prijelaz pogleda i učitavanje** (`253cbc3`): ulaz 250 ms po pogledu, stari sadržaj prigušen
+  dok novi izvještaj stiže, kostur pri prvom učitavanju projekta (dimni test: pojavio se 8 ms nakon
+  klika, nestao na 551 ms).
+- **T41 — kartica s objašnjenjem, mehanizam + 18 pokazatelja** (`b2580a9` + popravak `6f2c74c`):
+  `Explainable`/`ExplainCard` (R31 — preimenovana s brifova `Explain.svelte`, jer se na Windowsu
+  sudara neosjetljivo na veličinu slova s `explain.svelte.ts` u istoj mapi); „formula na klik" postaje
+  kartica. Recenzija je vratila pet natpisa koji su parsiranje jezgre pripisivali `io`-u — ispravljeno.
+- **T42 — kartica u svim pogledima** (`bcc9ddc` + popravak `ec5e377`): 37 id-eva ukupno (18 + 19),
+  svih devet pogleda i traka signala imaju barem jedno objašnjenje; kartica projekta na Pregledu
+  razdvojena na naslov-gumb i tri objašnjive sestre (R26 — ugniježđeni gumbi nisu valjan HTML).
+  Recenzija je vratila tri natpisa — ispravljeno.
+- **Spajanje: `6947189` `merge: SUCELJE-2 (T38-T42)`** (`--no-ff` na `main` iz `e5f5e51`; 39 datoteka,
+  +1006/−103, nijedna nova ovisnost, Rust dirnut samo u `commands.rs`). Pune brane: `cargo fmt --check`
+  OK · `cargo clippy --workspace --all-targets -- -D warnings` OK · **145 Rust-testova + 1 ignoriran,
+  0 palo** (nepromijenjeno) · svelte-check **235** datoteka/0 · i18n **283** ključa hr=en (bilo 162) ·
+  kontrast 4/4 · **vitest 93**, 13 datoteka (bilo 82) · `npm run build` OK (main.js 208,57 kB /
+  gzip 53,66; main.css 22,80 kB) · `sokratis docs .` 100/100 · `signals .` nema. Pushano, `main` =
+  `origin/main`.
+- **Dimni test S4** (`tauri dev --config identifier=dev.sokratis.app.dev` UZ instaliranu 1.0.0-pre.1 —
+  `single-instance` po identifikatoru, bez sudara; `LOCALAPPDATA` u scratchpad; CDP nad vlastitim
+  webviewom): Postavke bez teme/jezika u gornjoj traci, postavke prežive reload, sve četiri vrste
+  grafova animiraju, `data-motion=off` svodi trajanja na 0. Kartica s objašnjenjem NIJE vizualno
+  provjerena okom (samo testovi + strukturna provjera) — ostaje na Leonovoj ručnoj listi.
+- **Nalaz za S5 (jezgra):** `closed_phases_in_range` (`indicators.rs:80-83`) gleda samo `since`, ne
+  `until` — tekst kartice to istinito opisuje; popravak jezgre čeka krug popravaka S5.
+- **Stablo `sokratis.ui2` i grana `feat/ui-2` obrisani** nakon provjere (spojeno, čisto). **Na disku
+  je jedno stablo (`main`), jedina grana `main`.**
+
+### Što slijedi
+**Etapa 3 „izdanje" — S5:** T35 (mjerenja, verzija 1.0.0) → završna recenzija (opus, `8edf3df..main`)
+→ jedan krug popravaka → §13.8 (čuvar izdanja) → STANI, tag traži Leonov izričit OK. Ledger:
+`.superpowers/sdd/2026-09-18-m2-desktop/progress.md` i `NOVA-SESIJA-PROMPT.md` pored njega.

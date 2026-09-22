@@ -72,20 +72,21 @@ pogrešna uporaba**; `--help`/`--version` = 0) — sve rade nad pravim repozitor
 Sokrat Studyjem).
 Testovi i brane: `docs/workflow/TESTING.md`.
 
-## Stanje — TRENUTNO (2026-09-22 — INTEGRACIJA spojena; sljedeća sesija je S4 SUČELJE-2: T38–T42)
+## Stanje — TRENUTNO (2026-09-23 — SUČELJE-2 spojena, etapa 2 gotova; sljedeća sesija je S5 IZDANJE)
 - **M0 gotov. M1 zatvoren** (0.1.0): `sokratis report/docs/signals` rade nad pravim repozitorijem,
   paritet s `RAD.xlsx` je test. Što je izgrađeno i **što još ne radi**: `ARCHITECTURE.md` (§11).
 - **M2 izlazi kao verzija 1.0.0** (S-024; 0.2.0 se preskače). Spec `docs/plan/ARHITEKTURA_M2.md`
   (§11 izlazni uvjet + **§13 dopuna rezom**), plan cigli `docs/superpowers/plans/2026-09-18-m2-desktop.md`.
 - **U `main`-u, verzija `1.0.0-pre.1`:** KOSTUR · JEZGRA · PROFIL · STORE · IO (+ M2/14b) · CLI ·
-  SUČELJE · DESKTOP · INTEGRACIJA (T34, T36, T37, merge `b560f7c`, 2026-09-22 — sučelje zove prave
-  Tauri-naredbe, repo bez konvencija ne laže, instalater NSIS postoji, **razvojna baza `sokratis-dev.db`
-  je odvojena od instalirane**). **Nespojeno:** ništa. **Nije započeto:** T35 · pet cigli etape 2 (§13).
-- **Tri etape (S-025):** (1) funkcija ✅ — T28 → SUČELJE → DESKTOP → T34 → repo bez konvencija →
-  instalater → **cjelovita u kodu 2026-09-22**; Leon instalira „1.0.0-pre“ (ručna radnja, izvan sesije)
-  · (2) izgled — S4 T38–T42: Postavke · animacije · kartica s objašnjenjem · (3) izdanje — T35 ·
-  završna recenzija · krug popravaka · cigla dokumentacije · čuvar izdanja. **Sesije su kratke, s
-  dogovorenim stajanjem** (Leonov usage je ograničen).
+  SUČELJE · DESKTOP · INTEGRACIJA (T34, T36, T37, merge `b560f7c`, 2026-09-22) · SUČELJE-2 (T38–T42,
+  merge `6947189`, 2026-09-23 — deseti pogled Postavke, animacije preko `data-motion`, kartica s
+  objašnjenjem na 37 mjesta). **Nespojeno:** ništa. **Nije započeto:** T35 · etapa 3 „izdanje" (§13.8).
+- **Tri etape (S-025):** (1) funkcija ✅ 2026-09-22 · (2) izgled ✅ 2026-09-23 — Postavke · animacije ·
+  kartica s objašnjenjem, **cjelovita u kodu**; Leon je instalirao „1.0.0-pre" (izvan sesije, potvrđeno
+  radnom instalacijom u dimnom testu S4) · (3) izdanje — **sljedeća sesija S5:** T35 (mjerenja, verzija
+  1.0.0) → završna recenzija (opus, `8edf3df..main`) → jedan krug popravaka → §13.8 (čuvar izdanja) →
+  STANI, tag traži Leonov izričit OK. **Sesije su kratke, s dogovorenim stajanjem** (Leonov usage je
+  ograničen).
 - Druga verzija (M3) i kasnije: `docs/records/BACKLOG.md`. Zapis namjere iz kojeg je rez nastao:
   `docs/archive/PLAN_DESIGNE.md` (ispunjen, nije izvor istine).
 - **Na disku je jedno stablo (`main`)**; LICENCE i taga nema. Prva radnja sesije:
@@ -117,7 +118,7 @@ hrvatski · **S-031** dokumentacija: točnost se čuva smanjivanjem, ispunjeno i
 Uloge i protokol: `docs/workflow/AGENTI.md`. Graditelj radi **jednu ciglu u svom stablu**, recenzent presuđuje
 u dva prolaza, čuvar dokumentacije piše zapise; **samo orkestrator spaja u `main`**. Nakon compacta stanje se
 čita iz gita (`git log --oneline -15` · `git worktree list`), ne iz sjećanja. Nijedno stablo toka nije
-otvoreno; stablo za S4 (`sokratis.ui2`, grana `feat/ui-2`) otvara se sljedeće, a
+otvoreno (stablo `sokratis.ui2`, grana `feat/ui-2` obrisani nakon spajanja SUČELJA-2, 2026-09-23) —
 potpuno spojena se brišu (pravilo #1). Popis tokova i vlasništvo datoteka su u planu M2, ne ovdje.
 
 ## Dokumentacija — ulaz je SAMO `docs/README.md`
