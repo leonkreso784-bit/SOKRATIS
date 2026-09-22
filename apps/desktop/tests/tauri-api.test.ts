@@ -1,4 +1,5 @@
-// ZAŠTO OVAKO (cigla M2/34 — TauriApi testiran bez Taurija i bez DOM-a)
+// ZAŠTO OVAKO (cigla M2/34 — TauriApi testiran bez Taurija i bez DOM-a; dopunjeno M2/38 — test za
+// `setSetting` sad tvrdi i `motion`, PO TIPU vrijednosti, ne po ključu)
 // `vi.mock` zamjenjuje `@tauri-apps/api/core`/`event` lažnim `invoke`/`listen` PRIJE nego se `api.ts`
 // uveze; `vi.hoisted` diže `invokeMock`/`listenMock` iznad `vi.mock` poziva jer Vitest sam diže
 // `vi.mock` na vrh datoteke (obični `const` bi ondje inače bio nedostupan). Testovi provjeravaju SAMO
@@ -87,15 +88,19 @@ describe('TauriApi — ugovor prema commands.rs', () => {
     expect(invokeMock).toHaveBeenCalledWith('refresh', { id: 9 });
   });
 
-  it('setSetting("autostart", true/false) šalje "on"/"off"; ostale postavke šalju tekst kakav jest', async () => {
+  it('setSetting("autostart"/"motion", true/false) šalje "on"/"off"; ostale postavke šalju tekst kakav jest', async () => {
     invokeMock.mockResolvedValue(undefined);
     const t = new TauriApi();
     await t.setSetting('autostart', true);
     expect(invokeMock).toHaveBeenNthCalledWith(1, 'set_setting', { key: 'autostart', value: 'on' });
     await t.setSetting('autostart', false);
     expect(invokeMock).toHaveBeenNthCalledWith(2, 'set_setting', { key: 'autostart', value: 'off' });
+    await t.setSetting('motion', true);
+    expect(invokeMock).toHaveBeenNthCalledWith(3, 'set_setting', { key: 'motion', value: 'on' });
+    await t.setSetting('motion', false);
+    expect(invokeMock).toHaveBeenNthCalledWith(4, 'set_setting', { key: 'motion', value: 'off' });
     await t.setSetting('theme', 'mint');
-    expect(invokeMock).toHaveBeenNthCalledWith(3, 'set_setting', { key: 'theme', value: 'mint' });
+    expect(invokeMock).toHaveBeenNthCalledWith(5, 'set_setting', { key: 'theme', value: 'mint' });
   });
 
   it('onReportUpdated: listen uhvati handler, project_id iz tereta stiže do cb', () => {

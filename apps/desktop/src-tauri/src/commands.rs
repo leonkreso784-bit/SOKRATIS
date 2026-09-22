@@ -5,6 +5,8 @@
 //! pozivaju je. (M2/30: `set_override`/`save_visions`/`refresh` sad zovu `engine::request_refresh`
 //! umjesto da same diraju `state.reports` — detalj uz svaku naredbu niže.)
 //! (M2/32: `refresh(None)` petlju sad radi `engine::refresh_all` — i tray je zove, iz zasebne niti.)
+//! (M2/38: `Settings` dobiva četvrti ključ `motion: bool`, `SETTING_KEYS` postaje `[&str; 4]` —
+//! `set_setting` ga upisuje kroz istu opću granu kao `theme`/`lang`, bez novog `if`.)
 use crate::cache::StoreCache;
 use crate::state::{AppState, text};
 use crate::summary::{ProjectSummary, summarize};
@@ -68,13 +70,14 @@ pub struct Settings {
     pub theme: String,
     pub lang: String,
     pub autostart: bool,
+    pub motion: bool,
 }
 
-const SETTING_KEYS: [&str; 3] = ["theme", "lang", "autostart"];
+const SETTING_KEYS: [&str; 4] = ["theme", "lang", "autostart", "motion"];
 
-/// Jedan ključ postavke, sa zadanom vrijednošću ako nikad nije zapisan — dodavanje četvrtog ključa
-/// (`motion`, T38) će u `get_settings` biti JEDAN redak koji ovo zove. `pub(crate)`: motor
-/// (`engine.rs`) je zove za `lang` prije obavijesti OS-a.
+/// Jedan ključ postavke, sa zadanom vrijednošću ako nikad nije zapisan — `motion` (M2/38) je upravo
+/// takav četvrti ključ, JEDAN redak u `get_settings` niže. `pub(crate)`: motor (`engine.rs`) je zove
+/// za `lang` prije obavijesti OS-a.
 pub(crate) fn setting_or(
     store: &sokratis_store::Store,
     key: &str,
@@ -346,6 +349,7 @@ pub fn get_settings(state: tauri::State<'_, AppState>) -> Result<Settings, Strin
         theme: setting_or(&store, "theme", "academic")?,
         lang: setting_or(&store, "lang", "hr")?,
         autostart: setting_or(&store, "autostart", "off")? == "on",
+        motion: setting_or(&store, "motion", "on")? != "off",
     })
 }
 

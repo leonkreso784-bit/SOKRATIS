@@ -1,5 +1,7 @@
 <script lang="ts">
-  // ZAŠTO OVAKO (cigla M2/25 — četiri kruga, bojaju se iz tokena, ne iz Tailwind klasa)
+  // ZAŠTO OVAKO (cigla M2/25 — četiri kruga, bojaju se iz tokena, ne iz Tailwind klasa; dopunjeno
+  // M2/38 — komponenta sada živi u `Settings.svelte`, `aria-label` grupe čita `settings.theme`,
+  // isti ključ kao natpis retka lijevo; `top.theme` je izbrisan, R23)
   // `--theme-swatch-*` u `tokens.css` NISU u `--color-*` imenskom prostoru (namjerno — krug za
   // "chalk" mora ostati tamnog izgleda i dok je aktivna "academic" tema), pa Tailwind za njih ne
   // gradi utility-klase. `var(--theme-swatch-{tema}-bg)` je i dalje boja SAMO iz tokena (S-017),
@@ -22,7 +24,7 @@
   }
 </script>
 
-<div class="flex items-center gap-1.5" role="group" aria-label={t('top.theme')}>
+<div class="flex items-center gap-1.5" role="group" aria-label={t('settings.theme')}>
   {#each themes as theme (theme)}
     <button
       type="button"

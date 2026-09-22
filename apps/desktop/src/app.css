@@ -1,8 +1,9 @@
-/* ZAŠTO OVAKO (cigla M2/20 — ulaz stilova)
+/* ZAŠTO OVAKO (cigla M2/20 — ulaz stilova; dopunjeno M2/38 — dodan uvoz `styles/motion.css`, S-026)
    Tailwind prvo (daje utility klase), pa tokens.css odmah zatim (definira `@theme` iz kojeg te
    klase crpe boje) — jedan uvoz, jedan izvor istine za sve boje u markupu (S-017/S-018). */
 @import "tailwindcss";
 @import "./styles/tokens.css";
+@import "./styles/motion.css";
 
 :root { color-scheme: light; }
 :root[data-theme="chalk"], :root[data-theme="mint"], :root[data-theme="carbon"] { color-scheme: dark; }

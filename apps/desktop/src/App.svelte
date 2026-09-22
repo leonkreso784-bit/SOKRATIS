@@ -5,14 +5,16 @@
   // komponentu, pa je grana `{:else}` s `common.loading` UKLONJENA jer više nije dostižna ni za
   // jedan mogući `View`: `app.view` je zatvoren TS-enum, if/else-if lanac ovdje ga pokriva u cijelosti;
   // dopunjeno M2/34 — pretplata na `report_updated` je OVDJE, ne u `Overview.svelte`: promjena u
-  // repou mora osvježiti pogled u kojem korisnik TRENUTNO stoji, ne samo Pregled)
+  // repou mora osvježiti pogled u kojem korisnik TRENUTNO stoji, ne samo Pregled; dopunjeno M2/38 —
+  // `syncMotion` sluša `prefers-reduced-motion` odmah nakon `applyTheme`, a ruta `settings` je deseti,
+  // globalni pogled koji `Sidebar` crta i bez odabranog projekta (R22))
   // `onMount` je Svelteov standardni "kad je komponenta u DOM-u" udarac — ovdje je to JEDINO mjesto
   // koje povlači početne postavke i popis projekata (S-010: jedno mjesto pokretanja, ne u svakoj
   // podkomponenti). Umotan u `try/catch` (dopuna T34): pad `getSettings` (npr. baza nedostupna) više
   // ne smije ostaviti prazan prozor bez ijedne poruke — greška ide u traku ispod.
   import { onDestroy, onMount } from 'svelte';
   import { api } from './lib/api';
-  import { app, applyTheme, dismissError, loadProjects, loadReport, setError } from './lib/state.svelte';
+  import { app, applyTheme, dismissError, loadProjects, loadReport, setError, syncMotion } from './lib/state.svelte';
   import { setLang, t } from './lib/i18n/index.svelte';
   import Topbar from './lib/shell/Topbar.svelte';
   import Sidebar from './lib/shell/Sidebar.svelte';
@@ -26,13 +28,18 @@
   import Deliveries from './views/Deliveries.svelte';
   import Visions from './views/Visions.svelte';
   import Docs from './views/Docs.svelte';
+  import Settings from './views/Settings.svelte';
 
   let unsubscribeReportUpdated: (() => void) | null = null;
+  let motionQuery: MediaQueryList | undefined;
 
   onMount(async () => {
     try {
       app.settings = await api.getSettings();
       applyTheme(app.settings.theme);
+      syncMotion();
+      motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+      motionQuery.addEventListener('change', syncMotion);
       setLang(app.settings.lang);
       await loadProjects();
     } catch (e) {
@@ -48,6 +55,7 @@
 
   onDestroy(() => {
     unsubscribeReportUpdated?.();
+    motionQuery?.removeEventListener('change', syncMotion);
   });
 </script>
 
@@ -91,6 +99,8 @@
         <Visions />
       {:else if app.view === 'docs'}
         <Docs />
+      {:else if app.view === 'settings'}
+        <Settings />
       {/if}
     </main>
   </div>

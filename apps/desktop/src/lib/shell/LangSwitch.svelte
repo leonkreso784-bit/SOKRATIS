@@ -1,5 +1,7 @@
 <script lang="ts">
-  // ZAŠTO OVAKO (cigla M2/25 — HR/EN kao dva gumba, ne padajući izbornik)
+  // ZAŠTO OVAKO (cigla M2/25 — HR/EN kao dva gumba, ne padajući izbornik; dopunjeno M2/38 —
+  // komponenta sada živi u `Settings.svelte`, `aria-label` grupe čita `settings.lang`, isti ključ kao
+  // natpis retka lijevo; `top.lang` je izbrisan, R23)
   // Samo dvije vrijednosti postoje (S-021) — gumb po jeziku je jednostavniji za klik i čitljiviji
   // za a11y (`aria-pressed`) nego `<select>` s dvije stavke. `setLang` mijenja `document.documentElement
   // .lang` (u `i18n/index.svelte.ts`), a `app.settings.lang` prati istu vrijednost radi `getSettings`.
@@ -21,7 +23,7 @@
   }
 </script>
 
-<div class="flex items-center gap-1" role="group" aria-label={t('top.lang')}>
+<div class="flex items-center gap-1" role="group" aria-label={t('settings.lang')}>
   {#each langs as lang (lang)}
     <button
       type="button"

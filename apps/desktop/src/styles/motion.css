@@ -1,0 +1,10 @@
+/* ZAŠTO OVAKO (cigla M2/38): jedno mjesto za sav pokret sučelja (S-026). Trajanje je JEDNA varijabla,
+   pa „≤ 250 ms" čuva test, a ne disciplina; atribut `data-motion` radi kao `data-theme` — piše ga
+   `applyMotion` u `state.svelte.ts`. `!important` je ovdje namjeran: mora pobijediti i inline `animation`
+   koji Svelte piše za svoje prijelaze. */
+:root { --motion-dur: 250ms; }
+:root[data-motion="off"] { --motion-dur: 0ms; }
+:root[data-motion="off"] *, :root[data-motion="off"] *::before, :root[data-motion="off"] *::after {
+  animation-duration: 0s !important; animation-delay: 0s !important;
+  transition-duration: 0s !important; transition-delay: 0s !important;
+}

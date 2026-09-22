@@ -4,6 +4,8 @@
 // `model.rs` doslovno — `Option<T>` u Rustu postaje `T | null` (serde ga serijalizira kao `null`,
 // nikad ga ne izostavlja, pa `?` ovdje ne bi bio točan opis). Enumi su `snake_case` string-literali
 // jer `#[serde(rename_all = "snake_case")]` u Rustu daje `"debugging"`, ne `"Debugging"` (S-008).
+// Dopunjeno M2/38 — `Settings.motion` i `View`+`'settings'` niže: oblici koje `model.rs` ne zna
+// (popis projekata, raspon, postavke), sučelje ih drži samo za sebe.
 import type { Lang } from './i18n/index.svelte';
 
 export type { Lang };
@@ -164,10 +166,13 @@ export interface Settings {
   theme: Theme;
   lang: Lang;
   autostart: boolean;
+  motion: boolean;
 }
 
 // Devet stavki lijevog izbornika (spec 6.2: Pregled + osam pogleda); imena prate ključeve `nav.*`
 // u `src/lib/i18n/{hr,en}.json` tako da `t(\`nav.${view}\`)` uvijek pogodi postojeći natpis.
+// `'settings'` je deseti, globalni pogled izvan popisa (M2/38): `Sidebar` ga crta zasebno, NIJE u
+// `VIEWS` niže, jer radi i bez odabranog projekta (R22, spec §13.2).
 export type View =
   | 'overview'
   | 'tempo'
@@ -177,7 +182,8 @@ export type View =
   | 'diary'
   | 'deliveries'
   | 'visions'
-  | 'docs';
+  | 'docs'
+  | 'settings';
 
 export const VIEWS: readonly View[] = [
   'overview',
