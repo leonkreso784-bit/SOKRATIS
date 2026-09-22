@@ -3,7 +3,7 @@
   // `<Topbar>` čita/piše izravno globalnu runu `app` (`state.svelte.ts`) — bez callback-propsa kao
   // u starijem Svelteu: promjena `app.currentId` ovdje se odmah vidi u `<Sidebar>` i `<main>`.
   import markUrl from '../../assets/intro/mark.webp';
-  import { app, loadReport, selectProject } from '../state.svelte';
+  import { app, loadReport, selectProject, setError } from '../state.svelte';
   import { api } from '../api';
   import { t } from '../i18n/index.svelte';
   import RangePicker from './RangePicker.svelte';
@@ -16,8 +16,12 @@
   }
 
   async function refresh(): Promise<void> {
-    await api.refresh(app.currentId ?? undefined);
-    if (app.currentId !== null) await loadReport();
+    try {
+      await api.refresh(app.currentId ?? undefined);
+      if (app.currentId !== null) await loadReport();
+    } catch (e) {
+      setError(e);
+    }
   }
 </script>
 

@@ -10,6 +10,16 @@
 //! `starts_with(prefix)` i umjesto toga čita regex iz profila — polje `phase_tag` i
 //! `classify::phase_tag` prestaju biti mrtvi (I3, M14), a tuđi projekt s drukčijom konvencijom
 //! (npr. `[M1.3]`) veže se istim putem kao Sokrat Study (`F2/3`).
+//!
+//! ZAŠTO RUST OVAKO (cigla M2/36 — repo bez konvencija ne laže, spec §13.7)
+//! `.filter(|ph| ph.commits > 0)` je popravak sloja koji je LAGAO: `p.closed_phases` dolazi iz
+//! ZADANOG profila (S-005 — Sokrat Studyjeve povijesne faze „MREŽA", „RAČUN R1" …), pa je prije
+//! ove cigle SVAKI tuđi repo bez `.sokratis/profile.json` dobivao ta četiri imena u `Report.phases`
+//! s `0/0 cigli`, samo zato što profil postoji kao FALLBACK. I8 (M1) je isti nalaz već popravio za
+//! POKAZATELJE (`indicators.rs` filtrira `commits > 0` prije brojanja), ali `Report.phases` — ono
+//! što `Phases.svelte` stvarno iscrta — je ostao netaknut. Za Sokrat Study se ništa ne mijenja
+//! (snapshot dokazuje: sve četiri zatvorene faze imaju desetke pogođenih commita), jer su te faze
+//! stvarno njegova povijest — filtar samo skida imena koja OVAJ repo nikad nije doživio.
 use crate::civil::days_between;
 use crate::{Commit, Patterns, Phase, PhaseState};
 
@@ -39,6 +49,9 @@ pub fn closed_phases(all_commits: &[Commit], p: &Patterns) -> Vec<Phase> {
                 commits: n,
             }
         })
+        // M2/36: zatvorena faza bez ijednog pogođenog commita nije ISTINA za OVAJ repo — ostaje
+        // samo u `docs/plan/…`/profilu kao deklaracija, ne u izvještaju koji korisnik gleda.
+        .filter(|ph| ph.commits > 0)
         .collect()
 }
 
@@ -97,7 +110,10 @@ mod tests {
             c("d", 4, "2026-08-31", "MREZA A1: baza"),
         ];
         let ph = closed_phases(&all, &p);
-        assert_eq!(ph.len(), 4);
+        // M2/36: samo DVIJE od zadanih četiriju faza pogode ijedan commit ovog fixturea (RAČUN R1
+        // i MREŽA) — druge dvije („Osobni UGC-graditelj", „Frontend redizajn") nemaju commit u
+        // svom rasponu pa ih `closed_phases` više ne vraća (bile bi tuđa povijest za ovaj repo).
+        assert_eq!(ph.len(), 2);
         let r1 = ph.iter().find(|x| x.name.starts_with("RAČUN R1")).unwrap();
         assert_eq!(
             (

@@ -103,4 +103,27 @@ impl Repo {
         );
         self.git(&["rev-parse", "--short", "HEAD"])
     }
+
+    /// M2/36 (spec §13.7, R17): commit BEZ ijedne datoteke (`--allow-empty`) — točno ono što „Dodaj
+    /// projekt" donese kad korisnik doda tek `git init`-iran repo s jednim praznim commitom. Isti
+    /// obrazac kao `commit()`/`commit_merge` (FIKSNI `GIT_AUTHOR_DATE`/`GIT_COMMITTER_DATE`), samo
+    /// bez pisanja/`add`-anja jer nema sadržaja. Vidi napomenu o `#[allow(dead_code)]` uz `try_merge`
+    /// — ovaj pomoćnik koristi samo `project.rs`.
+    #[allow(dead_code)]
+    pub fn commit_empty(&self, msg: &str, a: &str, c: &str) -> String {
+        let out = Command::new("git")
+            .arg("-C")
+            .arg(self.path())
+            .env("GIT_AUTHOR_DATE", a)
+            .env("GIT_COMMITTER_DATE", c)
+            .args(["commit", "--allow-empty", "-q", "-m", msg])
+            .output()
+            .expect("git commit --allow-empty");
+        assert!(
+            out.status.success(),
+            "{}",
+            String::from_utf8_lossy(&out.stderr)
+        );
+        self.git(&["rev-parse", "--short", "HEAD"])
+    }
 }

@@ -158,5 +158,7 @@
   "splash.skip": "click or key to skip",
   "common.loading": "loading…",
   "common.na": "—",
-  "common.confirm": "Confirm"
+  "common.confirm": "Confirm",
+  "common.error": "Error: {msg}",
+  "common.dismiss": "Dismiss"
 }

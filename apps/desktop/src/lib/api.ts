@@ -1,9 +1,15 @@
-// ZAŠTO OVAKO (cigla M2/25 — jedan API, dvije izvedbe)
+// ZAŠTO OVAKO (cigla M2/25 — jedan API, dvije izvedbe; dopunjeno M2/34 — TauriApi spojen na naredbe)
 // Sučelje vidi SAMO sučelje `Api`, nikad izravno Tauri ni mock (ovisnost o apstrakciji, ne o izvedbi).
 // `MockApi` čita insta snapshot prave jezgre kroz Viteov `?raw` uvoz, pa dev-prikaz i testovi crtaju
 // TOČNO one brojke koje jezgra stvarno izračuna — nema ručno prepisane kopije podataka (S-010).
-// `TauriApi` (poziva Rust preko `invoke`) dolazi u T34; do tada `createApi()` uvijek vraća mock.
+// `TauriApi` (M2/34) svaku metodu prevodi u `invoke('<naredba>', {…})` s imenima argumenata točno
+// kao u `commands.rs`; ugovor provjerava `tests/tauri-api.test.ts` s lažnim `invoke`/`listen`, bez
+// pravog Tauri prozora. `createApi()` bira izvedbu po `'__TAURI_INTERNALS__' in window` (isti test
+// kao `Splash.svelte`) — `typeof window === 'undefined'` čuva vitest (Node, bez DOM-a) da uvijek
+// dobije `MockApi`, jer ovaj modul konstruira `api` ODMAH pri uvozu (zadnji redak datoteke).
 import snapRaw from '../../../../crates/sokratis-core/tests/snapshots/snapshot__report-sokratstudy-2026-09-17.snap?raw';
+import { invoke } from '@tauri-apps/api/core';
+import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import type {
   CommitRow,
   DocsHealth,
@@ -79,13 +85,13 @@ export class MockApi implements Api {
         check: 'stale-decision',
         path: 'docs/records/DECISIONS.md',
         line: 12,
-        message: 'MOCK primjer: odluka bez datuma zatvaranja (dev-prikaz dok TauriApi ne postoji, T34)',
+        message: 'MOCK primjer: odluka bez datuma zatvaranja (dev-prikaz izvan Tauri prozora)',
       },
       {
         check: 'missing-glossary-entry',
         path: 'docs/workflow/RUST.md',
         line: null,
-        message: 'MOCK primjer: nov Rust-konstrukt bez unosa u pojmovnik (dev-prikaz dok TauriApi ne postoji, T34)',
+        message: 'MOCK primjer: nov Rust-konstrukt bez unosa u pojmovnik (dev-prikaz izvan Tauri prozora)',
       },
     ],
     lag_days: 3,
@@ -114,7 +120,7 @@ export class MockApi implements Api {
   }
 
   async renameProject(_id: number, _name: string): Promise<void> {
-    // Mock nema trajnu pohranu za ime projekta; ostaje bez efekta do TauriApija (T34).
+    // Mock nema trajnu pohranu za ime projekta; ostaje bez efekta — TauriApi (T34) stvarno piše u store.
   }
 
   async removeProject(_id: number): Promise<void> {
@@ -227,9 +233,93 @@ export class MockApi implements Api {
   }
 }
 
+// `listen()` vraća `Promise<UnlistenFn>`, ali `Api.onReportUpdated`/`onSignalRaised` moraju vratiti
+// SINKRONU funkciju odjave (isti oblik kao `MockApi`, koje samo briše iz `Set`) — ova pomoćna funkcija
+// omata Promise umjesto da na nju čeka: odjava pozvana i PRIJE nego se `listen()` razriješi svejedno
+// otkaže pretplatu ČIM Promise legne, ne prije (S-010: jedan mehanizam za oba događaja).
+function deferredUnlisten(pending: Promise<UnlistenFn>): () => void {
+  return () => {
+    void pending.then((off) => off());
+  };
+}
+
+// Svaka metoda samo prevodi `Api`-poziv u `invoke(naredba, argumenti)` — imena naredbi i argumenata
+// prepisana doslovno iz `commands.rs` (S-012: `Report` prolazi kroz Rust nepromijenjen, ovdje se
+// ništa ne preslaguje ni ne hvata). Greška `invoke`-a stiže kao goli tekst (Rust `Err(String)`) i
+// samo se propušta pozivatelju — hvatanje živi na JEDNOM mjestu, u `state.svelte.ts` i pozivateljima
+// u `views/`, ne ovdje (S-010).
+export class TauriApi implements Api {
+  async listProjects(): Promise<ProjectSummary[]> {
+    return invoke<ProjectSummary[]>('list_projects');
+  }
+
+  // `null` = korisnik zatvorio dijalog bez odabira mape (Rust `Ok(None)`); duplikat stiže kao
+  // odbijen `invoke` (Rust `Err(tekst s imenom projekta)`).
+  async addProject(): Promise<ProjectSummary | null> {
+    return invoke<ProjectSummary | null>('add_project');
+  }
+
+  async renameProject(id: number, name: string): Promise<void> {
+    await invoke<void>('rename_project', { id, name });
+  }
+
+  async removeProject(id: number): Promise<void> {
+    await invoke<void>('remove_project', { id });
+  }
+
+  async getReport(id: number, range: Range): Promise<Report> {
+    return invoke<Report>('get_report', { id, range });
+  }
+
+  async getTrend(id: number, metric: string, range: Range): Promise<TrendPoint[]> {
+    return invoke<TrendPoint[]>('get_trend', { id, metric, range });
+  }
+
+  async setOverride(id: number, sha: string, kind: WorkKind | null): Promise<void> {
+    await invoke<void>('set_override', { id, sha, kind });
+  }
+
+  async saveVisions(id: number, visions: Vision[]): Promise<void> {
+    await invoke<void>('save_visions', { id, visions });
+  }
+
+  // `id` izostavljen/`undefined` znači "svi projekti" — Rust prima `Option<i64>` i tumači
+  // izostavljeno polje kao `None` (test `commands.rs::range_json_round_trip…` provjerava srodan oblik).
+  async refresh(id?: number): Promise<void> {
+    await invoke<void>('refresh', { id });
+  }
+
+  async getSettings(): Promise<Settings> {
+    return invoke<Settings>('get_settings');
+  }
+
+  // Baza drži TEKST po ključu — `autostart` je u `Api`-ju `boolean`, ovdje se pretvara u `"on"`/
+  // `"off"`; `theme`/`lang` su već tekst (Rust `Theme`/`Lang` su i tamo `String`), idu kakvi jesu.
+  async setSetting<K extends keyof Settings>(key: K, value: Settings[K]): Promise<void> {
+    const text = key === 'autostart' ? (value ? 'on' : 'off') : String(value);
+    await invoke<void>('set_setting', { key, value: text });
+  }
+
+  onReportUpdated(cb: (id: number) => void): () => void {
+    const pending = listen<{ project_id: number }>('report_updated', (e) => cb(e.payload.project_id));
+    return deferredUnlisten(pending);
+  }
+
+  onSignalRaised(cb: (e: { project_id: number; rule: string; severity: Severity }) => void): () => void {
+    const pending = listen<{ project_id: number; rule: string; severity: Severity }>('signal_raised', (e) =>
+      cb(e.payload),
+    );
+    return deferredUnlisten(pending);
+  }
+}
+
+// `window` ne postoji u vitestu (Node) — provjera mora preživjeti to PRIJE nego pita za
+// `__TAURI_INTERNALS__` (isti obrazac kao `Splash.svelte`). Pregledniku (`npm run dev`) i vitestu
+// ostaje `MockApi`; pravi Tauri prozor dobiva `TauriApi`.
 export function createApi(): Api {
-  // T34 ovdje dodaje granu za pravi Tauri prozor (provjera `'__TAURI_INTERNALS__' in window`,
-  // isti obrazac kao `Splash.svelte`); do tada je mock jedina izvedba.
+  if (typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window) {
+    return new TauriApi();
+  }
   return new MockApi();
 }
 

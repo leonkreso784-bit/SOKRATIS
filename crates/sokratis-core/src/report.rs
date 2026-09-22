@@ -217,12 +217,15 @@ pub(crate) mod tests {
             (2, 1, 0),
             "F1/1 je prije since pa se ne broji"
         );
+        // M2/36: nijedan od dva commita ovog fixturea ne pogađa raspon/uzorak ijedne od četiriju
+        // zadanih zatvorenih faza (Sokrat Studyjeva povijest, S-005) — `closed_phases` ih više ne
+        // vraća bez pogotka (spec §13.7: profil ne smije tvrditi tuđu povijest kao ovog repoa).
         assert_eq!(
             r.phases
                 .iter()
                 .filter(|p| p.state == crate::PhaseState::Closed)
                 .count(),
-            4
+            0
         );
         assert!(r.docs.is_some());
         let rules: Vec<&str> = r.signals.iter().map(|s| s.rule.as_str()).collect();
@@ -231,10 +234,12 @@ pub(crate) mod tests {
         assert_eq!((r.generated_at, r.branch.as_str()), (input().now, "main"));
     }
 
-    /// I8 (završna recenzija M1): zatvorena faza bez ijednog pogođenog commita je TUĐA povijest,
-    /// ne naša. Nad praznim repoom sa ZADANIM profilom (S-005) je pisalo „zatvorenih faza u
-    /// razdoblju 3" i „prosječno trajanje 8.5" — dva od 18 pokazatelja izmišljena za svaki
-    /// projekt osim Sokrat Studyja. Faze ostaju u ispisu (0/0), ali se ne broje.
+    /// I8 (završna recenzija M1) + M2/36 (spec §13.7): zatvorena faza bez ijednog pogođenog
+    /// commita je TUĐA povijest, ne naša. Nad praznim repoom sa ZADANIM profilom (S-005) je pisalo
+    /// „zatvorenih faza u razdoblju 3" i „prosječno trajanje 8.5" — dva od 18 pokazatelja izmišljena
+    /// za svaki projekt osim Sokrat Studyja; I8 je to popravio SAMO za pokazatelje. `closed_phases`
+    /// (M2/36) ide korak dalje: takva faza više se i ne ispisuje u `r.phases` (bila je 0/0 do ove
+    /// cigle) — provjera ispod ostaje vrijediti i nad praznim popisom (`all()` na `[]` je `true`).
     #[test]
     fn closed_phase_without_commits_is_not_counted() {
         let mut empty = input();

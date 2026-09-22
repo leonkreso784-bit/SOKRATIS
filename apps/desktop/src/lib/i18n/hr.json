@@ -158,5 +158,7 @@
   "splash.skip": "klik ili tipka preskače",
   "common.loading": "učitavam…",
   "common.na": "—",
-  "common.confirm": "Potvrdi"
+  "common.confirm": "Potvrdi",
+  "common.error": "Greška: {msg}",
+  "common.dismiss": "Zatvori"
 }
