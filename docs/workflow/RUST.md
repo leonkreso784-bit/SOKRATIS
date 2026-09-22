@@ -47,6 +47,10 @@ Nijedan nov crate za nešto što projekt već ima: `serde`/`serde_json` u `store
 snimka piše profil kao **kanonski JSON** (S-014) — `DefaultHasher` nije stabilan među verzijama, a
 zaseban crate samo za hash bio bi pravilo #6 naopako.
 
+**NSIS (instalater, T37, S-029) nije crate ni ovisnost u smislu pravila #6** — Taurijev bundler ga
+sam preuzme u `%LOCALAPPDATA%\tauri\` pri prvoj gradnji `npm run tauri build` (alat izvan repoa, ne
+ulazi u `Cargo.lock` ni `package-lock.json`, Ruling R18).
+
 Nova ovisnost = namjerna radnja: redak ovdje + obrazloženje u commitu (CLAUDE.md #6).
 `Cargo.lock` se commita. Ovisnost smije čekati svoju ciglu (danas: `notify` i `insta`), ali samo ako
 je pinana u cigli koja je uvela i ovdje objašnjena — stanje koda je u
@@ -195,6 +199,7 @@ Test za pravilo: **Leon može pročitati datoteku i reći što radi.** Ako ne mo
 | `AppHandle`, `State<'_, T>`, `#[tauri::command]`, `generate_handler!` | M2/29 (`desktop/src-tauri/src/{commands,lib}.rs`) | `AppHandle` je jeftin klon-ključ do aplikacije iz bilo koje niti (šalje događaje, dohvaća stanje); `State<'_, T>` je posuđeni pristup dijeljenom stanju unutar jedne naredbe; `#[tauri::command]` pretvara običnu funkciju u RPC koji sučelje zove kroz `invoke(ime, args)`; `generate_handler!` na KOMPAJLIRANJU provjeri da svako navedeno ime postoji i ima ispravan potpis — tipfeler je greška prevoditelja, ne runtime iznenađenje |
 | `include_bytes!` | M2/32 (`desktop/src-tauri/src/tray.rs`, tray-ikona) | isto što i `include_str!` (niže), ali za binarni sadržaj (PNG) — ikona putuje UNUTAR `.exe`-a, instalacija ne treba zasebnu datoteku pored njega |
 | `#[serde(tag = "preset", rename_all = "snake_case")]` + `#[serde(rename = "7d")]` | M2/29 (`desktop/src-tauri/src/commands.rs`, `Range`) | vanjski tag u JSON-u kao poseban ključ (`"preset"`) uz podatke varijante u istoj razini — `{"preset":"7d"}`, ne `{"SevenDays":{...}}`; `rename` na pojedinoj varijanti prepiše automatsko ime (`SevenDays` → `"7d"`) kad ugovor prema TS-u traži baš taj tekst |
+| `cfg!(debug_assertions)` vs `#[cfg(...)]` | M2/37 (`desktop/src-tauri/src/state.rs`, `db_file_name`) | `cfg!(...)` je makro koje se PRI KOMPILACIJI svede na `true`/`false` — obje grane ostaju u binarnoj i obje se daju testirati u istom buildu; atribut `#[cfg(...)]` umjesto toga NEPOTREBAN kod izbacuje iz binarnog zapisa. Ovdje bira ime datoteke baze (`sokratis-dev.db` u debug, `sokratis.db` u release) bez dvije zasebne binarne |
 
 Redak se dodaje **u cigli u kojoj se pojam prvi put pojavi**, s referencom na datoteku.
 

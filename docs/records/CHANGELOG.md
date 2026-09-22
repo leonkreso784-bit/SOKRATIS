@@ -8,7 +8,9 @@ Isporuka = ono što je u `main`-u; sesije su u `PROGRESS.md`.
 **Milestone 2 (desktop) je u izvedbi** po odobrenom specu
 [`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md) (odluke S-012…S-022) i planu od 35 cigli.
 **Ovaj odjeljak izlazi kao 1.0.0, ne 0.2.0** (S-024; rez i dopuna speca §13 od 2026-09-21).
-Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek sesije:
+**Na disku je `main` verzije `1.0.0-pre.1`** (jedan izvor: `[workspace.package]` u korijenskom
+`Cargo.toml`, M2/37) — netagirano, neobjavljeno; tag traži Leonov izričit OK na kraju etape izdanja
+(S-025). Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek sesije:
 [`PROGRESS.md`](./PROGRESS.md).
 
 - **`M2/1a` — kostur M2 (2026-09-18).** Korisnik CLI-ja **ne vidi ništa novo**: nema nove naredbe ni
@@ -201,6 +203,25 @@ Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek sesije:
   --all-targets -- -D warnings` OK · `cargo test --workspace` **142 testa, 1 ignoriran, 0 palo** ·
   `npm run check` (i18n 160 hr=en · kontrast 4/4 · vitest 66/66) · `npm run build` OK · `sokratis
   docs .` 100/100 · `signals .` nema signala. Tok DESKTOP je time **gotov** (T29–T33 u `main`-u).
+- **INTEGRACIJA (T34, T36, T37) u `main`-u (2026-09-22).** Korisnik dobiva PRAVU aplikaciju umjesto
+  demoa: `apps/desktop/src` prestaje raditi SAMO nad `MockApi` — `TauriApi` prevodi svaku metodu
+  `Api`-ja u `invoke()` prema `commands.rs`, `report_updated` osvježava popis I trenutačni izvještaj
+  kroz jednu globalnu pretplatu, a svaki neuspio poziv sad izlazi na ekran u traci greške umjesto da
+  tiho nestane (zatvara nošene nalaze T25/T26). **Repo bez konvencija Sokrat Studyja više ne laže**
+  (spec §13.7): repo bez `docs/`, dnevnika, plana i `.sokratis/` dobiva brojke iz gita i prazna stanja
+  za sve što traži konvenciju, nikad izmišljenu brojku ni grešku — popravak u jezgri (Ruling R21):
+  zatvorena faza bez ijednog pogođenog commita se od sad ne upisuje ni u `Report.phases` (I8 je isto
+  već popravio za pokazatelje, ne za tablicu faza). **Instalater postoji**: `npm run tauri build` daje
+  NSIS za trenutnog korisnika (`currentUser`, bez administratorskih prava, S-029) — nepotpisan, bez
+  auto-ažuriranja, samo za Leona. **Verzija ima jedan izvor** (`[workspace.package]` u korijenskom
+  `Cargo.toml`, `1.0.0-pre.1`) — CLI i desktop dijele isti broj. **Razvojna baza je odvojena od
+  instalirane**: `npm run tauri dev` sad piše u `sokratis-dev.db`, instalirana aplikacija u
+  `sokratis.db` — razvoj više ne dira Leonovu pravu bazu.
+  Brane nakon spajanja (merge `b560f7c`): `cargo fmt --check` OK · `cargo clippy --workspace
+  --all-targets -- -D warnings` OK · `cargo test --workspace` **145 testova, 1 ignoriran, 0 palo** ·
+  `npm run check` (svelte-check 212 datoteka/0 · i18n **162** ključa hr=en · kontrast 4/4 ·
+  **vitest 82**) · `npm run build` OK · `sokratis docs .` 100/100 · `signals .` nema signala. Time je
+  **etapa 1 „funkcija" (S-025) cjelovita u kodu** — preostaje da Leon instalira „1.0.0-pre".
 
 ## [0.1.0] — 2026-09-17 — Jezgra i CLI (Milestone 1)
 

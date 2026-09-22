@@ -7,8 +7,8 @@
 
 | stavka | za | bilješka |
 |---|---|---|
-| Pravila M3: udio debugginga raste 3 dana · cigle/dan ispod prosjeka zatvorenih faza · deploy > 14 dana · udio testnih pada · commiti bez unosa u dnevniku · faza dulja od prosjeka | M3 | popis iz speca §2.5; svako pravilo = svoja datoteka + test |
-| Profil za tuđe projekte: dokumentiran JSON format + primjer za repo bez `docs/` | M3 | zadano = Sokrat Study (S-005) |
+| Pravila M3: udio debugginga raste 3 dana · cigle/dan ispod prosjeka zatvorenih faza · deploy > 14 dana · udio testnih pada · commiti bez unosa u dnevniku · faza dulja od prosjeka · **(Leon, 2026-09-22)** dokumentacija kasni za kodom po datotekama (npr. `ARCHITECTURE.md` nedirnut N dana dok `src/` ima M commita) · test-omjer po cigli (commit u `src/` bez pripadnog testa, pravilo #7) · faza bez zatvaranja dulje od procjene iz plana · nova `.rs`/`.ts` bez zaglavlja „zašto" (pravilo #5) · obećanje u dnevniku („sljedeća sesija: X") bez commita koji X dotiče u N dana | M3 | popis iz speca §2.5; svako pravilo = svoja datoteka + test |
+| Profil za tuđe projekte: dokumentiran JSON format + primjer za repo bez `docs/`; **(Leon, 2026-09-22)** čarobnjak koji PREDLOŽI `profile.json` iz onoga što vidi u repou umjesto tihog Sokrat Studyjeva zadanog, i Conventional Commits kao drugi ponuđeni zadani profil | M3 | zadano = Sokrat Study (S-005); §13.7 (M2, gotovo) jamči da brojke nad neprepoznatim repoom ne lažu — čarobnjak je sljedeći korak, prijedlog umjesto tišine |
 | GitHub adapter: CI status po grani, PR-ovi | M3 (opcionalno) | mreža; `gh` nije na stroju |
 | Vercel adapter: deployi umjesto `🚀` u dnevniku | M3 (opcionalno) | mreža |
 | HR/EN natpisi u **sučelju** | → spec M2 [§6.4](../plan/ARHITEKTURA_M2.md) (S-021) | samo pointer |
@@ -36,8 +36,13 @@ verzija nadgleda gradnju druge, pa se redoslijed ispod još može promijeniti iz
 | **Postavke s vlastitim dodacima** | Leon želi sve četvero; redoslijed po cijeni: vlastiti pragovi i pravila signala → vlastiti pokazatelj (formula nad postojećim brojkama) → slaganje Pregleda → pravi pluginovi (kod) zadnji |
 | Kartica s objašnjenjem **s dokazom** — commiti ili dani iz kojih je broj nastao | 1.0.0 ima statičnu karticu (S-027) |
 | Punjenje trenda iz git-povijesti | u 1.0.0 trend kreće prazan od dana instalacije (Leon, 2026-09-21); tempo i commiti se mogu izračunati unatrag (`--until` po danu), docs-ocjena ne bez skupog čitanja starih stabala |
-| Izvoz u CSV / xlsx | „bit će potrebno u novijim verzijama“; do tada je izvoz `sokratis report --json` |
+| Izvoz — **(Leon, 2026-09-22)** MD/CSV/PDF, zamjena za `RAD.xlsx` | „bit će potrebno u novijim verzijama“; do tada je izvoz `sokratis report --json` |
 | Izgled u iOS stilu, blago „glossy“ | Leon: „nije toliko bitno još“; tokeni (S-017) su mjesto gdje se to mijenja |
+| **(Leon, 2026-09-22)** Kalibracija sati: „koliko si danas stvarno radio?" mijenja osobni prag razmaka između commita; opcionalni senzor mtimea datoteka u stablu (npr. „radio si 14:10–16:40, commitao 17:00") | sati ostaju git-proxy (PRD §5, „Štoperica za sate" je odbijena niže) — ovo je kalibracija proxyja, ne mjerenje uživo; odluka je Leonova kad dođe na red |
+| **(Leon, 2026-09-22)** Tjedni izvještaj-obavijest ponedjeljkom („prošli tjedan: 14 h, 23 commita, docs 100→92, 1 nov signal") · usporedba dva razdoblja · usporedba projekata na Pregledu (redak s omjerom na karticama) | trend iz snimki (S-014) je preduvjet; obavijest isti mehanizam kao signal-Alert (S-020) |
+| **(Leon, 2026-09-22)** Dnevni streak + heatmap kalendar (godišnji pregled, ne toplinska karta dan × sat gore) · pogled „Danas" · kratice tipkovnice | sitnice, niska cijena; heatmap dan × sat (red iznad) ostaje zaseban graf |
+| **(Leon, 2026-09-22)** Klik na obavijest OS-a otvara projekt | poznat rub koda, ne nova ideja — plugin na Windowsu danas nema povratni poziv za klik (Ruling R7, `ARCHITECTURE.md` §11); Leon ga želi popravljenog |
+| **(Leon, 2026-09-22)** CLI izlazni kodovi dokumentirani KAO NAMJENA za CI (preflight) | ugovor već postoji i testiran je (`0`/`1`/`2`/`3`, `TESTING.md` §1); ide uz GitHub Actions (M4, „Čeka milestone" gore) kao primjer uporabe, ne novo ponašanje |
 
 ## Kasnije — zasebnim planom
 

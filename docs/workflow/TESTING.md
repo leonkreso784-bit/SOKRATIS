@@ -12,8 +12,12 @@
 | **integracijski (io)** | `crates/sokratis-io/tests/` | git-proces, radna stabla, profil, ručni podaci | **privremeni repo** stvoren u testu |
 | **izlazni kodovi (cli)** | `crates/sokratis-cli/tests/cli.rs` | ugovor prema preflightu: **0** (nema signala) i **2** (Alert) nad repoom s poznatom poviješću, **3** za pogrešnu uporabu i za putanju koja nije repozitorij, **0** za `--help`/`--version` | **privremeni repo** (`tests/common/mod.rs`) |
 | **pohrana (store)** — *od M2* | `crates/sokratis-store/src/**` (`#[cfg(test)]`) | migracije se primijene od prazne baze; registar, postavke, snimke i keš sirovih commita (M2/15–18) rade; od DESKTOP-a (T29–T30) imaju pravog pozivatelja u aplikaciji, ali test i dalje ostaje nad `:memory:` bazom (`docs/architecture/ARCHITECTURE.md` §1) | **`:memory:` baza** (`Store::open_in_memory`) — bez gita i bez datoteka |
-| **sučelje (TS/Svelte)** — *od M2* | `apps/desktop/tests/**`, uz komponente | oblikovanje brojki, i18n ključevi, kontrast tokena, grafovi s praznim ulazom | `npm run check` u `apps/desktop`: danas `svelte-check` + `vitest`; brane za i18n i kontrast dolaze s ciglama M2/20–21 |
+| **sučelje (TS/Svelte)** — *od M2* | `apps/desktop/tests/**`, uz komponente | oblikovanje brojki, i18n ključevi, kontrast tokena, grafovi s praznim ulazom, ugovor `TauriApi` prema `commands.rs` (`tests/tauri-api.test.ts`, lažni `invoke`/`listen`), verzija iz jednog izvora (`tests/version.test.ts`) | `npm run check` u `apps/desktop`: `svelte-check` + `vitest` (**82** testa, 11 datoteka) |
 | **ljuska (desktop)** — *od M2* | `apps/desktop/src-tauri/src/commands.rs` (`#[cfg(test)]`) | S-013: crate nema logike, pa je jedini jedinični test pretvorba birača raspona (`Range::to_dates`) u datume | 2 testa nad fiksnim „danas" |
+
+Stanje brana nakon spajanja INTEGRACIJE (`b560f7c`, 2026-09-22, dokaz metode, ne tekuća brojka —
+kanonska je u [`../records/CHANGELOG.md`](../records/CHANGELOG.md), S-010): `cargo test --workspace`
+**145 testova + 1 ignoriran**, `check:i18n` **162** ključa hr=en.
 
 **Test-prvo** (CLAUDE.md #7): fixture → očekivano → implementacija. Rub koji prepoznaš odmah dobiva test.
 
@@ -87,14 +91,18 @@ danas piše [`../records/CHANGELOG.md`](../records/CHANGELOG.md) — brojka prep
 
 - **Ljuska i izgled** — `sokratis-desktop` po S-013 gotovo nema logike (jedini test: pretvorba
   `Range`, §1). Dokaz da se ljuska stvarno pokreće je **dimni test** `npm run tauri dev`, ručno
-  pokrenut prije spajanja svake DESKTOP-cigle (spec M2 §9): splash prikazan i zatvoren točno jednom,
-  glavni prozor se pojavi tek nakon animacije I prvog izračuna svih projekata, tray postoji i njegov
-  izbornik radi, druga instanca podigne postojeći prozor umjesto da otvori novi, X sakriva umjesto da
-  zatvori, ponovno pokretanje `.exe`-a vraća skriveni prozor. `prefers-reduced-motion`, autostart u
-  `HKCU\…\Run` i obavijest na prijelaz u Alert su i dalje na ručnoj listi (`docs/architecture/
-  ARCHITECTURE.md` §11 — nisu provjereni u sesiji koja je DESKTOP spojila). `LOCALAPPDATA` se pri
-  dimnom testu preusmjerava (varijabla okoline) da razvoj ne piše u Leonovu pravu
-  `%LOCALAPPDATA%\sokratis\sokratis.db` — T37 tek razdvaja razvojnu bazu od prave; do tada `npm run
-  tauri dev` BEZ preusmjeravanja piše na PRAVU putanju (poznato ograničenje, `ARCHITECTURE.md` §11).
+  pokrenut prije spajanja svake DESKTOP/INTEGRACIJA-cigle (spec M2 §9): splash prikazan i zatvoren
+  točno jednom, glavni prozor se pojavi tek nakon animacije I prvog izračuna svih projekata, tray
+  postoji i njegov izbornik radi, druga instanca podigne postojeći prozor umjesto da otvori novi, X
+  sakriva umjesto da zatvori, ponovno pokretanje `.exe`-a vraća skriveni prozor.
+- **Od T37 (2026-09-22) razvojna baza je odvojena od prave** (`state::db_file_name`,
+  `cfg!(debug_assertions)`): `npm run tauri dev` piše u `sokratis-dev.db`, instalirana aplikacija u
+  `sokratis.db` — razvoj više ne dira Leonovu pravu bazu. Dimni test INTEGRACIJE (S3, prije spajanja)
+  je unatoč tome i dalje preusmjeravao `LOCALAPPDATA` (dodatna sigurnost) i čitao prozor kroz Chrome
+  DevTools Protocol (`--remote-debugging-port`, nad vlastitim webviewom) umjesto snimke ekrana
+  (`PrintWindow`, obrazac iz S2) — provjera DOM-a je pouzdanija od piksela.
+- **Na ručnoj listi za Leona ostaju** (`docs/architecture/ARCHITECTURE.md` §11 — nisu provjereni ni u
+  S2 ni u S3): tray-ikona na 100 %/200 %, autostart u `HKCU\…\Run`, obavijest na prijelaz u Alert,
+  preskok splasha, `prefers-reduced-motion`, osvježenje bez klika (sa štopericom), četiri teme.
 - **Performanse** — danas se ne testiraju; M2/11 prvo **mjeri** (brojač git-procesa po izvještaju) i
   tek to mjerenje nosi brojku u test; `gix` je odgovor koji i dalje čeka pitanje.

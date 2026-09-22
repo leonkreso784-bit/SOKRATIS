@@ -897,3 +897,49 @@ vrijedi za opseg S2; tag/izdanje/LICENCA/force-push ostaju izvan i dalje se ne d
 `main`-a — `TauriApi` (sučelje prestaje raditi nad `MockApi`), repo bez konvencija, instalater NSIS;
 nakon T34 Leon instalira „1.0.0-pre" (S-025, prva etapa). Ledger:
 `.superpowers/sdd/2026-09-18-m2-desktop/progress.md` i `NOVA-SESIJA-PROMPT.md` pored njega.
+
+## 2026-09-22 (FABLE) — Izvedba S3: INTEGRACIJA (T34, T36, T37) spojena u `main`
+
+**Treća od pet kratkih sesija izvedbe.** Opseg: INTEGRACIJA T34 → T36 → T37, serijski u jednom stablu
+(`sokratis.int`, grana `feat/integration` iz `cc74bb8`). Time je **etapa 1 „funkcija" (S-025)
+cjelovita u kodu** — preostaje da Leon instalira i mjeri (§13.1).
+
+- **T34 — `TauriApi`** (`029601c`): sučelje prestaje raditi SAMO nad `MockApi`. Svaka metoda `Api`-ja
+  je sad `invoke('<naredba>', {…})` s imenima naredbi/argumenata iz `commands.rs`; `createApi()` bira
+  izvedbu po `'__TAURI_INTERNALS__' in window`. Događaj `report_updated` seli u JEDNU globalnu
+  pretplatu u `App.svelte` (prije: `Overview.svelte` posebno) — promjena u repou sad osvježi pogled u
+  kojem korisnik trenutačno stoji, ne samo Pregled. Svaki poziv `api.*` hvata grešku u traku greške
+  (`role="alert"`); „zadnji zahtjev pobjeđuje" za `getReport`. Nošeni nalazi T25/T26 (tihe greške)
+  time zatvoreni.
+- **T36 — repo bez konvencija** (`28f311e`, spec §13.7): dva nova testa u `io` (repo bez `docs/`/
+  dnevnika/plana/`.sokratis/`; repo s jednim praznim commitom) otkrila su **Ruling R21** — `closed_phases()`
+  je iz ZADANOG profila (S-005) vraćao sve četiri Sokrat Studyjeve zatvorene faze i za repo s nula
+  pogodaka; popravak filtrira `commits > 0` prije nego faza uđe u `Report.phases` (isti nalaz kao I8,
+  ali za tablicu faza, ne pokazatelje). Snapshot jezgre nepromijenjen. Devet pogleda sučelja već ima
+  natpis praznog stanja — nijedan `.svelte` nije trebalo dirati.
+- **T37 — instalater** (`b1b137a`, S-029): verzija ima JEDAN izvor (`[workspace.package] version =
+  "1.0.0-pre.1"`, `package.json` zrcalo s testom, `tauri.conf.json` bez `version`) — CLI je time isto
+  1.0.0-pre.1. `bundle` NSIS `currentUser`, bez potpisa i auto-ažuriranja. `state::db_file_name`
+  razdvaja razvojnu bazu (`tauri dev` → `sokratis-dev.db`) od instalirane (`sokratis.db`) preko
+  `cfg!(debug_assertions)`. Nova ovisnost: nijedna.
+- **Spajanje: `b560f7c` `merge: INTEGRACIJA (T34, T36, T37)`** (`--no-ff` na `main` iz `3819ab8`).
+  Pune brane: `cargo fmt --check` OK · `cargo clippy --workspace --all-targets -- -D warnings` OK ·
+  **145 Rust-testova + 1 ignoriran** (bilo 142) · `npm run check` (svelte-check 212 datoteka/0 ·
+  i18n **162** ključa hr=en, bilo 160 · kontrast 4/4 · **vitest 82**, bilo 66, 11 datoteka) ·
+  `npm run build` OK (main.js 143,92 kB / gzip 34,86) · `sokratis docs .` 100/100 · `signals .` nema
+  signala. Pushano, `main` = `origin/main`.
+- **Dimni test, u stablu prije spajanja** (`tauri dev`, `LOCALAPPDATA` preusmjeren, provjera kroz CDP
+  nad vlastitim webviewom umjesto snimke ekrana): `TauriApi` živ, dijalog mape dodaje projekt, brojke
+  Tempa = `sokratis report --json` (178 commita · 5 dana · 23,7 h), baza `sokratis-dev.db`, „Osvježi" →
+  `report_updated` → popis i izvještaj ponovno učitani. Ostaje na ručnoj listi za Leona na instaliranoj
+  „1.0.0-pre": tray na 100 %/200 %, izbornik, „Izađi", autostart ↔ `HKCU\…\Run`, obavijest na Alert,
+  preskok splasha, `prefers-reduced-motion`, osvježenje bez klika sa štopericom, četiri teme.
+- **Stablo `sokratis.int` i grana `feat/integration` obrisani** nakon provjere (spojeno, čisto). **Na
+  disku je jedno stablo (`main`), jedina grana `main`.**
+
+### Što slijedi
+**Etapa 2 „izgled" (S-025) — S4 = SUČELJE-2, cigle T38–T42** (Postavke §13.2, animacije §13.3,
+kartica s objašnjenjem §13.4) u novom stablu `sokratis.ui2`, grana `feat/ui-2`. Zatim S5: T35
+(mjerenja, verzija 1.0.0) → završna recenzija → jedan krug popravaka → §13.8 (čuvar izdanja) → STANI,
+tag traži Leonov izričit OK. Ledger: `.superpowers/sdd/2026-09-18-m2-desktop/progress.md` i
+`NOVA-SESIJA-PROMPT.md` pored njega.

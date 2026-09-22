@@ -466,9 +466,9 @@ iz nje je **u 1.0.0** ušlo ono što stoji ovdje, a ostalo je u
 
 | etapa | cigle | na kraju |
 |---|---|---|
-| **1 · funkcija** | T28 → spajanje SUČELJA u `main` → DESKTOP T29–T33 → T34 → §13.7 → §13.6 | Leon instalira **„1.0.0-pre"** (bez taga) i mjeri Sokrat Study i Sokratis |
-| **2 · izgled** | §13.2 → §13.3 (dvije cigle) → §13.4 (dvije cigle) | 1.0.0-pre nadgleda gradnju vlastitog izgleda |
-| **3 · izdanje** | T35 (mjerenja, verzija 1.0.0) → završna recenzija → jedan krug popravaka → §13.8 → čuvar izdanja | **1.0.0**; tag uz Leonov izričit OK |
+| **1 · funkcija** ✅ 2026-09-22 (`main` `b560f7c`) | T28 → spajanje SUČELJA u `main` → DESKTOP T29–T33 → T34 → §13.7 (T36) → §13.6 (T37) | **cjelovita u kodu**; Leon instalira **„1.0.0-pre"** (bez taga) i mjeri Sokrat Study i Sokratis |
+| **2 · izgled** — sljedeća sesija (S4, T38–T42, stablo `sokratis.ui2`) | §13.2 → §13.3 (dvije cigle) → §13.4 (dvije cigle) | 1.0.0-pre nadgleda gradnju vlastitog izgleda |
+| **3 · izdanje** — S5 | T35 (mjerenja, verzija 1.0.0) → završna recenzija → jedan krug popravaka → §13.8 → čuvar izdanja | **1.0.0**; tag uz Leonov izričit OK |
 
 ### 13.2 Pogled Postavke (S-028)
 
@@ -517,21 +517,24 @@ Bez promjene opsega: §5.2 i cigle T24 (portirana, u `main`-u) + T31 (splash-pro
 
 ### 13.6 Instalater — samo za Leona (S-029)
 
-`npm run tauri build` → NSIS. Nepotpisan, neobjavljen, bez automatskog ažuriranja. Verzija dolazi iz
-jednog mjesta (workspace `Cargo.toml` → `tauri.conf.json` je čita), „1.0.0-pre" na kraju etape 1,
-„1.0.0" na kraju etape 3.
+**Kod gotov (T37, `main` `b560f7c`, 2026-09-22).** `npm run tauri build` → NSIS. Nepotpisan,
+neobjavljen, bez automatskog ažuriranja. Verzija dolazi iz jednog mjesta (workspace `Cargo.toml` →
+`tauri.conf.json` je čita), „1.0.0-pre" na kraju etape 1, „1.0.0" na kraju etape 3.
 **Gotovo kad:** Leon pokrene instalater, Sokratis se pojavi u izborniku Start, autostart nakon
 ponovnog pokretanja Windowsa diže **instalirani** exe, drugo pokretanje podiže postojeći prozor, a baza
-u `%LOCALAPPDATA%\sokratis\` preživi reinstalaciju.
+u `%LOCALAPPDATA%\sokratis\` preživi reinstalaciju — **ovo je Leonova ručna provjera, još ne
+potvrđena** (izvan ove sesije).
 
 ### 13.7 Repo bez konvencija Sokrat Studyja
 
-Leon će uz Sokrat Study i Sokratis pratiti još najmanje dva projekta za koje se ne zna drže li se
-konvencija (dnevnik, plan, faze, cigle). Zadani profil (S-005) nad takvim repoom ne smije lagati.
+**Gotovo (T36, `main` `b560f7c`, 2026-09-22).** Leon će uz Sokrat Study i Sokratis pratiti još
+najmanje dva projekta za koje se ne zna drže li se konvencija (dnevnik, plan, faze, cigle). Zadani
+profil (S-005) nad takvim repoom ne smije lagati.
 **Gotovo kad:** repo bez `docs/`, bez dnevnika i bez `.sokratis/` daje brojke koje dolaze iz gita
 (commiti, dani, sati, vrste rada po poruci) i **prazna stanja** za sve što traži konvenciju („nema
 dnevnika" · „nema faza" · „nema isporuka"), bez greške i bez izmišljene brojke — fixture + test u
-`io`/`core` ako ga M1 već nema, i ručna provjera u sučelju zapisana u izvještaju cigle.
+`io`/`core` (`crates/sokratis-io/tests/project.rs`) i ručna provjera u sučelju (devet pogleda već ima
+natpis praznog stanja, nijedan `.svelte` nije trebalo mijenjati).
 
 ### 13.8 Dokumentacija točna i manja (S-031)
 
