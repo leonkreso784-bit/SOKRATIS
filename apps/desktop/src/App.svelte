@@ -20,6 +20,9 @@
   // koje povlači početne postavke i popis projekata (S-010: jedno mjesto pokretanja, ne u svakoj
   // podkomponenti). Umotan u `try/catch` (dopuna T34): pad `getSettings` (npr. baza nedostupna) više
   // ne smije ostaviti prazan prozor bez ijedne poruke — greška ide u traku ispod.
+  // Dopunjeno M2/40 — ključ `{#key}` sada nosi i `app.view`: promjena pogleda dobiva isti ulaz
+  // (`view-enter`) kao promjena `epoch`, `is-loading` prigušuje stari sadržaj dok raspon učitava
+  // novi, a `Skeleton` zamjenjuje poglede SAMO dok prvi izvještaj još nije stigao.
   import { onDestroy, onMount } from 'svelte';
   import { getCurrentWindow } from '@tauri-apps/api/window';
   import { api } from './lib/api';
@@ -38,6 +41,7 @@
   import Visions from './views/Visions.svelte';
   import Docs from './views/Docs.svelte';
   import Settings from './views/Settings.svelte';
+  import Skeleton from './lib/shell/Skeleton.svelte';
 
   let unsubscribeReportUpdated: (() => void) | null = null;
   let motionQuery: MediaQueryList | undefined;
@@ -114,28 +118,32 @@
   <div class="flex min-h-0 flex-1">
     <Sidebar />
     <main class="flex-1 overflow-auto p-4">
-      {#key app.epoch}
-        {#if app.view === 'overview'}
-          <Overview />
-        {:else if app.view === 'tempo'}
-          <Tempo />
-        {:else if app.view === 'kinds'}
-          <Kinds />
-        {:else if app.view === 'indicators'}
-          <Indicators />
-        {:else if app.view === 'phases'}
-          <Phases />
-        {:else if app.view === 'diary'}
-          <Diary />
-        {:else if app.view === 'deliveries'}
-          <Deliveries />
-        {:else if app.view === 'visions'}
-          <Visions />
-        {:else if app.view === 'docs'}
-          <Docs />
-        {:else if app.view === 'settings'}
-          <Settings />
-        {/if}
+      {#key `${app.epoch}:${app.view}`}
+        <div class="view-enter" class:is-loading={app.loading && app.report !== null}>
+          {#if app.loading && app.report === null && app.currentId !== null}
+            <Skeleton />
+          {:else if app.view === 'overview'}
+            <Overview />
+          {:else if app.view === 'tempo'}
+            <Tempo />
+          {:else if app.view === 'kinds'}
+            <Kinds />
+          {:else if app.view === 'indicators'}
+            <Indicators />
+          {:else if app.view === 'phases'}
+            <Phases />
+          {:else if app.view === 'diary'}
+            <Diary />
+          {:else if app.view === 'deliveries'}
+            <Deliveries />
+          {:else if app.view === 'visions'}
+            <Visions />
+          {:else if app.view === 'docs'}
+            <Docs />
+          {:else if app.view === 'settings'}
+            <Settings />
+          {/if}
+        </div>
       {/key}
     </main>
   </div>

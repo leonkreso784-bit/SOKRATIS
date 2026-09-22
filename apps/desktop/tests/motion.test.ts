@@ -31,4 +31,8 @@ describe('pokret', () => {
     for (const name of ['chart-grow', 'chart-draw', 'chart-fade']) expect(css).toContain(`@keyframes ${name}`);
     for (const cls of ['.chart-bar', '.chart-line', '.chart-dot']) expect(css).toContain(cls);
   });
+  it('prijelaz pogleda i učitavanje žive u motion.css', () => {
+    expect(css).toContain('@keyframes view-in');
+    for (const cls of ['.view-enter', '.is-loading', '.skeleton']) expect(css).toContain(cls);
+  });
 });

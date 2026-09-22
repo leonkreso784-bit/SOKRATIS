@@ -3,7 +3,8 @@
    `applyMotion` u `state.svelte.ts`. `!important` je ovdje namjeran: mora pobijediti i inline `animation`
    koji Svelte piše za svoje prijelaze.
    Dopunjeno M2/39 — ulazne animacije grafova (`chart-*`) žive OVDJE, ne u pojedinim komponentama:
-   isti `--motion-dur` ih gasi kad je pokret isključen, bez posebne provjere u svakom grafu. */
+   isti `--motion-dur` ih gasi kad je pokret isključen, bez posebne provjere u svakom grafu.
+   Dopunjeno M2/40 — prijelaz pogleda (`view-*`) i kostur učitavanja (`skeleton-*`) iz istog razloga. */
 :root { --motion-dur: 250ms; }
 :root[data-motion="off"] { --motion-dur: 0ms; }
 :root[data-motion="off"] *, :root[data-motion="off"] *::before, :root[data-motion="off"] *::after {
@@ -17,3 +18,9 @@
 .chart-bar  { transform-box: fill-box; transform-origin: bottom; animation: chart-grow var(--motion-dur) ease-out both; }
 .chart-line { stroke-dasharray: 1; animation: chart-draw var(--motion-dur) ease-out both; }
 .chart-dot  { animation: chart-fade var(--motion-dur) ease-out both; }
+
+@keyframes view-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes skeleton-pulse { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+.view-enter { animation: view-in var(--motion-dur) ease-out both; }
+.is-loading { opacity: .6; transition: opacity var(--motion-dur) ease-out; }
+.skeleton   { background: var(--color-surface-2); border-radius: 8px; animation: skeleton-pulse calc(var(--motion-dur) * 4) ease-in-out infinite; }
