@@ -1,5 +1,7 @@
 <!-- ZAŠTO OVAKO (cigla M2/23 — mini-trend): ista putanja kao Line, samo manja; označena točka -->
 <!-- (promjena profila) dobiva boju `accent` da se razlikuje od trenda (S-018). -->
+<!-- dopunjeno M2/39 — isti par klasa kao Line: `chart-line` na putanji (`pathLength="1"`), -->
+<!-- `chart-dot` samo na označenoj točki jer to je jedina koja se ovdje uopće iscrtava. -->
 <script lang="ts">
   import { finiteMax, linear, linePath, niceMax, svgA11y } from './scale';
 
@@ -16,10 +18,10 @@
 </script>
 
 <svg viewBox="0 0 {width} {height}" {...svgA11y(label)} class="w-full">
-  <path {d} stroke="var(--color-brand-400)" fill="none" stroke-width="1.5" />
+  <path class="chart-line" pathLength="1" {d} stroke="var(--color-brand-400)" fill="none" stroke-width="1.5" />
   {#each coords as c, i (i)}
     {#if c.marked}
-      <circle cx={c.x} cy={c.y} r="3" fill="var(--color-accent)"><title>{c.value}</title></circle>
+      <circle class="chart-dot" cx={c.x} cy={c.y} r="3" fill="var(--color-accent)"><title>{c.value}</title></circle>
     {/if}
   {/each}
 </svg>

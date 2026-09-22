@@ -29,4 +29,8 @@ describe('pokret', () => {
     expect(css).toMatch(/:root\[data-motion="off"\][^{]*\{[^}]*animation-duration:\s*0s\s*!important/);
     expect(css).toMatch(/:root\[data-motion="off"\][^{]*\{[^}]*transition-duration:\s*0s\s*!important/);
   });
+  it('grafovi imaju ulazne animacije definirane na jednom mjestu', () => {
+    for (const name of ['chart-grow', 'chart-draw', 'chart-fade']) expect(css).toContain(`@keyframes ${name}`);
+    for (const cls of ['.chart-bar', '.chart-line', '.chart-dot']) expect(css).toContain(cls);
+  });
 });

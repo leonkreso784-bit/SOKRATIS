@@ -1,5 +1,7 @@
 <!-- ZAŠTO OVAKO (cigla M2/23 — stupci): komponenta ne računa ništa osim koordinata; -->
 <!-- natpisi i boje dolaze izvana kao props/tokeni (S-021, S-018), sama ne zna nijednu riječ. -->
+<!-- dopunjeno M2/39 — klasa `chart-bar` (definirana u `motion.css`) svaki stupac uveća iz nule; -->
+<!-- `transform-box: fill-box` tamo čini `scaleY` relativnim na okvir `<rect>`, ne na cijeli SVG. -->
 <script lang="ts">
   import { finiteMax, linear, niceMax, svgA11y, ticks } from './scale';
 
@@ -23,6 +25,7 @@
   {/each}
   {#each values as v, i (i)}
     <rect
+      class="chart-bar"
       x={PAD + i * bw + 1}
       y={y(v)}
       width={Math.max(1, bw - 2)}

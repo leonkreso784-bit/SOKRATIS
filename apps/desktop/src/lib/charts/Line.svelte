@@ -1,5 +1,8 @@
 <!-- ZAŠTO OVAKO (cigla M2/23 — trend): jedna putanja iz `linePath`, točke samo nose tooltip; -->
 <!-- boje su tokeni, natpis dolazi izvana kroz `label` (S-021, S-018). -->
+<!-- dopunjeno M2/39 — `pathLength="1"` normalizira duljinu puta na 1 bez mjerenja u JS-u, pa -->
+<!-- `stroke-dasharray: 1` iz `.chart-line` (motion.css) uvijek znači "cijela putanja"; točke -->
+<!-- dobivaju `chart-dot` da se pojave TEK kad je linija nacrtana. -->
 <script lang="ts">
   import { finiteMax, linear, linePath, niceMax, svgA11y } from './scale';
 
@@ -16,8 +19,8 @@
 </script>
 
 <svg viewBox="0 0 {W} {height}" {...svgA11y(label)} class="w-full">
-  <path {d} stroke="var(--color-brand-500)" fill="none" stroke-width="2" />
+  <path class="chart-line" pathLength="1" {d} stroke="var(--color-brand-500)" fill="none" stroke-width="2" />
   {#each points as p, i (i)}
-    <circle cx={p.x} cy={p.y} r="3" fill="var(--color-brand-500)"><title>{p.v}</title></circle>
+    <circle class="chart-dot" cx={p.x} cy={p.y} r="3" fill="var(--color-brand-500)"><title>{p.v}</title></circle>
   {/each}
 </svg>

@@ -2,7 +2,9 @@
 // korisniku umjesto tihog odbijenog Promisea, i "zadnji zahtjev pobjeđuje" za `getReport`; dopunjeno
 // M2/38 — `applyMotion`/`syncMotion` pišu `data-motion` isto kao `applyTheme` piše `data-theme`;
 // `syncMotion` je OVDJE, ne u `App.svelte`, jer `Settings.svelte` treba istu odluku bez pristupa
-// lokalnoj `MediaQueryList` iz tuđeg `onMount`)
+// lokalnoj `MediaQueryList` iz tuđeg `onMount`; dopunjeno M2/39 — `epoch` broji koliko je puta
+// glavni prozor postao vidljiv korisniku; `App.svelte` njime omata poglede u `{#key}` da se ulazna
+// animacija grafova (S-026) prikaže tek kad ima tko gledati, ne dok je prozor skriven iza splasha)
 // `$state` izvan komponente treba nastavak `.svelte.ts` da ga kompajler prepozna kao rune-modul
 // (isti obrazac kao `src/lib/i18n/index.svelte.ts`). Jedan objekt `app` je jedini izvor istine za
 // okvir — Topbar/Sidebar/pogledi ga čitaju izravno, bez proslijeđivanja kroz propse; promjena jednog
@@ -20,6 +22,7 @@ export const app = $state({
   settings: { theme: 'academic', lang: 'hr', autostart: false, motion: true } as Settings,
   loading: false,
   error: null as string | null,
+  epoch: 0,
 });
 
 // `TauriApi` odbija Promise s golim tekstom (Rust `Err(String)`, ne `Error` objektom); `MockApi`/
