@@ -1,10 +1,9 @@
 <script lang="ts">
   // ZAŠTO OVAKO (cigla M2/38 — pogled Postavke: tema, jezik, autostart, animacije, spec §13.2, S-028)
-  // Deseti, globalni pogled (`types.ts`): NE čita `app.report`, radi i bez odabranog projekta i bez
-  // izvještaja (R22). `ThemeSwitch`/`LangSwitch` sele OVAMO bez promjene ponašanja (R23) — samo
-  // mijenjaju roditelja, gornja traka ih više ne crta. `writing` gasi autostart/animacije dok upis
-  // traje (isti obrazac kao `Diary.svelte`, T28) da dvostruki klik ne pošalje dva zahtjeva odjednom;
-  // `ThemeSwitch`/`LangSwitch` imaju vlastiti try/catch po kliku, ne dijele ovaj `writing`.
+  // Deseti, globalni pogled (`types.ts`): NE čita `app.report`, radi i bez odabranog projekta.
+  // `ThemeSwitch`/`LangSwitch` sele OVAMO bez promjene ponašanja (R23), samo mijenjaju roditelja.
+  // `writing` gasi autostart/animacije dok upis traje (obrazac `Diary.svelte`, T28); ThemeSwitch/
+  // LangSwitch imaju vlastiti try/catch po kliku, ne dijele ovaj `writing`.
   import { app, setError, syncMotion } from '../lib/state.svelte';
   import { api } from '../lib/api';
   import { t } from '../lib/i18n/index.svelte';

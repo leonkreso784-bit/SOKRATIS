@@ -1,10 +1,8 @@
 // ZAŠTO OVAKO (cigla M2/38): vitest ovdje nema DOM, pa se pokret čuva na dva mjesta koja se DAJU
-// testirati — čista odluka `motionOff` i sam tekst `motion.css`. ODSTUPANJE OD BRIFA: brif traži
-// uvoz `motion.css?raw` (isti obrazac kao snimka jezgre u `i18n.test.ts`), ali `@tailwindcss/vite`
-// hvata SVAKI `*.css(?query)` uvoz i vraća prazan modul kad datoteka nema vlastiti
-// `@import "tailwindcss"` — isti nalaz kao `read-tokens.mjs` (M2/20), izmjereno: `?raw` ovdje daje
-// `""`. Čitanje je zato izmješteno u `scripts/read-motion.mjs` (node:fs, isti obrazac kao
-// `contrast.test.ts`). Pravila niže vrijede i za sve što T39–T41 dodaju u istu datoteku.
+// testirati — čista odluka `motionOff` i sam tekst `motion.css`. ODSTUPANJE OD BRIFA: `?raw` na
+// `.css` pod `@tailwindcss/vite` vraća prazan modul (isti nalaz kao `read-tokens.mjs`, M2/20), pa
+// čitanje ide kroz `scripts/read-motion.mjs` (node:fs). Pravila niže vrijede i za T39–T41 dodatke u
+// istu datoteku.
 import { describe, expect, it } from 'vitest';
 import { motionOff } from '../src/lib/motion';
 import { motionCss as css } from '../scripts/read-motion.mjs';
