@@ -72,26 +72,18 @@ pogrešna uporaba**; `--help`/`--version` = 0) — sve rade nad pravim repozitor
 Sokrat Studyjem).
 Testovi i brane: `docs/workflow/TESTING.md`.
 
-## Stanje — TRENUTNO (2026-09-23 — SUČELJE-2 spojena, etapa 2 gotova; sljedeća sesija je S5 IZDANJE)
-- **M0 gotov. M1 zatvoren** (0.1.0): `sokratis report/docs/signals` rade nad pravim repozitorijem,
-  paritet s `RAD.xlsx` je test. Što je izgrađeno i **što još ne radi**: `ARCHITECTURE.md` (§11).
-- **M2 izlazi kao verzija 1.0.0** (S-024; 0.2.0 se preskače). Spec **`docs/plan/ARHITEKTURA_1_0.md`** (2026-09-24, S-032…S-037; M2 spec arhiviran)
-  (§11 izlazni uvjet + **§13 dopuna rezom**), plan cigli `docs/superpowers/plans/2026-09-18-m2-desktop.md`.
-- **U `main`-u, verzija `1.0.0-pre.1`:** KOSTUR · JEZGRA · PROFIL · STORE · IO (+ M2/14b) · CLI ·
-  SUČELJE · DESKTOP · INTEGRACIJA (T34, T36, T37, merge `b560f7c`, 2026-09-22) · SUČELJE-2 (T38–T42,
-  merge `6947189`, 2026-09-23 — deseti pogled Postavke, animacije preko `data-motion`, kartica s
-  objašnjenjem na 37 mjesta). **Nespojeno:** ništa. **Nije započeto:** T35 · etapa 3 „izdanje" (§13.8).
-- **Tri etape (S-025):** (1) funkcija ✅ 2026-09-22 · (2) izgled ✅ 2026-09-23 — Postavke · animacije ·
-  kartica s objašnjenjem, **cjelovita u kodu**; Leon je instalirao „1.0.0-pre" (izvan sesije, potvrđeno
-  radnom instalacijom u dimnom testu S4) · (3) izdanje — **sljedeća sesija S5:** T35 (mjerenja, verzija
-  1.0.0) → završna recenzija (opus, `8edf3df..main`) → jedan krug popravaka → §13.8 (čuvar izdanja) →
-  STANI, tag traži Leonov izričit OK. **Sesije su kratke, s dogovorenim stajanjem** (Leonov usage je
-  ograničen).
-- Druga verzija (M3) i kasnije: `docs/records/BACKLOG.md`. Zapis namjere iz kojeg je rez nastao:
-  `docs/archive/PLAN_DESIGNE.md` (ispunjen, nije izvor istine).
-- **Na disku je jedno stablo (`main`)**; LICENCE i taga nema. Prva radnja sesije:
-  `git log --oneline -15` · `git worktree list`, pa ledger
-  `.superpowers/sdd/2026-09-18-m2-desktop/progress.md` (zadnji odjeljak) i `NOVA-SESIJA-PROMPT.md` pored njega.
+## Stanje — TRENUTNO (2026-09-24 — drugi rez do 1.0.0 odlučen i planiran; izvedba još nije počela)
+- **M0 gotov, M1 zatvoren** (0.1.0); etape 1+2 M2 cjelovite u kodu (svih devet tokova + SUČELJE-2),
+  vrh `main`-a `7462bfd`, verzija u kodu `1.0.0-pre.1`. Leon je nakon instalacije tražio veće promjene
+  (`docs/product/NALAZI_LEON_2026-09-23.md`) → brainstorming dao **drugi rez do 1.0.0**: S-032…S-037.
+- **Aktivan spec `docs/plan/ARHITEKTURA_1_0.md`** (spec M2 arhiviran, `docs/archive/ARHITEKTURA_M2.md`).
+  **Aktivan plan `docs/superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md`**: T44–T63, šest tokova
+  (DESKTOP-2 · JEZGRA-2 · IO-2 · GRAFOVI · PLOČA · IZDANJE), pet sesija; tok IZDANJE preuzima T35/T43
+  iz plana M2 (ostaje u `superpowers/plans/`, nije arhiviran).
+- **Dva stabla:** `sokratis` (`main`) i `sokratis.rel` (`feat/release`, T35 napola, necommitano, ne
+  dirati do toka IZDANJE); nova sesija ih ne briše. **Sljedeća sesija = izvedba 1:** T44 · T46 · T53,
+  svaka u novom stablu → instalater „1.0.0-pre.2". Tag traži Leonov izričit OK.
+- Druga verzija (M3) i kasnije: `docs/records/BACKLOG.md`.
 - Brane, brojke i tijek sesija: `PROGRESS.md`; isporuke: `CHANGELOG.md`. Ovaj odjeljak to ne ponavlja.
 
 ## Ključne odluke — samo žive
@@ -104,22 +96,32 @@ mjesto · **S-011** `--since` računa cijeli dan, ne goli datum · **[M2 spec]**
 `desktop` bez logike · **S-014** SQLite = istina koju git ne zna + pogodnost (snimke brojki, keš sirovih
 commita tek nakon mjerenja) · **S-015** projekt = `git-common-dir`, ručni podaci u glavno stablo, Sokratis
 ne commita · **S-016** watcher u `io`, odgoda 600 ms, bez petlje · **S-017** `tokens.css` cijel, `brand-*`
-iz loga izmjeren, Tailwind kroz Vite plugin · **S-018** grafovi vlastiti SVG · **S-019** animacija jednom
-po pokretanju, prozor čeka, preskočiva · **S-020** tray minimizira, autostart, jedna instanca, obavijest
-samo na prijelaz u Alert · **S-021** HR/EN od M2 · **S-022** snapshot `Report`-a prva cigla M2 ·
+iz loga izmjeren, Tailwind kroz Vite plugin · **S-018** grafovi vlastiti SVG (dio „bez biblioteke" ukinut
+S-035: d3-matematika ulazi, izgled ostaje naš) · **S-019** animacija jednom po pokretanju, prozor čeka,
+preskočiva · **S-020** tray minimizira, autostart, jedna instanca, obavijest samo na prijelaz u Alert
+(dio „X sakriva, tray" ukinut S-036: X pita pa izlazi, tray uklonjen) · **S-021** HR/EN od M2 ·
+**S-022** snapshot `Report`-a prva cigla M2 ·
 **S-023** repo javan na GitHubu od 2026-09-20 (Leonova odluka, prije kraja M2); tajne se traže prije commita.
 **[rez za 1.0.0]** **S-024** izlaz iz M2 = 1.0.0, 0.2.0 se preskače · **S-025** crta reza i tri etape (funkcija →
 izgled → izdanje, „1.0.0-pre“ nakon prve) · **S-026** animacije ≤ 250 ms, bez biblioteke, `data-motion="off"` ·
 **S-027** kartica s objašnjenjem je statična (`explain.<id>.what|how|read`) · **S-028** tema · jezik · autostart ·
 animacije u pogledu Postavke · **S-029** instalater NSIS samo za Leona · **S-030** README engleski, `docs/`
 hrvatski · **S-031** dokumentacija: točnost se čuva smanjivanjem, ispunjeno ide u `archive/`.
+**[drugi rez do 1.0.0]** **S-032** metrike nad svim lokalnim granama, oznaka grane po commitu ·
+**S-033** dnevnik = unija radnih stabala, plan/`docs/` iz vodećeg stabla · **S-034** klik na karticu →
+nadzorna ploča projekta · **S-035** grafovi: d3-matematika + naš SVG · **S-036** X = upit → izlaz, tray
+uklonjen, autostart otvara prozor · **S-037** sve prije 1.0.0, instalater „1.0.0-pre.N" nakon svake
+sesije.
 
 ## Agenti — više grana, jedan orkestrator
 Uloge i protokol: `docs/workflow/AGENTI.md`. Graditelj radi **jednu ciglu u svom stablu**, recenzent presuđuje
 u dva prolaza, čuvar dokumentacije piše zapise; **samo orkestrator spaja u `main`**. Nakon compacta stanje se
-čita iz gita (`git log --oneline -15` · `git worktree list`), ne iz sjećanja. Nijedno stablo toka nije
-otvoreno (stablo `sokratis.ui2`, grana `feat/ui-2` obrisani nakon spajanja SUČELJA-2, 2026-09-23) —
-potpuno spojena se brišu (pravilo #1). Popis tokova i vlasništvo datoteka su u planu M2, ne ovdje.
+čita iz gita (`git log --oneline -15` · `git worktree list`), ne iz sjećanja. **Otvorena su dva stabla:**
+`sokratis` (`main`) i `sokratis.rel` (`feat/release`, T35 napola, necommitano) — potpuno spojena se
+brišu (pravilo #1), ali `sokratis.rel` NIJE spojeno, pa ga nova sesija ne dira ni ne briše, samo
+nastavlja T35 ondje kad tok IZDANJE dođe na red. Popis tokova i vlasništvo datoteka:
+`docs/superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md` (T44–T63); T35/T43 su u starijem
+`docs/superpowers/plans/2026-09-18-m2-desktop.md`.
 
 ## Dokumentacija — ulaz je SAMO `docs/README.md`
 Složena **po ulozi dokumenta** (kao Sokrat Study): `product/` ŠTO · `plan/` ŠTO SADA (najviše **jedan**

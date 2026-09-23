@@ -28,9 +28,10 @@ objašnjenjem** (S-027: 37 objašnjivih `id`-eva u svih devet pogleda i traci si
 > podataka, formati koje čita i ugovori prema korisniku CLI-ja. **Što NIJE:** kronologija (to su
 > [records/CHANGELOG.md](../records/CHANGELOG.md) i [records/PROGRESS.md](../records/PROGRESS.md)),
 > plan ([plan/ROADMAP.md](../plan/ROADMAP.md)) ni dom odluka
-> ([records/DECISIONS.md](../records/DECISIONS.md), S-001…S-022). Spec po kojem je M1 građen je
-> arhiviran: [archive/ARHITEKTURA_M1.md](../archive/ARHITEKTURA_M1.md); aktivan spec M2 (što se tek
-> gradi) je [plan/ARHITEKTURA_M2.md](../archive/ARHITEKTURA_M2.md).
+> ([records/DECISIONS.md](../records/DECISIONS.md), S-001…S-037). Specovi po kojima je M1 i M2 građen
+> su arhivirani: [archive/ARHITEKTURA_M1.md](../archive/ARHITEKTURA_M1.md) i
+> [archive/ARHITEKTURA_M2.md](../archive/ARHITEKTURA_M2.md); aktivan spec (drugi rez do 1.0.0) je
+> [plan/ARHITEKTURA_1_0.md](../plan/ARHITEKTURA_1_0.md).
 >
 > **Izvor istine je kod.** Gdje se dokument i kod razilaze, kod je u pravu, a dokument je propust.
 > Zato uz svaku tvrdnju stoji datoteka u kojoj se provjerava.

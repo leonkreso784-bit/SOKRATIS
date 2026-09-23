@@ -992,3 +992,53 @@ cjelovita u kodu** — preostaje etapa 3 „izdanje" (S5).
 **Etapa 3 „izdanje" — S5:** T35 (mjerenja, verzija 1.0.0) → završna recenzija (opus, `8edf3df..main`)
 → jedan krug popravaka → §13.8 (čuvar izdanja) → STANI, tag traži Leonov izričit OK. Ledger:
 `.superpowers/sdd/2026-09-18-m2-desktop/progress.md` i `NOVA-SESIJA-PROMPT.md` pored njega.
+
+## 2026-09-24 (FABLE) — Brainstorming: drugi rez do 1.0.0 (S-032…S-037), spec i plan aktivni
+
+**Peta sesija, čisto planiranje — nijedan redak koda dirnut.** Leon je pregledao instaliranu
+1.0.0-pre i tražio veće promjene (`docs/product/NALAZI_LEON_2026-09-23.md`, zapisan prošlu sesiju).
+Brainstorming (jedno pitanje odjednom) dao je šest odluka, pune u `records/DECISIONS.md`:
+
+- **S-032** metrike nad **svim lokalnim granama** (`git log --branches`, svaki commit jednom); oznaka
+  grane po commitu iz odvojene karte (ne u keš, jer se mijenja spajanjem); sati po grani = po udjelu
+  commita; profil `branch_scope`, CLI `--scope`.
+- **S-033** dnevnik je **unija svih radnih stabala** (isporuke se uniraju, najnoviji naslov
+  pobjeđuje); plan i `docs/` i dalje čita samo **vodeće stablo** (HEAD s najnovijim `author_time`).
+- **S-034** klik na karticu u Pregledu → **nadzorna ploča projekta**: šest dosadašnjih pogleda (Tempo ·
+  Vrste rada · Pokazatelji · Faze · Isporuke · Dokumentacija) postaju sekcije jedne ploče; Dnevnik i
+  Vizije ostaju zasebni; birač projekta u gornjoj traci se uklanja.
+- **S-035** grafovi: **d3-matematika + naš Svelte SVG** (hibrid) — četiri nove npm-ovisnosti uz
+  Leonov OK (`d3-scale` 4.0.2 · `d3-shape` 3.2.0 · `d3-array` 3.2.4 · `d3-time-format` 4.1.0); S-018
+  dopunjena, ne poništena (izgled i boje i dalje naši).
+- **S-036** X → upit → izlaz procesa; **tray-ikona i izbornik se uklanjaju**; autostart pokreće
+  aplikaciju s prozorom; svako pokretanje je nov proces pa animacija ide svaki put (S-020 dio o trayu
+  ukinut).
+- **S-037** sve iz Leonovih nalaza ulazi **prije 1.0.0**, jedno izdanje; instalater
+  „1.0.0-pre.N" gradi se nakon svake od pet sesija (S-029 nastavljena).
+
+### Napisano
+- **Spec `docs/plan/ARHITEKTURA_1_0.md`** (drugi rez do 1.0.0), commit `77953ec`: §1–§9 — grane (S-032),
+  dnevnik po stablima (S-033), sučelje (S-034, S-035), desktop (§4), testovi test-prvo (§5), ovisnosti
+  (§6), redoslijed pet sesija (§7), izlazni uvjet 1.0.0 (§8), izvan opsega u `BACKLOG.md` (§9). Spec M2
+  arhiviran s pečatom (`docs/archive/ARHITEKTURA_M2.md`), poveznice u `docs/README.md` i `CLAUDE.md`
+  prebačene (docs 100/100).
+- **Samopregled speca**, commit `17c7c41`: unija dnevnika ide redom od vodećeg stabla, karta grana
+  koristi isti `ref_name` kao `branches()` (nepromijenjen), sekcija Grane uvijek vidljiva,
+  `branch_scope` označava promjenu profila u trendu kao oznaku, ne lom krivulje (S-033 usklađena).
+- **Plan `docs/superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md`**, commit `7462bfd`: cigle T44–T63
+  u šest tokova (DESKTOP-2 konzola+X · JEZGRA-2 grane+dnevnik · IO-2 `--branches`+stabla+CLI · GRAFOVI
+  d3-temelji+8 komponenata · PLOČA tok+8 sekcija · IZDANJE), test-prvo s kodom, vlasništvo datoteka po
+  toku, pet sesija s instalaterom nakon svake. Tok IZDANJE preuzima T35/T43 iz plana M2 — taj plan
+  ostaje u `superpowers/plans/` (nije arhiviran, samo spec M2 jest) jer T35/T43 još vrijede.
+
+### Stanje stabala i brana
+Na disku **dva** stabla: `sokratis` (`main`, vrh `7462bfd`) i `sokratis.rel` (`feat/release`, T35
+napola — pet datoteka necommitano, bez izvještaja) — parkirano od prošle sesije, **ne dirati** dok tok
+IZDANJE ne dođe na red. `sokratis docs .` 100/100, 0 nalaza; `sokratis signals .` nema signala.
+Rust-testovi i vitest nepromijenjeni od S4 (145 testova + 1 ignoriran; vitest 93) — kod se u ovoj
+sesiji nije dirao, samo `.md`.
+
+### Što slijedi
+**Sljedeća sesija je izvedba sesija 1** po planu 1.0.0: T44 (DESKTOP-2 — konzola, X) · T46 (JEZGRA-2 —
+model grana i sati po udjelu) · T53 (GRAFOVI — ovisnosti i temelji), svaka u novom radnom stablu; na
+kraju instalater „1.0.0-pre.2".

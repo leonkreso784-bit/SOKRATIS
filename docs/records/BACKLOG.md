@@ -21,6 +21,9 @@
 | `sokratis report --table` u zaglavlju ispisuje samo „od {since}" — `until` se u tabličnom ispisu ne vidi iako je prozor ograničen (JSON je točan) | M2, završni krug popravaka | nalaz recenzije M2/19 (2026-09-20); `table.rs` nema presedan za uvjetno dodavanje polja u zaglavlje |
 | Keširani put (`cached_log`, M2/14b) ne broji `touched.skipped_lines` iz PRVOG čitanja commita — keš pamti `Commit`-e (strukturu), ne sirovi tekst git loga | M2, desktop (T29) ili odluka da nije bitno | poznato ograničenje ugrađeno u zaglavlje `io/src/cache.rs`; ne utječe na commite/redak-brojke, samo na broj preskočenih redaka pri parsiranju |
 | Ključ keša sirovih commita je kratki SHA (`%h`) — ako git jednog dana produlji zadanu duljinu kratice, keš se jednom puni iznova (jednokratni trošak, ne kvar) | M2, desktop (T29) ili odluka da nije bitno | poznato ograničenje ugrađeno u zaglavlje `io/src/cache.rs`; točnost brojki ne strada |
+| Zajednički graf usporedbe projekata na Pregledu (linija po projektu) | M3 | izvan opsega 1.0.0 — [ARHITEKTURA_1_0.md §9](../plan/ARHITEKTURA_1_0.md); srodno: „usporedba projekata na Pregledu" niže (Leon, 2026-09-22) je redak na kartici, ovo je zajednički graf |
+| `branch_ignore` — isključivanje grana po uzorku iz metrika | M3 ili odluka | izvan opsega 1.0.0 — [ARHITEKTURA_1_0.md §9](../plan/ARHITEKTURA_1_0.md); S-032 zadano mjeri SVE lokalne grane, ovo bi bio izuzetak |
+| Sat autora u formatu loga — doba dana prikazano u zoni autora, ne stroja | M3 ili odluka | izvan opsega 1.0.0 — [ARHITEKTURA_1_0.md §9](../plan/ARHITEKTURA_1_0.md) |
 
 ## Druga verzija (M3) — iz Leonova zapisa namjere 2026-09-21
 

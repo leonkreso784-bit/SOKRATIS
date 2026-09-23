@@ -53,14 +53,15 @@ redak u backlogu.
 | Dokument | Svrha |
 |---|---|
 | [PRD.md](./product/PRD.md) | Što gradimo, za koga, opseg po milestoneima, ne-ciljevi, rječnik |
-| [NALAZI_LEON_2026-09-23.md](./product/NALAZI_LEON_2026-09-23.md) | ⚠️ **ULAZ U SLJEDEĆU SESIJU** — Leonovi nalazi nad instaliranom „1.0.0-pre" s provjerenim uzrocima: metrike vide samo `main` (njegov rad u granama nevidljiv od 13. 9.), premalo/nečitki grafovi, X mora zatvoriti + animacija svaki put, konzolni prozor `git`-a (kvar), više projekata, kartica → nadzorna ploča. Traži brainstorming, ne cigle |
+| [NALAZI_LEON_2026-09-23.md](./product/NALAZI_LEON_2026-09-23.md) | Leonovi nalazi nad instaliranom „1.0.0-pre" s provjerenim uzrocima (metrike vide samo `main`, premalo/nečitki grafovi, X mora zatvoriti + animacija svaki put, konzolni prozor `git`-a, više projekata, kartica → nadzorna ploča) — **pretvoreno 2026-09-24** brainstormingom u S-032…S-037 i spec [ARHITEKTURA_1_0.md](./plan/ARHITEKTURA_1_0.md); ovdje ostaje kao izvorni zapis |
 
 ## `plan/` — što sada
 
 Spec Milestonea 1 je **ispunjen i arhiviran** ([archive/ARHITEKTURA_M1.md](./archive/ARHITEKTURA_M1.md));
-**jedini aktivni spec je M2** (desktop) — odobren 2026-09-18, **dopunjen 2026-09-21 rezom za 1.0.0**
-(§13; odluke S-024…S-031). Gdje je izvedba stala i što je sljedeće kaže `plan/ROADMAP.md` („Gdje smo“)
-— ovaj indeks to ne ponavlja.
+spec M2 (desktop) je **ispunjen i arhiviran** ([archive/ARHITEKTURA_M2.md](./archive/ARHITEKTURA_M2.md),
+2026-09-24) — etape 1–2 su u kodu, etapa 3 „izdanje" seli u novi spec. **Jedini aktivni spec je
+ARHITEKTURA_1_0** (drugi rez do 1.0.0, iz brainstorminga nad Leonovim nalazima, S-032…S-037). Gdje je
+izvedba stala i što je sljedeće kaže `plan/ROADMAP.md` („Gdje smo“) — ovaj indeks to ne ponavlja.
 
 | Dokument | Svrha |
 |---|---|
