@@ -11,10 +11,10 @@
 | Profil za tuđe projekte: dokumentiran JSON format + primjer za repo bez `docs/`; **(Leon, 2026-09-22)** čarobnjak koji PREDLOŽI `profile.json` iz onoga što vidi u repou umjesto tihog Sokrat Studyjeva zadanog, i Conventional Commits kao drugi ponuđeni zadani profil | M3 | zadano = Sokrat Study (S-005); §13.7 (M2, gotovo) jamči da brojke nad neprepoznatim repoom ne lažu — čarobnjak je sljedeći korak, prijedlog umjesto tišine |
 | GitHub adapter: CI status po grani, PR-ovi | M3 (opcionalno) | mreža; `gh` nije na stroju |
 | Vercel adapter: deployi umjesto `🚀` u dnevniku | M3 (opcionalno) | mreža |
-| HR/EN natpisi u **sučelju** | → spec M2 [§6.4](../plan/ARHITEKTURA_M2.md) (S-021) | samo pointer |
+| HR/EN natpisi u **sučelju** | → spec M2 [§6.4](../archive/ARHITEKTURA_M2.md) (S-021) | samo pointer |
 | HR/EN natpisi u **CLI tablici** | M3 | jezgra je već engleska (S-008); tablica je pomoć za terminal |
 | LICENCA · GitHub Actions | M4 (objava) | README na engleskom je gotov 2026-09-21 (S-030). Licenca je **neodlučena**: Leon ne isključuje prodaju (2026-09-21), pa „MIT kao Sokrat Study“ više nije pretpostavka; do odluke sva prava pridržana |
-| Instalater NSIS samo za Leona | → spec M2 [§13.6](../plan/ARHITEKTURA_M2.md) (S-029) | samo pointer |
+| Instalater NSIS samo za Leona | → spec M2 [§13.6](../archive/ARHITEKTURA_M2.md) (S-029) | samo pointer |
 | Potpisan i objavljen instalater · MSI · automatsko ažuriranje | M4 (objava) | S-029 |
 | `sokratis docs .` mjeri samo korijen i `docs_dir`; `.md` pod `apps/desktop` (npr. budući README sučelja) nitko ne provjerava | M3 (profil: više `docs_dir`-ova ili `extra_docs_dirs`) | nalaz čuvara 2026-09-18 |
 | „Klasifikacija jednom" (spec §3.2) nije dovršena: `metrics/kinds.rs::commit_rows`/`kind_stats` (M2/5) klasificiraju svaki commit jednom za `Report.commits`, ali `metrics/indicators.rs:31` (`kind_count`) i dalje zove `effective_kind` odvojeno za `debugging_commits`/`docs_share` — commit se klasificira više od jednom | M2, odluka na završnoj recenziji | nalaz recenzije M2/5 (2026-09-18); stanje koda: `ARCHITECTURE.md` §11 |
@@ -59,7 +59,7 @@ Izvor je izvještaj završne recenzije (`.superpowers/sdd/2026-09-17-m1-jezgra-i
 — radni zapis izvan gita), zato je uz svaku stavku broj nalaza. **Stanje koda** (što danas ne radi)
 opisuje [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §11; ovdje stoji **plan**.
 
-**Sedam od devet stavki preuzeo je spec M2** — [`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md)
+**Sedam od devet stavki preuzeo je spec M2** — [`../archive/ARHITEKTURA_M2.md`](../archive/ARHITEKTURA_M2.md)
 §8 ih nabraja s mjestom u specu i testom koji ih dokazuje: snapshot `Report`-a (I7) · performanse
 (M11) · ograda putanja (I9) · zbroj vizija (I6) · `phase_tag` (I3 + M14) · detached HEAD · testni redak
 koji fixture prevlada (odgođena 8). **Svih sedam je sad riješeno u `main`-u.** **I7 je riješena ciglom
@@ -99,7 +99,7 @@ Ovdje ostaju samo dvije stavke koje M2 **ne** uzima:
 | stavka | bilješka |
 |---|---|
 | Pogled s telefona na LAN-u (lokalni servis + PWA) | razmatrano kao ljuska C; nije odabrano, ali jezgra to ne sprječava |
-| Snimke ocjena kroz vrijeme kao graf (trend docs-čistoće) | → spec M2 [§4.2](../plan/ARHITEKTURA_M2.md) (S-014); samo pointer |
+| Snimke ocjena kroz vrijeme kao graf (trend docs-čistoće) | → spec M2 [§4.2](../archive/ARHITEKTURA_M2.md) (S-014); samo pointer |
 | `gix` umjesto `git` procesa | tek kad mjerenje kaže da je sporo (S-003) |
 | Vektorizacija znaka (danas raster WebP/PNG iz Leonove datoteke) | kad tray na 16 px ili instalater to zatraže; M2 rješava pojednostavljenim rasterom |
 | Otvaranje nalaza dokumentacije u editoru (danas klik kopira putanju) | M3; traži `tauri-plugin-opener` — jedna ovisnost više |

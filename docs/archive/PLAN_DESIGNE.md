@@ -2,7 +2,7 @@
 
 > **Status:** ✅ ISPUNJEN 2026-09-21 — **referenca, ne izvor istine.** Leonov zapis namjere je istog dana
 > pretvoren u rez za 1.0.0: odluke **S-024…S-031** ([DECISIONS.md](../records/DECISIONS.md)), dopuna aktivnog
-> speca ([ARHITEKTURA_M2.md §13](../plan/ARHITEKTURA_M2.md)) i stavke za drugu verziju i kasnije
+> speca ([ARHITEKTURA_M2.md §13](./ARHITEKTURA_M2.md)) i stavke za drugu verziju i kasnije
 > ([BACKLOG.md](../records/BACKLOG.md)). Tekst ispod je ostavljen kako ga je Leon zapisao.
 
 ## Odakle ovo

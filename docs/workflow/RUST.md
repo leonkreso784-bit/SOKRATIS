@@ -58,7 +58,7 @@ je pinana u cigli koja je uvela i ovdje objašnjena — stanje koda je u
 
 **npm-ovisnosti sučelja** (`apps/desktop/package.json`, verzije pinane bez `^`) nisu crateovi i ne
 ulaze u ovu tablicu; što je zašto odabrano stoji u specu
-[`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md) §7.
+[`../archive/ARHITEKTURA_M2.md`](../archive/ARHITEKTURA_M2.md) §7.
 
 **`rust-toolchain.toml`** (korijen repoa, od 2026-09-18) pina i sam kompajler, ne samo crateove:
 `channel = "1.98.1"` + `rustfmt`/`clippy` kao komponente. Rustup ga čita sam kad se pokrene bilo koja

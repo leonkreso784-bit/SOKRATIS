@@ -281,7 +281,7 @@ zato ne dobiva rezanjem M2 nego odlukom što iz zapisa namjere ulazi. Orkestrato
 animacije grafova i pogleda.
 **Odluka:** 1.0.0 = T28–T35 + osam novih cigli (Postavke · animacija grafova · prijelaz pogleda s
 prekidačem · kartica s objašnjenjem ×2 · instalater · repo bez konvencija · dokumentacija točna i
-manja). Opseg i „gotovo kad": spec [§13](../plan/ARHITEKTURA_M2.md). Gradi se u tri etape:
+manja). Opseg i „gotovo kad": spec [§13](../archive/ARHITEKTURA_M2.md). Gradi se u tri etape:
 **(1) funkcija** — T28 → spajanje SUČELJA → DESKTOP T29–T33 → T34 → repo bez konvencija → instalater;
 Leon instalira **„1.0.0-pre"** (bez taga, nije izdanje) i počinje mjeriti Sokrat Study i Sokratis ·
 **(2) izgled** — pet cigli sučelja, dok 1.0.0-pre već nadgleda tu gradnju · **(3) izdanje** — T35,
@@ -354,3 +354,91 @@ ispunio svrhu seli u `archive/` isti dan, s pečatom — prvi je zapis namjere `
 „Gdje smo" u ROADMAP-u bez kronologije. Imena dokumenata govore ulogu.
 **Posljedice:** manje teksta koji može zastarjeti; povijest ostaje dostupna, ali odvojena od onoga što
 vrijedi sad (S-010).
+
+## S-032 — metrike nad svim lokalnim granama; oznaka grane po commitu (2026-09-24)
+
+**Kontekst:** Leon je instalirao „1.0.0-pre" i vidio zadnje podatke od 13. 9. — zadnji commit na
+`main`-u Sokrat Studyja; on od tada radi u šest grana u radnim stablima (102 commita u granama, 11 na
+`main`-u od 13. 9.). Mjerenje „samo zadana grana" (S-005, paritet s `RAD.xlsx`) je za njegov način
+rada krivo mjerilo. Kandidati: sve lokalne grane · grane u radnim stablima + zadana · zadana +
+upozorenje.
+**Odluka:** zadano se mjeri nad **svim lokalnim granama** (`git log --branches`: svaki commit jednom,
+bez remote-tracking referenci i tagova); profil `branch_scope: "all" | "default"` pregazi, CLI
+`--scope`. Oznaka grane po commitu dolazi iz odvojene karte (`git log --branches --not <zadana>
+--format=%h|%S`), **ne u keš** — nakon spajanja commit prelazi pod zadanu granu. Sati po grani = sati
+dana po udjelu commita grane (zbroj = ukupno; proxy). Stabla-samo odbijeno: grana bez stabla (danas
+33 commita) bila bi nevidljiva, a brisanje stabla bi rušilo brojke unatrag. Upozorenje odbijeno: ne
+rješava problem.
+**Posljedice:** S-005 dopunjena (zadano više nije „samo zadana grana"); paritet s `RAD.xlsx` ostaje
+isti test (fixture je log `main`-a); `Report` dobiva `scope`, `branches` i `branch` po retku
+(snapshot mijenjan namjerno); signal `unmerged_branches` nepromijenjen; spec
+[plan/ARHITEKTURA_1_0.md](../plan/ARHITEKTURA_1_0.md) §1.
+
+## S-033 — dnevnik je unija svih radnih stabala; plan i `docs/` iz vodećeg stabla (2026-09-24)
+
+**Kontekst:** `io` čita dnevnik, plan i `docs/` iz glavnog stabla (uz `.git`), a Leon dnevnik piše u
+grani u kojoj radi (`feat/f6-mcp` ga dira 22.–23. 9.; stablo `.f6` ima 1300 redaka više). Isporuke i
+docs-ocjena zato staju na 13. 9. kao i commiti.
+**Odluka:** dnevnik se čita s diska **svakog radnog stabla** i isporuke se uniraju po (datum, naslov),
+prvi viđeni pobjeđuje; plan i `docs/` (ocjena, kašnjenje, nalazi) čitaju se iz **vodećeg stabla** —
+onog čiji HEAD ima najnoviji `author_time`. Grane bez stabla daju samo commite. Pisanje ručnih
+podataka ostaje u glavno stablo (S-015). „Sve iz vodećeg stabla" odbijeno (isporuke iz drugih grana
+nevidljive do spajanja); „ostaje glavno stablo" odbijeno (ne rješava problem).
+**Posljedice:** `ReportInput.diary` → `diaries`; `Touched` += `worktrees`, `diaries`; +2 git-procesa po
+izvještaju (nova granica u `perf.rs`); isporuka s uređenim naslovom u drugoj grani pojavi se dvaput
+(dokumentirano na kartici).
+
+## S-034 — klik na karticu = nadzorna ploča projekta; zasebni ostaju Dnevnik i Vizije (2026-09-24)
+
+**Kontekst:** Leon očekuje da klik na karticu u Pregledu otvori „stranicu tog projekta sa svim
+grafovima i brojkama", ne devet pogleda; „više projekata usporedno" za njega znači neograničene
+kartice i ulazak u svaku. Kandidati: ploča + Dnevnik + Vizije · ploča kao jedanaesti pogled · jedna
+stranica za sve uključujući uređivanje.
+**Odluka:** šest pogleda koji samo prikazuju (Tempo · Vrste rada · Pokazatelji · Faze · Isporuke ·
+Dokumentacija) postaju **sekcije jedne ploče** `Projekt`; zasebne stranice ostaju samo one koje pišu
+(Dnevnik · Vizije). Izbornik: Pregled · Projekt · Dnevnik · Vizije · Postavke; **birač projekta u
+gornjoj traci se uklanja** — Pregled je jedini ulaz. Jedanaesti pogled odbijen (grafovi dvaput);
+sve-u-jednom odbijeno (uređivanje usred grafova).
+**Posljedice:** spec M2 §6.1/§6.2 zamijenjen (spec 1.0.0 §3); svi `explain` id-evi ostaju; zajednički
+graf usporedbe projekata na Pregledu ide u BACKLOG.
+
+## S-035 — grafovi: d3-matematika + naš Svelte SVG; 4 nove npm ovisnosti (2026-09-24)
+
+**Kontekst:** Leon traži puno više grafova, čitljivih, s datumima na osima. Vlastiti SVG bez datuma na
+X-osi (S-018) nije dovoljan; težina je u matematici osi (datumski ticksi, `nice()`, stack, binovi,
+lukovi), ne u pravokutnicima. Leon je odbio tri prve ponude i tražio bolje. Kandidati: čisti vlastiti
+SVG · LayerChart 2.5 · Observable Plot · ECharts 6 · d3-jezgreni moduli + naš SVG.
+**Odluka:** **hibrid** — `d3-scale@4.0.2` · `d3-shape@3.2.0` · `d3-array@3.2.4` ·
+`d3-time-format@4.1.0` (ISC, bez DOM-a, čiste funkcije testirane vitestom) za matematiku; Svelte crta,
+boje samo tokeni, animacije kroz `data-motion`, tooltip/legenda naši. Leon je 2026-09-24 dao OK za te
+četiri ovisnosti (pravilo #6). LayerChart odbijen (30+ paketa, `-next` pre-release ovisnosti), Plot
+(cijeli d3), ECharts (canvas, vlastiti izgled, teme kroz runtime, ≈1 MB), čisti SVG (datumske osi bismo
+pisali sami).
+**Posljedice:** S-018 revidirana (izgled i dalje naš, matematika tuđa); temelji `Chart · Axis · Grid ·
+Legend · Tooltip · scales.ts · bucket.ts` i 8 komponenata; dan/tjedan/mjesec je preslagivanje u
+Svelteu s testom, ne mjerenje (dopuna S-012); iOS-glossy izgled (v2 želja) ostaje moguć.
+
+## S-036 — X = upit → izlaz; tray se uklanja; autostart otvara prozor (2026-09-24)
+
+**Kontekst:** X je skrivao u tray (S-020), animacija se vrtjela jednom po procesu (S-019) — Leona je
+zbunilo da drugi klik na ikonu ne daje ni animaciju ni „novo" pokretanje. Traži: X zatvara uz upit,
+animacija pri svakom pokretanju. Kandidati: upit → izlaz bez traya · upit s tri gumba i tray ·
+zatvaranje bez upita.
+**Odluka:** X → upit „Zatvoriti Sokratis? Nadzor projekata i obavijesti staju dok ga ponovno ne
+pokreneš." [Zatvori] [Odustani] → izlaz procesa; **tray-ikona i izbornik se uklanjaju**; autostart
+pokreće aplikaciju **s prozorom** pri prijavi; `single-instance` ostaje. Svako pokretanje je nov
+proces, pa S-019 sam daje animaciju. Tri gumba odbijena (isto stanje koje je zbunilo); bez upita
+odbijeno (slučajan klik).
+**Posljedice:** S-020 ukinuta u dijelu „X sakriva, tray"; obavijesti na Alert stižu samo dok je
+aplikacija otvorena; `tray.rs` van, `set_autostart` u `autostart.rs`; feature `tray-icon` van.
+
+## S-037 — sve iz Leonovih nalaza ulazi prije 1.0.0; jedno izdanje, instalater nakon svake sesije (2026-09-24)
+
+**Kontekst:** procjena ≈ 20 cigli u 4–5 kratkih sesija. Kandidati: sve prije 1.0.0 · 1.0.0 = grane +
+kvarovi + osi, ploča u 1.1.0 · 1.0.0 = samo grane + kvarovi.
+**Odluka:** **sve prije 1.0.0** — Leonov izbor unatoč preporuci da se ploča odvoji. Redoslijed
+„vrijednost prvo": DESKTOP-2 (konzola, X) → JEZGRA-2 + IO-2 (grane, dnevnik) → GRAFOVI → PLOČA →
+IZDANJE; nakon svake sesije instalater „1.0.0-pre.N" (S-029) da Leon vidi gotovo odmah.
+**Posljedice:** etapa 3 iz M2 §13 (T35, završna recenzija, T43) seli na kraj ovog reza; T35 ostaje
+napola u stablu `sokratis.rel` do tada; spec M2 arhiviran, aktivan je
+[plan/ARHITEKTURA_1_0.md](../plan/ARHITEKTURA_1_0.md).

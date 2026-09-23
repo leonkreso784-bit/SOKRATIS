@@ -65,7 +65,7 @@ Spec Milestonea 1 je **ispunjen i arhiviran** ([archive/ARHITEKTURA_M1.md](./arc
 | Dokument | Svrha |
 |---|---|
 | [ROADMAP.md](./plan/ROADMAP.md) | 🟩 **živ** — milestonei M0–M4, status, što je sljedeće |
-| [ARHITEKTURA_M2.md](./plan/ARHITEKTURA_M2.md) | 🟩 **AKTIVAN SPEC** — desktop: granice (`store`, `desktop` bez logike), Tauri ugovor (`Report` nepromijenjen), SQLite shema, watcher, pogledi, teme i znak, splash, ovisnosti, dug M1 koji preuzima, testovi, M0 alati, izlazni uvjet **1.0.0** (§11) i **dopuna rezom za 1.0.0** (§13: etape · Postavke · animacije · kartica s objašnjenjem · instalater · repo bez konvencija · dokumentacija) |
+| [ARHITEKTURA_1_0.md](./plan/ARHITEKTURA_1_0.md) | 🟩 **AKTIVAN SPEC** (2026-09-24, iz brainstorminga nad Leonovim nalazima, S-032…S-037) — do 1.0.0: metrike nad **svim lokalnim granama** s oznakom grane po commitu, dnevnik kao unija stabala, nadzorna ploča projekta s 8 sekcija i 11 grafova (d3-matematika + naš SVG), X = upit → izlaz bez traya, kvar konzolnog prozora; preuzima etapu „izdanje" iz speca M2 |
 
 ## `architecture/` — što je izgrađeno
 
@@ -99,6 +99,7 @@ Spec Milestonea 1 je **ispunjen i arhiviran** ([archive/ARHITEKTURA_M1.md](./arc
 |---|---|
 | [ARHITEKTURA_M1.md](./archive/ARHITEKTURA_M1.md) | ✅ ISPUNJEN 2026-09-17 — spec arhitekture i opsega Milestonea 1 (jezgra · io · CLI) |
 | [PLAN_DESIGNE.md](./archive/PLAN_DESIGNE.md) | ✅ ISPUNJEN 2026-09-21 — Leonov zapis namjere (izgled, dodaci, put do 1.0.0); pretvoren u rez S-024…S-031, spec M2 §13 i stavke u `records/BACKLOG.md` |
+| [ARHITEKTURA_M2.md](./archive/ARHITEKTURA_M2.md) | ✅ ISPUNJEN 2026-09-24 (etape 1–2 u kodu; etapa 3 „izdanje" preuzeta u `plan/ARHITEKTURA_1_0.md`) — spec desktopa: granice (`store`, `desktop` bez logike), Tauri ugovor, SQLite shema, watcher, pogledi, teme i znak, splash, ovisnosti, testovi, §13 rez za 1.0.0 |
 
 ## `superpowers/plans/` — planovi implementacije
 
@@ -107,4 +108,4 @@ Nastaju iz aktivnog speca, jedan po milestoneu.
 | Dokument | Svrha |
 |---|---|
 | [2026-09-17-m1-jezgra-i-cli.md](./superpowers/plans/2026-09-17-m1-jezgra-i-cli.md) | **Plan M1** — ✅ IZVRŠEN 2026-09-17: 22 cigle u 8 tokova (kostur · fixture · parse · metrike · docs+pravila · io · cli · integracija) s testovima i kodom po koraku; vlasništvo datoteka po toku. Zapis plana, ne izvor istine |
-| [2026-09-18-m2-desktop.md](./superpowers/plans/2026-09-18-m2-desktop.md) | **Plan M2** — 📋 AKTIVAN od 2026-09-18, **dopunjen 2026-09-21 ciglama T36–T43** (rez za 1.0.0, spec §13): 35 + 8 cigli u 9 tokova (kostur · jezgra · profil · io · store · cli · sučelje · desktop · integracija) iz speca `plan/ARHITEKTURA_M2.md`; testovi i kod po koraku, vlasništvo datoteka po toku, ovisnosti među tokovima, dva Leonova OK-a (`npm install`, tray-ikona) |
+| [2026-09-18-m2-desktop.md](./superpowers/plans/2026-09-18-m2-desktop.md) | **Plan M2** — 📋 AKTIVAN od 2026-09-18, **dopunjen 2026-09-21 ciglama T36–T43** (rez za 1.0.0, spec §13): 35 + 8 cigli u 9 tokova (kostur · jezgra · profil · io · store · cli · sučelje · desktop · integracija) iz speca `archive/ARHITEKTURA_M2.md`; testovi i kod po koraku, vlasništvo datoteka po toku, ovisnosti među tokovima, dva Leonova OK-a (`npm install`, tray-ikona) |

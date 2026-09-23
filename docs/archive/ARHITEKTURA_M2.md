@@ -1,14 +1,18 @@
 # ARHITEKTURA + MILESTONE 2 — desktop Sokratisa
 
-**Status:** 🟩 AKTIVAN SPEC — napisan 2026-09-18 iz brainstorminga s Leonom i **isti dan odobren**
-(„Imaš moj OK", bez izmjena) · plan cigli iz njega:
-[superpowers/plans/2026-09-18-m2-desktop.md](../superpowers/plans/2026-09-18-m2-desktop.md) ·
-jedini aktivni spec u `plan/` · **dopunjen 2026-09-21 rezom za 1.0.0** (§13, Leonov OK isti dan,
-S-024…S-031): izlaz iz M2 je verzija **1.0.0**, ne 0.2.0
+**Status:** ✅ ISPUNJEN 2026-09-24 — **referenca, ne izvor istine.** Etape 1 „funkcija" i 2 „izgled"
+(§13.1) su u kodu (`main`, `1.0.0-pre.1`); etapa 3 „izdanje" (§13.1, §13.8) preuzeta je u novi
+aktivni spec [plan/ARHITEKTURA_1_0.md](../plan/ARHITEKTURA_1_0.md) nakon Leonovih nalaza
+([product/NALAZI_LEON_2026-09-23.md](../product/NALAZI_LEON_2026-09-23.md)) — on mijenja §1.1
+(grane), §6.1/§6.2 (pogledi → ploča), §6.6 (grafovi) i §5.3 (tray). Što je stvarno izgrađeno:
+[architecture/ARCHITECTURE.md](../architecture/ARCHITECTURE.md). Izvorni status: napisan 2026-09-18 iz
+brainstorminga s Leonom i isti dan odobren; plan cigli
+[superpowers/plans/2026-09-18-m2-desktop.md](../superpowers/plans/2026-09-18-m2-desktop.md);
+dopunjen 2026-09-21 rezom za 1.0.0 (§13, S-024…S-031).
 
 Što je od M1 stvarno izgrađeno opisuje [architecture/ARCHITECTURE.md](../architecture/ARCHITECTURE.md);
 ispunjeni spec M1 je [archive/ARHITEKTURA_M1.md](../archive/ARHITEKTURA_M1.md); status milestonea
-[ROADMAP.md](./ROADMAP.md); dug koji M2 nasljeđuje [records/BACKLOG.md](../records/BACKLOG.md).
+[ROADMAP.md](../plan/ROADMAP.md); dug koji M2 nasljeđuje [records/BACKLOG.md](../records/BACKLOG.md).
 
 > **Što ovaj dokument JEST:** precizan opseg Milestonea 2 — desktop ljuska nad jezgrom iz M1 — iz
 > kojeg se piše plan implementacije (`docs/superpowers/plans/`). Odjeljci su isti kao u specu M1:

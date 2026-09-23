@@ -6,7 +6,7 @@ Isporuka = ono što je u `main`-u; sesije su u `PROGRESS.md`.
 ## [Unreleased] — rad u tijeku
 
 **Milestone 2 (desktop) je u izvedbi** po odobrenom specu
-[`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md) (odluke S-012…S-022) i planu od 35 cigli.
+[`../archive/ARHITEKTURA_M2.md`](../archive/ARHITEKTURA_M2.md) (odluke S-012…S-022) i planu od 35 cigli.
 **Ovaj odjeljak izlazi kao 1.0.0, ne 0.2.0** (S-024; rez i dopuna speca §13 od 2026-09-21).
 **Na disku je `main` verzije `1.0.0-pre.1`** (jedan izvor: `[workspace.package]` u korijenskom
 `Cargo.toml`, M2/37) — netagirano, neobjavljeno; tag traži Leonov izričit OK na kraju etape izdanja

@@ -20,7 +20,7 @@ gasi ulaz grafova, prijelaz pogleda i kostur učitavanja preko jedne varijable),
 objašnjenjem** (S-027: 37 objašnjivih `id`-eva u svih devet pogleda i traci signala) — §1, §11.
 **Time je etapa 2 „izgled" (S-025) cjelovita u kodu**; preostaje T35 (mjerenja, verzija 1.0.0) i etapa
 3 „izdanje" (završna recenzija, krug popravaka, §13.8) — [`../plan/ROADMAP.md`](../plan/ROADMAP.md),
-[`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md) §13.
+[`../archive/ARHITEKTURA_M2.md`](../archive/ARHITEKTURA_M2.md) §13.
 Što od koda još stoji bez pokrića ili s poznatim rubom je u §11 ·
 **Zadnja provjera:** 2026-09-23
 
@@ -30,7 +30,7 @@ objašnjenjem** (S-027: 37 objašnjivih `id`-eva u svih devet pogleda i traci si
 > plan ([plan/ROADMAP.md](../plan/ROADMAP.md)) ni dom odluka
 > ([records/DECISIONS.md](../records/DECISIONS.md), S-001…S-022). Spec po kojem je M1 građen je
 > arhiviran: [archive/ARHITEKTURA_M1.md](../archive/ARHITEKTURA_M1.md); aktivan spec M2 (što se tek
-> gradi) je [plan/ARHITEKTURA_M2.md](../plan/ARHITEKTURA_M2.md).
+> gradi) je [plan/ARHITEKTURA_M2.md](../archive/ARHITEKTURA_M2.md).
 >
 > **Izvor istine je kod.** Gdje se dokument i kod razilaze, kod je u pravu, a dokument je propust.
 > Zato uz svaku tvrdnju stoji datoteka u kojoj se provjerava.
@@ -510,7 +510,7 @@ i `until` ne primaju (uvijek `None`).
 
 Uredno zapisani propusti, ne skrivene rupe (CLAUDE.md #4). Ovo je **stanje koda**; što se od toga
 planira uzeti i kada je u [`../records/BACKLOG.md`](../records/BACKLOG.md), a za stavke koje je
-preuzeo M2 u [`../plan/ARHITEKTURA_M2.md`](../plan/ARHITEKTURA_M2.md) §8 i planu cigli
+preuzeo M2 u [`../archive/ARHITEKTURA_M2.md`](../archive/ARHITEKTURA_M2.md) §8 i planu cigli
 [`../superpowers/plans/2026-09-18-m2-desktop.md`](../superpowers/plans/2026-09-18-m2-desktop.md).
 
 **Rezervirano polje profila** (deklarirano, jezgra ga ne čita):

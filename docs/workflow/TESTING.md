@@ -1,7 +1,7 @@
 # TESTING — kako dokazujemo da radi
 
 > Preuzeto iz Sokrat Studyja ono što vrijedi za Rust CLI bez ekrana. Sučelje M2 se testira `vitest`-om
-> i `svelte-check`-om (**ne** Playwrightom — spec [ARHITEKTURA_M2.md](../plan/ARHITEKTURA_M2.md) §9);
+> i `svelte-check`-om (**ne** Playwrightom — spec [ARHITEKTURA_M2.md](../archive/ARHITEKTURA_M2.md) §9);
 > što se od toga danas može pokrenuti piše u tablici ispod.
 
 ## 1 · Vrste testova

@@ -75,7 +75,7 @@ Testovi i brane: `docs/workflow/TESTING.md`.
 ## Stanje — TRENUTNO (2026-09-23 — SUČELJE-2 spojena, etapa 2 gotova; sljedeća sesija je S5 IZDANJE)
 - **M0 gotov. M1 zatvoren** (0.1.0): `sokratis report/docs/signals` rade nad pravim repozitorijem,
   paritet s `RAD.xlsx` je test. Što je izgrađeno i **što još ne radi**: `ARCHITECTURE.md` (§11).
-- **M2 izlazi kao verzija 1.0.0** (S-024; 0.2.0 se preskače). Spec `docs/plan/ARHITEKTURA_M2.md`
+- **M2 izlazi kao verzija 1.0.0** (S-024; 0.2.0 se preskače). Spec **`docs/plan/ARHITEKTURA_1_0.md`** (2026-09-24, S-032…S-037; M2 spec arhiviran)
   (§11 izlazni uvjet + **§13 dopuna rezom**), plan cigli `docs/superpowers/plans/2026-09-18-m2-desktop.md`.
 - **U `main`-u, verzija `1.0.0-pre.1`:** KOSTUR · JEZGRA · PROFIL · STORE · IO (+ M2/14b) · CLI ·
   SUČELJE · DESKTOP · INTEGRACIJA (T34, T36, T37, merge `b560f7c`, 2026-09-22) · SUČELJE-2 (T38–T42,
@@ -123,7 +123,7 @@ potpuno spojena se brišu (pravilo #1). Popis tokova i vlasništvo datoteka su u
 
 ## Dokumentacija — ulaz je SAMO `docs/README.md`
 Složena **po ulozi dokumenta** (kao Sokrat Study): `product/` ŠTO · `plan/` ŠTO SADA (najviše **jedan**
-aktivni spec + ROADMAP; aktivan je `docs/plan/ARHITEKTURA_M2.md`) · `architecture/` **ŠTO JE IZGRAĐENO**
+aktivni spec + ROADMAP; aktivan je `docs/plan/ARHITEKTURA_1_0.md`) · `architecture/` **ŠTO JE IZGRAĐENO**
 (`docs/architecture/ARCHITECTURE.md` — granice crateova, tok podataka, sva polja profila, formati
 `.sokratis/*.json`, izlazni kodovi) · `workflow/` KAKO RADIMO · `records/` POVIJEST ·
 `archive/` ispunjeni specovi — oboje **nikad izvor istine**. Ne traži fajlove napamet — otvori indeks.
