@@ -380,7 +380,7 @@ isti test (fixture je log `main`-a); `Report` dobiva `scope`, `branches` i `bran
 grani u kojoj radi (`feat/f6-mcp` ga dira 22.–23. 9.; stablo `.f6` ima 1300 redaka više). Isporuke i
 docs-ocjena zato staju na 13. 9. kao i commiti.
 **Odluka:** dnevnik se čita s diska **svakog radnog stabla** i isporuke se uniraju po (datum, naslov),
-prvi viđeni pobjeđuje; plan i `docs/` (ocjena, kašnjenje, nalazi) čitaju se iz **vodećeg stabla** —
+najnoviji pobjeđuje (dnevnici se uniraju redom od vodećeg stabla); plan i `docs/` (ocjena, kašnjenje, nalazi) čitaju se iz **vodećeg stabla** —
 onog čiji HEAD ima najnoviji `author_time`. Grane bez stabla daju samo commite. Pisanje ručnih
 podataka ostaje u glavno stablo (S-015). „Sve iz vodećeg stabla" odbijeno (isporuke iz drugih grana
 nevidljive do spajanja); „ostaje glavno stablo" odbijeno (ne rješava problem).

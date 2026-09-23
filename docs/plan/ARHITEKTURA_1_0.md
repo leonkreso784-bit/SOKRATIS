@@ -72,8 +72,9 @@ danu) · S-015 (projekt = `git-common-dir`, ručni podaci u glavno stablo) · S-
   identično kao nad jednom granom, ali **jezgra presuđuje po `commit_date`**, pa brojka ne ovisi o
   tome. Mjerenje nad Sokrat Studyjem (cigla u planu) to potvrđuje: broj commita `--branches` u prozoru
   ≥ zbroj po granama koje jezgra izbroji.
-- `branches()` (signal „nespojene grane") i `last_changes` dobivaju `Scope` gdje ga trebaju
-  (`last_changes` gleda povijest vodećeg stabla, §2).
+- Karta koristi **isti `ref_name` kao danas** (zadana grana → trenutna → `HEAD`, `project.rs::input_with`),
+  pa detached HEAD i repo bez zadane grane rade kao prije. `branches()` (signal „nespojene grane") se
+  ne mijenja; jedino `last_changes` dobiva referencu — gleda povijest **vodećeg stabla** (§2).
 
 ### 1.2 Jezgra — model i mjere
 
@@ -106,6 +107,9 @@ struct BranchStats { name: String, commits: u32, lines: u64, hours: f64, merged:
   radi u granama). Drugi tekst = `ParseError` s imenom polja (kao datumi).
 - CLI: `sokratis report <putanja> --scope all|default` pregazi profil (isti obrazac kao `--since`).
   Tablica dobiva redak „grana/opseg". `signals`/`docs` bez promjene.
+- `branch_scope` ulazi u kanonski JSON profila koji dnevna snimka pamti (`engine.rs::try_snapshot`,
+  S-014), pa trend pokazatelja **dobiva oznaku „profil promijenjen"** na dan nadogradnje — brojke
+  prije i poslije nisu usporedive i graf to kaže sam, bez posebnog koda.
 - Sokrat Study ima lokalne grane `origin/content/*` (materijali, ne kod); u rasponu od 29. 8. daju ≤ 2
   commita — prihvaćeno, bez polja za isključivanje (YAGNI; ako zatreba: `git log --exclude=<glob>
   --branches` je jedan argument).
@@ -118,7 +122,8 @@ struct BranchStats { name: String, commits: u32, lines: u64, hours: f64, merged:
   (`GitSource::worktrees`, postoji od M1) → `ReportInput.diaries: Vec<String>` (zamjenjuje
   `diary: Option<String>`; prazan vektor = nema dnevnika). Jezgra parsira svaki tekst istim
   `parse_diary` i **unira isporuke po `(date, title)`**, sortirano po datumu; isti naslov s drukčijim
-  `model`/`deploy` uzima **prvi** viđeni (redoslijed stabala = redoslijed `worktree list`). Necommitani
+  `model`/`deploy` uzima **najnoviji** — `io` predaje dnevnike **redom od vodećeg stabla** (najnoviji
+  HEAD, niže) prema starijima, pa isporuka uređena u grani u kojoj se radi pobjeđuje onu s `main`-a. Necommitani
   unos u dnevniku je vidljiv (čita se disk, ne git-objekt). Isporuka čiji je naslov uređen u drugoj
   grani pojavi se dvaput — poznato, dokumentirano na kartici.
 - **Vodeće stablo** = radno stablo čiji HEAD ima **najnoviji `author_time`**. `io`:
@@ -164,7 +169,8 @@ Ljepljiv skok-izbornik na vrhu (sidra po sekciji). Sadržaj šest bivših pogled
 | 8 | Dokumentacija | ocjena · kašnjenje · ▲ **trend ocjene i signala** · nalazi | `docs`, `get_trend(docs_score, signals_warn, signals_alert)` | `docs.*`, ▲`docs.trend` |
 
 **7 novih `explain` id-eva**, svaki s `what|how|read` u oba jezika (S-027); test pokrivenosti raste
-sam. **Doba dana** računa sat iz `author_time` u **zoni ovog računala** — jezgra ne nosi sat autora, a
+sam. Sekcija **Grane** se prikazuje uvijek — s jednom granom (ili `scope = default`) ima jedan stupac
+i natpis „mjerena samo zadana grana", da se vidi *zašto* je jedan. **Doba dana** računa sat iz `author_time` u **zoni ovog računala** — jezgra ne nosi sat autora, a
 proširenje formata loga bi zastarjelo keš; kartica to kaže. **Trend** postoji tek od dana kad je
 projekt dodan u Sokratis (dnevne snimke, S-014) — kartica to kaže.
 
