@@ -4,8 +4,9 @@
 [product/NALAZI_LEON_2026-09-23.md](../product/NALAZI_LEON_2026-09-23.md) (pitanje po pitanje, odluke
 **S-032…S-037** u [records/DECISIONS.md](../records/DECISIONS.md)) · jedini aktivni spec u `plan/` ·
 **preuzima etapu 3 „izdanje"** iz speca M2 (§13.1, §13.8), koji je istoga dana arhiviran:
-[archive/ARHITEKTURA_M2.md](../archive/ARHITEKTURA_M2.md) · plan cigli: `superpowers/plans/` (piše se
-nakon Leonova pregleda ovog speca).
+[archive/ARHITEKTURA_M2.md](../archive/ARHITEKTURA_M2.md) · plan cigli:
+[superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md](../superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md)
+(T44–T63, napisan 2026-09-24 nakon Leonova pregleda speca).
 
 Što je STVARNO izgrađeno do ovog speca opisuje
 [architecture/ARCHITECTURE.md](../architecture/ARCHITECTURE.md) (verzija `1.0.0-pre.1` u `main`-u);
@@ -80,8 +81,7 @@ danu) · S-015 (projekt = `git-common-dir`, ručni podaci u glavno stablo) · S-
 
 ```rust
 // core/src/model.rs — samo dodaci, ništa se ne preimenuje
-#[serde(rename_all = "snake_case")]
-pub enum BranchScope { AllBranches, DefaultBranch }
+pub enum BranchScope { #[serde(rename = "all")] AllBranches, #[serde(rename = "default")] DefaultBranch }
 struct ReportInput { …, scope: BranchScope, commit_branches: HashMap<String, String> }
 struct CommitRow   { …, branch: String }                     // ime grane (zadana ako nije u karti)
 struct Report      { …, scope: BranchScope, branches: Vec<BranchStats> }
@@ -104,7 +104,9 @@ struct BranchStats { name: String, commits: u32, lines: u64, hours: f64, merged:
 ### 1.3 Profil i CLI
 
 - `profile.json` += `branch_scope: "all" | "default"`, **zadano `"all"`** (dopuna S-005: prvi korisnik
-  radi u granama). Drugi tekst = `ParseError` s imenom polja (kao datumi).
+  radi u granama). Polje je isti enum `BranchScope` kao u `Report` (serde `rename`: `"all"` /
+  `"default"`), pa drugi tekst odbije serde s popisom dopuštenih vrijednosti, kao za `kind` u
+  klasifikatoru — `IoError::Profile` nosi putanju, redak i stupac.
 - CLI: `sokratis report <putanja> --scope all|default` pregazi profil (isti obrazac kao `--since`).
   Tablica dobiva redak „grana/opseg". `signals`/`docs` bez promjene.
 - `branch_scope` ulazi u kanonski JSON profila koji dnevna snimka pamti (`engine.rs::try_snapshot`,
@@ -193,9 +195,11 @@ Težina grafova nije u pravokutnicima nego u **matematici osi** (datumski ticksi
 
 **Komponente** na temeljima (8): `Bars` (grupirani/naslagani, X = datumi ili kategorije) · `Line`
 (više nizova) · `Ring` · `Sparkline` · `Heatmap` (kalendar) · `Gantt` · `HBars` · `Histogram`.
-Postojeće četiri se **prepisuju na temelje** (isti props gdje je moguće, plus osi/legenda). Sve
-komponente imaju test renderiranja (vitest + `@testing-library/svelte` kao dosad) koji tvrdi da su osi
-s datumima u DOM-u.
+Postojeće četiri se **prepisuju na temelje** (isti props gdje je moguće, plus osi/legenda). Sučelje
+nema DOM u vitestu (bez `jsdom`, S-018 obrazac: „komponente se ne testiraju renderiranjem"), pa svaki
+graf dijeli posao na **čistu funkciju rasporeda** (`layout.ts`: iz podataka i okvira u koordinate,
+ticksove i natpise — vitest) i **tanku komponentu** koja te koordinate samo iscrta; datumi na osima
+se dokazuju testom rasporeda, a izgled dimnim testom (CDP snimka orkestratora).
 
 ### 3.4 Dijalog izlaza — `components/ConfirmQuit.svelte`
 
@@ -249,7 +253,7 @@ zaglavlju. Pravilo u `RUST.md`: svaki budući `Command` u `io`/desktopu ide kroz
 | performanse | Sokrat Study: broj git-procesa po izvještaju ≤ 8; trajanje izmjereno u izvještaju cigle | `io/tests/perf.rs` |
 | `bucket.ts` | 10 dana preko prijelaza godine → tjedni ISO, mjeseci; prazno → prazno | vitest |
 | `scales.ts` | raspon 7 dana → dnevni ticksi, 6 mjeseci → mjesečni; HR nazivi mjeseci | vitest |
-| komponente grafova | svaka renderira osi s datumima i legendu; `data-motion="off"` bez animacije | vitest |
+| `layout.ts` (raspored grafova) | svaki graf: iz podataka + okvira → koordinate, ticksovi s datumima, legenda; prazan ulaz → prazan raspored bez NaN | vitest |
 | ploča | 8 sekcija u DOM-u, skok-izbornik, svaki `explain` id postoji u oba rječnika (postojeći test raste sam) | vitest |
 | tok | klik na karticu → `app.view === 'project'`; izbornik zasivljen bez projekta | vitest |
 | `ConfirmQuit` | potvrdi → `quit`; odustani/Esc → ne | vitest |
