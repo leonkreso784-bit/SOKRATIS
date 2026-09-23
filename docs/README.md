@@ -53,6 +53,7 @@ redak u backlogu.
 | Dokument | Svrha |
 |---|---|
 | [PRD.md](./product/PRD.md) | Što gradimo, za koga, opseg po milestoneima, ne-ciljevi, rječnik |
+| [NALAZI_LEON_2026-09-23.md](./product/NALAZI_LEON_2026-09-23.md) | ⚠️ **ULAZ U SLJEDEĆU SESIJU** — Leonovi nalazi nad instaliranom „1.0.0-pre" s provjerenim uzrocima: metrike vide samo `main` (njegov rad u granama nevidljiv od 13. 9.), premalo/nečitki grafovi, X mora zatvoriti + animacija svaki put, konzolni prozor `git`-a (kvar), više projekata, kartica → nadzorna ploča. Traži brainstorming, ne cigle |
 
 ## `plan/` — što sada
 
