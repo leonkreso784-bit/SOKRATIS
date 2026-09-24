@@ -72,17 +72,18 @@ pogrešna uporaba**; `--help`/`--version` = 0) — sve rade nad pravim repozitor
 Sokrat Studyjem).
 Testovi i brane: `docs/workflow/TESTING.md`.
 
-## Stanje — TRENUTNO (2026-09-24 — drugi rez do 1.0.0 odlučen i planiran; izvedba još nije počela)
-- **M0 gotov, M1 zatvoren** (0.1.0); etape 1+2 M2 cjelovite u kodu (svih devet tokova + SUČELJE-2),
-  vrh `main`-a `7462bfd`, verzija u kodu `1.0.0-pre.1`. Leon je nakon instalacije tražio veće promjene
-  (`docs/product/NALAZI_LEON_2026-09-23.md`) → brainstorming dao **drugi rez do 1.0.0**: S-032…S-037.
+## Stanje — TRENUTNO (2026-09-24 — drugi rez do 1.0.0: izvedba sesija 1 gotova, sesija 2 u tijeku)
+- **M0 gotov, M1 zatvoren** (0.1.0); etape 1+2 M2 cjelovite u kodu (svih devet tokova + SUČELJE-2).
+  Leon je nakon instalacije tražio veće promjene (`docs/product/NALAZI_LEON_2026-09-23.md`) →
+  brainstorming dao **drugi rez do 1.0.0**: S-032…S-037.
 - **Aktivan spec `docs/plan/ARHITEKTURA_1_0.md`** (spec M2 arhiviran, `docs/archive/ARHITEKTURA_M2.md`).
   **Aktivan plan `docs/superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md`**: T44–T63, šest tokova
   (DESKTOP-2 · JEZGRA-2 · IO-2 · GRAFOVI · PLOČA · IZDANJE), pet sesija; tok IZDANJE preuzima T35/T43
   iz plana M2 (ostaje u `superpowers/plans/`, nije arhiviran).
+- **Sesija 1 gotova:** DESKTOP-2 (T44–T45) · JEZGRA-2 (T46–T47) · GRAFOVI (T53) spojeni, vrh `main`-a
+  `cedbf20`, verzija u kodu `1.0.0-pre.2`. **Sesija 2 u tijeku:** T48 → T49 · T50 (IO-2) · T54 (PLOČA).
 - **Dva stabla:** `sokratis` (`main`) i `sokratis.rel` (`feat/release`, T35 napola, necommitano, ne
-  dirati do toka IZDANJE); nova sesija ih ne briše. **Sljedeća sesija = izvedba 1:** T44 · T46 · T53,
-  svaka u novom stablu → instalater „1.0.0-pre.2". Tag traži Leonov izričit OK.
+  dirati do toka IZDANJE); nova sesija ih ne briše. Tag traži Leonov izričit OK.
 - Druga verzija (M3) i kasnije: `docs/records/BACKLOG.md`.
 - Brane, brojke i tijek sesija: `PROGRESS.md`; isporuke: `CHANGELOG.md`. Ovaj odjeljak to ne ponavlja.
 

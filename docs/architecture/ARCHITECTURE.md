@@ -18,11 +18,16 @@ odvojena od instalirane · **SUČELJE-2** (T38–T42, spojeno 2026-09-23, merge 
 pogled Postavke** (tema · jezik · autostart · animacije, S-028), **animacije** (S-026: `data-motion`
 gasi ulaz grafova, prijelaz pogleda i kostur učitavanja preko jedne varijable), **kartica s
 objašnjenjem** (S-027: 37 objašnjivih `id`-eva u svih devet pogleda i traci signala) — §1, §11.
-**Time je etapa 2 „izgled" (S-025) cjelovita u kodu**; preostaje T35 (mjerenja, verzija 1.0.0) i etapa
-3 „izdanje" (završna recenzija, krug popravaka, §13.8) — [`../plan/ROADMAP.md`](../plan/ROADMAP.md),
-[`../archive/ARHITEKTURA_M2.md`](../archive/ARHITEKTURA_M2.md) §13.
+**Time je etapa 2 „izgled" (S-025) cjelovita u kodu**; preostaje etapa 3 „izdanje".
+**Drugi rez do 1.0.0** (S-032…S-037, aktivan spec [`../plan/ARHITEKTURA_1_0.md`](../plan/ARHITEKTURA_1_0.md))
+je u izvedbi — sesija 1 (2026-09-24) spojila je tri toka: **DESKTOP-2** (T44–T45: `git_command()`
+jedino mjesto `Command::new("git")` s `CREATE_NO_WINDOW` na Windowsu, kvar 4; X → upit → `quit`, tray
+uklonjen, S-036), **JEZGRA-2** (T46–T47: `BranchScope`, `CommitRow.branch`, `Report.scope`/`branches`
+sa satima po udjelu commita, S-032; `ReportInput.diaries` unija po datum+naslov, S-033) i **GRAFOVI**
+(T53: četiri d3-ovisnosti pinane, `lib/charts/scales.ts`+`bucket.ts`, S-035) — §1, §3, §11. Verzija u
+kodu `1.0.0-pre.2`; sesija 2 nastavlja IO-2 (T48–T50) i PLOČA (T54).
 Što od koda još stoji bez pokrića ili s poznatim rubom je u §11 ·
-**Zadnja provjera:** 2026-09-23
+**Zadnja provjera:** 2026-09-24
 
 > **Što ovaj dokument JEST:** opis sustava kakav stoji u `crates/` i `apps/` — granice između crateova, tok
 > podataka, formati koje čita i ugovori prema korisniku CLI-ja. **Što NIJE:** kronologija (to su
@@ -90,15 +95,15 @@ jezgru/`io`/`store`):
 | `state.rs` | `AppState` (`store`, `reports` — zadnji izračun po projektu, `watcher`, red čekanja `queue`, primatelj događaja `rx`; svih pet iza `Mutex`, jer svaki `invoke` iz sučelja stiže na svojoj niti); `db_path()` (`%LOCALAPPDATA%\sokratis\` + `db_file_name(cfg!(debug_assertions))`, rezerva u privremenu mapu ako profil ne postoji); `db_file_name` (T37, M2/37) — `sokratis-dev.db` u debug gradnji (`tauri dev`), `sokratis.db` u release (instalirana); `text()` — jedino mjesto koje bilo koju grešku (`IoError`, `StoreError`, otrovan `Mutex`) pretvara u tekst za IPC |
 | `cache.rs` | `StoreCache` — JEDINA implementacija `sokratis_io::CommitCache` nad `sokratis-store` (S-013: `io` i dalje ne zna za `store`); zaključava `Mutex<Store>` kratko, po pozivu — pozivatelj (`compute`) NE SMIJE držati bravu preko `Project::input_cached`, std `Mutex` nije reentrantan |
 | `summary.rs` | `ProjectSummary`/`LastCommit` — sažetak jednog projekta za Pregled (S-012: preslagivanje `Report`-a, nikakvo novo mjerenje); zadnji commit je najnoviji po `author_time`, ne zadnji u nizu (`Report.commits` ne jamči poredak) |
-| `commands.rs` | jedanaest `#[tauri::command]` (tablica niže), `Range` (birač raspona), `Settings`, zajednički `compute`/`compute_input` (izračun kroz keš; na `IoError::Cache`/`CacheIncomplete` javi razlog na stderr i ponovi BEZ keša — keš je pogodnost, ne istina, S-014) |
+| `commands.rs` | **dvanaest** `#[tauri::command]` (tablica niže, +`quit` od M2/45), `Range` (birač raspona), `Settings`, zajednički `compute`/`compute_input` (izračun kroz keš; na `IoError::Cache`/`CacheIncomplete` javi razlog na stderr i ponovi BEZ keša — keš je pogodnost, ne istina, S-014) |
 | `engine.rs` | motor osvježavanja (opis niže) |
 | `splash.rs` | `SplashState` — tri `AtomicBool` (animacija gotova, prvi izračun gotov, već prikazano), rezerva od 10 s ako `splash:done` ne stigne |
-| `tray.rs` | tray-izbornik (Otvori · Osvježi sve · Autostart · Izađi), `set_autostart` (plugin PA baza — baza se mijenja SAMO ako plugin uspije) |
-| `lib.rs` | `tauri::Builder` — redoslijed plugina (`single-instance` prvi), `manage(AppState)`, `generate_handler!`, X sakriva SAMO glavni prozor, `setup` (splash naoružan → motor kreće → tray se gradi) |
+| `autostart.rs` (M2/45, S-036) | `set_autostart` — plugin PA baza, tim redom (baza se mijenja SAMO ako plugin uspije); preseljen iz `tray.rs` (uklonjen), jedini pozivatelj je `commands::set_setting` |
+| `lib.rs` | `tauri::Builder` — redoslijed plugina (`single-instance` prvi), `manage(AppState)`, `generate_handler!`; **od M2/45 (S-036) X NE zatvara ni skriva prozor sam** — `on_window_event` zove `api.prevent_close()` pa `window.emit("close_requested", ())` (trait `tauri::Emitter`), sučelje pokaže upit i na potvrdu zove naredbu `quit`; `setup` (splash naoružan → motor kreće, **tray-a više nema**) |
 
-**Motor osvježavanja** (`engine.rs`, S-016 + S-020) — tri izvora istog zahtjeva: watcher nad
-`.git`/docs/`.sokratis` (600 ms odgoda) · naredba (`refresh`/`set_override`/`save_visions`) · tray
-(„Osvježi sve") **svi idu kroz `request_refresh(app, id)`** — JEDAN red čekanja po projektu
+**Motor osvježavanja** (`engine.rs`, S-016 + S-020) — **dva** izvora istog zahtjeva (tray uklonjen
+M2/45, S-036, bio je treći): watcher nad `.git`/docs/`.sokratis` (600 ms odgoda) · naredba
+(`refresh`/`set_override`/`save_visions`) **oba idu kroz `request_refresh(app, id)`** — JEDAN red čekanja po projektu
 (`RefreshQueue`, `sokratis-io`): dok jedan izračun projekta traje, novi zahtjev ZAMJENJUJE čekanje
 umjesto da uđe u red (spec §3.3 t. 3 — naredba i watcher tako nikad ne računaju isti projekt
 istodobno). `refresh_project` zatim: `compute` (UVIJEK `Range::All`, nikad kraći raspon — kraći bi
@@ -120,8 +125,9 @@ prvi redak dokaza).
 | `get_report(id, range: Range)` | `Report` | NE piše u `reports` — to radi SAMO motor |
 | `get_trend(id, metric, range: Range)` | `Vec<TrendPoint>` | `None` granice → `"0000-01-01"`/`"9999-12-31"` |
 | `set_override` / `save_visions` | `()` | potisni watcher PRIJE upisa → piši → ponovno nadziri → `request_refresh` |
-| `refresh(id: Option<i64>)` | `()` | `Some` → jedan projekt kroz `request_refresh`; `None` → `refresh_all` (isti red, jedna petlja i za naredbu i za tray) |
-| `get_settings` / `set_setting(key, value: String)` | `Settings` / `()` | `autostart` ide kroz `tray::set_autostart` (plugin PA baza); ostale postavke ravno u bazu |
+| `refresh(id: Option<i64>)` | `()` | `Some` → jedan projekt kroz `request_refresh`; `None` → `refresh_all` (isti red čekanja, jedna petlja — Topbar je zove bez `id` kad nema odabranog projekta; tray koji je nekoć zvao istu petlju je uklonjen, M2/45) |
+| `get_settings` / `set_setting(key, value: String)` | `Settings` / `()` | `autostart` ide kroz `autostart::set_autostart` (plugin PA baza, M2/45); ostale postavke ravno u bazu |
+| `quit` (M2/45, S-036) | `()` | `app.exit(0)`; jedini pozivatelj je sučelje, na potvrdu upita „Zatvoriti Sokratis?" nakon događaja `close_requested` (X na prozoru) |
 
 `Range` (`#[serde(tag = "preset", rename_all = "snake_case")]`): `{"preset":"all"}` ·
 `{"preset":"7d"}` · `{"preset":"30d"}` · `{"preset":"month"}` ·
@@ -145,10 +151,11 @@ Dokaz da se ljuska stvarno pokreće je **dimni test** (`npm run tauri dev`, ruč
 | `styles/motion.css` | **jedino mjesto pokreta sučelja** (S-026): `--motion-dur: 250ms`, `:root[data-motion="off"]` svodi svaku `animation-`/`transition-duration` na `0s !important`; `lib/motion.ts::motionOff` je čista odluka bez DOM-a, `state.svelte.ts::syncMotion` je upisuje kao `data-motion` na `<html>` — isti obrazac kao `data-theme` |
 | `lib/i18n/` (`hr.json`, `en.json`, `t.ts`, `index.svelte.ts`) | HR/EN rječnik (S-021); `scripts/check-i18n.mjs` brani da oba jezika imaju isti skup ključeva |
 | `lib/format.ts` | jedino mjesto oblikovanja brojki, datuma i postotaka za sučelje |
-| `lib/charts/` (`Bars`, `Line`, `Ring`, `Sparkline`, `scale.ts`) | vlastiti SVG grafovi (S-018), bez biblioteke; ulaze animirano (M2/39, §11 niže) |
+| `lib/charts/` (`Bars`, `Line`, `Ring`, `Sparkline`, `scale.ts`) | vlastiti SVG grafovi (S-018), bez biblioteke; ulaze animirano (M2/39, §11 niže); **od T53 (2026-09-24, S-035, Leonov OK) += `scales.ts`/`bucket.ts`** — d3-matematika za osi (`d3-scale`/`d3-shape`/`d3-array`/`d3-time-format`, UTC datumski ticksi, grupiranje po danu/tjednu/mjesecu), izgled i boje ostaju naši; nitko ih još ne uvozi (`main.js` tree-shaken) |
 | `lib/explain/` (`ids.ts`, `explain.svelte.ts`, `Explainable.svelte`, `ExplainCard.svelte`) | **kartica s objašnjenjem** (S-027, M2/41–42): `EXPLAIN_IDS` (37) + `explainKeys(id)` → ključevi `explain.<id>.what\|how\|read`; `Explainable` je okidač (`<button aria-haspopup="dialog">`), `ExplainCard` (`role="dialog" aria-modal="false"`) prikazuje tekst; test pokrivenosti veže popis na OBA rječnika u oba smjera i na 18 id-eva pokazatelja iz prave snimke jezgre |
 | `splash/` (`Splash.svelte`, `intro.ts`) | animacija pokretanja, 4,2 s, preskočiva (S-019); zaseban Vite-ulaz `splash.html` |
-| `lib/api.ts` | sučelje `Api`; `MockApi` čita insta snapshot jezgre kroz Viteov `?raw` uvoz — dev-prikaz i vitest vide TOČNO brojke koje bi jezgra izračunala, ne ručno prepisanu kopiju (S-010); `TauriApi` (T34) svaku metodu prevodi u `invoke('<naredba>', {…})` prema `commands.rs`, `onReportUpdated`/`onSignalRaised` idu preko `listen()`; `createApi()` bira izvedbu po `'__TAURI_INTERNALS__' in window` |
+| `lib/api.ts` | sučelje `Api`; `MockApi` čita insta snapshot jezgre kroz Viteov `?raw` uvoz — dev-prikaz i vitest vide TOČNO brojke koje bi jezgra izračunala, ne ručno prepisanu kopiju (S-010); `TauriApi` (T34) svaku metodu prevodi u `invoke('<naredba>', {…})` prema `commands.rs`, `onReportUpdated`/`onSignalRaised` idu preko `listen()`; `createApi()` bira izvedbu po `'__TAURI_INTERNALS__' in window`; **od T45 (M2/45, S-036) += `quit()`/`onCloseRequested(cb)`** — `TauriApi` zove naredbu `quit` i sluša događaj `close_requested`, `MockApi` oboje nema-op (preglednik nema proces za ugasiti) |
+| `lib/shell/ConfirmQuit.svelte` (T45, S-036) | upit „Zatvoriti Sokratis?" nakon `close_requested`; `role="dialog" aria-modal="true"`, fokus na „Odustani", Esc = odustani; NE testira se vitestom (nema jsdom-a, isti razlog kao T39/R37) — ponašanje dokazuje dimni test |
 | `lib/types.ts` | TS zrcalo `Report`-a; `tests/types.test.ts` ga veže na isti insta snapshot da se oblik ne razmine s Rustom |
 | `lib/state.svelte.ts` | Svelte 5 rune (`$state`) drže odabrani projekt, raspon, postavke, izvještaj, `epoch` (0 → 1 jednom kad glavni prozor prvi put postane vidljiv, M2/39) |
 | `views/` (**deset** pogleda) + `views/helpers.ts` | Pregled, Tempo, Vrste rada, Pokazatelji, Faze, Dnevnik, Isporuke, Vizije, Dokumentacija — svih devet traže odabran projekt — i **Postavke** (M2/38, S-028): tema · jezik · autostart · animacije, jedini pogled koji NE čita `app.report`, radi i bez projekta; `helpers.ts` drži čiste funkcije testirane odvojeno od komponenata (sortiranje, boja po vrsti/težini, i18n-množina, kopiranje i spajanje putanje, zamjena vizije po indeksu) |
@@ -197,12 +204,19 @@ ga ožiči nad `sokratis-store`, `commands.rs::compute_input` ga zove za svaki i
 (`report_for`) i dalje zove `input_between`, BEZ keša (§11).
 
 **Granica S-002:** jezgra ne zna odakle su podaci došli. Sve što joj treba dolazi u jednoj strukturi
-(`ReportInput`: `git_log` kao tekst, dnevnik i plan kao tekst, docs, grane, ručni podaci, `now`,
-`today`, `since`, `until`, `branch`) i vraća se jedna struktura (`Report`). Zato se jezgra testira bez
-gita, i zato će je Tauri u M2 koristiti bez ijedne izmjene (S-012).
+(`ReportInput`: `git_log` kao tekst, `diaries: Vec<String>` — **od M2/47 (S-033) više od jednog
+teksta**, jedan po radnom stablu od vodećeg prema starijima, bilo `diary: Option<String>` — i plan kao
+tekst, docs, grane, ručni podaci, `now`, `today`, `since`, `until`, `branch`, `scope: BranchScope` i
+`commit_branches: HashMap<String, String>` — **od M2/46 (S-032)**, karta `sha → grana` SAMO za
+commite izvan zadane grane, prazna kad je `scope == DefaultBranch` — te `worktrees: u32`) i vraća se
+jedna struktura (`Report`). Zato se jezgra testira bez gita, i zato će je Tauri u M2 koristiti bez
+ijedne izmjene (S-012).
 
-**Granica S-003:** git se čita **kroz proces**, ne kroz biblioteku. Poziv se gradi bez shella
-(`Command::new("git").arg("-C")…`), pa nema escapinga. Iza traita `GitSource` (osam metoda, jedna
+**Granica S-003:** git se čita **kroz proces**, ne kroz biblioteku. Poziv se gradi bez shella, kroz
+`git_command(repo)` (`git.rs`, M2/44, kvar 4) — **jedino mjesto** koje smije zvati `Command::new("git")`
+(test `command_new_lives_only_inside_git_command` to čuva čitanjem izvora); na Windowsu ista funkcija
+postavlja `CREATE_NO_WINDOW`, jer bi instalirana aplikacija (`windows_subsystem = "windows"`) inače
+bljesnula konzolu `git.exe` pri svakom osvježenju. Iza traita `GitSource` (osam metoda, jedna
 implementacija `GitCli`) stoji mjesto na koje kasnije može ući `gix` bez dizanja jezgre.
 
 ## 2 · Tok podataka
@@ -256,9 +270,22 @@ postoji kao referenca (repo nakon `git init`, bez commita), `io` vraća `IoError
 
 ## 3 · Što `Report` nosi
 
-`core/src/model.rs`. Petnaest polja: `generated_at` · `since` · `until` · `branch` · `touched` ·
-`days` · `kinds` · `commits` · `deliveries` · `indicators` · `phases` · `visions` · `vision_totals` ·
-`docs` (`null` kad projekt nema mapu s dokumentacijom — nula bi bila laž) · `signals`.
+`core/src/model.rs`. Sedamnaest polja (**M2/46** dodala `scope`, `branches`): `generated_at` ·
+`since` · `until` · `branch` · `scope` · `touched` · `days` · `kinds` · `branches` · `commits` ·
+`deliveries` · `indicators` · `phases` · `visions` · `vision_totals` · `docs` (`null` kad projekt
+nema mapu s dokumentacijom — nula bi bila laž) · `signals`.
+
+**Grane (M2/46, S-032, spec 1.0.0):** `scope: BranchScope` (`"all"`/`"default"`, `#[serde(rename)]`
+na varijanti; zadano `AllBranches` kroz `#[default]`) kaže koje je grane `io` obišao pri mjerenju;
+`branches: Vec<BranchStats>` je sekcija Grane — jedan redak po grani (`name`, `commits`, `lines`,
+`hours`, `merged`), zadana grana prva, sortirano po broju commita silazno pa po imenu; `hours` su
+sati DANA (`DayStats.hours`) podijeljeni po udjelu commita te grane tog dana — **proxy**, zbroj po
+granama je jednak ukupnim satima (`metrics::branch_stats`). `CommitRow.branch` (zadnje polje u
+strukturi, dodatak na kraju — S-022, snapshot-diff ostaje malen) bilježi granu na koju je commit
+dospio; commit koji nije u `ReportInput.commit_branches` dobiva zadanu granu. **`io` danas i dalje
+šalje `scope: DefaultBranch` i praznu kartu grana** (privremeno, dok IO-2 T49 ne stigne) — mjerenje je
+zato u `1.0.0-pre.2` još uvijek samo nad zadanom granom, iako je ugovor prema sučelju spreman.
+**CLI-tablica (`table.rs`) `scope`/`branches` ne ispisuje** (dolazi s T51).
 
 **Tri polja koja je `M2/1a` deklarirala prazna sad jezgra puni** (M2/4, M2/5) — deklarirana su prije
 potrošača da sučelje i snapshot ugovora (S-022) ne mijenjaju oblik svakom ciglom:
@@ -297,6 +324,8 @@ ove tipove i imaju teste, ali ih ništa u `main`-u ne zove (§11); obavijest na 
 | `lines` | Σ `added + deleted` po svim izmjenama datoteka | |
 | `files` | **broj izmjena datoteka kroz commite**, ne broj različitih datoteka | datoteka dirnuta u 10 commita doda 10 |
 | `skipped_lines` | redaka `numstat`-a koje parser nije razumio | preskočeno se broji, nikad tiho ne ispari |
+| `worktrees` (M2/47, S-033) | broj radnih stabala koje je `io` obišao | danas uvijek `1` dok IO-2 (T50) ne doda ostala |
+| `diaries` (M2/47, S-033) | broj tekstova dnevnika koje je `parse_diaries` unirao (dužina `ReportInput.diaries`) | danas uvijek `1`, isti razlog |
 
 ## 4 · Profil projekta — sva polja i zadane vrijednosti
 
@@ -528,6 +557,10 @@ preuzeo M2 u [`../archive/ARHITEKTURA_M2.md`](../archive/ARHITEKTURA_M2.md) §8 
 - **`Report.commits`/`deliveries`/`vision_totals`** postoje u JSON-u, ali `cli/src/table.rs` ih ne
   ispisuje — redak po commitu (uz `classify_sub`, sad `CommitRow.sub`), redak po isporuci i zbroj
   vizija po stanju čekaju pogled Dnevnik/Isporuke/Vizije u sučelju M2.
+- **`Report.scope`/`branches` (M2/46, S-032) isto postoje u JSON-u bez CLI-ispisa** (T51) — i `io`
+  danas puni `scope`/`commit_branches`/`diaries` PRIVREMENO (`scope: DefaultBranch`, prazna karta,
+  jedan tekst dnevnika), dok IO-2 (T49/T50) ne stigne, pa je mjerenje u `1.0.0-pre.2` i dalje samo nad
+  zadanom granom — puni ugovor je u §3.
 
 **Rubovi koje kod danas ne pokriva:**
 
@@ -606,20 +639,18 @@ i dalje ne radi ili nije provjereno:**
 
 - **Klik na obavijest OS-a ne otvara projekt** (spec §5.3) — `tauri-plugin-notification` na Windowsu
   nema povratni poziv za klik; obavijest samo javlja, ne vodi nikamo (Ruling R7, dopuna T30).
-- **Rub autostarta (Ruling R12, T32):** ako `tauri-plugin-autostart` uspije registrirati OS, a upis u
-  bazu padne (otrovana brava, SQLite), kvačica u trayu se vrati na staro dok baza kaže suprotno od
-  OS-a — OS je stvarno promijenjen, baza i kvačica privremeno lažu dok korisnik ponovno ne klikne
-  (ponovni klik je idempotentan i popravlja stanje). Lijek (`is_enabled()` iz plugina kao izvor
-  istine za kvačicu i `get_settings`) čeka krug popravaka S5.
-- **Natpisi tray-izbornika se ne mijenjaju s jezikom dok se proces ne ponovno pokrene** — grade se
-  JEDNOM pri pokretanju (`tray.rs`, konstante `HR`/`EN`), za razliku od Svelte-sučelja koje jezik
-  mijenja odmah.
+- **Rub autostarta (Ruling R12, T32; `tray.rs` uklonjen M2/45, prekidač je od tad u pogledu
+  Postavke):** ako `tauri-plugin-autostart` uspije registrirati OS, a upis u bazu padne (otrovana
+  brava, SQLite), prekidač se vrati na staro dok baza kaže suprotno od OS-a — OS je stvarno
+  promijenjen, baza i prekidač privremeno lažu dok korisnik ponovno ne klikne (ponovni klik je
+  idempotentan i popravlja stanje). Lijek (`is_enabled()` iz plugina kao izvor istine za prekidač i
+  `get_settings`) čeka krug popravaka S5.
 - **Druga instanca otvori bazu prije nego što je `single-instance` stigne odbiti** — `Store::open` je
   u `.manage(...)`, koji se zove PRIJE `.run()`; bezopasno (SQLite `open` + idempotentne migracije),
   ali znači da i odbijeni proces načas dirne datoteku baze.
 - **`project_worktree.branch` se puni praznim tekstom** — `io::Project::git::worktrees()` daje samo
   putanje radnih stabala, ne granu svakog; sučelje danas crta samo BROJ stabala, pa je prazan tekst
   bez posljedice (Ruling R6).
-- **Ručna lista sa dimnog testa S3 čeka instaliranu „1.0.0-pre"** ([`TESTING.md`](../workflow/TESTING.md)
-  §5): tray-ikona na 100 %/200 %, autostart ↔ `HKCU\…\Run`, obavijest na prijelaz u Alert, preskok
-  splasha, `prefers-reduced-motion`, osvježenje bez klika sa štopericom, četiri teme.
+- **Ručna lista za Leona** ([`TESTING.md`](../workflow/TESTING.md) §5, popis se ne ponavlja ovdje —
+  S-010): autostart ↔ `HKCU\…\Run`, obavijest na prijelaz u Alert, preskok splasha,
+  `prefers-reduced-motion`, osvježenje bez klika sa štopericom, četiri teme.

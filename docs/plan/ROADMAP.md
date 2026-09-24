@@ -26,18 +26,24 @@ IO-2 (`--branches`, stabla, dnevnik po stablima, CLI) · GRAFOVI (d3-temelji + 8
 `superpowers/plans/` jer te cigle još vrijede) — pet sesija, instalater „1.0.0-pre.N" nakon svake
 (izlazni uvjet §8 speca).
 
-**Na disku dva stabla:** `sokratis` (`main`, vrh `7462bfd`) i `sokratis.rel` (`feat/release`, T35
-napola — pet datoteka necommitano, bez izvještaja) — parkirano do toka IZDANJE, nova sesija ga ne
-dira ni ne briše. **Sljedeća sesija je izvedba sesija 1:** T44 (DESKTOP-2) · T46 (JEZGRA-2) · T53
-(GRAFOVI), svaka u novom radnom stablu; na kraju instalater „1.0.0-pre.2". Tijek sesija:
-`records/PROGRESS.md`.
+**Izvedba sesija 1 je gotova (2026-09-24):** DESKTOP-2 (T44–T45) · JEZGRA-2 (T46–T47) · GRAFOVI (T53)
+spojeni u `main`, vrh `cedbf20`; verzija u kodu je bumpana na `1.0.0-pre.2` (`cb62454`), instalater se
+gradi. Brojke i sadržaj svake cigle: `records/CHANGELOG.md`; tijek i rulinzi sesije:
+`records/PROGRESS.md`. **Sesija 2 je u tijeku:** T48 → T49 · T50 (IO-2) · T54 (PLOČA), pa instalater
+„1.0.0-pre.3".
+
+**Na disku dva stabla:** `sokratis` (`main`, vrh `cedbf20`/`cb62454`) i `sokratis.rel`
+(`feat/release`, T35 napola — pet datoteka necommitano, bez izvještaja) — parkirano do toka IZDANJE,
+nova sesija ga ne dira ni ne briše. Stabla sesije 1 (`sokratis.desktop2`, `sokratis.jezgra2`,
+`sokratis.grafovi`) su obrisana nakon provjere da su potpuno spojena.
 
 **M0 gotov. M1 je zatvoren** (0.1.0, T1–T22, paritet s `RAD.xlsx` je test); repozitorij je od
 2026-09-20 javan na GitHubu (`records/DECISIONS.md` S-023). **Spec M2**
 ([archive/ARHITEKTURA_M2.md](../archive/ARHITEKTURA_M2.md)) je iz brainstorminga 2026-09-18
 (S-012…S-022) i rez za 1.0.0 od 2026-09-21 (S-024…S-031); svih devet tokova (KOSTUR · JEZGRA · PROFIL
 · STORE · IO · CLI · SUČELJE · DESKTOP · INTEGRACIJA) + SUČELJE-2 (T38–T42: Postavke, animacije,
-kartica s objašnjenjem) su spojena u `main`, verzija u kodu `1.0.0-pre.1`. Puna povijest svake spojene
+kartica s objašnjenjem) su spojena u `main`; drugi rez do 1.0.0 (S-032…S-037) dodao je sesiju 1
+(DESKTOP-2, JEZGRA-2, GRAFOVI) — verzija u kodu je sad `1.0.0-pre.2`. Puna povijest svake spojene
 sesije (merge-hashevi, brojke testova, nalazi recenzije) je u `records/PROGRESS.md`; što je izgrađeno
 danas opisuje `architecture/ARCHITECTURE.md` §11.
 
@@ -50,7 +56,7 @@ prvi rez nastao: [archive/PLAN_DESIGNE.md](../archive/PLAN_DESIGNE.md) (ispunjen
 |---|---|---|---|---|
 | **M0** | **Toolchain** | Visual Studio Build Tools (workload „Desktop development with C++") · rustup s MSVC targetom · `cargo --version` · workspace koji se builda | …pokrenuti `cargo test` u ovom folderu i dobiti zeleno na praznom testu | ✅ gotovo (2026-09-17) |
 | **M1** | **Jezgra + CLI** | `core` · `io` (git-proces, profil, ručni podaci) · `cli` · paritet s `RAD.xlsx` · ispravak sati · docs-ocjena · signali `unmerged-branches` i `docs-lag` | …nad Sokrat Studyjem iz terminala dobiti iste brojke kao u tablici, ispravne sate, ocjenu docs-a i dva signala s dokazom; staviti `sokratis signals` u preflight | ✅ **zatvoren 2026-09-18** (0.1.0, T1–T22 + krug popravaka u `main`; grane i stabla tokova obrisani uz Leonov OK) |
-| **M2** | **Desktop — verzija 1.0.0** | Tauri 2 · Svelte 5 · tokeni Sokrat Studyja (4 teme, `brand-*` iz loga) · `sokratis-store` (SQLite: registar · snimke · keš) · watcher · tray · autostart · obavijesti · 8 pogleda s uređivanjem + Postavke · HR/EN · znak i animacija pokretanja · **dopuna rezom 2026-09-21:** animacije grafova i pogleda · kartica s objašnjenjem · instalater za Leona · repo bez konvencija · dokumentacija točna i manja — sve u [ARHITEKTURA_M2.md](../archive/ARHITEKTURA_M2.md) (§11 + §13, ✅ ispunjen, arhiviran) | …instalirati Sokratis, vidjeti animaciju, Pregled sa Sokrat Studyjem (pet stabala = jedan projekt) i Sokratisom, sve poglede s brojkama istim kao CLI, osvježenje bez klika, obavijest na Alert iz traya, objašnjenje svake brojke na klik — i prestati otvarati `RAD.xlsx` | 🟨 **u izvedbi (drugi rez)** — etape 1 „funkcija" i 2 „izgled" gotove u kodu: u `main`-u svih devet tokova M2 + SUČELJE-2 (T38–T42). Leonovi nalazi nad instaliranom 1.0.0-pre pokrenuli drugi rez (S-032…S-037, [ARHITEKTURA_1_0.md](./ARHITEKTURA_1_0.md)): stara etapa 3 „izdanje" (T35, T43) seli na kraj novog plana [T44–T63](../superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md); **1.0.0 izlazi tek nakon T44–T63**, pet sesija, prva sljedeća |
+| **M2** | **Desktop — verzija 1.0.0** | Tauri 2 · Svelte 5 · tokeni Sokrat Studyja (4 teme, `brand-*` iz loga) · `sokratis-store` (SQLite: registar · snimke · keš) · watcher · autostart · obavijesti · 8 pogleda s uređivanjem + Postavke · HR/EN · znak i animacija pokretanja · **dopuna rezom 2026-09-21:** animacije grafova i pogleda · kartica s objašnjenjem · instalater za Leona · repo bez konvencija · dokumentacija točna i manja — sve u [ARHITEKTURA_M2.md](../archive/ARHITEKTURA_M2.md) (§11 + §13, ✅ ispunjen, arhiviran; **tray iz tog speca uklonjen drugim rezom, S-036**) | …instalirati Sokratis, vidjeti animaciju, Pregled sa Sokrat Studyjem (pet stabala = jedan projekt) i Sokratisom, sve poglede s brojkama istim kao CLI, osvježenje bez klika, obavijest OS-a na Alert, objašnjenje svake brojke na klik — i prestati otvarati `RAD.xlsx` | 🟨 **u izvedbi (drugi rez)** — etape 1 „funkcija" i 2 „izgled" gotove u kodu: u `main`-u svih devet tokova M2 + SUČELJE-2 (T38–T42). Leonovi nalazi nad instaliranom 1.0.0-pre pokrenuli drugi rez (S-032…S-037, [ARHITEKTURA_1_0.md](./ARHITEKTURA_1_0.md)): stara etapa 3 „izdanje" (T35, T43) seli na kraj novog plana [T44–T63](../superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md), pet sesija. **Sesija 1 gotova** (T44–T45, T46–T47, T53 u `main`-u, verzija `1.0.0-pre.2`); sesija 2 u tijeku (T48–T50, T54); **1.0.0 izlazi tek nakon T44–T63** |
 | **M3** | **Druga verzija** | iz stvarne uporabe 1.0.0: ocjena projekta F−…A+ · omjer popravaka i nova statistika · Postavke s vlastitim dodacima · kartica s dokazom · punjenje trenda iz povijesti · izvoz · izgled u iOS stilu — popis u [BACKLOG.md](../records/BACKLOG.md), spec se piše kad 1.0.0 bude u uporabi | …(određuje spec M3) | 📋 planirano |
 | **M4** | **Objava** | ostala pravila · profil za tuđe projekte · potpisan instalater · licenca · GitHub Actions; kasnije zasebnim planom: timovi · ne samo git | …instalirati Sokratis s GitHuba na čist stroj i priključiti tuđi repo | 📋 planirano |
 

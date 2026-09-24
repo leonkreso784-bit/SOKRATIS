@@ -1,7 +1,8 @@
 # Progress Log — Sokratis
 
-Dnevnik rada. Najnoviji unos na vrhu. Svaka sesija: što je napravljeno, što je provjereno, što
-slijedi. **Format naslova je ugovor:** `## YYYY-MM-DD (MODEL) — naslov` — Sokratis ga sam parsira
+Dnevnik rada. **Kronološki, najstariji unos na vrhu, najnoviji na dnu** — svaka nova sesija se
+dopisuje na kraj datoteke. Svaka sesija: što je napravljeno, što je provjereno, što slijedi.
+**Format naslova je ugovor:** `## YYYY-MM-DD (MODEL) — naslov` — Sokratis ga sam parsira
 (dogfooding), pa se ne mijenja bez promjene zadanog profila.
 
 ---
@@ -1042,3 +1043,58 @@ sesiji nije dirao, samo `.md`.
 **Sljedeća sesija je izvedba sesija 1** po planu 1.0.0: T44 (DESKTOP-2 — konzola, X) · T46 (JEZGRA-2 —
 model grana i sati po udjelu) · T53 (GRAFOVI — ovisnosti i temelji), svaka u novom radnom stablu; na
 kraju instalater „1.0.0-pre.2".
+
+## 2026-09-24 (FABLE) — IZVEDBA sesija 1 drugog reza 1.0.0: DESKTOP-2 · JEZGRA-2 · GRAFOVI spojeni, instalater pre.2 u pripremi
+
+**Šesta sesija, prva izvedbena drugog reza.** Tri stabla usporedno (`sokratis.desktop2`/`feat/desktop-2`
+· `sokratis.jezgra2`/`feat/core-branches` · `sokratis.grafovi`/`feat/charts`, sve iz `f694c9d`),
+spojena serijski DESKTOP-2 → JEZGRA-2 → GRAFOVI, pune brane na `main`-u i push nakon svakog spajanja.
+Brojke, snapshot-promjene i sadržaj svake cigle: [`CHANGELOG.md`](./CHANGELOG.md) `[Unreleased]`
+(S-010, ne ponavlja se ovdje).
+
+- **DESKTOP-2 → `main` `d949163`** (T44 `755209e` + T45 `48107a5` + `6838c0c`): `git_command()` jedino
+  mjesto `Command::new("git")`, `CREATE_NO_WINDOW` na Windowsu (kvar 4); X → upit → izlaz, tray i
+  `tray.rs` uklonjeni (S-036), `autostart.rs` izdvojen.
+- **JEZGRA-2 → `main` `9204512`** (T46 `4d9da70` + T47 `4ca1a0d`): `BranchScope`, `CommitRow.branch`,
+  `Report.scope`/`branches`, sati po udjelu commita (S-032); `ReportInput.diaries` unija po
+  datum+naslov (S-033); snapshot NAMJERNO promijenjen.
+- **GRAFOVI → `main` `cedbf20`** (T53 `910b7b6`): četiri d3-ovisnosti pinane (S-035, Leonov OK),
+  `scales.ts` + `bucket.ts` — matematika osi, ništa se još ne uvozi (main.js nepromijenjen).
+- **Bump verzije `1.0.0-pre.2`** (`cb62454`, S-037): `Cargo.toml` je izvor, `package.json` i lockovi
+  zrcale samo redak verzije; instalater se gradi u pozadini ove sesije (ledger, ne ovdje).
+
+**Rulinzi (puni tekst i obrazloženje: `.superpowers/sdd/2026-09-18-m2-desktop/progress.md`, sesija
+„IZVEDBE 1"):** R38 test T44 čita izvor s `concat!`-iglom umjesto brifova teksta (koji bi brojao sam
+sebe) · R39 `ConfirmQuit` bez vitest render-testa (nema jsdom-a, R37) — ponašanje dokazuje dimni test
+· R40/R44/R46 JEZGRA-2 smjela dirati redce konstrukcije u tuđem vlasništvu
+(`apps/desktop/tests/{helpers,tauri-api}.test.ts`, `io/tests/project.rs`) da `main` ne bude crven
+između spajanja · R41 `yTicks` dobiva `Math.min(count, niceMax)` da os s brojem commita/isporuka nema
+razlomljene ticksove · R42 testovi `bucket.test.ts` grade `CommitRow` kroz base-objekt + spread, da
+svelte-check prođe i prije i poslije T46 · R45 nazivi mjeseci/dana ostaju u `scales.ts` (spec §3.3
+traži `timeFormatLocale`), prefiks „tj./wk" seli u i18n tek u T61 kad ga T55 prvi put prikaže na osi ·
+R47 prošla sesija zatvorena bez dimnog testa/instalatera/čuvara na Leonov izričit zahtjev („stani kad
+završiš fazu") — taj dug je ova sesija odradila prije nastavka na T48+.
+
+**Odstupanja od plana:** planov test za T44 bi brojao `Command::new(` i u vlastitom tekstu i u
+zaglavlju datoteke (nikad ne bi prošao) → zamijenjen testom koji čita izvor s iglom sastavljenom u
+runtimeu i broji samo retke koji nisu komentar (R38). `@types/d3-shape` je na npm-u **3.2.0**, ne
+3.1.7 iz plana (plan sam predviđa da npm prevladava). Dva reda konstrukcije izvan brifova vlasništva
+(`helpers.test.ts`, `tauri-api.test.ts`, `io/tests/project.rs`) prihvaćena kao iznimka istog duha kao
+raniji R36 — bez njih bi `main` bio crven između spajanja tokova.
+
+**Dimni test DESKTOP-2** (`tauri dev --config identifier=dev.sokratis.app.dev`, `LOCALAPPDATA` u
+scratchpad, CDP nad vlastitim webviewom): WM_CLOSE → dijalog „Zatvoriti Sokratis?" s fokusom na
+„Odustani"; Esc i klik „Odustani" ostavljaju prozor i proces živ; klik „Zatvori" → proces nestao za
+**250 ms**, instalirana pre.1 netaknuta. Ponovno pokretanje nakon izlaza → splash pa glavni prozor
+≈ 5,7 s kasnije, dakle **animacija pri svakom pokretanju** (S-019 kroz S-036: nov proces). „Osvježenje
+bez bljeska konzole" se ne da izmjeriti u `tauri dev` (debug build dijeli konzolu s roditeljem) — dokaz
+ostaje test izvora (T44) i Leonova ručna provjera na instaliranoj verziji.
+
+**Stabla `sokratis.desktop2`, `sokratis.jezgra2`, `sokratis.grafovi` i njihove grane obrisani** nakon
+provjere (`--merged main` + `merge-base --is-ancestor`, nijedna nije bila pushana zasebno). **Na disku
+ostaju dva stabla:** `sokratis` (`main`, vrh `cedbf20` prije bumpa, `cb62454` poslije) i `sokratis.rel`
+(`feat/release`, T35 napola, necommitano) — i dalje se ne dira dok tok IZDANJE ne dođe na red.
+
+### Što slijedi
+**Dug preuzet iz prošle sesije je odrađen** (dimni test, instalater pre.2, ovaj zapis). Sljedeće u
+istom nizu sesija: T48 → T49 · T50 · T54 (IO-2, PLOČA), pa instalater „1.0.0-pre.3".

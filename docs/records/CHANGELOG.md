@@ -6,11 +6,13 @@ Isporuka = ono što je u `main`-u; sesije su u `PROGRESS.md`.
 ## [Unreleased] — rad u tijeku
 
 **Milestone 2 (desktop) je u izvedbi** po odobrenom specu
-[`../archive/ARHITEKTURA_M2.md`](../archive/ARHITEKTURA_M2.md) (odluke S-012…S-022) i planu od 35 cigli.
+[`../archive/ARHITEKTURA_M2.md`](../archive/ARHITEKTURA_M2.md) (odluke S-012…S-022) i planu od 35 cigli;
+**drugi rez do 1.0.0** (S-032…S-037) nastavlja po
+[`../plan/ARHITEKTURA_1_0.md`](../plan/ARHITEKTURA_1_0.md).
 **Ovaj odjeljak izlazi kao 1.0.0, ne 0.2.0** (S-024; rez i dopuna speca §13 od 2026-09-21).
-**Na disku je `main` verzije `1.0.0-pre.1`** (jedan izvor: `[workspace.package]` u korijenskom
-`Cargo.toml`, M2/37) — netagirano, neobjavljeno; tag traži Leonov izričit OK na kraju etape izdanja
-(S-025). Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek sesije:
+**Na disku je `main` verzije `1.0.0-pre.2`** (jedan izvor: `[workspace.package]` u korijenskom
+`Cargo.toml`, M2/37, S-037) — netagirano, neobjavljeno; tag traži Leonov izričit OK na kraju etape
+izdanja (S-025). Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek sesije:
 [`PROGRESS.md`](./PROGRESS.md).
 
 - **`M2/1a` — kostur M2 (2026-09-18).** Korisnik CLI-ja **ne vidi ništa novo**: nema nove naredbe ni
@@ -237,6 +239,46 @@ Isporuka = ono što je u `main`-u; sesije su u `PROGRESS.md`.
   i18n **283** ključa hr=en, bilo 162 · kontrast 4/4 · **vitest 93**, 13 datoteka, bilo 82) ·
   `npm run build` OK (main.js 208,57 kB / gzip 53,66) · `sokratis docs .` 100/100 · `signals .` nema
   signala. Time je **etapa 2 „izgled" (S-025) cjelovita u kodu** — preostaje etapa 3 „izdanje" (S5).
+- **`M2/44`–`M2/45` — konzola bez bljeska, X = upit → izlaz, tray uklonjen (2026-09-24, DESKTOP-2,
+  S-036).** Korisnik desktop aplikacije više ne vidi bljesak konzole `git.exe` pri svakom osvježenju
+  (kvar 4 iz Leonovih nalaza) — svaki poziv gita sad ide kroz jedino mjesto `git_command()`, koje na
+  Windowsu postavlja `CREATE_NO_WINDOW`. X na prozoru više ne zatvara aplikaciju izravno: pokazuje upit
+  „Zatvoriti Sokratis? Nadzor projekata i obavijesti staju dok ga ponovno ne pokreneš." s dva izbora
+  (fokus na „Odustani", Esc = odustani); potvrda zove novu naredbu `quit`. **Tray-izbornik i
+  tray-ikona su uklonjeni** (nema više „Osvježi sve"/kvačice za autostart u trayu) — autostart ostaje
+  postavka u pogledu Postavke, funkcija seli u vlastitu datoteku `autostart.rs`. Svako pokretanje
+  (uklj. iz autostarta) je otad nov proces, pa se animacija pokretanja prikazuje **svaki put**, ne samo
+  prvi. Poznato ograničenje: „osvježenje bez bljeska konzole" se ne da izmjeriti u `tauri dev` (debug
+  build dijeli konzolu s roditeljem) — dokaz je test koji čita izvor + Leonova ručna provjera na
+  instaliranoj verziji.
+- **`M2/46`–`M2/47` — metrike po grani, dnevnik kao unija stabala (2026-09-24, JEZGRA-2, S-032,
+  S-033).** `Report` dobiva dva nova polja: `scope` (`"all"`/`"default"`, koje su grane ušle u
+  mjerenje) i `branches[]` (redak po grani: commiti, redci, sati po udjelu commita tog dana — proxy,
+  zbroj po granama je jednak ukupnom — i je li spojena); `commits[].branch` bilježi na koju je granu
+  commit dospio. CLI-tablica ih još ne ispisuje (dolazi s T51). Jezgra sad zna unirati dnevnik iz
+  **više** radnih stabala (`ReportInput.diaries`, bilo `diary`): unija po (datum, naslov), prvi viđeni
+  (vodeće stablo) pobjeđuje; `touched` dobiva `worktrees`/`diaries`. **`io` danas i dalje šalje samo
+  jedan tekst dnevnika i praznu kartu grana** (privremeno, dok IO-2 ne stigne T49/T50) — mjerenje je
+  zato u `1.0.0-pre.2` i dalje samo nad zadanom granom, iako je ugovor prema sučelju već spreman.
+  **SNAPSHOT NAMJERNO PROMIJENJEN** (S-022): `+scope: "default"`, `+branches` (main 190 commita /
+  70164 redaka / 85,0 h / spojena), `+branch: "main"` u svih 190 redaka commita, `+touched.worktrees:
+  1`, `+touched.diaries: 1`; sva ostala polja snimke ostaju jednaka.
+- **`M2/53` — temelji grafova: d3-matematika, naš SVG (2026-09-24, GRAFOVI, S-035, Leonov OK).**
+  Korisnik i dalje ne vidi ništa novo (nitko još ne uvozi ove datoteke, `main.js` nepromijenjen,
+  tree-shaken) — priprema: četiri nove, pinane npm-ovisnosti (`d3-scale` · `d3-shape` · `d3-array` ·
+  `d3-time-format` + `@types`) i dvije nove datoteke, `lib/charts/scales.ts` (UTC datumski ticksi,
+  HR/EN nazivi mjeseci/dana) i `lib/charts/bucket.ts` (grupiranje po danu/tjednu/mjesecu, doba dana) —
+  matematika osi dolazi iz d3, izgled i boje ostaju naši (S-018 dopunjena, ne poništena).
+- **Bump verzije `1.0.0-pre.2` (2026-09-24, S-037).** Instalater nakon prve izvedbene sesije drugog
+  reza (T44–T47, T53); `Cargo.toml` je izvor broja verzije, `package.json`/lockovi ga zrcale (samo
+  redak verzije, bez `npm install`).
+  Brane nakon sve tri spojene cigle (`d949163` → `9204512` → `cedbf20`): `cargo fmt --check` OK ·
+  `cargo clippy --workspace --all-targets -- -D warnings` OK · `cargo test --workspace` **0 padova, 1
+  ignoriran** (`sokratis-core`: **63** unit + `tests/branches.rs` **4** + `tests/diary_union.rs`
+  **2** + `tests/parity.rs` **1** + `tests/snapshot.rs` **1**; `io`/`store`/`cli`/`desktop` zeleni) ·
+  `npm run check` (svelte-check **0** · `check:i18n` **287** ključa hr=en, bilo 283 · kontrast 4/4 ·
+  **vitest 109**, **15** datoteka, bilo 93) · `npm run build` `main.js` **215,01 kB** / gzip **54,22
+  kB** · `sokratis docs .` 100/100 · `signals .` nema signala.
 
 ## [0.1.0] — 2026-09-17 — Jezgra i CLI (Milestone 1)
 
