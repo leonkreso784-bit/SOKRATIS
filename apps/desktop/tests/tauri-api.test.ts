@@ -132,6 +132,31 @@ describe('TauriApi — ugovor prema commands.rs', () => {
     expect(received).toEqual({ project_id: 5, rule: 'unmerged-branches', severity: 'alert' });
   });
 
+  it('quit zove naredbu quit bez argumenata', async () => {
+    invokeMock.mockResolvedValue(undefined);
+    const t = new TauriApi();
+    await t.quit();
+    expect(invokeMock).toHaveBeenCalledWith('quit');
+  });
+
+  it('onCloseRequested sluša događaj close_requested i odjavljuje se', async () => {
+    const unlisten = vi.fn();
+    listenMock.mockResolvedValue(unlisten as unknown as UnlistenFn);
+    const t = new TauriApi();
+    const cb = vi.fn();
+    const off = t.onCloseRequested(cb);
+    expect(listenMock).toHaveBeenCalledWith('close_requested', expect.any(Function));
+    // `expect(...).toHaveBeenCalledWith` iznad već jamči da poziv postoji; `?? []` samo čuva
+    // `noUncheckedIndexedAccess` bez izjave da drugi argument sigurno postoji (isti obrazac kao
+    // `splash/intro.ts`).
+    const handler = (listenMock.mock.calls[0] ?? [])[1] as (e: { payload: null }) => void;
+    handler({ payload: null });
+    expect(cb).toHaveBeenCalledTimes(1);
+    off();
+    await Promise.resolve();
+    expect(unlisten).toHaveBeenCalledTimes(1);
+  });
+
   it('odjava pozvana PRIJE nego se listen razriješi svejedno otkaže pretplatu', async () => {
     const fakeUnlisten = vi.fn();
     let resolveListen!: (fn: UnlistenFn) => void;

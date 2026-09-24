@@ -49,6 +49,9 @@ export interface Api {
   setSetting<K extends keyof Settings>(key: K, value: Settings[K]): Promise<void>;
   onReportUpdated(cb: (id: number) => void): () => void;
   onSignalRaised(cb: (e: { project_id: number; rule: string; severity: Severity }) => void): () => void;
+  /** X na prozoru (S-036): Rust `prevent_close` + `close_requested` → sučelje pita → `quit()` gasi proces. */
+  quit(): Promise<void>;
+  onCloseRequested(cb: () => void): () => void;
 }
 
 const MOCK_PROJECT_ID = 1;
@@ -186,6 +189,14 @@ export class MockApi implements Api {
     return () => {};
   }
 
+  async quit(): Promise<void> {
+    /* preglednik: nema procesa za ugasiti */
+  }
+
+  onCloseRequested(_cb: () => void): () => void {
+    return () => {};
+  }
+
   // ── pomoćne metode — rastavljaju brifov zgusnuti zapis u čitljive korake, ponašanje isto ──
 
   private commitsWithOverrides(): CommitRow[] {
@@ -313,6 +324,15 @@ export class TauriApi implements Api {
     const pending = listen<{ project_id: number; rule: string; severity: Severity }>('signal_raised', (e) =>
       cb(e.payload),
     );
+    return deferredUnlisten(pending);
+  }
+
+  async quit(): Promise<void> {
+    await invoke<void>('quit');
+  }
+
+  onCloseRequested(cb: () => void): () => void {
+    const pending = listen<null>('close_requested', () => cb());
     return deferredUnlisten(pending);
   }
 }
