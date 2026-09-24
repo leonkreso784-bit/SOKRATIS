@@ -14,8 +14,14 @@
 //! provjerava PRIJE svih uključivih pravila, pa jedan pogodak u `test_path_exclude` presiječe
 //! ostatak funkcije bez ugniježđenih `if`. Zadano `[]` znači da `.any()` nad praznim vektorom vrati
 //! `false` i stara staza ostane netaknuta — paritet je zaštićen samim tipom, ne posebnim testom.
+//!
+//! ZAŠTO RUST OVAKO (cigla M2/48 — `branch_scope`)
+//! `BranchScope` (definiran u `model.rs`, dijeljen s `Report.scope`) je `enum` s `#[serde(rename)]`
+//! na svakoj varijanti: nepoznata vrijednost u JSON-u ("worktrees") sama padne s porukom koja
+//! nabraja dopuštene nazive ("all", "default") — bez ručne `validate_*` funkcije, jer to serde već
+//! radi bolje nego string-usporedba koju bismo inače pisali.
 use crate::ParseError;
-use crate::model::WorkKind;
+use crate::model::{BranchScope, WorkKind};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::path::{Component, Path};
@@ -65,6 +71,9 @@ impl Default for DocsWeights {
 #[serde(default, deny_unknown_fields)]
 pub struct Profile {
     pub default_branch: String,
+    /// Koje grane ulaze u metrike (S-032): `"all"` = sve lokalne grane (zadano — prvi korisnik radi
+    /// u granama), `"default"` = samo `default_branch` (paritet s `RAD.xlsx`, ponašanje do 1.0.0-pre).
+    pub branch_scope: BranchScope,
     pub since: String,
     pub diary_path: String,
     pub changelog_path: String,
@@ -111,6 +120,7 @@ impl Default for Profile {
     fn default() -> Self {
         Self {
             default_branch: "main".into(),
+            branch_scope: BranchScope::AllBranches,
             since: "2026-08-29".into(),
             diary_path: "docs/records/PROGRESS.md".into(),
             changelog_path: "docs/records/CHANGELOG.md".into(),
@@ -435,6 +445,23 @@ mod tests {
         ] {
             assert!(!inside_root(bad), "{bad}");
         }
+    }
+
+    #[test]
+    fn branch_scope_defaults_to_all_and_parses_both_values() {
+        assert_eq!(Profile::default().branch_scope, BranchScope::AllBranches);
+        let p: Profile = serde_json::from_str(r#"{ "branch_scope": "default" }"#).unwrap();
+        assert_eq!(p.branch_scope, BranchScope::DefaultBranch);
+        let p: Profile = serde_json::from_str(r#"{ "branch_scope": "all" }"#).unwrap();
+        assert_eq!(p.branch_scope, BranchScope::AllBranches);
+    }
+
+    #[test]
+    fn branch_scope_rejects_unknown_value_naming_the_allowed_ones() {
+        let err =
+            serde_json::from_str::<Profile>(r#"{ "branch_scope": "worktrees" }"#).unwrap_err();
+        let msg = err.to_string();
+        assert!(msg.contains("`all`") && msg.contains("`default`"), "{msg}");
     }
 
     #[test]
