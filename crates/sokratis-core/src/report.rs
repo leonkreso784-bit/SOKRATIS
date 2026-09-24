@@ -17,11 +17,15 @@
 //! `commit_rows` klasificira svaki commit ovdje, JEDNOM; `kind_stats` posuđuje te redke prije nego
 //! što se pomaknu (`move`) u `Report` na kraju — posudba završava prije premještanja, pa borrow
 //! checker to dopušta bez klona (S-012: mjerenje u jezgri, ne u sučelju).
+//!
+//! Dopuna (cigla M2/46, S-032): `branch_stats` je pozvan nakon `rows`/`days`, kao svaki drugi korak
+//! mjerenja — sastavljanje ostaje jedino mjesto koje zna redoslijed, `branch_stats` sam ne zna ni
+//! za `commit_rows` ni za `day_stats`.
 use crate::docs::docs_health;
 use crate::metrics::indicators::IndicatorInput;
 use crate::metrics::{
-    active_phases, closed_phases, commit_rows, day_stats, hours_per_day, indicators, kind_stats,
-    vision_totals,
+    active_phases, branch_stats, closed_phases, commit_rows, day_stats, hours_per_day, indicators,
+    kind_stats, vision_totals,
 };
 use crate::parse::{parse_diary, parse_git_log, parse_plan};
 use crate::rules::{default_rules, evaluate_all};
@@ -94,8 +98,15 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
         profile.session_start_hours,
     );
     let days = day_stats(&commits, &deliveries, &hours, profile);
-    let rows = commit_rows(&commits, &input.overrides, &p);
+    let rows = commit_rows(
+        &commits,
+        &input.overrides,
+        &p,
+        &input.commit_branches,
+        &input.branch,
+    );
     let kinds = kind_stats(&rows, &commits);
+    let branches = branch_stats(&rows, &commits, &days, &input.branches, &input.branch);
     // Zatvorene faze se broje iz SVIH commita loga (mogu prethoditi `since`); aktivne samo iz
     // filtriranih, jer prate napredak od danas unatrag.
     let mut phases = closed_phases(&all, &p);
@@ -133,6 +144,7 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
         since: input.since.clone(),
         until: input.until.clone(),
         branch: input.branch.clone(),
+        scope: input.scope,
         touched: Touched {
             commits: commits.len(),
             lines: commits
@@ -145,6 +157,7 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
         },
         days,
         kinds,
+        branches,
         commits: rows,
         deliveries,
         indicators,
@@ -161,7 +174,7 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
 // roditelja i potomaka, a `snapshot::tests` (brat, ne potomak) treba `report::tests::input()`.
 pub(crate) mod tests {
     use super::*;
-    use crate::{BranchInfo, DocFile, WorkKind};
+    use crate::{BranchInfo, BranchScope, DocFile, WorkKind};
     use std::collections::HashMap;
 
     const LOG: &str = "@@a1|1788700000|1788700000|2026-08-28|2026-08-28|F1/1 prije since\n1\t0\tjs/a.js\n\n@@b2|1788854400|1788854400|2026-09-04|2026-09-04|fix: kvar u js\n5\t1\tjs/b.js\n\n@@c3|1788858000|1788858000|2026-09-04|2026-09-04|docs: zapis\n3\t0\tdocs/records/PROGRESS.md\n";
@@ -191,6 +204,8 @@ pub(crate) mod tests {
             since: "2026-08-29".into(),
             until: None,
             branch: "main".into(),
+            scope: BranchScope::DefaultBranch,
+            commit_branches: HashMap::new(),
         }
     }
 

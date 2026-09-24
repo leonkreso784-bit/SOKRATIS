@@ -154,6 +154,7 @@ const commitRow = (sha: string, date: string): CommitRow => ({
   kind: 'execution',
   sub: 'other',
   overridden: false,
+  branch: 'main',
 });
 
 describe('sortDiary', () => {

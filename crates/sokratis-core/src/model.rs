@@ -5,6 +5,12 @@
 //!
 //! Dopuna (cigla M2/29a): `CommitRow.author_time` nosi `i64` iz `Commit`, ne novi tip — Pregled
 //! računa „prije X" iz istog broja koji tablica već zna, pa nema drugog izvora vremena (S-010).
+//!
+//! Dopuna (cigla M2/46, S-032): `BranchScope` je enum s `#[serde(rename)]`, ne `bool` — ista riječ
+//! (`"all"`/`"default"`) piše u profilu (`branch_scope`) i u `Report.scope`, pa nema prijevoda
+//! izgubljenog u prijenosu. `ReportInput.commit_branches` je `HashMap` jer jezgra ne zna git —
+//! kartu `sha → grana` joj donosi `io`. `CommitRow.branch` je ZADNJE polje: dodatak na kraju
+//! strukture je diff od jednog retka u snapshotu (S-022), ne pomak svih polja iza njega.
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -130,6 +136,8 @@ pub struct CommitRow {
     pub sub: SubKind,
     /// vrsta dolazi iz `.sokratis/overrides.json`, ne iz klasifikatora
     pub overridden: bool,
+    /// grana koja je commit dosegla (S-032); zadana grana ako nije u karti
+    pub branch: String,
 }
 
 /// Broj signala po težini — ono što Pregled i snimka trebaju umjesto cijelog popisa.
@@ -247,6 +255,29 @@ pub struct BranchInfo {
     pub merged: bool,
 }
 
+/// Koje su grane ušle u mjerenje (S-032). JSON `"all"` / `"default"` — isti tekst u profilu
+/// (`branch_scope`) i u `Report.scope`, pa korisnik čita istu riječ na oba mjesta.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+pub enum BranchScope {
+    #[default]
+    #[serde(rename = "all")]
+    AllBranches,
+    #[serde(rename = "default")]
+    DefaultBranch,
+}
+
+/// Jedan red sekcije Grane: commiti i redci su zbrojeni po oznaci grane iz `CommitRow.branch`;
+/// `hours` su sati dana podijeljeni po udjelu commita grane tog dana (proxy, S-032) — zbroj po
+/// granama je jednak ukupnim satima. `merged` dolazi iz `BranchInfo`; zadana grana je uvijek `true`.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct BranchStats {
+    pub name: String,
+    pub commits: u32,
+    pub lines: u64,
+    pub hours: f64,
+    pub merged: bool,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct DocFile {
     /// relativno od korijena repoa, s `/`
@@ -262,9 +293,12 @@ pub struct Report {
     /// gornja granica razdoblja (`YYYY-MM-DD`, cijeli dan), `None` = do danas (M2/3)
     pub until: Option<String>,
     pub branch: String,
+    pub scope: BranchScope,
     pub touched: Touched,
     pub days: Vec<DayStats>,
     pub kinds: Vec<KindStats>,
+    /// sekcija Grane (S-032) — sati po udjelu commita, zadana grana prva
+    pub branches: Vec<BranchStats>,
     /// commiti razdoblja s vrstom i podvrstom — ulaz za Dnevnik (M2/5)
     pub commits: Vec<CommitRow>,
     /// isporuke iz dnevnika u razdoblju — ulaz za pogled Isporuke (M2/5); M1 ih je samo zbrajao po danu
@@ -294,6 +328,12 @@ pub struct ReportInput {
     /// gornja granica, `YYYY-MM-DD`, uključivo cijeli dan; `None` = bez gornje granice
     pub until: Option<String>,
     pub branch: String,
+    /// Što je `io` obišao (S-032) — jezgra to samo prepiše u `Report.scope`.
+    pub scope: BranchScope,
+    /// `sha → grana` SAMO za commite izvan zadane grane (`git log --branches --not <zadana>
+    /// --format=%h|%S`); commit kojeg nema u karti je na zadanoj grani. Prazno kad je
+    /// `scope == DefaultBranch`.
+    pub commit_branches: HashMap<String, String>,
 }
 
 /// Sve što pravilo smije vidjeti — u vlasništvu, bez lifetimeova (gradi se jednom u `build_report`).

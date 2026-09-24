@@ -12,6 +12,7 @@ describe('ugovor Report', () => {
     const r = parseSnap(snapRaw) as Report;
     expect(Object.keys(r).sort()).toEqual([
       'branch',
+      'branches',
       'commits',
       'days',
       'deliveries',
@@ -20,6 +21,7 @@ describe('ugovor Report', () => {
       'indicators',
       'kinds',
       'phases',
+      'scope',
       'signals',
       'since',
       'touched',
@@ -32,5 +34,7 @@ describe('ugovor Report', () => {
     expect(r.commits.length > 0 ? r.commits[0] : { kind: 'execution', sub: 'other', overridden: false }).toMatchObject({
       overridden: expect.any(Boolean),
     });
+    expect(r.scope).toBe('default');
+    expect(r.branches[0]).toMatchObject({ name: 'main', merged: true });
   });
 });

@@ -4,7 +4,7 @@
 //! Tako promjena OBLIKA (novo polje, preimenovanje, drugi redoslijed) ne prolazi neopaženo, a
 //! namjerna promjena je diff `.snap` datoteke u commitu s obrazloženjem (S-022). Isti fixture kao
 //! paritet: paritet čuva BROJKE, snapshot čuva OBLIK — dva testa, dvije tvrdnje.
-use sokratis_core::{Profile, ReportInput, build_report};
+use sokratis_core::{BranchScope, Profile, ReportInput, build_report};
 use std::collections::HashMap;
 
 const STAMP: &str = "2026-09-17";
@@ -32,6 +32,8 @@ fn report_json_shape_is_locked() {
         since: "2026-08-29".into(),
         until: None,
         branch: "main".into(),
+        scope: BranchScope::DefaultBranch,
+        commit_branches: HashMap::new(),
     };
     let r = build_report(&input, &Profile::default()).expect("fixture je čist ulaz");
     insta::assert_json_snapshot!("report-sokratstudy-2026-09-17", r);

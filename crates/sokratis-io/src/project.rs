@@ -34,7 +34,7 @@
 //! radno stablo kao dva projekta. `today()` postaje slobodna funkcija jer je desktopu treba bez
 //! vlastite ovisnosti o `chrono`.
 use crate::{CommitCache, GitCli, GitSource, IoError, cached_log};
-use sokratis_core::{DocFile, Profile, ReportInput, Vision, WorkKind};
+use sokratis_core::{BranchScope, DocFile, Profile, ReportInput, Vision, WorkKind};
 use std::collections::{BTreeMap, HashMap};
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -320,6 +320,9 @@ impl Project {
             since,
             until: until.map(str::to_string),
             branch: label,
+            // M2/46: privremeno; IO-2 (T49) puni iz profila i gita.
+            scope: BranchScope::DefaultBranch,
+            commit_branches: HashMap::new(),
         })
     }
 
