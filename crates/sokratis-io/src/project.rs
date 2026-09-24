@@ -38,7 +38,13 @@
 //! kad je opseg sve grane, plaća jedan dodatan proces (`commit_sources`) da napuni kartu `sha →
 //! grana` — Leonov rad izvan zadane grane time ulazi u brojke, ali repo koji ostaje pri paritetu
 //! (`branch_scope = default`) ne plaća ništa novo.
-use crate::{CommitCache, GitCli, GitSource, IoError, Scope, cached_log};
+//!
+//! Cigla M2/50 (S-033): `Lead` je par put+puni-SHA — najmanji zapis koji kaže „ovo je stablo gdje
+//! se trenutno radi". `worktrees_by_recency` sortira `sort_by_key` + `std::cmp::Reverse` (stabilan
+//! sort, silazno bez ručnog komparatora) po `author_time` HEAD-a: vodeće stablo VODI plan i
+//! `docs/` (tamo se radi), a dnevnik se ipak ČITA IZ SVIH (necommitani unos u bilo kojem stablu je
+//! vidljiv) — pisanje ostaje isključivo u glavno (`main_root`, S-015), čitanje je šire.
+use crate::{CommitCache, GitCli, GitSource, IoError, Scope, WorktreeHead, cached_log};
 use sokratis_core::{BranchScope, DocFile, Profile, ReportInput, Vision, WorkKind};
 use std::collections::{BTreeMap, HashMap};
 use std::path::{Path, PathBuf};
@@ -50,6 +56,15 @@ pub struct Project {
     pub common_dir: PathBuf,
     pub profile: Profile,
     pub git: GitCli,
+}
+
+/// Vodeće stablo (S-033): ono čiji HEAD ima najnoviji `author_time` — tamo se radi, pa se odatle
+/// čitaju plan i `docs/`. `head` je puni SHA: `last_changes` ga uzima kao reviziju, pa i detached
+/// stablo (bez grane) ima povijest.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Lead {
+    pub root: PathBuf,
+    pub head: String,
 }
 
 const SKIP_DIRS: [&str; 3] = ["node_modules", ".git", "target"];
@@ -222,16 +237,64 @@ impl Project {
         Ok(path)
     }
 
-    /// Svi `*.md` u korijenu i pod `profile.docs_dir`, sa sadržajem i zadnjom promjenom iz gita.
+    /// Sva radna stabla, od najnovijeg HEAD-a prema starijima (isti `author_time` → redoslijed
+    /// gita, glavno stablo prvo). Dva procesa: `worktree list` + `commit_times`.
+    fn worktrees_by_recency(&self) -> Result<Vec<WorktreeHead>, IoError> {
+        let mut heads = self.git.worktree_heads()?;
+        let shas: Vec<String> = heads.iter().map(|h| h.head.clone()).collect();
+        let times = self.git.commit_times(&shas)?;
+        // `sort_by_key` je stabilan; `Reverse` okreće u silazno bez ručnog komparatora.
+        heads.sort_by_key(|h| std::cmp::Reverse(times.get(&h.head).copied().unwrap_or(0)));
+        Ok(heads)
+    }
+
+    /// Stablo s najnovijim `author_time` HEAD-a (S-033) — javna verzija za pozivatelje koji trebaju
+    /// SAMO vodeće stablo (npr. desktop koji pokazuje „radi se u …"), bez cijelog `input`-a.
+    /// Jedno stablo → `root`, `"HEAD"` (nema smisla plaćati proces za trivijalan slučaj).
+    pub fn lead(&self) -> Result<Lead, IoError> {
+        Ok(self
+            .worktrees_by_recency()?
+            .into_iter()
+            .next()
+            .map(|h| Lead {
+                root: normalized(h.path),
+                head: h.head,
+            })
+            .unwrap_or_else(|| Lead {
+                root: self.root.clone(),
+                head: "HEAD".to_string(),
+            }))
+    }
+
+    /// Dnevnici s DISKA svakog stabla, zadanim redom (vodeće prvo) — necommitani unos je vidljiv.
+    /// Stablo čiji dnevnik ne postoji ili se ne može pročitati jednostavno izostaje iz popisa.
+    fn diaries(&self, ordered: &[WorktreeHead]) -> Vec<String> {
+        ordered
+            .iter()
+            .filter_map(|h| std::fs::read_to_string(h.path.join(&self.profile.diary_path)).ok())
+            .collect()
+    }
+
+    /// Svi `*.md` u korijenu i pod `profile.docs_dir`, sa sadržajem i zadnjom promjenom iz gita —
+    /// GLAVNO stablo, `HEAD` (javni ugovor nepromijenjen; unutarnji pozivatelji koji trebaju
+    /// VODEĆE stablo zovu `docs_in` izravno, vidi `input_with`).
     pub fn docs(&self) -> Result<Vec<DocFile>, IoError> {
+        self.docs_in(&self.root, "HEAD")
+    }
+
+    /// Tijelo dosadašnjeg `docs()`, s korijenom i revizijom kao parametrima (cigla M2/50): `root`
+    /// je odakle se ČITA S DISKA (necommitane datoteke ostaju vidljive), `rev` je odakle git ČITA
+    /// POVIJEST (`last_changes`) — u vodećem sporednom stablu to je njegov puni SHA, ne `HEAD` iz
+    /// glavnog stabla, jer git svaki proces pokreće u `self.git.repo` (glavno stablo).
+    fn docs_in(&self, root: &Path, rev: &str) -> Result<Vec<DocFile>, IoError> {
         let mut paths = Vec::new();
-        for entry in std::fs::read_dir(&self.root)? {
+        for entry in std::fs::read_dir(root)? {
             let p = entry?.path();
             if p.is_file() && p.extension().is_some_and(|e| e == "md") {
                 paths.push(p);
             }
         }
-        let docs_dir = self.root.join(&self.profile.docs_dir);
+        let docs_dir = root.join(&self.profile.docs_dir);
         if docs_dir.is_dir() {
             walk(&docs_dir, &mut paths)?;
         }
@@ -242,11 +305,11 @@ impl Project {
         // pathspecom kad `docs_dir` nije korijen.
         let changes = self
             .git
-            .last_changes(&[self.profile.docs_dir.as_str(), ":(glob)*.md"])?;
+            .last_changes(rev, &[self.profile.docs_dir.as_str(), ":(glob)*.md"])?;
         let mut out = Vec::new();
         for p in paths {
             let rel = p
-                .strip_prefix(&self.root)
+                .strip_prefix(root)
                 .unwrap_or(&p)
                 .to_string_lossy()
                 .replace('\\', "/");
@@ -295,7 +358,20 @@ impl Project {
                 }
             }
         };
-        let read_opt = |rel: &str| std::fs::read_to_string(self.root.join(rel)).ok();
+        // S-033: sva radna stabla, vodeće prvo — MORA doći nakon ruba `NoCommits` iznad, jer repo
+        // bez ijednog commita treba pasti s TOM greškom, ne s greškom `commit_times` na prazan HEAD.
+        let ordered = self.worktrees_by_recency()?;
+        let lead = ordered
+            .first()
+            .map(|h| Lead {
+                root: normalized(h.path.clone()),
+                head: h.head.clone(),
+            })
+            .unwrap_or_else(|| Lead {
+                root: self.root.clone(),
+                head: "HEAD".to_string(),
+            });
+        let read_lead = |rel: &str| std::fs::read_to_string(lead.root.join(rel)).ok();
         let since = since
             .map(str::to_string)
             .unwrap_or_else(|| self.profile.since.clone());
@@ -322,10 +398,12 @@ impl Project {
         };
         Ok(ReportInput {
             git_log,
-            // M2/47: privremeno jedno stablo; IO-2 (T50) čita sva.
-            diaries: read_opt(&self.profile.diary_path).into_iter().collect(),
-            plan: read_opt(&self.profile.plan_path),
-            docs: self.docs()?,
+            // S-033: unija dnevnika iz SVIH stabala, vodeće prvo (`parse_diaries` unira po datum+
+            // naslov, prvi pobjeđuje — jezgra time vidi vodeće stablo kao mjerodavno).
+            diaries: self.diaries(&ordered),
+            // Plan i docs dolaze SAMO iz vodećeg stabla: ondje se trenutno radi.
+            plan: read_lead(&self.profile.plan_path),
+            docs: self.docs_in(&lead.root, &lead.head)?,
             branches: self.git.branches(&ref_name)?,
             overrides: self.overrides()?,
             visions: self.visions()?,
@@ -339,8 +417,7 @@ impl Project {
             branch: label,
             scope: self.profile.branch_scope,
             commit_branches,
-            // M2/47: privremeno jedno stablo; IO-2 (T50) čita sva.
-            worktrees: 1,
+            worktrees: ordered.len().max(1) as u32,
         })
     }
 

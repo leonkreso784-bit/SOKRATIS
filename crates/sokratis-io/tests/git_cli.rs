@@ -297,6 +297,47 @@ fn all_branches_scope_sees_feature_commits_and_commit_sources_labels_them() {
     );
 }
 
+/// M2/50 (S-033): porcelain daje putanju + puni HEAD po stablu; detached stablo nema redak `branch`
+/// i ne smije srušiti parser (Review Focus #2); `commit_times` vraća author_time po punom SHA-u.
+#[test]
+fn worktree_heads_parses_detached_worktree_and_commit_times_map_full_shas() {
+    let r = Repo::init();
+    r.commit(
+        "a.txt",
+        "1",
+        "prvi",
+        "2026-09-10T10:00:00+02:00",
+        "2026-09-10T10:00:00+02:00",
+    );
+    let wt = r.add_worktree("feat/x");
+    let detached = tempfile::tempdir().unwrap();
+    let dpath = detached.path().join("d");
+    r.git(&[
+        "worktree",
+        "add",
+        "-q",
+        "--detach",
+        &dpath.to_string_lossy(),
+    ]);
+    let g = GitCli::new(r.path());
+    let heads = g.worktree_heads().unwrap();
+    assert_eq!(heads.len(), 3, "glavno + feat/x + detached");
+    assert!(heads.iter().all(|h| h.head.len() == 40), "puni SHA");
+    let shas: Vec<String> = heads.iter().map(|h| h.head.clone()).collect();
+    let times = g.commit_times(&shas).unwrap();
+    assert_eq!(
+        times.len(),
+        1,
+        "sva tri HEAD-a su isti commit → jedan ključ"
+    );
+    assert_eq!(
+        times[&shas[0]], 1789027200,
+        "author_time 2026-09-10T10:00:00+02:00 = 1789027200"
+    );
+    assert!(g.commit_times(&[]).unwrap().is_empty());
+    drop(wt);
+}
+
 #[test]
 fn commit_sources_is_empty_when_only_default_branch_exists() {
     let r = Repo::init();

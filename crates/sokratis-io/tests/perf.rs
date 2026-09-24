@@ -8,7 +8,7 @@ use sokratis_io::Project;
 use std::time::Instant;
 
 #[test]
-fn input_over_sixty_docs_and_thirty_branches_spawns_at_most_six_git_processes() {
+fn input_over_sixty_docs_and_thirty_branches_spawns_at_most_eight_git_processes() {
     let r = Repo::init();
     for i in 0..60 {
         std::fs::create_dir_all(r.path().join("docs")).unwrap();
@@ -38,7 +38,9 @@ fn input_over_sixty_docs_and_thirty_branches_spawns_at_most_six_git_processes() 
     assert_eq!(input.docs.len(), 60);
     assert_eq!(input.branches.len(), 31);
     assert!(
-        spawned <= 6,
-        "input() je pokrenuo {spawned} git procesa, dopušteno 6 — +1 `commit_sources` (M2/49)"
+        spawned <= 8,
+        "input() je pokrenuo {spawned} git procesa, dopušteno 8 — 4 osnovna \
+         (log, branches, docs last_changes, HEAD/branch_exists rub) + 1 commit_sources (M2/49) \
+         + 2 vodeće stablo (M2/50: worktree list + commit_times)"
     );
 }

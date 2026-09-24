@@ -9,7 +9,7 @@ use common::Repo;
 use sokratis_core::parse::parse_git_log;
 use sokratis_core::{BranchInfo, Commit};
 use sokratis_io::{
-    CacheError, CommitCache, GitCli, GitSource, IoError, Project, Scope, cached_log,
+    CacheError, CommitCache, GitCli, GitSource, IoError, Project, Scope, WorktreeHead, cached_log,
 };
 use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
@@ -133,10 +133,20 @@ impl GitSource for PartialGit {
     fn worktrees(&self) -> Result<Vec<PathBuf>, IoError> {
         unimplemented!()
     }
+    fn worktree_heads(&self) -> Result<Vec<WorktreeHead>, IoError> {
+        unimplemented!()
+    }
+    fn commit_times(&self, _shas: &[String]) -> Result<HashMap<String, i64>, IoError> {
+        unimplemented!()
+    }
     fn last_change(&self, _path: &str) -> Result<Option<i64>, IoError> {
         unimplemented!()
     }
-    fn last_changes(&self, _pathspecs: &[&str]) -> Result<HashMap<String, i64>, IoError> {
+    fn last_changes(
+        &self,
+        _rev: &str,
+        _pathspecs: &[&str],
+    ) -> Result<HashMap<String, i64>, IoError> {
         unimplemented!()
     }
     fn common_dir(&self) -> Result<PathBuf, IoError> {
@@ -254,7 +264,10 @@ fn warm_cache_fetches_only_what_is_new() {
     // M2/49: zadani profil (nema `.sokratis/profile.json` s `branch_scope`) je `all` (T48) — svaki
     // `input_with` plaća JEDAN dodatan proces (`commit_sources`) bez obzira na toplinu keša, jer
     // karta `sha → grana` nije dio keša commita. Granica je zato +1 u odnosu na prijašnjih 4.
-    assert!(spawned <= 5, "topao poziv bez novih commita: {spawned}");
+    // M2/50 (S-033, odstupanje od brifa): `input_with` sad UVIJEK plaća i DVA procesa za vodeće
+    // stablo (`worktree_heads` + `commit_times`), bez obzira na toplinu keša — nije dio keša
+    // commita niti opsega grana. Izmjereno: 7 (5+2), ne 5 kako je pisalo prije T50.
+    assert!(spawned <= 7, "topao poziv bez novih commita: {spawned}");
 
     r.commit(
         "d.txt",
@@ -273,8 +286,9 @@ fn warm_cache_fetches_only_what_is_new() {
         "jedan novi commit: tocno jedan novi poziv store"
     );
     // M2/49: isti +1 kao gore, jer `commit_sources` nije dio keša — mjerodavno je +1 na 5.
+    // M2/50 (S-033, odstupanje od brifa): isti +2 kao gore (vodeće stablo) — mjerodavno je 8 (6+2).
     assert!(
-        spawned <= 6,
+        spawned <= 8,
         "topao poziv s jednim novim commitom: {spawned}"
     );
 }
