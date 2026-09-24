@@ -2,7 +2,19 @@
 // Testovi provjeravaju da su naši omotači oko `d3-scale`/`d3-time-format` konačni (bez NaN),
 // monotoni i dvojezični — komponente (T54+) im vjeruju bez ponovne provjere.
 import { describe, expect, it } from 'vitest';
-import { dateTicks, formatDate, niceMax, parseYmd, toYmd, yTicks } from '../src/lib/charts/scales';
+import {
+  arcPath,
+  dateTicks,
+  finiteMax,
+  formatDate,
+  linear,
+  niceMax,
+  parseYmd,
+  ringSegments,
+  svgA11y,
+  toYmd,
+  yTicks,
+} from '../src/lib/charts/scales';
 
 describe('scales', () => {
   it('parseYmd/toYmd su inverzi u UTC-u', () => {
@@ -35,5 +47,50 @@ describe('scales', () => {
     expect(formatDate('2026-09-07', 'hr', 'week')).toBe('tj. 37');
     expect(formatDate('2026-09-01', 'hr', 'month')).toBe('ruj 2026');
     expect(formatDate('2026-09-01', 'en', 'month')).toBe('Sep 2026');
+  });
+});
+
+// Preseljeno iz scale.ts (M2/23, obrisan M2/55) — `linear`, `finiteMax`, `arcPath`, `ringSegments`,
+// `svgA11y` i dalje trebaju vlastiti test jer `Sparkline`/`Ring` ne prolaze kroz `layout.ts` (S-035).
+describe('preseljeno iz scale.ts (M2/55)', () => {
+  it('linear preslikava domenu u raspon (i obrnuto za y)', () => {
+    const y = linear([0, 10], [100, 0]);
+    expect(y(0)).toBe(100);
+    expect(y(10)).toBe(0);
+    expect(y(5)).toBe(50);
+    expect(linear([5, 5], [0, 100])(5)).toBe(0);
+  });
+  it('finiteMax računa maksimum SAMO nad konačnim vrijednostima', () => {
+    expect(finiteMax([1, Number.NaN, 5])).toBe(5);
+    expect(finiteMax([Number.NaN])).toBe(0);
+    expect(finiteMax([])).toBe(0);
+  });
+  it('ringSegments i arcPath ostaju konačni na rubovima (prazno/nula/negativno/NaN)', () => {
+    expect(ringSegments([0, 0])).toEqual([]);
+    expect(ringSegments([])).toEqual([]);
+    const s = ringSegments([1, 3]);
+    expect(s.map((x) => +x.share.toFixed(2))).toEqual([0.25, 0.75]);
+    expect(s[1]!.end).toBeCloseTo(Math.PI * 2, 6);
+    expect(arcPath(50, 50, 40, 0, Math.PI / 2)).toMatch(/^M50 10 A40 40 0 0 1 90 50$/);
+    const neg = ringSegments([-1, 3]);
+    expect(neg.every((x) => Number.isFinite(x.share) && Number.isFinite(x.start) && Number.isFinite(x.end))).toBe(
+      true,
+    );
+    expect(ringSegments([1, Number.NaN])).toEqual([]);
+  });
+  it('puni krug (jedan segment = 100 %) crta konačan, ne prazan luk', () => {
+    const full = arcPath(50, 50, 40, 0, Math.PI * 2);
+    expect(full).not.toMatch(/NaN|Infinity/);
+    const nums = full.match(/-?\d+(\.\d+)?/g)!.map(Number);
+    expect(nums.every((n) => Number.isFinite(n))).toBe(true);
+    // Početna i završna točka luka se NE smiju poklopiti — inače se puni krug ne crta.
+    expect(full.startsWith('M50 10')).toBe(true);
+    expect(full.endsWith('50 10')).toBe(false);
+  });
+  it('svgA11y: graf S imenom je slika, BEZ imena je ukras', () => {
+    expect(svgA11y('x')).toEqual({ role: 'img', 'aria-label': 'x' });
+    expect(svgA11y(undefined)).toEqual({ 'aria-hidden': 'true' });
+    expect(svgA11y('')).toEqual({ 'aria-hidden': 'true' });
+    expect(svgA11y('   ')).toEqual({ 'aria-hidden': 'true' });
   });
 });
