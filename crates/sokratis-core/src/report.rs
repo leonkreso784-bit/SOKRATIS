@@ -17,13 +17,21 @@
 //! `commit_rows` klasificira svaki commit ovdje, JEDNOM; `kind_stats` posuđuje te redke prije nego
 //! što se pomaknu (`move`) u `Report` na kraju — posudba završava prije premještanja, pa borrow
 //! checker to dopušta bez klona (S-012: mjerenje u jezgri, ne u sučelju).
+//!
+//! Dopuna (cigla M2/46, S-032): `branch_stats` je pozvan nakon `rows`/`days`, kao svaki drugi korak
+//! mjerenja — sastavljanje ostaje jedino mjesto koje zna redoslijed, `branch_stats` sam ne zna ni
+//! za `commit_rows` ni za `day_stats`.
+//!
+//! Dopuna (cigla M2/47, S-033): `input.diary.map(parse_diary)` (jedan `Option`) postaje
+//! `parse_diaries(&input.diaries, …)` (poziv koji sam zna raditi s praznim popisom) — jedan poziv
+//! manje grana nego prije, jer unija PRIHVAĆA nula tekstova bez posebnog slučaja.
 use crate::docs::docs_health;
 use crate::metrics::indicators::IndicatorInput;
 use crate::metrics::{
-    active_phases, closed_phases, commit_rows, day_stats, hours_per_day, indicators, kind_stats,
-    vision_totals,
+    active_phases, branch_stats, closed_phases, commit_rows, day_stats, hours_per_day, indicators,
+    kind_stats, vision_totals,
 };
-use crate::parse::{parse_diary, parse_git_log, parse_plan};
+use crate::parse::{parse_diaries, parse_git_log, parse_plan};
 use crate::rules::{default_rules, evaluate_all};
 use crate::{Commit, Context, ParseError, Patterns, Profile, Report, ReportInput, Touched};
 
@@ -75,11 +83,7 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
         })
         .cloned()
         .collect();
-    let deliveries: Vec<_> = input
-        .diary
-        .as_deref()
-        .map(|d| parse_diary(d, &p, &input.since))
-        .unwrap_or_default()
+    let deliveries: Vec<_> = parse_diaries(&input.diaries, &p, &input.since)
         .into_iter()
         .filter(|d| input.until.as_deref().is_none_or(|u| d.date.as_str() <= u))
         .collect();
@@ -94,8 +98,15 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
         profile.session_start_hours,
     );
     let days = day_stats(&commits, &deliveries, &hours, profile);
-    let rows = commit_rows(&commits, &input.overrides, &p);
+    let rows = commit_rows(
+        &commits,
+        &input.overrides,
+        &p,
+        &input.commit_branches,
+        &input.branch,
+    );
     let kinds = kind_stats(&rows, &commits);
+    let branches = branch_stats(&rows, &commits, &days, &input.branches, &input.branch);
     // Zatvorene faze se broje iz SVIH commita loga (mogu prethoditi `since`); aktivne samo iz
     // filtriranih, jer prate napredak od danas unatrag.
     let mut phases = closed_phases(&all, &p);
@@ -133,6 +144,7 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
         since: input.since.clone(),
         until: input.until.clone(),
         branch: input.branch.clone(),
+        scope: input.scope,
         touched: Touched {
             commits: commits.len(),
             lines: commits
@@ -142,9 +154,12 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
                 .sum(),
             files: commits.iter().map(|c| c.files.len()).sum(),
             skipped_lines: parsed.skipped_lines,
+            worktrees: input.worktrees,
+            diaries: input.diaries.len() as u32,
         },
         days,
         kinds,
+        branches,
         commits: rows,
         deliveries,
         indicators,
@@ -161,7 +176,7 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
 // roditelja i potomaka, a `snapshot::tests` (brat, ne potomak) treba `report::tests::input()`.
 pub(crate) mod tests {
     use super::*;
-    use crate::{BranchInfo, DocFile, WorkKind};
+    use crate::{BranchInfo, BranchScope, DocFile, WorkKind};
     use std::collections::HashMap;
 
     const LOG: &str = "@@a1|1788700000|1788700000|2026-08-28|2026-08-28|F1/1 prije since\n1\t0\tjs/a.js\n\n@@b2|1788854400|1788854400|2026-09-04|2026-09-04|fix: kvar u js\n5\t1\tjs/b.js\n\n@@c3|1788858000|1788858000|2026-09-04|2026-09-04|docs: zapis\n3\t0\tdocs/records/PROGRESS.md\n";
@@ -171,7 +186,7 @@ pub(crate) mod tests {
     pub(crate) fn input() -> ReportInput {
         ReportInput {
             git_log: LOG.into(),
-            diary: Some("## 2026-09-04 (X) — 🚀 deploy nečega\n".into()),
+            diaries: vec!["## 2026-09-04 (X) — 🚀 deploy nečega\n".into()],
             plan: Some("| **F1/1** ✅ |\n| **F1/2** |\n".into()),
             docs: vec![DocFile {
                 path: "docs/records/PROGRESS.md".into(),
@@ -191,6 +206,9 @@ pub(crate) mod tests {
             since: "2026-08-29".into(),
             until: None,
             branch: "main".into(),
+            scope: BranchScope::DefaultBranch,
+            commit_branches: HashMap::new(),
+            worktrees: 1,
         }
     }
 
@@ -245,7 +263,7 @@ pub(crate) mod tests {
         let mut empty = input();
         empty.git_log = String::new();
         empty.plan = None;
-        empty.diary = None;
+        empty.diaries = vec![];
         let r = build_report(&empty, &Profile::default()).expect("prazan log je valjan ulaz");
         let value = |id: &str| {
             r.indicators
@@ -346,7 +364,7 @@ pub(crate) mod tests {
         const LOG_WITH_LATER_COMMIT: &str = "@@a1|1788700000|1788700000|2026-08-28|2026-08-28|F1/1 prije since\n1\t0\tjs/a.js\n\n@@b2|1788854400|1788854400|2026-09-04|2026-09-04|fix: kvar u js\n5\t1\tjs/b.js\n\n@@c3|1788858000|1788858000|2026-09-04|2026-09-04|docs: zapis\n3\t0\tdocs/records/PROGRESS.md\n\n@@d4|1789000000|1789000000|2026-09-06|2026-09-06|F1/2 poslije\n1\t0\tjs/d.js\n";
         let mut i = input();
         i.git_log = LOG_WITH_LATER_COMMIT.into();
-        i.diary = Some("## 2026-09-04 (X) — unutar\n## 2026-09-05 (X) — poslije\n".into());
+        i.diaries = vec!["## 2026-09-04 (X) — unutar\n## 2026-09-05 (X) — poslije\n".into()];
         i.until = Some("2026-09-04".into());
         let r = build_report(&i, &Profile::default()).unwrap();
         assert_eq!(r.until.as_deref(), Some("2026-09-04"));

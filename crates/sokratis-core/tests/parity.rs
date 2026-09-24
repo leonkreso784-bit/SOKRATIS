@@ -4,7 +4,7 @@
 //! posebne strukture: fixture je tuđi izlaz (Python). Ako test padne, prvo pitaj „je li fixture
 //! snimljen s istog commita" (README uz fixture), tek onda „je li kod kriv".
 use serde_json::Value;
-use sokratis_core::{Profile, ReportInput, build_report};
+use sokratis_core::{BranchScope, Profile, ReportInput, build_report};
 use std::collections::HashMap;
 
 const STAMP: &str = "2026-09-17";
@@ -26,7 +26,7 @@ fn matches_rad_xlsx_except_fixed_hours() {
         serde_json::from_str(&fx("expected.json")).expect("expected.json je valjani JSON");
     let input = ReportInput {
         git_log: fx("log"),
-        diary: Some(fx("PROGRESS.md")),
+        diaries: vec![fx("PROGRESS.md")],
         plan: Some(fx("RASPORED.md")),
         docs: vec![],
         branches: vec![],
@@ -37,6 +37,9 @@ fn matches_rad_xlsx_except_fixed_hours() {
         since: "2026-08-29".into(),
         until: None,
         branch: "main".into(),
+        scope: BranchScope::DefaultBranch,
+        commit_branches: HashMap::new(),
+        worktrees: 1,
     };
     let r =
         build_report(&input, &Profile::default()).expect("fixture je čist ulaz za build_report");

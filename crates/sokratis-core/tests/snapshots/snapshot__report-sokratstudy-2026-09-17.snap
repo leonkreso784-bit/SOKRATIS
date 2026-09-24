@@ -7,11 +7,14 @@ expression: r
   "since": "2026-08-29",
   "until": null,
   "branch": "main",
+  "scope": "default",
   "touched": {
     "commits": 190,
     "lines": 70164,
     "files": 1801,
-    "skipped_lines": 0
+    "skipped_lines": 0,
+    "worktrees": 1,
+    "diaries": 1
   },
   "days": [
     {
@@ -187,6 +190,15 @@ expression: r
       "lines": 6278
     }
   ],
+  "branches": [
+    {
+      "name": "main",
+      "commits": 190,
+      "lines": 70164,
+      "hours": 85.0,
+      "merged": true
+    }
+  ],
   "commits": [
     {
       "sha": "81665d2",
@@ -195,7 +207,8 @@ expression: r
       "subject": "ALAT-1: css:diff prestaje lagati o seobi markup -> CSS (dug placen PRIJE C4)",
       "kind": "debugging",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "26b1cd1",
@@ -204,7 +217,8 @@ expression: r
       "subject": "docs: revizija pred compact (pravilo #6) -- jedan NALOG koji je vec izvrsen i jedna nosiva tvrdnja",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "80fc83c",
@@ -213,7 +227,8 @@ expression: r
       "subject": "C4a: mrtva povrsina odlazi -- i vodila je pravu ikonu u nevidljivost (spec 10.1)",
       "kind": "polish",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "e1ace64",
@@ -222,7 +237,8 @@ expression: r
       "subject": "Potraga za kvarovima koji se ne vide: 9 mjesta, 2 nove brane (spec 10.2)",
       "kind": "debugging",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "8117624",
@@ -231,7 +247,8 @@ expression: r
       "subject": "docs: revizija pred compact (pravilo #6) -- pet nalaza, od toga jedan NALOG i tri brojke",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "df1d6e2",
@@ -240,7 +257,8 @@ expression: r
       "subject": "C4b/1: browse prelazi na utilityje -- i rez ide po ELEMENTU, ne po datoteci",
       "kind": "polish",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "a4dfc22",
@@ -249,7 +267,8 @@ expression: r
       "subject": "C4b/2: lekcije -- dvije ljestve pragova su se tukle, tri pravila bila mrtva (spec 10.3)",
       "kind": "polish",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "9e39f7c",
@@ -258,7 +277,8 @@ expression: r
       "subject": "docs: zapis uz C4b -- PROGRESS + CLAUDE.md, i jedan inventar manje",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "369adad",
@@ -267,7 +287,8 @@ expression: r
       "subject": "docs: puna suita potvrdjena -- 529/0, i nalog izlazi iz zapisa dok je svjez",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "0375fa7",
@@ -276,7 +297,8 @@ expression: r
       "subject": "docs: revizija pred compact (pravilo #6) -- jedna NEISTINA, dva zastarjela naloga, sest brojki",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "46e7b45",
@@ -285,7 +307,8 @@ expression: r
       "subject": "C5a/1: kromo ucenja -- i tri pravila koja su lagala o sebi (spec 11.1)",
       "kind": "polish",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "1620c56",
@@ -294,7 +317,8 @@ expression: r
       "subject": "C5a/2: kartice i dopune -- a prvi kvar je bio u MJERACU (spec 11.2)",
       "kind": "debugging",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "0ce25af",
@@ -303,7 +327,8 @@ expression: r
       "subject": "docs: ADR-031 (MCP je cjevovod) + seoba se suzila na SAMO Supabase",
       "kind": "planning",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "396f178",
@@ -312,7 +337,8 @@ expression: r
       "subject": "C5a/3: kviz -- ljestva koja se nikad nije iscrtala (spec 11.3)",
       "kind": "polish",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "e3767ac",
@@ -321,7 +347,8 @@ expression: r
       "subject": "docs: revizija pred compact (pravilo #6) -- jedan STVARAN nalog i cetiri ostarjele tvrdnje",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "cea250e",
@@ -330,7 +357,8 @@ expression: r
       "subject": "C5a/4a: napredak -- 12 od 32 pravila nije radilo nista (spec 11.4)",
       "kind": "polish",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "54ffb69",
@@ -339,7 +367,8 @@ expression: r
       "subject": "C5a/4b: kontrast, mjera na telefonu -- i 7 od 11 na jednoj odluci (spec 11.4)",
       "kind": "polish",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "9275c21",
@@ -348,7 +377,8 @@ expression: r
       "subject": "docs: revizija pred compact (pravilo #6) + MJERA za C5b (spec 12)",
       "kind": "planning",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "6cbef10",
@@ -357,7 +387,8 @@ expression: r
       "subject": "docs: obrnuti rizik C5b-a nije \"dva pravila\" nego NULA (spec 12.2)",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "ff1b87e",
@@ -366,7 +397,8 @@ expression: r
       "subject": "docs: cetiri Leonove odluke -- ADR-032 (ispune), OAuth NE, history plitak, VPS otvoren",
       "kind": "planning",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "4a769e5",
@@ -375,7 +407,8 @@ expression: r
       "subject": "docs: seoba ODGODJENA za ~mjesec dana -- zapovijed povucena sa svih mjesta",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "cf53287",
@@ -384,7 +417,8 @@ expression: r
       "subject": "C5b/0: boje gradiva bile su nevidljive na zadanoj temi (spec 12.7)",
       "kind": "polish",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "e889825",
@@ -393,7 +427,8 @@ expression: r
       "subject": "docs: revizija pred compact (pravilo #6) -- sest tvrdnji koje je C5b/0 ostario",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "8a9479f",
@@ -402,7 +437,8 @@ expression: r
       "subject": "BUG-042: pouka je bila zapisana u datoteci koju pali spec nije zvao",
       "kind": "debugging",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "9237006",
@@ -411,7 +447,8 @@ expression: r
       "subject": "C5b/1a: exercises.css migriran -- ali mjera je prvo oborila redoslijed cigli",
       "kind": "polish",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "8c3e854",
@@ -420,7 +457,8 @@ expression: r
       "subject": "ci: job je OTKAZAN a nijedan test nije pao -- budzet je pojela suita",
       "kind": "debugging",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "5b269ce",
@@ -429,7 +467,8 @@ expression: r
       "subject": "C5b/1b: learn-blocks.css migriran; math.css izasao iz opsega MJEROM",
       "kind": "polish",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "b505ebd",
@@ -438,7 +477,8 @@ expression: r
       "subject": "alat: tri rupe iz C5b/1 zatvorene -- prva je bila propust, ne odgoda",
       "kind": "debugging",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "ceb994c",
@@ -447,7 +487,8 @@ expression: r
       "subject": "faza MREZA: sanacija dobiva svoj spec -- i brana je morala naucit trece stanje",
       "kind": "planning",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "0cc945e",
@@ -456,7 +497,8 @@ expression: r
       "subject": "docs: cold-start pokazuje na MREZU -- i rez je uzet iz duplikata, ne iz praga",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "6e3ab20",
@@ -465,7 +507,8 @@ expression: r
       "subject": "MREZA A1: baza popravljena na stagingu -- a plan je bio kriv na dva mjesta",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "0521f5b",
@@ -474,7 +517,8 @@ expression: r
       "subject": "MREZA A1 na PRODUKCIJI: performance 14 WARN -> 0, security 15 -> 11",
       "kind": "execution",
       "sub": "deploy",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "ce526f5",
@@ -483,7 +527,8 @@ expression: r
       "subject": "MREZA A2: check:node napisan i dokazan -- ali namjerno jos ne stoji na vratima",
       "kind": "execution",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "c7a296b",
@@ -492,7 +537,8 @@ expression: r
       "subject": "MREZA A2 zatvoren: npm audit 15 -> 0, cijeli projekt na Node 24",
       "kind": "polish",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "bda5dd4",
@@ -501,7 +547,8 @@ expression: r
       "subject": "docs: revizija pred compact -- cetiri tvrdnje koje je blok A oborio",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "3419e2c",
@@ -510,7 +557,8 @@ expression: r
       "subject": "MREZA B1: check:tokens -- var() bez definicije je zakucana vrijednost s ukrasom",
       "kind": "execution",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "15e896d",
@@ -519,7 +567,8 @@ expression: r
       "subject": "MREZA B2: check:final imenuje preskocene -- tiho preskakanje nije legitimno",
       "kind": "execution",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "cdacd8c",
@@ -528,7 +577,8 @@ expression: r
       "subject": "MREZA B3a: a11y dug izmjeren po WCAG razini -- i mjerenje je oborilo premisu cigle",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "22b26d6",
@@ -537,7 +587,8 @@ expression: r
       "subject": "docs: revizija pred compact (pravilo #6) -- cetiri tvrdnje koje su B1/B3a oborili",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "95e4178",
@@ -546,7 +597,8 @@ expression: r
       "subject": "MREZA B3b: a11y brana sudi po WCAG razini (uniji s tezinom) -- macro ulazi u povrsine, osnovica imenuje",
       "kind": "execution",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "dba26de",
@@ -555,7 +607,8 @@ expression: r
       "subject": "MREZA B3c: skrolabilne formule i tablice dohvatljive tipkovnicom -- 9 na 0, osnovica opet prazna",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "9e1517d",
@@ -564,7 +617,8 @@ expression: r
       "subject": "MREZA B4: check:cascade -- tko koga gasi u responsive/* postaje izmjeren popis (23 imenovana)",
       "kind": "execution",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "573e0a4",
@@ -573,7 +627,8 @@ expression: r
       "subject": "docs: revizija pred compact (pravilo #6) -- ljestvica brane u prozi dovedena na B3b stanje",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "8673cc4",
@@ -582,7 +637,8 @@ expression: r
       "subject": "MREZA B5: check:i18n -- zakucani tekst postaje izmjeren razred (421 u 23 datoteke)",
       "kind": "execution",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "afb5049",
@@ -591,7 +647,8 @@ expression: r
       "subject": "docs: revizija pred compact (pravilo #6) -- backlog-stavka za check:i18n vise ne ceka",
       "kind": "documentation",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "b2e04ba",
@@ -600,7 +657,8 @@ expression: r
       "subject": "docs: ADR-033 -- dvojezicnost se PREVODI, ne gasi; jezik sucelja nikad ne dira predmete (Leon, 2026-09-01)",
       "kind": "planning",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "630d134",
@@ -609,7 +667,8 @@ expression: r
       "subject": "MREZA B6: CI shardanje -- 533 testa vise ne zivi u jednom procesu",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "f8068b0",
@@ -618,7 +677,8 @@ expression: r
       "subject": "fix: emnapi bomba se opet naoruzala -- i gate koji ju je trebao vidjeti je gledao u krivi minor (Kvar 3)",
       "kind": "debugging",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "674031f",
@@ -627,7 +687,8 @@ expression: r
       "subject": "docs: B6 ISHOD -- blok B zatvoren; CI zid 11.8 min umjesto 19.4, brze brane 24 s",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "af465be",
@@ -636,7 +697,8 @@ expression: r
       "subject": "MREZA C1: fatalno 10 -> 0 -- tinta po temi, ne ispuna (ADR-032); tri pravila presudjena mjerom",
       "kind": "planning",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "88b0d4f",
@@ -645,7 +707,8 @@ expression: r
       "subject": "MREZA C2: boja kartice = CIJELA kartica -- tri moda poravnata, inkForTint seli u renderer (EDITOR 1)",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "ef8bc0a",
@@ -654,7 +717,8 @@ expression: r
       "subject": "MREZA C3+C4: paleta 93 -> 0 -- blago i stara ugaseni; medjunalaz iz palog suita: par tinti nije dosezao AA na vlastitom sjecistu",
       "kind": "polish",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "dd8b8d4",
@@ -663,7 +727,8 @@ expression: r
       "subject": "docs: revizija pred compact (pravilo #6) -- dvije tvrdnje koje je OVA sesija ucinila zastarjelima",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "0f6cb68",
@@ -672,7 +737,8 @@ expression: r
       "subject": "MREZA D1: inline van -- a krivi zakljucak je srusio klik, ne grep",
       "kind": "polish",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "20828ec",
@@ -681,7 +747,8 @@ expression: r
       "subject": "MREZA D2 (1/2): CSP Report-Only na sve rute -- policy iz izmjerene karte izvora",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "e60df39",
@@ -690,7 +757,8 @@ expression: r
       "subject": "MREZA D2 (2/2): report procitan na svim rutama -- nula nasih povreda",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "ac741c2",
@@ -699,7 +767,8 @@ expression: r
       "subject": "MREZA D3: CSP enforce + check:csp na vratima -- prva iduca inline skripta pada kod nas, ne kod korisnika",
       "kind": "execution",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "6cd9220",
@@ -708,7 +777,8 @@ expression: r
       "subject": "docs: D3 ISHOD -- enforce ziv, setnja cista; check:csp u preflight tablicama",
       "kind": "documentation",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "f62ef4c",
@@ -717,7 +787,8 @@ expression: r
       "subject": "MREZA D4: procurjela lozinka pada u pregledniku -- 0 EUR umjesto Pro plana",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "8f767df",
@@ -726,7 +797,8 @@ expression: r
       "subject": "docs: D4 ISHOD -- vrijednost cigle nije u danasnjem stanju nego u seobi",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "3a1f374",
@@ -735,7 +807,8 @@ expression: r
       "subject": "docs: revizija pred compact (pravilo #6) -- dvije tvrdnje koje je blok D ucinio zastarjelima",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "bf4aa82",
@@ -744,7 +817,8 @@ expression: r
       "subject": "MREZA-E1: analiza je pojela ciglu -- dopune isporucene jos 2026-08-25, spec je prepisao zadatak bez statusa",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "cd5fe1f",
@@ -753,7 +827,8 @@ expression: r
       "subject": "MREZA-E2: nijedna kartica preko 500 -- selidba je vecinom bila brisanje duplikata learna, a strop sada zivi i u shemi",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "6f4b00c",
@@ -762,7 +837,8 @@ expression: r
       "subject": "MREZA-E3: 'odluka o 8' se raspala -- jedan je bio zrtva resolvera i sad se PROVJERAVA, sedam zakljucano s obrazlozenjem u brani",
       "kind": "planning",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "45747c4",
@@ -771,7 +847,8 @@ expression: r
       "subject": "docs: paleta-kucica izlaznog uvjeta -- C4 ju je ispunio (0-0-0, potvrdjeno uzivo) a nikad oznacio",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "b1bfc76",
@@ -780,7 +857,8 @@ expression: r
       "subject": "MREZA-E4: vjezbe i slijepa karta usle u telefon-mjeru (44->52) -- 'cine se ok' postao broj, i broj je nula nalaza",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "539ab5d",
@@ -789,7 +867,8 @@ expression: r
       "subject": "docs: tracnice na redizajn -- MREZA ⏸️ s deploy-gated izlazom, FRONTEND_REDIZAJN opet aktivan od C5b/2 (Leonova rijec)",
       "kind": "planning",
       "sub": "deploy",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "9a7cf57",
@@ -798,7 +877,8 @@ expression: r
       "subject": "C5b/2: blind-map skela u utilityje -- i 4 mrtva pravila koja su cekala igraca kojeg nema (spec 12.12)",
       "kind": "polish",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "8eba0fa",
@@ -807,7 +887,8 @@ expression: r
       "subject": "C5b/3a: #learn razoruzan -- :where() cuva doseg, a utility prvi put prolazi (spec 12.13)",
       "kind": "polish",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "0f84e86",
@@ -816,7 +897,8 @@ expression: r
       "subject": "C5b/3b: learn skela u utilityje -- mjera srezala opseg, C5b time CIJELI zatvoren (spec 12.14)",
       "kind": "polish",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "9e7d517",
@@ -825,7 +907,8 @@ expression: r
       "subject": "C6 mjera + C6/1: home-ljestva iz pet datoteka skupljena -- pola je bilo mrtvo (spec 13, 13.6)",
       "kind": "polish",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "e060b60",
@@ -834,7 +917,8 @@ expression: r
       "subject": "C6/2: sidebar-ljestva skupljena -- i nalaz da sidebar NITKO ne moze otvoriti (spec 13.7)",
       "kind": "polish",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "1f74143",
@@ -843,7 +927,8 @@ expression: r
       "subject": "docs: CLAUDE.md pod budzet -- pipeline mi je maskirao exit check:docs brane pa je prosli commit otisao crven",
       "kind": "documentation",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "0dc1521",
@@ -852,7 +937,8 @@ expression: r
       "subject": "C6/3: about -- mobilna pravila kuci, skela u utilityje (spec 13.8)",
       "kind": "polish",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "c6a787a",
@@ -861,7 +947,8 @@ expression: r
       "subject": "C6/4: profil + auth -- dokaz koji css:diff ne moze dati; C6 ZATVOREN (spec 13.9)",
       "kind": "polish",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "707a892",
@@ -870,7 +957,8 @@ expression: r
       "subject": "C7/1: selektorski mrtvo van -- pola mrtvih gate nije ni vidio (spec 14.1)",
       "kind": "polish",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "5bdfdd9",
@@ -879,7 +967,8 @@ expression: r
       "subject": "C7/2: cta-ljestva dosla kuci i zatekla da kuce NEMA -- C2 obrisao zivu bazu (spec 14.2)",
       "kind": "polish",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "c71acd7",
@@ -888,7 +977,8 @@ expression: r
       "subject": "C7/3: css/responsive/* NE POSTOJI -- zive ljestve doseljene bazama, s njima umirovljen i check:cascade (spec 14.3)",
       "kind": "polish",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "c224b7d",
@@ -897,7 +987,8 @@ expression: r
       "subject": "C7/4: components raspusten -- mobile-nav je stilizirao samo NEVIDLJIVO (spec 14.4)",
       "kind": "polish",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "0509d19",
@@ -906,7 +997,8 @@ expression: r
       "subject": "C7/5: paleta-most mrtav (990 poziva na tokene); gradivo cuva 2 imena kao UGOVOR -- C7 ZATVOREN (spec 14.5)",
       "kind": "polish",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "6790bee",
@@ -915,7 +1007,8 @@ expression: r
       "subject": "docs: seoba OTKAZANA (Leon: Nastavlja Supabase do daljnjeg) + RACUN blok u BACKLOG -- pala jedina blokada OAutha",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "2e21615",
@@ -924,7 +1017,8 @@ expression: r
       "subject": "Dorada iz pregleda: learn u bojama sekcija -- boja je vec bila na kartici, trosio ju je samo rub (spec 15.1)",
       "kind": "execution",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "f8bc5cb",
@@ -933,7 +1027,8 @@ expression: r
       "subject": "Popravak CI-ja: h3 mix 55->45% -- amber je na 4.41, a SE je bio glasnik, ne uzrok (spec 15.1)",
       "kind": "debugging",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "a2d28af",
@@ -942,7 +1037,8 @@ expression: r
       "subject": "docs: deploy-zapis -- 🚀 CHANGELOG, kucice §9 MREZE zatvorene, oba speca u arhivu, RACUN.md preuzima 'sto sada'",
       "kind": "planning",
       "sub": "deploy",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "6bdd75f",
@@ -951,7 +1047,8 @@ expression: r
       "subject": "Birac tema u profilu -- mehanizam je postojao cijelo vrijeme, falio je samo UI",
       "kind": "execution",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "6c5a5d8",
@@ -960,7 +1057,8 @@ expression: r
       "subject": "Tema paper VAN (Leon uz pregled biraca) -- 10 mjesta, a stari localStorage pada na academic besplatno",
       "kind": "polish",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "8f303c1",
@@ -969,7 +1067,8 @@ expression: r
       "subject": "docs: 🚀 birac tema na produkciji (6c5a5d8, Leonov OK)",
       "kind": "documentation",
       "sub": "deploy",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "1e50d11",
@@ -978,7 +1077,8 @@ expression: r
       "subject": "R1/A: dijalog pregradjen u JEDNOM zahvatu -- OAuth ulazi + dvokoracni upitnik (spec RACUN)",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "555007f",
@@ -987,7 +1087,8 @@ expression: r
       "subject": "R1/docs: Google OAuth potvrdjen UZIVO (Leonov krug) -- FB jos ceka Metine kljuceve",
       "kind": "documentation",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "b23c15f",
@@ -996,7 +1097,8 @@ expression: r
       "subject": "R1/docs: cetiri Leonova UX-nalaza (brisanje povijesti je dizajnerski samoporazno; studio sekcije; mail redirect; SMTP posiljatelj)",
       "kind": "documentation",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "921ef08",
@@ -1005,7 +1107,8 @@ expression: r
       "subject": "R1/U1+U2: brisanje povijesti STVARNO brise (cloud+lokalno+snapshot, bez odjave) + Nova sekcija na dnu panea",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "4cd20ea",
@@ -1014,7 +1117,8 @@ expression: r
       "subject": "docs: 🚀 RACUN R1 na produkciji (921ef08, Leonov OK)",
       "kind": "documentation",
       "sub": "deploy",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "2de0456",
@@ -1023,7 +1127,8 @@ expression: r
       "subject": "R1/U5: Google prijava bez supabase-domene -- implicit id_token izravno s nase stranice",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "3c6c995",
@@ -1032,7 +1137,8 @@ expression: r
       "subject": "docs/compact-prep: R1-UX statusi (U1+U2 deployani, U5 na grani, U3/U4 Leonove konzole) + RACUN/CLAUDE poravnati",
       "kind": "documentation",
       "sub": "deploy",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "b248107",
@@ -1041,7 +1147,8 @@ expression: r
       "subject": "docs: 🚀 U5 na produkciji (2de0456, Leonov OK)",
       "kind": "documentation",
       "sub": "deploy",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "9f2977c",
@@ -1050,7 +1157,8 @@ expression: r
       "subject": "R1: Facebook gumb maknut iz dijaloga (FB_LOGIN=false; ceka Metine kljuceve)",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "0656511",
@@ -1059,7 +1167,8 @@ expression: r
       "subject": "docs: 🚀 FB gumb maknut — na produkciji (9f2977c, Leonov OK)",
       "kind": "documentation",
       "sub": "deploy",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "8e6b452",
@@ -1068,7 +1177,8 @@ expression: r
       "subject": "docs: U3+U4 zatvoreni (Leonove konzole) + FB odgoda u RACUN/BACKLOG",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "5539861",
@@ -1077,7 +1187,8 @@ expression: r
       "subject": "fix: 5xx bez tijela vise ne ispisuje '{}' u auth statusu (+ regresijski test)",
       "kind": "debugging",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "4e4192c",
@@ -1086,7 +1197,8 @@ expression: r
       "subject": "R2/mail: brendirani Supabase predlosci (potvrda+dobrodoslica, reset, promjena adrese) + scripts/mail-preview.js",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "13669f3",
@@ -1095,7 +1207,8 @@ expression: r
       "subject": "R2/mail: potpis u podnozju predlozaka (znak u kvadratu + ime + tagline + link)",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "123192e",
@@ -1104,7 +1217,8 @@ expression: r
       "subject": "docs/compact-prep: mail-identitet zatvoren + Leonova dva zadatka za sljedecu sesiju (FOUC teme, tema=izgled maila)",
       "kind": "planning",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "e4b0eaf",
@@ -1113,7 +1227,8 @@ expression: r
       "subject": "docs: brzina kao treci zadatak za sljedecu sesiju (izmjereno: 38 skripti / 192.8 KiB od 200 KB budzeta)",
       "kind": "planning",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "891a1ce",
@@ -1122,7 +1237,8 @@ expression: r
       "subject": "FOUC: tema se odlucuje u boot.js, prije prvog crtanja (izmjereno 0 ms bljeska)",
       "kind": "execution",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "6db1c2f",
@@ -1131,7 +1247,8 @@ expression: r
       "subject": "brzina: znakovi providera su ugradjeni SVG — brands-font (106 KB) vise se ne skida",
       "kind": "execution",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "d0d5543",
@@ -1140,7 +1257,8 @@ expression: r
       "subject": "docs: prava dijagnoza sva tri problema (obje ranije bile krive) + zapis dviju zatvorenih cigli",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "69cd297",
@@ -1149,7 +1267,8 @@ expression: r
       "subject": "docs/compact-prep: izmjerene brojke za dizajn-ciglu + doc-audit (pravilo #6)",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "e42cd90",
@@ -1158,7 +1277,8 @@ expression: r
       "subject": "ucitavanje po ruti: prvi kadar s 41 skripte na 22",
       "kind": "execution",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "e8f1651",
@@ -1167,7 +1287,8 @@ expression: r
       "subject": "docs: suradnik otkazan · RASPORED postaje tekuci spec",
       "kind": "planning",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "18e5c3e",
@@ -1176,7 +1297,8 @@ expression: r
       "subject": "F1/1: stranica je dobila boju vlastitog znaka",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "11a366c",
@@ -1185,7 +1307,8 @@ expression: r
       "subject": "docs: crna tema — mail ima DVIJE palete, a izmjerio sam jednu",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "22c556b",
@@ -1194,7 +1317,8 @@ expression: r
       "subject": "F1/2: tema `carbon` — tamna polovica maila, na stranici",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "551df3a",
@@ -1203,7 +1327,8 @@ expression: r
       "subject": "docs/compact-prep: doc-audit (pravilo #6) — sto je danas ostarjelo",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "9307a2b",
@@ -1212,7 +1337,8 @@ expression: r
       "subject": "F1/3: prvi kadar prati uredjaj -- crno bez klika, kao mail",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "10607f0",
@@ -1221,7 +1347,8 @@ expression: r
       "subject": "test: kaskada cita `--color-warn-ink` -- `--warning-text` vise ne postoji",
       "kind": "debugging",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "cbbfd34",
@@ -1230,7 +1357,8 @@ expression: r
       "subject": "docs: Leonova dva nova -- ljepljivi hover (izmjeren) · Tinder-spil kartica (zapisan)",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "a45796d",
@@ -1239,7 +1367,8 @@ expression: r
       "subject": "Analiza rada: docs/records/RAD.xlsx + generator scripts/rad-xlsx.py",
       "kind": "execution",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "8b70c15",
@@ -1248,7 +1377,8 @@ expression: r
       "subject": "F1/6: sonda za trzanje (jank-probe) + ljepljivi hover izmjeren na WebKitu -- mjerenja, bez popravaka",
       "kind": "execution",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "e5a93c5",
@@ -1257,7 +1387,8 @@ expression: r
       "subject": "docs: 🚀 deploy 8b70c15 zapisan (F1/1–F1/3 + F1/6 na produkciji, Leonov OK)",
       "kind": "documentation",
       "sub": "deploy",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "a27b1b8",
@@ -1266,7 +1397,8 @@ expression: r
       "subject": "docs: Leonov treci nalaz -- zoom na dodir izmjeren (F1/10), nista popravljano",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "a31a418",
@@ -1275,7 +1407,8 @@ expression: r
       "subject": "docs/compact-prep: cetiri \"na grani\" tvrdnje → na produkciji · Leonova odluka za sljedecu sesiju (zoom + hover do kraja)",
       "kind": "planning",
       "sub": "deploy",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "831d905",
@@ -1284,7 +1417,8 @@ expression: r
       "subject": "F1/10: zoom na dodir -- (pointer: coarse) umjesto nemjerljivog @supports-njuskanja, touch-action u resetu, brana ⑨",
       "kind": "execution",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "92269c2",
@@ -1293,7 +1427,8 @@ expression: r
       "subject": "F1/8 ①: `:hover` samo gdje hover postoji -- build-prolaz (lightningcss cita, tekst se prepisuje), check:hover, hover-probe",
       "kind": "execution",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "11d8729",
@@ -1302,7 +1437,8 @@ expression: r
       "subject": "docs: Leon na iPhoneu potvrdio F1/8 ① (\"Ne svijetli, odlicno\") · compact-priprema (pravilo #6)",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "c53c28c",
@@ -1311,7 +1447,8 @@ expression: r
       "subject": "F1/8 ②: hover na misu se naoruza tek prvim pomakom -- pauzirajHover() (navigateTo + browseNaRazinu), prefiks :where(:root:not([data-hover-paused])) u hover-css, sonda prelaz, 28 tvrdnji",
       "kind": "execution",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "00584f8",
@@ -1320,7 +1457,8 @@ expression: r
       "subject": "docs: 🚀 deploy c53c28c zapisan (F1/10 + F1/8 ①+② na produkciji, Leonov uvjetni OK, suita 571/0/117)",
       "kind": "documentation",
       "sub": "deploy",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "d82ba1c",
@@ -1329,7 +1467,8 @@ expression: r
       "subject": "docs: ADR-034 -- stranica se NE zumira (Leon) → cigla F1/11; compact-priprema",
       "kind": "planning",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "d1bb543",
@@ -1338,7 +1477,8 @@ expression: r
       "subject": "F1/11: nista ne zumira -- meta min/max-scale=1 + user-scalable=no na 6 stranica, reset touch-action: pan-x pan-y, ISKLJUCENO_ODLUKOM u axe-gate (ADR-034)",
       "kind": "planning",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "9139d6f",
@@ -1347,7 +1487,8 @@ expression: r
       "subject": "F1/7 ①: landing bez `background-attachment: fixed` -- 240 paintova/533 Mpx po prolazu → 0/0, brana no-fixed-background",
       "kind": "execution",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "07f4ab2",
@@ -1356,7 +1497,8 @@ expression: r
       "subject": "F1/7 ②: `?bez=` prekidac za A/B na iPhoneu -- css/bez.css + boot.js (data-bez prije crtanja), jank-probe cita modul umjesto vlastite tablice",
       "kind": "execution",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "4d3962a",
@@ -1365,7 +1507,8 @@ expression: r
       "subject": "docs/compact-prep: BUG-043 nosi biljesku da je F1/11 zamijenio manipulation s pan-x pan-y (ADR-034)",
       "kind": "planning",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "a9689e6",
@@ -1374,7 +1517,8 @@ expression: r
       "subject": "F1/11 ②: js/no-zoom.js -- stipanje s dva prsta gasi JS (gesturestart + touchmove scale), jer Safari metu i touch-action ne slusa",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "eb5b061",
@@ -1383,7 +1527,8 @@ expression: r
       "subject": "docs: matura = VIZIJA, ne projekt -- VISION.md §8 (Leon: \"mature ne diramo, to je vizija\")",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "cbaf4d2",
@@ -1392,7 +1537,8 @@ expression: r
       "subject": "rad: dnevni zapis 2026-09-05 (automatski, scripts/rad-dnevno.ps1)",
       "kind": "execution",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "26e4965",
@@ -1401,7 +1547,8 @@ expression: r
       "subject": "rad: RAD.xlsx se puni AUTOMATSKI svaki dan 23:45 -- scripts/rad-dnevno.ps1 + Windows Task Scheduler (Leon: \"to treba biti automatski\")",
       "kind": "execution",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "93b4897",
@@ -1410,7 +1557,8 @@ expression: r
       "subject": "docs: Leonov odgovor §6/1 -- odjava brise lokalni izbor teme (F2/1); iPhone-nalaz o stipanju opisuje PRODUKCIJU (instalirana app), ne F1/11",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "4d8f19b",
@@ -1419,7 +1567,8 @@ expression: r
       "subject": "F1/4: popis tema ima JEDNO mjesto -- scripts/teme.js cita tokens.css za sve cetiri brane; a11y-brana prvi put skenira carbon",
       "kind": "execution",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "0785952",
@@ -1428,7 +1577,8 @@ expression: r
       "subject": "F1/5: pravne stranice prate uredjaj -- boot.js (sinkron) + data-theme na contact/faq/privacy/terms; legal.spec mjeri iscrtano dark→carbon / light→academic",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "2d45182",
@@ -1437,7 +1587,8 @@ expression: r
       "subject": "docs: Leonove stavke 06.09. SAMO ZAPISANE -- FAQ/About/kontakt sokrat@sokratstudy.com (F3/1 dopuna, prije prijevoda) · \"uvijek bijela\" = produkcija bez F1/5 · \"Automatic · Carbon\" u biracu = pitanje §6/7",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "a354960",
@@ -1446,7 +1597,8 @@ expression: r
       "subject": "docs/compact-prep: HISTORY dobiva redak 2026-09-06 (F1/4 + F1/5 bili zalijepljeni na 05.09.) · CLAUDE.md: F1 gotov osim F1/9",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "4cce27b",
@@ -1455,7 +1607,8 @@ expression: r
       "subject": "docs: CLAUDE.md natrag pod budzet -- dva retka stanja F1 sazeta u jedan (prethodni commit je prosao jer je `| tail` progutao pad check:docs)",
       "kind": "documentation",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "57e2158",
@@ -1464,7 +1617,8 @@ expression: r
       "subject": "F1/9: kartice kao Tinder-spil na dodiru -- palac desno = znam, lijevo = ne znam, spil od tri (samo `pointer: coarse`), strelice kao stolni pandan; jedini put upisa ostaju markKnown/markUnknown",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "d1743a8",
@@ -1473,7 +1627,8 @@ expression: r
       "subject": "docs: HISTORY -- F1 uredjaj: sve cigle isporucene (F1/9 Tinder-spil 57e2158)",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "95e3ba1",
@@ -1482,7 +1637,8 @@ expression: r
       "subject": "docs: Tinder-KADAR -- mjerenje (BACKLOG §E) + plan F1/12 kadar · F1/13 listanje (RASPORED) · §6/8 kraj spila; bez koda",
       "kind": "planning",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "182bac3",
@@ -1491,7 +1647,8 @@ expression: r
       "subject": "docs: Leonovi odgovori za Tinder-kadar -- izbornik na kraju spila · ✕ lijevo / strelica desno i na kompu · sve tipkama (X/Z) · F1/14 tutorial (kasnije, ali predvidjen tablicom akcija)",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "900f142",
@@ -1500,7 +1657,8 @@ expression: r
       "subject": "docs: anketa -- Leonovih pet odgovora zatvara §6 (sidebar obrisati · vjezbe samo tokeni · Facebook otpao · HR predmeti cekaju F5 recepte · birac samo \"Automatski\")",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "fe1af72",
@@ -1509,7 +1667,8 @@ expression: r
       "subject": "docs: HR autor-bot zapisan kao KASNIJE (Leon 06.09.) -- sto postoji, sto fali, redoslijed kad dodje na red",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "2d07d00",
@@ -1518,7 +1677,8 @@ expression: r
       "subject": "docs: HR autor-bot bez API kljuca -- graditelji su Claude Code subagenti, ne Sonnet API (Leon 06.09.)",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "8ec0e18",
@@ -1527,7 +1687,8 @@ expression: r
       "subject": "docs: HR materijali 1. godine postoje na Driveu (Leon 06.09.) -- izvor za autor-bota, jos nepregledano",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "3bfe40a",
@@ -1536,7 +1697,8 @@ expression: r
       "subject": "fix(check:docs): gitignoriran artefakt nije duh-datoteka -- brana je padala u svakom svjezem klonu",
       "kind": "debugging",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "4c9e4f1",
@@ -1545,7 +1707,8 @@ expression: r
       "subject": "F2/1 (6/7): birac tema -- natpis je samo \"Automatski\", sufiks s temom uredjaja otpada",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "e6ed07d",
@@ -1554,7 +1717,8 @@ expression: r
       "subject": "rad: dnevni zapis 2026-09-06 (automatski, scripts/rad-dnevno.ps1)",
       "kind": "execution",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "27d495a",
@@ -1563,7 +1727,8 @@ expression: r
       "subject": "docs: model monetizacije -- organizacija je najam, firme placaju prve (ADR-036)",
       "kind": "planning",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "1384f6b",
@@ -1572,7 +1737,8 @@ expression: r
       "subject": "docs(progress): sesija 07.09. -- model monetizacije zakljucan, cinjenice o inkubatoru provjerene",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "a341880",
@@ -1581,7 +1747,8 @@ expression: r
       "subject": "Mjerenje aktivacije i povratka: SokratMetrika u consent.js + kuka u switchSection()",
       "kind": "execution",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "d5377ff",
@@ -1590,7 +1757,8 @@ expression: r
       "subject": "rad: dnevni zapis 2026-09-07 (automatski, scripts/rad-dnevno.ps1)",
       "kind": "execution",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "5233a0a",
@@ -1599,7 +1767,8 @@ expression: r
       "subject": "fix(check:docs): gitignoriran artefakt nije duh-datoteka -- brana je padala u svakom svjezem klonu",
       "kind": "debugging",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "74eb8ae",
@@ -1608,7 +1777,8 @@ expression: r
       "subject": "F2/0: traka dobiva dva odredista -- \"Pocni uciti\" obrisan, gore su UGC i profil",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "49101f0",
@@ -1617,7 +1787,8 @@ expression: r
       "subject": "rad: dnevni zapis 2026-09-08 (automatski, scripts/rad-dnevno.ps1)",
       "kind": "execution",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "cc01a1b",
@@ -1626,7 +1797,8 @@ expression: r
       "subject": "F2/0 ②: materials-entry okrenut -- CI je nasao spec koji je moja pretraga promasila",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "6f51b7c",
@@ -1635,7 +1807,8 @@ expression: r
       "subject": "docs(TESTING): pouka F2/0 -- element sucelja se ne trazi po imenu nego po svemu cime se gada",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "8b79790",
@@ -1644,7 +1817,8 @@ expression: r
       "subject": "docs(PROGRESS): dnevnik pokazuje na pouku umjesto da je ponavlja (ADR-027)",
       "kind": "planning",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "1e2d157",
@@ -1653,7 +1827,8 @@ expression: r
       "subject": "check:docs: budzet CLAUDE.md se mjeri BEZ znaka povratka -- ista datoteka, ista presuda",
       "kind": "planning",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "4a2b260",
@@ -1662,7 +1837,8 @@ expression: r
       "subject": "docs(CLAUDE.md): stanje govori danasnji dan -- F1 parkiran u karticama, F2 poceo",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "e6b6515",
@@ -1671,7 +1847,8 @@ expression: r
       "subject": "F2/3a: profil postaje ZID -- identitet gore, administracija ispod",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "5950c86",
@@ -1680,7 +1857,8 @@ expression: r
       "subject": "F2/3b: ime i opis dobivaju svoju tablicu -- `role` ostaje zatvoren",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "f670767",
@@ -1689,7 +1867,8 @@ expression: r
       "subject": "docs: pred-compact revizija -- odluka o bucketu, nova tablica u BACKEND-u, stanje govori danasnji dan",
       "kind": "planning",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "d9c1f4d",
@@ -1698,7 +1877,8 @@ expression: r
       "subject": "docs: matura seli u archive/ -- VISION.md §8 je jedino mjesto gdje matura zivi (Leon 12.09.)",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "d54d015",
@@ -1707,7 +1887,8 @@ expression: r
       "subject": "N5: odbijeni paket se zaboravlja -- drugi poziv paket() ponovno skida, ne vraca staru gresku (BUG-051)",
       "kind": "debugging",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "5e7e3e3",
@@ -1716,7 +1897,8 @@ expression: r
       "subject": "N3: snapshot tek nakon uspjelog upisa u pullu -- pali prvi push ceka sljedeci interval, bez laznog \"sinkronizirano\" (BUG-049)",
       "kind": "debugging",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "c7dea8e",
@@ -1725,7 +1907,8 @@ expression: r
       "subject": "N2: spajanje nizova koji nisu stringovi = multiskup-maksimum -- [80]+[90] daje oba, ne \"dulje polje\" (BUG-048)",
       "kind": "debugging",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "6bfb61b",
@@ -1734,7 +1917,8 @@ expression: r
       "subject": "N4: lokalni napredak ima VLASNIKA -- drugi racun na istom pregledniku ga ne nasljedjuje (BUG-050)",
       "kind": "debugging",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "86113e7",
@@ -1743,7 +1927,8 @@ expression: r
       "subject": "N1: naucena kartica se pamti po IDENTITETU, ne po poziciji u promijesanom spilu (BUG-047)",
       "kind": "debugging",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "fdcb2b3",
@@ -1752,7 +1937,8 @@ expression: r
       "subject": "bump: cache tokeni + CONTENT_VERSION/SW_VERSION nakon N1-N5 (js/loader, cloud-sync, flashcards, storage, progress, profile)",
       "kind": "execution",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "a68f154",
@@ -1761,7 +1947,8 @@ expression: r
       "subject": "docs: BUG-047..051 (pet nalaza vanjske recenzije, svi rijeseni) + CHANGELOG + PROGRESS 12.09.",
       "kind": "documentation",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "5da7119",
@@ -1770,7 +1957,8 @@ expression: r
       "subject": "fix(check:docs): gitignoriran artefakt nije duh-datoteka -- brana je padala u svakom svjezem klonu",
       "kind": "debugging",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "5273ea0",
@@ -1779,7 +1967,8 @@ expression: r
       "subject": "test(app-state): tvrdnja o naucenim karticama okrenuta na identitete -- includes(0)&&includes(1) je kodirala BUG-047",
       "kind": "debugging",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "bfb3a50",
@@ -1788,7 +1977,8 @@ expression: r
       "subject": "docs: BUGS.md razdvojen (BUG-001..038 u BUGS_ARCHIVE.md) + RASPORED §0 SPAJANJE -- karta grana i redoslijed za sljedecu sesiju (Leon 12.09.)",
       "kind": "planning",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "d8e61be",
@@ -1797,7 +1987,8 @@ expression: r
       "subject": "merge: NAPREDAK POUZDAN (BUG-047…051) -- identitet kartice, merge = multiskup-max, snapshot tek nakon upserta, vlasnik lokalnog napretka, odbijeni paket se zaboravlja; + check:docs gitignore-fix (3bfe40a)",
       "kind": "debugging",
       "sub": "gate_or_measure",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "d2aa6b3",
@@ -1806,7 +1997,8 @@ expression: r
       "subject": "merge: ostatak F1 (F1/4, F1/5, F1/7, F1/9, F1/11) + metrika ucenje/povratak + docs 05.-12.09. (ADR-035/036, matura u archive/) -- feat/mjerenje-aktivacije",
       "kind": "planning",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "3dc6624",
@@ -1815,7 +2007,8 @@ expression: r
       "subject": "merge: F2/1 (6/7) birac tema -- natpis samo 'Automatski' (feat/nocna-b)",
       "kind": "execution",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "1d54700",
@@ -1824,7 +2017,8 @@ expression: r
       "subject": "merge: F2/0 traka s dva odredista + F2/3a profil = zid + F2/3b identitet (profile_identity + RPC) -- feat/profil-zid",
       "kind": "execution",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "a34ebf0",
@@ -1833,7 +2027,8 @@ expression: r
       "subject": "BUG-046: pilula kategorije na obojenoj kartici pada AA -- mijesa se SUPROTNA tinta (cherry-pick 2641834 s parkirane feat/tinder-kadar)",
       "kind": "debugging",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "c64a156",
@@ -1842,7 +2037,8 @@ expression: r
       "subject": "BUG-045: Service Worker nikad nije spremao runtime assete -- res.clone() sinkrono PRIJE caches.open (cherry-pick 3708e2d s parkirane feat/tinder-kadar)",
       "kind": "debugging",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "d943a84",
@@ -1851,7 +2047,8 @@ expression: r
       "subject": "docs(progress, raspored §0): sesija SPAJANJE 12.09. -- svih sest koraka pripremljeno i izmjereno lokalno, nista pushano na main, svaki korak ceka Leonov OK",
       "kind": "planning",
       "sub": "other",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "2ae9051",
@@ -1860,7 +2057,8 @@ expression: r
       "subject": "docs(progress, raspored §0): spajanje IZVEDENO 13.09. -- pet koraka na produkciji, §0 ispunjen, F2/2 ide u novom stablu od main-a",
       "kind": "planning",
       "sub": "deploy",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "3ddf5f2",
@@ -1869,7 +2067,8 @@ expression: r
       "subject": "F2/2 cigla 1: bucket profile-images (javan, upis samo vlasniku) + RPC set_profile_image + delete-account cisti oba bucketa (STAGING)",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "90dca49",
@@ -1878,7 +2077,8 @@ expression: r
       "subject": "F2/2 cigla 2: js/profile-images.js — smanjivanje u pregledniku (WebP), upload u vlastiti prefiks, RPC, brisanje stare",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "61c39dd",
@@ -1887,7 +2087,8 @@ expression: r
       "subject": "F2/2 cigla 3: zid crta profilnu i naslovnu; Promijeni/Ukloni u „Uredi profil\" (i18n, CSS, spec ⑤ klik-put)",
       "kind": "execution",
       "sub": "brick",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     },
     {
       "sha": "090bd0c",
@@ -1896,7 +2097,8 @@ expression: r
       "subject": "docs: 🚀 F2/2 slike profila na produkciji (main 61c39dd, token 20260913203047) — SQL, Edge Function, push; odluke iz ankete; stabla počišćena",
       "kind": "planning",
       "sub": "deploy",
-      "overridden": false
+      "overridden": false,
+      "branch": "main"
     }
   ],
   "deliveries": [

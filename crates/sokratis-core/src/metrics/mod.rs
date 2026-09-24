@@ -1,9 +1,11 @@
+pub mod branches;
 pub mod days;
 pub mod hours;
 pub mod indicators;
 pub mod kinds;
 pub mod phases;
 pub mod visions;
+pub use branches::branch_stats;
 pub use days::day_stats;
 pub use hours::hours_per_day;
 pub use indicators::indicators;

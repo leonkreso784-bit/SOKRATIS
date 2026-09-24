@@ -9,6 +9,9 @@
 //! commits)` spaja dva paralelna niza bez indeksa; nema `[i]` koji bi mogao pasti izvan granica.
 //!
 //! Dopuna (cigla M2/29a): `commit_rows` prepisuje `c.author_time` u redak bez računanja — čisti prijenos.
+//!
+//! Dopuna (cigla M2/46, S-032): `commit_branches.get(&c.sha).cloned().unwrap_or_else(..)` — commit
+//! izvan karte je na zadanoj grani; `unwrap_or_else` računa `to_string()` samo kad treba (lijeno).
 use crate::classify::{classify_kind, classify_sub};
 use crate::{Commit, CommitRow, KindStats, Patterns, WorkKind};
 use std::collections::HashMap;
@@ -26,6 +29,8 @@ pub fn commit_rows(
     commits: &[Commit],
     overrides: &HashMap<String, WorkKind>,
     p: &Patterns,
+    commit_branches: &HashMap<String, String>,
+    default_branch: &str,
 ) -> Vec<CommitRow> {
     commits
         .iter()
@@ -37,6 +42,11 @@ pub fn commit_rows(
             kind: effective_kind(c, overrides, p),
             sub: classify_sub(&c.subject, p),
             overridden: overrides.contains_key(&c.sha),
+            // `get(..).cloned()` + `unwrap_or_else`: commit izvan karte je na zadanoj grani (S-032).
+            branch: commit_branches
+                .get(&c.sha)
+                .cloned()
+                .unwrap_or_else(|| default_branch.to_string()),
         })
         .collect()
 }
@@ -104,7 +114,7 @@ mod tests {
         ov.insert("b".to_string(), WorkKind::Polish);
         assert_eq!(effective_kind(&commits[0], &ov, &p), WorkKind::Debugging);
         assert_eq!(effective_kind(&commits[1], &ov, &p), WorkKind::Polish);
-        let rows = commit_rows(&commits, &ov, &p);
+        let rows = commit_rows(&commits, &ov, &p, &HashMap::new(), "main");
         let ks = kind_stats(&rows, &commits);
         let kinds: Vec<WorkKind> = ks.iter().map(|k| k.kind).collect();
         assert_eq!(kinds, WorkKind::ALL.to_vec());
@@ -161,7 +171,7 @@ mod tests {
         ];
         let mut ov = HashMap::new();
         ov.insert("b2".to_string(), WorkKind::Polish);
-        let rows = commit_rows(&commits, &ov, &p);
+        let rows = commit_rows(&commits, &ov, &p, &HashMap::new(), "main");
         let got: Vec<(&str, WorkKind, SubKind, bool, i64)> = rows
             .iter()
             .map(|r| (r.sha.as_str(), r.kind, r.sub, r.overridden, r.author_time))
@@ -183,7 +193,7 @@ mod tests {
             row_commit("a1", "F1/1 cigla"),
             row_commit("b2", "fix: kvar"),
         ];
-        let rows = commit_rows(&commits, &HashMap::new(), &p);
+        let rows = commit_rows(&commits, &HashMap::new(), &p, &HashMap::new(), "main");
         let ks = kind_stats(&rows, &commits);
         let exec = ks.iter().find(|k| k.kind == WorkKind::Execution).unwrap();
         assert_eq!((exec.commits, exec.share), (1, 0.5));

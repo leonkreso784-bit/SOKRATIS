@@ -6,6 +6,10 @@
 // jer `#[serde(rename_all = "snake_case")]` u Rustu daje `"debugging"`, ne `"Debugging"` (S-008).
 // Dopunjeno M2/38 — `Settings.motion` i `View`+`'settings'` niže: oblici koje `model.rs` ne zna
 // (popis projekata, raspon, postavke), sučelje ih drži samo za sebe.
+// Dopunjeno M2/46 (S-032) — `BranchScope`, `BranchStats`, `CommitRow.branch`, `Report.scope`/
+// `branches`: ista dva teksta ("all"/"default") kao Rustov `#[serde(rename)]`.
+// Dopunjeno M2/47 (S-033) — `Touched.worktrees`/`diaries`: mjerač kaže koliko je stabala i tekstova
+// dnevnika dotaknuo (isto polje kao Rustov `Touched`, zadnja dva polja).
 import type { Lang } from './i18n/index.svelte';
 
 export type { Lang };
@@ -21,6 +25,8 @@ export interface Touched {
   lines: number;
   files: number;
   skipped_lines: number;
+  worktrees: number;
+  diaries: number;
 }
 
 export interface DayStats {
@@ -51,6 +57,7 @@ export interface CommitRow {
   kind: WorkKind;
   sub: SubKind;
   overridden: boolean;
+  branch: string;
 }
 
 export interface Delivery {
@@ -115,15 +122,29 @@ export interface Signal {
   since: number | null;
 }
 
+// Koje su grane ušle u mjerenje (S-032); `Report.scope`.
+export type BranchScope = 'all' | 'default';
+
+// Jedan red sekcije Grane (`branch_stats` u jezgri) — sati su proxy, ne mjera (vidi `model.rs`).
+export interface BranchStats {
+  name: string;
+  commits: number;
+  lines: number;
+  hours: number;
+  merged: boolean;
+}
+
 // Zrcali `Report` iz `model.rs` polje po polje — vidi zaglavlje datoteke.
 export interface Report {
   generated_at: number;
   since: string;
   until: string | null;
   branch: string;
+  scope: BranchScope;
   touched: Touched;
   days: DayStats[];
   kinds: KindStats[];
+  branches: BranchStats[];
   commits: CommitRow[];
   deliveries: Delivery[];
   indicators: Indicator[];

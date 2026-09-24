@@ -84,7 +84,9 @@ fn open_reads_profile_manual_data_and_docs() {
         ("main", "2026-09-01")
     );
     assert!(input.git_log.contains("F1/1 kod"));
-    assert!(input.diary.as_deref().unwrap().starts_with("## 2026-09-01"));
+    // M2/47: `diaries` je Vec (jedno stablo za sada, T50 dodaje ostala) — prvi element je isti
+    // tekst koji je do sada nosio `Option<String>` (redak konstrukcije, polje preimenovano u T47).
+    assert!(input.diaries[0].starts_with("## 2026-09-01"));
     assert!(input.plan.is_none());
     assert_eq!(input.today.len(), 10);
     assert_eq!(input.branches.len(), 1);
@@ -160,7 +162,7 @@ fn repo_without_conventions_reports_git_numbers_and_empty_states() {
 
     let p = Project::open(r.path()).unwrap();
     let input = p.input(Some("2026-09-01")).unwrap();
-    assert!(input.diary.is_none(), "nema dnevnika");
+    assert!(input.diaries.is_empty(), "nema dnevnika");
     assert!(input.plan.is_none(), "nema plana");
     assert!(input.docs.is_empty(), "nema docs/");
 

@@ -1,6 +1,6 @@
 pub mod diary;
 pub mod gitlog;
 pub mod plan;
-pub use diary::parse_diary;
+pub use diary::{parse_diaries, parse_diary};
 pub use gitlog::{Parsed, format_gitlog, parse_git_log};
 pub use plan::parse_plan;
