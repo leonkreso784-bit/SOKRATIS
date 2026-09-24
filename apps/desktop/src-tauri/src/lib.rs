@@ -10,30 +10,35 @@
 //! (M2/30). Splash (`splash::arm`, M2/31) kreće PRIJE motora iz istog razloga — motorova nit zove
 //! `splash::loaded`, koji bi panicirao da `SplashState` još nije managed.
 //!
-//! ZAŠTO RUST OVAKO (cigla M2/32 — tray, zatvaranje, jedna instanca)
-//! `single-instance` je PRVI plugin (Tauri to zahtijeva); tray sam (`tray::build`) i X→hide
-//! (`on_window_event` niže) su odvojeni od ovog gradilišta jer nijedan drugi modul ih ne treba.
+//! ZAŠTO RUST OVAKO (cigla M2/45 — X = upit → izlaz, bez traya, S-036)
+//! Tray je ukinut: svako pokretanje je nov proces (nema pozadinske ikone koja bi ga držala živim),
+//! pa splash (S-019) sam daje animaciju bez posebnog slučaja za "već pokrenuto pa skriveno". X sad
+//! NE gasi ni skriva prozor sam — `prevent_close` ga zadrži, a `window.emit` pošalje događaj sučelju
+//! (trait `tauri::Emitter` mora biti u opsegu: Tauri 2 dijeli metode po traitovima — `Manager` daje
+//! pristup stanju, `Emitter` daje slanje događaja prozorima). Sučelje pokaže upit i, na potvrdu, zove
+//! naredbu `quit`.
+mod autostart;
 mod cache;
 mod commands;
 mod engine;
 mod splash;
 mod state;
 mod summary;
-mod tray;
 
 use commands::{
-    add_project, get_report, get_settings, get_trend, list_projects, refresh, remove_project,
+    add_project, get_report, get_settings, get_trend, list_projects, quit, refresh, remove_project,
     rename_project, save_visions, set_override, set_setting,
 };
 use state::AppState;
 use std::collections::HashMap;
 use std::sync::Mutex;
+use tauri::Emitter;
 use tauri_plugin_autostart::MacosLauncher;
 
 pub fn run() {
     tauri::Builder::default()
         // `single-instance` MORA biti prvi plugin (dopuna T32 #7) — drugo pokretanje ne otvara nov
-        // proces nego samo podigne postojeći glavni prozor (isti pomoćnik kao tray i splash).
+        // proces nego samo podigne postojeći glavni prozor (isti pomoćnik kao splash).
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
             splash::show_main(app);
         }))
@@ -69,30 +74,29 @@ pub fn run() {
             save_visions,
             refresh,
             get_settings,
-            set_setting
+            set_setting,
+            quit
         ])
-        // X sakriva SAMO glavni prozor (S-020) — watcher i tray rade dalje, izlaz je izričit kroz
-        // "Izađi" u tray-izborniku (`tray.rs`, `app.exit(0)`). `splash` se zatvara normalno, jer
-        // uvjet niže gleda samo prozor s labelom "main".
+        // X NE zatvara odmah (S-036): `prevent_close` zadrži prozor, `close_requested` ode sučelju,
+        // koje pokaže upit („Zatvoriti Sokratis?"); „Zatvori" zove naredbu `quit` → `app.exit(0)`.
+        // Traya više nema — svako pokretanje je nov proces, pa i animacija (S-019 ostaje).
         .on_window_event(|window, event| {
             if let tauri::WindowEvent::CloseRequested { api, .. } = event
                 && window.label() == "main"
             {
                 api.prevent_close();
-                if let Err(e) = window.hide() {
-                    eprintln!("glavni prozor: hide() nije uspio: {e}");
+                if let Err(e) = window.emit("close_requested", ()) {
+                    eprintln!("glavni prozor: close_requested nije poslan: {e}");
                 }
             }
         })
         // Splash se naoružava PRIJE motora (M2/31) — `engine::start` odmah otvara nit koja na
         // kraju zove `splash::loaded`, pa `SplashState` mora biti managed prije toga. Motor
         // (nadzor datoteka + prvi izračun) kreće nakon `manage` — `engine::start` čita `AppState`
-        // čim se pozove (M2/30). Tray (M2/32) se gradi zadnji — treba `AppState` za trenutnu
-        // postavku jezika/autostarta pri gradnji izbornika.
+        // čim se pozove (M2/30).
         .setup(|app| {
             splash::arm(app.handle());
             engine::start(app.handle());
-            tray::build(app.handle())?;
             Ok(())
         })
         .run(tauri::generate_context!())

@@ -1,12 +1,14 @@
-//! ZAŠTO RUST OVAKO (cigla M2/29 — jedanaest Tauri naredbi kao tanki pozivatelji)
+//! ZAŠTO RUST OVAKO (cigla M2/29 — dvanaest Tauri naredbi kao tanki pozivatelji)
 //! `#[tauri::command]` pretvara običnu funkciju u RPC koji sučelje zove kroz `invoke(ime, args)`;
 //! `Result<T, String>` je ugovor Tauri IPC-a (obrazložen uz `state::text`). Zajednička „računica"
 //! (izračun izvještaja) živi u `compute`/`compute_input` niže — naredbe SAMO posuđuju stanje i
 //! pozivaju je. (M2/30: `set_override`/`save_visions`/`refresh` sad zovu `engine::request_refresh`
 //! umjesto da same diraju `state.reports` — detalj uz svaku naredbu niže.)
-//! (M2/32: `refresh(None)` petlju sad radi `engine::refresh_all` — i tray je zove, iz zasebne niti.)
+//! (M2/32: `refresh(None)` petlju sad radi `engine::refresh_all`; `refresh(None)` je jedini
+//! pozivatelj.)
 //! (M2/38: `Settings` dobiva četvrti ključ `motion: bool`, `SETTING_KEYS` postaje `[&str; 4]` —
 //! `set_setting` ga upisuje kroz istu opću granu kao `theme`/`lang`, bez novog `if`.)
+//! (M2/45: naredba `quit` je nova — tray je ukinut, S-036.)
 use crate::cache::StoreCache;
 use crate::state::{AppState, text};
 use crate::summary::{ProjectSummary, summarize};
@@ -329,8 +331,8 @@ pub fn save_visions(
 
 /// `request_refresh` (ne `engine::refresh_project` izravno) — isti red kao watcher (S-010), pa gumb
 /// „Osvježi" i vanjska promjena datoteke nikad ne računaju isti projekt istodobno (Ruling R10).
-/// Petlja „svi projekti" je `engine::refresh_all` (dopuna T32 #5) — tray je zove iz zasebne niti,
-/// pa ta petlja ne smije postojati na dva mjesta (S-010).
+/// Petlja „svi projekti" je `engine::refresh_all` (dopuna T32 #5) — `refresh(None)` je jedini
+/// pozivatelj, pa ta petlja ne postoji na dva mjesta (S-010).
 #[tauri::command]
 pub fn refresh(app: tauri::AppHandle, id: Option<i64>) -> Result<(), String> {
     match id {
@@ -338,6 +340,16 @@ pub fn refresh(app: tauri::AppHandle, id: Option<i64>) -> Result<(), String> {
         None => crate::engine::refresh_all(&app),
     }
     Ok(())
+}
+
+/// Izlaz iz aplikacije (S-036): X na prozoru NE gasi proces sam — `lib.rs` ga presretne
+/// (`prevent_close`) i emitira `close_requested`; sučelje pokaže upit i, na „Zatvori", zove OVO.
+/// `app.exit(0)` prekida i nit motora usred izračuna: snimke su SQLite transakcije (S-014), pa
+/// prekid ne ostavlja pola dana u bazi. Ništa se ne sprema prije izlaza — nema što (registar i
+/// postavke se pišu odmah pri promjeni).
+#[tauri::command]
+pub fn quit(app: tauri::AppHandle) {
+    app.exit(0);
 }
 
 // ── postavke ─────────────────────────────────────────────────────────────────────────────────────
@@ -354,8 +366,8 @@ pub fn get_settings(state: tauri::State<'_, AppState>) -> Result<Settings, Strin
 }
 
 /// Autostart ima DVA učinka (registracija u OS-u preko plugina + zapis u bazu) na JEDNOM mjestu,
-/// `tray::set_autostart` (dopuna T32 #2) — tray-kvačica zove ISTU funkciju, pa baza nikad ne prođe
-/// mimo plugina. Ostale postavke idu ravno u bazu, kao i do sada.
+/// `autostart::set_autostart` (dopuna T32 #2, preseljeno M2/45) — jedini pozivatelj je ova naredba,
+/// pa baza nikad ne prođe mimo plugina. Ostale postavke idu ravno u bazu, kao i do sada.
 #[tauri::command]
 pub fn set_setting(
     app: tauri::AppHandle,
@@ -367,7 +379,7 @@ pub fn set_setting(
         return Err(format!("nepoznata postavka '{key}'"));
     }
     if key == "autostart" {
-        return crate::tray::set_autostart(&app, value == "on");
+        return crate::autostart::set_autostart(&app, value == "on");
     }
     state
         .store
