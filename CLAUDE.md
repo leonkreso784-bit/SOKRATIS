@@ -72,7 +72,7 @@ pogrešna uporaba**; `--help`/`--version` = 0) — sve rade nad pravim repozitor
 Sokrat Studyjem).
 Testovi i brane: `docs/workflow/TESTING.md`.
 
-## Stanje — TRENUTNO (2026-09-24 — drugi rez do 1.0.0: izvedba sesija 1 gotova, sesija 2 u tijeku)
+## Stanje — TRENUTNO (2026-09-24 — drugi rez do 1.0.0: izvedbe sesija 1–3 gotove)
 - **M0 gotov, M1 zatvoren** (0.1.0); etape 1+2 M2 cjelovite u kodu (svih devet tokova + SUČELJE-2).
   Leon je nakon instalacije tražio veće promjene (`docs/product/NALAZI_LEON_2026-09-23.md`) →
   brainstorming dao **drugi rez do 1.0.0**: S-032…S-037.
@@ -80,10 +80,13 @@ Testovi i brane: `docs/workflow/TESTING.md`.
   **Aktivan plan `docs/superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md`**: T44–T63, šest tokova
   (DESKTOP-2 · JEZGRA-2 · IO-2 · GRAFOVI · PLOČA · IZDANJE), pet sesija; tok IZDANJE preuzima T35/T43
   iz plana M2 (ostaje u `superpowers/plans/`, nije arhiviran).
-- **Sesija 1 gotova:** DESKTOP-2 (T44–T45) · JEZGRA-2 (T46–T47) · GRAFOVI (T53) spojeni, vrh `main`-a
-  `cb62454`, verzija u kodu `1.0.0-pre.2`, instalater pre.2 izgrađen. **Sesija 2 prekinuta:** T48 (`c226bd8`) i T54 (`459d9e4`, GRAFOVI) izgrađeni i **čekaju recenziju**; dalje T49 · T50 (IO-2) · T55.
-- **Četiri stabla:** `sokratis` (`main`), `sokratis.jezgra2` (`feat/core-profile`, T48), `sokratis.grafovi` (`feat/charts-2`, T54) i `sokratis.rel` (`feat/release`, T35 napola, necommitano, ne
-  dirati do toka IZDANJE); nova sesija ih ne briše. Tag traži Leonov izričit OK.
+- **Sesije 1–3 gotove:** DESKTOP-2 (T44–T45) · JEZGRA-2 (T46–T48) · GRAFOVI (T53–T55) · IO-2 (T49–T50)
+  spojeni, vrh `main`-a `9a0e98f`, verzija u kodu `1.0.0-pre.3` (Leon nije stigao instalirati pre.2).
+  Mjerenje po zadanom profilu sad ide preko **svih lokalnih grana** (S-032), dnevnik je unija svih
+  radnih stabala (S-033). **Sesija 4 slijedi:** T51 (CLI `--scope`) · T52 (mjerenje procesa/trajanja) ·
+  T56–T57 (GRAFOVI kraj) · T58 (PLOČA — tok kreće).
+- **Dva stabla:** `sokratis` (`main`) i `sokratis.rel` (`feat/release`, T35 napola, necommitano, ne
+  dirati do toka IZDANJE). Tag traži Leonov izričit OK.
 - Druga verzija (M3) i kasnije: `docs/records/BACKLOG.md`.
 - Brane, brojke i tijek sesija: `PROGRESS.md`; isporuke: `CHANGELOG.md`. Ovaj odjeljak to ne ponavlja.
 
@@ -117,7 +120,7 @@ sesije.
 ## Agenti — više grana, jedan orkestrator
 Uloge i protokol: `docs/workflow/AGENTI.md`. Graditelj radi **jednu ciglu u svom stablu**, recenzent presuđuje
 u dva prolaza, čuvar dokumentacije piše zapise; **samo orkestrator spaja u `main`**. Nakon compacta stanje se
-čita iz gita (`git log --oneline -15` · `git worktree list`), ne iz sjećanja. **Otvorena su četiri stabla** (v. „Stanje"); trajna dva:
+čita iz gita (`git log --oneline -15` · `git worktree list`), ne iz sjećanja. **Otvorena su dva stabla** (v. „Stanje"):
 `sokratis` (`main`) i `sokratis.rel` (`feat/release`, T35 napola, necommitano) — potpuno spojena se
 brišu (pravilo #1), ali `sokratis.rel` NIJE spojeno, pa ga nova sesija ne dira ni ne briše, samo
 nastavlja T35 ondje kad tok IZDANJE dođe na red. Popis tokova i vlasništvo datoteka:

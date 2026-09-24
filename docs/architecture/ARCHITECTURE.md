@@ -24,8 +24,15 @@ je u izvedbi — sesija 1 (2026-09-24) spojila je tri toka: **DESKTOP-2** (T44�
 jedino mjesto `Command::new("git")` s `CREATE_NO_WINDOW` na Windowsu, kvar 4; X → upit → `quit`, tray
 uklonjen, S-036), **JEZGRA-2** (T46–T47: `BranchScope`, `CommitRow.branch`, `Report.scope`/`branches`
 sa satima po udjelu commita, S-032; `ReportInput.diaries` unija po datum+naslov, S-033) i **GRAFOVI**
-(T53: četiri d3-ovisnosti pinane, `lib/charts/scales.ts`+`bucket.ts`, S-035) — §1, §3, §11. Verzija u
-kodu `1.0.0-pre.2`; sesija 2 nastavlja IO-2 (T48–T50) i PLOČA (T54).
+(T53: četiri d3-ovisnosti pinane, `lib/charts/scales.ts`+`bucket.ts`, S-035). Sesija 3 (2026-09-24) je
+zatim spojila **JEZGRA-2 T48** (`Profile.branch_scope`, zadano `"all"`), **GRAFOVI T54–T55** (temelji
+`lib/charts/layout.ts` + `Chart`/`Axis`/`Grid`/`Legend`/`Tooltip`; `Bars`/`Line` prepisani na temelje,
+`scale.ts` obrisan, d3 prvi put stvarno u snopu) i **IO-2 T49–T50** (`Scope::AllBranches`,
+`commit_sources`, `cached_log(scope)` puni `scope`/kartu grana iz profila — `GitSource` sad ima **15**
+metoda; `worktree_heads`/`commit_times`, vodeće stablo `Project::lead`, dnevnik kao unija SVIH radnih
+stabala s diska, plan/`docs`/zadnja promjena datoteke iz vodećeg stabla) — §1, §3, §4, §11. Verzija u
+kodu `1.0.0-pre.3`; sesija 4 nastavlja T51 (CLI `--scope`), T52 (mjerenje procesa/trajanja), T56–T57
+(GRAFOVI kraj) i T58 (PLOČA — tok kreće).
 Što od koda još stoji bez pokrića ili s poznatim rubom je u §11 ·
 **Zadnja provjera:** 2026-09-24
 
@@ -151,7 +158,7 @@ Dokaz da se ljuska stvarno pokreće je **dimni test** (`npm run tauri dev`, ruč
 | `styles/motion.css` | **jedino mjesto pokreta sučelja** (S-026): `--motion-dur: 250ms`, `:root[data-motion="off"]` svodi svaku `animation-`/`transition-duration` na `0s !important`; `lib/motion.ts::motionOff` je čista odluka bez DOM-a, `state.svelte.ts::syncMotion` je upisuje kao `data-motion` na `<html>` — isti obrazac kao `data-theme` |
 | `lib/i18n/` (`hr.json`, `en.json`, `t.ts`, `index.svelte.ts`) | HR/EN rječnik (S-021); `scripts/check-i18n.mjs` brani da oba jezika imaju isti skup ključeva |
 | `lib/format.ts` | jedino mjesto oblikovanja brojki, datuma i postotaka za sučelje |
-| `lib/charts/` (`Bars`, `Line`, `Ring`, `Sparkline`, `scale.ts`) | vlastiti SVG grafovi (S-018), bez biblioteke; ulaze animirano (M2/39, §11 niže); **od T53 (2026-09-24, S-035, Leonov OK) += `scales.ts`/`bucket.ts`** — d3-matematika za osi (`d3-scale`/`d3-shape`/`d3-array`/`d3-time-format`, UTC datumski ticksi, grupiranje po danu/tjednu/mjesecu), izgled i boje ostaju naši; nitko ih još ne uvozi (`main.js` tree-shaken) |
+| `lib/charts/` (`layout.ts`, `scales.ts`, `bucket.ts`, `Chart`/`Axis`/`Grid`/`Legend`/`Tooltip`/`Bars`/`Line`/`Ring`/`Sparkline`) | vlastiti SVG grafovi (S-018) s d3-matematikom za osi (S-035 dopunjena, Leonov OK: `d3-scale`/`d3-shape`/`d3-array`/`d3-time-format`, UTC datumski ticksi, grupiranje po danu/tjednu/mjesecu); izgled i boje ostaju naši; ulaze animirano (M2/39, §11 niže). **T54** (2026-09-24) donio temelje — `layout.ts` (okvir/margine, grupirani/naslagani stupci nad `scaleBand`, X-ticksi prorijeđeni na ≤ 10, linija s datumskom skalom, najbliža točka za tooltip) + pet tankih komponenata `Chart`/`Axis`/`Grid`/`Legend`/`Tooltip`. **T55** prepisao `Bars`/`Line` na te temelje (datumi na X-osi, mreža, legenda, tooltip miš+tipkovnica) i `Ring`/`Sparkline` na `scales.ts`; stari `scale.ts` **obrisan** — `linear`/`finiteMax`/`arcPath`/`ringSegments`/`svgA11y` sele u `scales.ts`. `main.js` sad stvarno uvozi d3 (258,67 kB, `CHANGELOG.md`). Prekidač dan/tjedan/mjesec dolazi u T59 |
 | `lib/explain/` (`ids.ts`, `explain.svelte.ts`, `Explainable.svelte`, `ExplainCard.svelte`) | **kartica s objašnjenjem** (S-027, M2/41–42): `EXPLAIN_IDS` (37) + `explainKeys(id)` → ključevi `explain.<id>.what\|how\|read`; `Explainable` je okidač (`<button aria-haspopup="dialog">`), `ExplainCard` (`role="dialog" aria-modal="false"`) prikazuje tekst; test pokrivenosti veže popis na OBA rječnika u oba smjera i na 18 id-eva pokazatelja iz prave snimke jezgre |
 | `splash/` (`Splash.svelte`, `intro.ts`) | animacija pokretanja, 4,2 s, preskočiva (S-019); zaseban Vite-ulaz `splash.html` |
 | `lib/api.ts` | sučelje `Api`; `MockApi` čita insta snapshot jezgre kroz Viteov `?raw` uvoz — dev-prikaz i vitest vide TOČNO brojke koje bi jezgra izračunala, ne ručno prepisanu kopiju (S-010); `TauriApi` (T34) svaku metodu prevodi u `invoke('<naredba>', {…})` prema `commands.rs`, `onReportUpdated`/`onSignalRaised` idu preko `listen()`; `createApi()` bira izvedbu po `'__TAURI_INTERNALS__' in window`; **od T45 (M2/45, S-036) += `quit()`/`onCloseRequested(cb)`** — `TauriApi` zove naredbu `quit` i sluša događaj `close_requested`, `MockApi` oboje nema-op (preglednik nema proces za ugasiti) |
@@ -201,7 +208,22 @@ SAMO nedostajuće; `commit --amend`/`reset --hard` time ne ostavljaju stari SHA 
 u kešu. Greška keša je vidljiva (`IoError::Cache`/`CacheIncomplete`), nema tihog povratka na puni log.
 **`input_cached` sad ima pozivatelja** — adapter `StoreCache` (`desktop/src-tauri/src/cache.rs`, T29)
 ga ožiči nad `sokratis-store`, `commands.rs::compute_input` ga zove za svaki izračun u desktopu. CLI
-(`report_for`) i dalje zove `input_between`, BEZ keša (§11).
+(`report_for`) i dalje zove `input_between`, BEZ keša (§11). **Od IO-2 (T49, S-032) `cached_log` prima
+`scope: Scope<'_>`** — isti enum kao `log`/`rev_list` (`Scope::Branch(ime)` ili `Scope::AllBranches`,
+lifetime posuđuje ime grane) — pa keš vrijedi i za mjerenje preko svih grana, ne samo zadane.
+
+**Grane i radna stabla ulaze u mjerenje** (T49–T50, S-032, S-033): `input_with` čita
+`profile.branch_scope` i bira `Scope` — `"all"` (zadano) šalje `git log --branches` i puni kartu
+`GitSource::commit_sources(default_ref, since, until)` (`sha → grana` SAMO za commite izvan zadane
+grane, preko `git log --branches --not <default_ref> --format=%h|%S`; `"default"` vraća staro
+ponašanje i praznu kartu). `GitSource::worktree_heads()` (puni SHA po radnom stablu) i
+`commit_times(shas)` daju `Project::lead()` — **vodeće stablo** je ono s najnovijim `author_time` na
+HEAD-u, ne nužno glavno; `worktrees_by_recency()` sortira sva stabla silazno po tome
+(`sort_by_key` + `Reverse`, stabilno). Dnevnik je unija tekstova SA SVAKOG stabla, čitanih izravno s
+DISKA (necommitani unos vidljiv), redom od vodećeg prema starijima; plan, `docs()` (`docs_in(&lead.
+root, &lead.head)`) i `GitSource::last_changes(rev, pathspecs)` čitaju SAMO iz vodećeg stabla (`rev`
+je `"HEAD"` za glavno stablo ili puni SHA vodećeg radnog stabla — detached stablo tako ipak ima
+povijest). Ručni podaci se i dalje pišu SAMO u glavno stablo (S-015, nepromijenjeno).
 
 **Granica S-002:** jezgra ne zna odakle su podaci došli. Sve što joj treba dolazi u jednoj strukturi
 (`ReportInput`: `git_log` kao tekst, `diaries: Vec<String>` — **od M2/47 (S-033) više od jednog
@@ -216,7 +238,8 @@ ijedne izmjene (S-012).
 `git_command(repo)` (`git.rs`, M2/44, kvar 4) — **jedino mjesto** koje smije zvati `Command::new("git")`
 (test `command_new_lives_only_inside_git_command` to čuva čitanjem izvora); na Windowsu ista funkcija
 postavlja `CREATE_NO_WINDOW`, jer bi instalirana aplikacija (`windows_subsystem = "windows"`) inače
-bljesnula konzolu `git.exe` pri svakom osvježenju. Iza traita `GitSource` (osam metoda, jedna
+bljesnula konzolu `git.exe` pri svakom osvježenju. Iza traita `GitSource` (**15** metoda — T49 dodao
+`commit_sources`, T50 `worktree_heads`/`commit_times` i novi parametar `rev` na `last_changes`; jedna
 implementacija `GitCli`) stoji mjesto na koje kasnije može ući `gix` bez dizanja jezgre.
 
 ## 2 · Tok podataka
@@ -282,10 +305,12 @@ na varijanti; zadano `AllBranches` kroz `#[default]`) kaže koje je grane `io` o
 sati DANA (`DayStats.hours`) podijeljeni po udjelu commita te grane tog dana — **proxy**, zbroj po
 granama je jednak ukupnim satima (`metrics::branch_stats`). `CommitRow.branch` (zadnje polje u
 strukturi, dodatak na kraju — S-022, snapshot-diff ostaje malen) bilježi granu na koju je commit
-dospio; commit koji nije u `ReportInput.commit_branches` dobiva zadanu granu. **`io` danas i dalje
-šalje `scope: DefaultBranch` i praznu kartu grana** (privremeno, dok IO-2 T49 ne stigne) — mjerenje je
-zato u `1.0.0-pre.2` još uvijek samo nad zadanom granom, iako je ugovor prema sučelju spreman.
-**CLI-tablica (`table.rs`) `scope`/`branches` ne ispisuje** (dolazi s T51).
+dospio; commit koji nije u `ReportInput.commit_branches` dobiva zadanu granu. **Od IO-2 (T49, S-032)
+`io` čita `profile.branch_scope`** i stvarno šalje `scope: AllBranches` (zadano) s popunjenom kartom
+`commit_branches`, ili `scope: DefaultBranch` s praznom kartom ako profil to traži — mjerenje po
+zadanom profilu je od `1.0.0-pre.3` preko SVIH lokalnih grana, ne samo zadane. **CLI-tablica
+(`table.rs`) `scope`/`branches` i dalje ne ispisuje** (dolazi s T51); sučelje ih isto još ne crta
+(§11).
 
 **Tri polja koja je `M2/1a` deklarirala prazna sad jezgra puni** (M2/4, M2/5) — deklarirana su prije
 potrošača da sučelje i snapshot ugovora (S-022) ne mijenjaju oblik svakom ciglom:
@@ -324,13 +349,14 @@ ove tipove i imaju teste, ali ih ništa u `main`-u ne zove (§11); obavijest na 
 | `lines` | Σ `added + deleted` po svim izmjenama datoteka | |
 | `files` | **broj izmjena datoteka kroz commite**, ne broj različitih datoteka | datoteka dirnuta u 10 commita doda 10 |
 | `skipped_lines` | redaka `numstat`-a koje parser nije razumio | preskočeno se broji, nikad tiho ne ispari |
-| `worktrees` (M2/47, S-033) | broj radnih stabala koje je `io` obišao | danas uvijek `1` dok IO-2 (T50) ne doda ostala |
-| `diaries` (M2/47, S-033) | broj tekstova dnevnika koje je `parse_diaries` unirao (dužina `ReportInput.diaries`) | danas uvijek `1`, isti razlog |
+| `worktrees` (M2/47, S-033) | broj radnih stabala koje je `io` obišao | od T50 = stvaran broj radnih stabala (`worktree_heads`), ne uvijek `1` |
+| `diaries` (M2/47, S-033) | broj tekstova dnevnika koje je `parse_diaries` unirao (dužina `ReportInput.diaries`) | od T50 = broj radnih stabala s diska, isti razlog |
 
 ## 4 · Profil projekta — sva polja i zadane vrijednosti
 
 **Izvor je `crates/sokratis-core/src/profile.rs`** (`impl Default for Profile`); ova tablica prati
-njega i ima jednako redaka koliko struktura ima polja (**39** od `M2/1a`). Zadane vrijednosti **jesu**
+njega i ima jednako redaka koliko struktura ima polja (**40** — `M2/1a` je imala 39, T48 dodao
+`branch_scope`). Zadane vrijednosti **jesu**
 konvencije Sokrat Studyja (S-005): prvi korisnik radi bez ijedne postavke. Profil je
 `#[serde(default, deny_unknown_fields)]` — polje koje nedostaje uzima zadano, polje s tipfelerom je
 greška, ne tiho ignoriranje (i to jedna poruka s putanjom, ne dvije). Ovo je jedina tablica profila
@@ -338,7 +364,8 @@ u dokumentaciji.
 
 | polje | zadano | čemu služi |
 |---|---|---|
-| `default_branch` | `"main"` | grana nad kojom se računaju metrike |
+| `default_branch` | `"main"` | grana nad kojom se računaju metrike kad je `branch_scope: "default"`; i dalje jedina referenca za dnevnik/plan/detached-provjeru |
+| `branch_scope` (T48, S-032) | `"all"` | `"all"` = sve lokalne grane ulaze u mjerenje (`Report.scope`/`branches`, `CommitRow.branch`); `"default"` = samo `default_branch`, paritet sa starim ponašanjem; nepoznata vrijednost je greška koja imenuje `all`/`default` |
 | `since` | `"2026-08-29"` | od kada se mjeri kad `--since` nije dan |
 | `diary_path` | `"docs/records/PROGRESS.md"` | dnevnik iz kojeg se čitaju isporuke |
 | `changelog_path` | `"docs/records/CHANGELOG.md"` | drugi dokument koji smije „pokriti" kašnjenje docs-a |
@@ -557,10 +584,10 @@ preuzeo M2 u [`../archive/ARHITEKTURA_M2.md`](../archive/ARHITEKTURA_M2.md) §8 
 - **`Report.commits`/`deliveries`/`vision_totals`** postoje u JSON-u, ali `cli/src/table.rs` ih ne
   ispisuje — redak po commitu (uz `classify_sub`, sad `CommitRow.sub`), redak po isporuci i zbroj
   vizija po stanju čekaju pogled Dnevnik/Isporuke/Vizije u sučelju M2.
-- **`Report.scope`/`branches` (M2/46, S-032) isto postoje u JSON-u bez CLI-ispisa** (T51) — i `io`
-  danas puni `scope`/`commit_branches`/`diaries` PRIVREMENO (`scope: DefaultBranch`, prazna karta,
-  jedan tekst dnevnika), dok IO-2 (T49/T50) ne stigne, pa je mjerenje u `1.0.0-pre.2` i dalje samo nad
-  zadanom granom — puni ugovor je u §3.
+- **`Report.scope`/`branches` (M2/46, S-032) postoje u JSON-u i `io` ih od T49/T50 stvarno puni** iz
+  profila (§1, §3), ali NITKO ih još ne prikazuje: CLI-tablica nema ispis (`--scope` na CLI-ju dolazi
+  s T51), a sučelje (SUČELJE-2, §1 tablica) ih još ne crta ni jednim pogledom — dolazi s PLOČOM
+  (T58+).
 
 **Rubovi koje kod danas ne pokriva:**
 

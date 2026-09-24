@@ -1098,3 +1098,61 @@ ostaju dva stabla:** `sokratis` (`main`, vrh `cedbf20` prije bumpa, `cb62454` po
 ### Što slijedi
 **Dug preuzet iz prošle sesije je odrađen** (dimni test, instalater pre.2, ovaj zapis). Sljedeće u
 istom nizu sesija: T48 → T49 · T50 · T54 (IO-2, PLOČA), pa instalater „1.0.0-pre.3".
+
+## 2026-09-24 (FABLE) — IZVEDBA sesija 3 drugog reza 1.0.0: T48 · T54 recenzirani i spojeni, IO-2 (T49–T50) i GRAFOVI (T55) spojeni, instalater pre.3
+
+**Sedma sesija.** Sesija 2 (istog dana) je u stablima `sokratis.jezgra2`/`feat/core-branches` i
+`sokratis.grafovi`/`feat/charts-2` izgradila T48 (`c226bd8`) i T54 (`459d9e4`) bez spajanja i bez
+zapisa — ništa nije ušlo u `main`, pa nema vlastiti naslov. Ova sesija ih prvo recenzira i spaja, zatim
+gradi i spaja IO-2 (T49–T50) i GRAFOVI (T55), pa bumpa verziju. Brojke, snapshot-promjene i sadržaj
+svake cigle: [`CHANGELOG.md`](./CHANGELOG.md) `[Unreleased]` (S-010, ne ponavlja se ovdje).
+
+- **JEZGRA-2 → `main` `5e5db15`** (T48 `c226bd8`, recenzija bez nalaza): `Profile.branch_scope`
+  (`"all"`/`"default"`, zadano `"all"`, S-032 dopuna S-005).
+- **GRAFOVI → `main` `0bc70cf`** (T54 `459d9e4`, recenzija bez nalaza): temelji grafova —
+  `lib/charts/layout.ts` + `Chart`/`Axis`/`Grid`/`Legend`/`Tooltip` (S-035).
+- **IO-2 → `main` `368eec5`** (T49 `15a5e27` + T50 `8fa5a44`): `Scope::AllBranches`, `commit_sources`,
+  `cached_log(scope)`, `input_with` puni `scope`/kartu iz profila (S-032, `GitSource` 13 metoda);
+  `worktree_heads`/`commit_times`, `Project::lead` (vodeće stablo po najnovijem HEAD-u), dnevnici s
+  diska svih stabala redom od vodećeg, plan/`docs`/`last_changes` iz vodećeg stabla (S-033,
+  `GitSource` naraste na **15** metoda). `tests/perf.rs` granica 5 → 8, izmjereno 7.
+- **GRAFOVI → `main` `2fcecf1`** (T55 `fdffa3e`): `Bars`/`Line` prepisani na temelje (datumi na
+  X-osi, mreža, legenda, tooltip), `Ring`/`Sparkline` na `scales.ts`, `scale.ts` obrisan, `Tempo`
+  prilagođen; d3 prvi put stvarno u snopu (`main.js` 215,01 → 258,67 kB).
+- **Bump verzije `1.0.0-pre.3`** (`9a0e98f`, S-037): `Cargo.toml` izvor, `package.json`/lockovi
+  zrcale samo redak verzije. **Leon nije stigao instalirati `pre.2`** (registar je pri provjeri i
+  dalje pokazivao `pre.1`) — `pre.3` zamjenjuje obje, instalater gradi orkestrator.
+
+**Rulinzi (puni tekst: `.superpowers/sdd/2026-09-18-m2-desktop/progress.md`, sesija 3):**
+R49 rub `\|` u imenu grane presuđen na razini parsera (`split_once`), ne fixtureom — Windows/NTFS ne
+može stvoriti granu `y\|z` · R51 `linear` seli iz `scale.ts` u `scales.ts` uz ostatak · R52 testovi
+`linePath` žive uz `layout.ts` u `layout.test.ts`, ne uz stari modul · R53 `tests/cache.rs` dobiva
++1/+2 procesa u granici — karta grana i stabala se plaća i s toplim kešom (namjerno izvan keša) ·
+R54 `Bars.svelte` svaki `<rect>` dobiva `tabindex="0" role="button" aria-label` (tipkovnica dodiruje
+tooltip jednako kao miš).
+
+**Odstupanja od plana:** grana s `|` u imenu (plan je predviđao fixture-repo s takvom granom) se na
+Windows NTFS-u ne može stvoriti (`|` je rezervirani znak) → rub dokazan unit-testom parsera
+(`abc123\|y\|z`), ne integracijskim repoom (R49). `linear`/`finiteMax`/`arcPath`/`ringSegments`/
+`svgA11y` nisu bili na popisu selidbe u T54 (T54 je gradio SAMO nove datoteke) — T55 ih je preselio iz
+`scale.ts` u `scales.ts` kad je `scale.ts` postao suvišan, plan to nije imenovao unaprijed. Granica u
+`tests/cache.rs` je zahtijevala prilagodbu (R53) koju plan T49/T50 nije brojčano predvidio.
+
+**Mjerenje nad Sokrat Studyjem** (orkestrator, samo čitanje, `sokratis report sokratstudy.dev --json`
+nad `main`-om `368eec5`, 7,1 s) — **ovo je kanonsko mjesto za ove brojke**: `scope: all` ·
+`touched.commits` **334** (u pre.2 bilo **190**, samo `main`) · `touched.worktrees` **6** ·
+`touched.diaries` **6** · **10 grana** (`main` 190 c / 85,3 h · `feat/f6-mcp` 58 c / 19,2 h ·
+`feat/tinder-kadar` 29 · `feat/f3-dvojezicnost` 20 · `feat/f2-mail` 9 · `feat/f2-tema-racun` 9 ·
+`feat/f2-zid` 9 · `fix/kadar-nalicje` 6 · `feat/f2-slike` 3 · `feat/f2-zid-radionica` 1; sve osim
+`main` `merged: false`) · 126 isporuka · najnoviji commit **2026-09-24** na `feat/f6-mcp`, najnovija
+isporuka **2026-09-24** → spec §8 izlazni uvjet 1 i 2 ispunjeni u CLI-ju (Leonov rad od 13. 9. je sad
+u brojkama). Puno mjerenje procesa/trajanja ostaje T52 (sljedeća sesija).
+
+**Stabla `sokratis.jezgra2` i `sokratis.grafovi` (i njihove grane) obrisani** nakon provjere
+(`--merged main` + `merge-base --is-ancestor`). **Na disku ostaju dva stabla:** `sokratis` (`main`,
+vrh `9a0e98f`) i `sokratis.rel` (`feat/release`, T35 napola, necommitano) — i dalje se ne dira dok tok
+IZDANJE ne dođe na red.
+
+### Što slijedi
+Sljedeća sesija (4. izvedbena): T51 (CLI `--scope`) · T52 (mjerenje procesa/trajanja nad Sokrat
+Studyjem) · T56 · T57 (GRAFOVI kraj) · T58 (PLOČA — tok kreće), pa instalater „1.0.0-pre.4".

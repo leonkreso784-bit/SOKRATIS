@@ -10,7 +10,7 @@ Isporuka = ono što je u `main`-u; sesije su u `PROGRESS.md`.
 **drugi rez do 1.0.0** (S-032…S-037) nastavlja po
 [`../plan/ARHITEKTURA_1_0.md`](../plan/ARHITEKTURA_1_0.md).
 **Ovaj odjeljak izlazi kao 1.0.0, ne 0.2.0** (S-024; rez i dopuna speca §13 od 2026-09-21).
-**Na disku je `main` verzije `1.0.0-pre.2`** (jedan izvor: `[workspace.package]` u korijenskom
+**Na disku je `main` verzije `1.0.0-pre.3`** (jedan izvor: `[workspace.package]` u korijenskom
 `Cargo.toml`, M2/37, S-037) — netagirano, neobjavljeno; tag traži Leonov izričit OK na kraju etape
 izdanja (S-025). Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek sesije:
 [`PROGRESS.md`](./PROGRESS.md).
@@ -279,6 +279,48 @@ izdanja (S-025). Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek ses
   `npm run check` (svelte-check **0** · `check:i18n` **287** ključa hr=en, bilo 283 · kontrast 4/4 ·
   **vitest 109**, **15** datoteka, bilo 93) · `npm run build` `main.js` **215,01 kB** / gzip **54,22
   kB** · `sokratis docs .` 100/100 · `signals .` nema signala.
+- **`M2/48` — `branch_scope` u profilu (2026-09-24, JEZGRA-2, S-032, dopuna S-005).** Korisnik CLI-ja
+  ne vidi ništa novo (`io` ga još ne čita — dolazi s T49). `Profile` dobiva `branch_scope: "all" |
+  "default"`, **zadano `"all"`**: zadano mjerenje projekta više nije samo zadana grana. Nepoznata
+  vrijednost pada s porukom koja imenuje `all`/`default`. Profil ulazi u kanonski JSON dnevne snimke
+  (`engine.rs::try_snapshot`) — prva snimka nakon nadogradnje dobiva nov `profile_seen_id` (trend
+  „profil promijenjen", bez koda koji bi to iscrtao).
+- **`M2/54` — temelji grafova s osima (2026-09-24, GRAFOVI, S-035).** Korisnik i dalje ne vidi ništa
+  novo (komponente još nitko ne uvozi). Nove čiste funkcije `lib/charts/layout.ts` (okvir i margine,
+  grupirani/naslagani stupci nad `scaleBand`, X-ticksi prorijeđeni na ≤ 10, linija s datumskom
+  skalom, najbliža točka za tooltip) i pet tankih komponenata `Chart`/`Axis`/`Grid`/`Legend`/`Tooltip`
+  (potonja izvan SVG-a, pozicionirana u postocima).
+- **`M2/49`–`M2/50` — grane i radna stabla stvarno ulaze u mjerenje (2026-09-24, IO-2, S-032,
+  S-033).** Korisnik CLI-ja i dalje ne vidi novu zastavicu (`--scope` dolazi u T51), ali mjerenje se
+  sad ravna po profilu: `branch_scope: "all"` (zadano) šalje `git log --branches` i puni kartu
+  `commit_sources` (`sha → grana`, `%h|%S` **izvan** zadane grane preko `git log --branches --not
+  <default>`), `"default"` vraća staro ponašanje s praznom kartom. `GitSource` dobiva
+  `worktree_heads()`/`commit_times()` — **vodeće stablo** (`Project::lead`) je ono s najnovijim
+  `author_time` na HEAD-u, ne nužno glavno; dnevnik je sad unija SVIH radnih stabala s diska (redom od
+  vodećeg, necommitani unos vidljiv), a plan/`docs`/zadnja promjena datoteke čitaju se iz vodećeg
+  stabla. Ručni podaci se i dalje pišu SAMO u glavno stablo (S-015, nepromijenjeno). `touched.
+  worktrees`/`touched.diaries` više nisu uvijek 1. **Granica broja git-procesa po izvještaju
+  podignuta 5 → 8** (izmjereno 7: 4 osnovna + 1 `commit_sources` + 2 za vodeće stablo).
+- **`M2/55` — grafovi Bars/Line na temeljima, `scale.ts` uklonjen (2026-09-24, GRAFOVI, S-035).**
+  `Tempo` sad crta stupce i kumulativnu liniju kroz `<Bars>`/`<Line>`: datumi na X-osi, mreža,
+  legenda (kad ima više od jednog niza), tooltip na najbližem stupcu/točki — miš ili tipkovnica
+  (svaki stupac je fokusabilan). `Ring`/`Sparkline` nepromijenjenih svojstava, sad nad `scales.ts`.
+  Stari `lib/charts/scale.ts` i njegovi testovi **obrisani** — `linear`/`finiteMax`/`arcPath`/
+  `ringSegments`/`svgA11y` sele u `scales.ts`. **`main.js` 215,01 → 258,67 kB (gzip 54,22 → 70,57)** —
+  d3 prvi put stvarno ulazi u snop (tree-shaking gotov, komponente ga sad uvoze). Prekidač
+  dan/tjedan/mjesec dolazi u T59.
+  Brane nakon sva četiri spajanja (`5e5db15` → `0bc70cf` → `368eec5` → `2fcecf1`): `cargo fmt --check`
+  OK · `cargo clippy --workspace --all-targets -- -D warnings` OK · `cargo test --workspace` **0
+  padova** (`sokratis-core`: 65 unit + `branches` 4 + `diary_union` 2 + `parity` 1 + `snapshot` 1;
+  `sokratis-io`: **52** + 1 ignoriran) · `npm run check` (svelte-check **248** datoteka 0/0 ·
+  `check:i18n` **287** ključa hr=en · kontrast 4/4 · **vitest 112**, **15** datoteka — `scale.test.ts`
+  nestao, `layout.test.ts` ušao) · `npm run build` `main.js` **258,67 kB** / gzip **70,57 kB** ·
+  `sokratis docs .` 100/100 · `signals .` nema signala. Vizualni dimni test Tempa (vite + preglednik,
+  MockApi): datumi na osi, mreža, tooltip, fokusabilni stupci — prošao.
+- **Bump verzije `1.0.0-pre.3` (2026-09-24, S-037).** Instalater nakon treće izvedbene sesije drugog
+  reza (T48–T50, T54–T55); `Cargo.toml` je izvor broja verzije, `package.json`/lockovi ga zrcale
+  (samo redak verzije, bez `npm install`). Leon nije stigao instalirati `1.0.0-pre.2` (registar je
+  još pokazivao pre.1) — pre.3 zamjenjuje obje.
 
 ## [0.1.0] — 2026-09-17 — Jezgra i CLI (Milestone 1)
 

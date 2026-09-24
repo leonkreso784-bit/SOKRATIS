@@ -9,10 +9,10 @@
 | vrsta | gdje | što tvrdi | ulaz |
 |---|---|---|---|
 | **jedinični (core)** | `crates/sokratis-core/src/**` uz kod (`#[cfg(test)]`) i `tests/` (uklj. **od 2026-09-24** `tests/branches.rs` — sati po udjelu commita grane, S-032; `tests/diary_union.rs` — unija dnevnika po (datum, naslov), S-033) | parser vraća točno ove strukture; metrika daje točno ovu brojku; pravilo daje točno ovaj signal s dokazom | **tekst fixture** — nikad živi git |
-| **integracijski (io)** | `crates/sokratis-io/tests/` | git-proces, radna stabla, profil, ručni podaci | **privremeni repo** stvoren u testu |
+| **integracijski (io)** | `crates/sokratis-io/tests/` | git-proces, radna stabla (**od T49/T50, 2026-09-24** `tests/common/mod.rs` += `add_worktree`/`commit_at`, uklj. detached stablo bez retka `branch` u porcelainu), profil, ručni podaci; `tests/perf.rs` tvrdi GORNJU GRANICU git-procesa po izvještaju (brojka: `../records/CHANGELOG.md`, S-010) | **privremeni repo** stvoren u testu |
 | **izlazni kodovi (cli)** | `crates/sokratis-cli/tests/cli.rs` | ugovor prema preflightu: **0** (nema signala) i **2** (Alert) nad repoom s poznatom poviješću, **3** za pogrešnu uporabu i za putanju koja nije repozitorij, **0** za `--help`/`--version` | **privremeni repo** (`tests/common/mod.rs`) |
 | **pohrana (store)** — *od M2* | `crates/sokratis-store/src/**` (`#[cfg(test)]`) | migracije se primijene od prazne baze; registar, postavke, snimke i keš sirovih commita (M2/15–18) rade; od DESKTOP-a (T29–T30) imaju pravog pozivatelja u aplikaciji, ali test i dalje ostaje nad `:memory:` bazom (`docs/architecture/ARCHITECTURE.md` §1) | **`:memory:` baza** (`Store::open_in_memory`) — bez gita i bez datoteka |
-| **sučelje (TS/Svelte)** — *od M2* | `apps/desktop/tests/**`, uz komponente | oblikovanje brojki, i18n ključevi, kontrast tokena, grafovi s praznim ulazom, ugovor `TauriApi` prema `commands.rs` (`tests/tauri-api.test.ts`, lažni `invoke`/`listen`, **od 2026-09-24 uklj. `quit`/`onCloseRequested`**), verzija iz jednog izvora (`tests/version.test.ts`), pokret bez DOM-a (`tests/motion.test.ts`, čita `motion.css` kroz `scripts/read-motion.mjs`), pokrivenost kartice s objašnjenjem (`tests/explain.test.ts` — svaki `id` ima sva tri ključa u oba jezika, svaki ključ `explain.*` ima svoj `id`, 18 id-eva pokazatelja iz prave snimke jezgre), **od T53 (2026-09-24) matematika osi grafova bez DOM-a** (`tests/scales.test.ts`, `tests/bucket.test.ts`) | `npm run check` u `apps/desktop`: `svelte-check` + `vitest` (**109** testova, **15** datoteka) |
+| **sučelje (TS/Svelte)** — *od M2* | `apps/desktop/tests/**`, uz komponente | oblikovanje brojki, i18n ključevi (**287** ključa hr=en), kontrast tokena, grafovi s praznim ulazom, ugovor `TauriApi` prema `commands.rs` (`tests/tauri-api.test.ts`, lažni `invoke`/`listen`, **od 2026-09-24 uklj. `quit`/`onCloseRequested`**), verzija iz jednog izvora (`tests/version.test.ts`), pokret bez DOM-a (`tests/motion.test.ts`, čita `motion.css` kroz `scripts/read-motion.mjs`), pokrivenost kartice s objašnjenjem (`tests/explain.test.ts` — svaki `id` ima sva tri ključa u oba jezika, svaki ključ `explain.*` ima svoj `id`, 18 id-eva pokazatelja iz prave snimke jezgre), matematika osi grafova bez DOM-a (`tests/scales.test.ts`, `tests/bucket.test.ts`, od T53), **raspored grafova bez DOM-a** (`tests/layout.test.ts`, od T54/T55: okvir, stupci, linija — **stari `tests/scale.test.ts` je nestao**, njegovi testovi su preseljeni u `scales.test.ts`/`layout.test.ts` uz kod koji sada testiraju, R51/R52) | `npm run check` u `apps/desktop`: `svelte-check` + `vitest` (**112** testova, **15** datoteka) |
 | **ljuska (desktop)** — *od M2* | `apps/desktop/src-tauri/src/commands.rs` (`#[cfg(test)]`) | S-013: crate nema logike, pa je jedini jedinični test pretvorba birača raspona (`Range::to_dates`) u datume | 2 testa nad fiksnim „danas" |
 
 **Tekuće brojke brana (fmt/clippy/test/svelte-check/i18n/vitest/build) nikad se ne prepisuju ovamo**
@@ -46,6 +46,10 @@ nije ostao `.snap.new` (insta ga ostavi kad snimka još ne postoji ili se pendin
   ```
 
   Tako se cherry-pick i rebase reproduciraju deterministički.
+- **Rub koji OS ne dopušta ide u unit test parsera, ne u privremeni repo** (R49, T49/2026-09-24):
+  grana s imenom `y|z` ne može se stvoriti na Windowsu/NTFS-u (`|` je rezerviran znak), pa
+  `parse_commit_sources` (dijeli `git log --format=%h|%S` na PRVOM `|`) dokazuje taj rub tekstom
+  (`"abc123|y|z"`), ne stvarnom granom u fixture-repou.
 
 ## 3 · Test pariteta s `RAD.xlsx` (izlazni uvjet M1)
 
@@ -118,6 +122,10 @@ danas piše [`../records/CHANGELOG.md`](../records/CHANGELOG.md) — brojka prep
   put). „Osvježenje bez bljeska konzole" (kvar 4) se u `tauri dev` ne da izmjeriti — debug build je
   konzolni proces pa djeca dijele konzolu s roditeljem; dokaz ostaje test izvora (T44,
   `command_new_lives_only_inside_git_command`) i Leonova ručna provjera na instaliranoj verziji.
+- **Vizualni dimni test Tempa (sesija 3 izvedbe drugog reza, 2026-09-24, T55)** — grafovi se ne
+  renderiraju u vitestu (R37, nema jsdom-a): `vite` dev-server + preglednik, `MockApi`. Provjereno
+  ručno na instaliranoj verziji: datumi na X-osi, mreža, tooltip na najbližem stupcu/točki, stupci
+  fokusabilni tipkovnicom — prošao.
 - **Na ručnoj listi za Leona ostaju** (`docs/architecture/ARCHITECTURE.md` §11 — nisu provjereni ni u
   S2 ni u S3 ni u S4): autostart u `HKCU\…\Run`, obavijest na prijelaz u
   Alert, preskok splasha, `prefers-reduced-motion`, osvježenje bez klika (sa štopericom), četiri teme,

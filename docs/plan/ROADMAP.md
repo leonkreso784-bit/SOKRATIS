@@ -26,26 +26,28 @@ IO-2 (`--branches`, stabla, dnevnik po stablima, CLI) · GRAFOVI (d3-temelji + 8
 `superpowers/plans/` jer te cigle još vrijede) — pet sesija, instalater „1.0.0-pre.N" nakon svake
 (izlazni uvjet §8 speca).
 
-**Izvedba sesija 1 je gotova (2026-09-24):** DESKTOP-2 (T44–T45) · JEZGRA-2 (T46–T47) · GRAFOVI (T53)
-spojeni u `main`, vrh `cedbf20`; verzija u kodu je bumpana na `1.0.0-pre.2` (`cb62454`), instalater se
-gradi. Brojke i sadržaj svake cigle: `records/CHANGELOG.md`; tijek i rulinzi sesije:
-`records/PROGRESS.md`. **Sesija 2 je u tijeku:** T48 → T49 · T50 (IO-2) · T54 (PLOČA), pa instalater
-„1.0.0-pre.3".
+**Izvedbe sesija 1–3 su gotove (2026-09-24):** DESKTOP-2 (T44–T45) · JEZGRA-2 (T46–T48) · GRAFOVI
+(T53–T55) · IO-2 (T49–T50) spojeni u `main`, vrh `9a0e98f`; verzija u kodu je bumpana na
+`1.0.0-pre.3`, instalater izgrađen (Leon nije stigao instalirati `pre.2`, `pre.3` zamjenjuje obje).
+Brojke i sadržaj svake cigle: `records/CHANGELOG.md`; tijek i rulinzi sesija: `records/PROGRESS.md`.
+**Sljedeća je sesija 4:** T51 (CLI `--scope`) · T52 (mjerenje procesa/trajanja nad Sokrat Studyjem) ·
+T56–T57 (GRAFOVI kraj) · T58 (PLOČA — tok kreće), pa instalater „1.0.0-pre.4".
 
-**Na disku dva stabla:** `sokratis` (`main`, vrh `cedbf20`/`cb62454`) i `sokratis.rel`
+**Na disku dva stabla:** `sokratis` (`main`, vrh `9a0e98f`) i `sokratis.rel`
 (`feat/release`, T35 napola — pet datoteka necommitano, bez izvještaja) — parkirano do toka IZDANJE,
-nova sesija ga ne dira ni ne briše. Stabla sesije 1 (`sokratis.desktop2`, `sokratis.jezgra2`,
-`sokratis.grafovi`) su obrisana nakon provjere da su potpuno spojena.
+nova sesija ga ne dira ni ne briše. Sva stabla tokova sesija 1–3 (DESKTOP-2, JEZGRA-2, GRAFOVI, IO-2)
+su obrisana nakon provjere da su potpuno spojena u pushani `main`.
 
 **M0 gotov. M1 je zatvoren** (0.1.0, T1–T22, paritet s `RAD.xlsx` je test); repozitorij je od
 2026-09-20 javan na GitHubu (`records/DECISIONS.md` S-023). **Spec M2**
 ([archive/ARHITEKTURA_M2.md](../archive/ARHITEKTURA_M2.md)) je iz brainstorminga 2026-09-18
 (S-012…S-022) i rez za 1.0.0 od 2026-09-21 (S-024…S-031); svih devet tokova (KOSTUR · JEZGRA · PROFIL
 · STORE · IO · CLI · SUČELJE · DESKTOP · INTEGRACIJA) + SUČELJE-2 (T38–T42: Postavke, animacije,
-kartica s objašnjenjem) su spojena u `main`; drugi rez do 1.0.0 (S-032…S-037) dodao je sesiju 1
-(DESKTOP-2, JEZGRA-2, GRAFOVI) — verzija u kodu je sad `1.0.0-pre.2`. Puna povijest svake spojene
-sesije (merge-hashevi, brojke testova, nalazi recenzije) je u `records/PROGRESS.md`; što je izgrađeno
-danas opisuje `architecture/ARCHITECTURE.md` §11.
+kartica s objašnjenjem) su spojena u `main`; drugi rez do 1.0.0 (S-032…S-037) dodao je sesije 1–3
+(DESKTOP-2, JEZGRA-2, GRAFOVI, IO-2) — mjerenje po zadanom profilu je sad preko **svih lokalnih
+grana** (S-032), dnevnik unija svih radnih stabala (S-033), verzija u kodu je sad `1.0.0-pre.3`. Puna
+povijest svake spojene sesije (merge-hashevi, brojke testova, nalazi recenzije) je u
+`records/PROGRESS.md`; što je izgrađeno danas opisuje `architecture/ARCHITECTURE.md` §11.
 
 Druga verzija (M3) i kasnije: [records/BACKLOG.md](../records/BACKLOG.md). Zapis namjere iz kojeg je
 prvi rez nastao: [archive/PLAN_DESIGNE.md](../archive/PLAN_DESIGNE.md) (ispunjen, nije izvor istine).
