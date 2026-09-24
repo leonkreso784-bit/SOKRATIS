@@ -6,7 +6,7 @@
 **preuzima etapu 3 „izdanje"** iz speca M2 (§13.1, §13.8), koji je istoga dana arhiviran:
 [archive/ARHITEKTURA_M2.md](../archive/ARHITEKTURA_M2.md) · plan cigli:
 [superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md](../superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md)
-(T44–T63, napisan 2026-09-24 nakon Leonova pregleda speca).
+(T44–T64, napisan 2026-09-24 nakon Leonova pregleda speca; T64 dodan 2026-09-25, §1.4).
 
 Što je STVARNO izgrađeno do ovog speca opisuje
 [architecture/ARCHITECTURE.md](../architecture/ARCHITECTURE.md) (verzija `1.0.0-pre.1` u `main`-u);
@@ -75,7 +75,8 @@ danu) · S-015 (projekt = `git-common-dir`, ručni podaci u glavno stablo) · S-
   ≥ zbroj po granama koje jezgra izbroji.
 - Karta koristi **isti `ref_name` kao danas** (zadana grana → trenutna → `HEAD`, `project.rs::input_with`),
   pa detached HEAD i repo bez zadane grane rade kao prije. `branches()` (signal „nespojene grane") se
-  ne mijenja; jedino `last_changes` dobiva referencu — gleda povijest **vodećeg stabla** (§2).
+  ne mijenja u ovom odjeljku (dopuna §1.4 mu dodaje vrh i sadržanost); jedino `last_changes` dobiva
+  referencu — gleda povijest **vodećeg stabla** (§2).
 
 ### 1.2 Jezgra — model i mjere
 
@@ -115,6 +116,28 @@ struct BranchStats { name: String, commits: u32, lines: u64, hours: f64, merged:
 - Sokrat Study ima lokalne grane `origin/content/*` (materijali, ne kod); u rasponu od 29. 8. daju ≤ 2
   commita — prihvaćeno, bez polja za isključivanje (YAGNI; ako zatreba: `git log --exclude=<glob>
   --branches` je jedan argument).
+
+### 1.4 Nespojene grane su lanci (S-038, dopuna 2026-09-25 iz vanjske analize)
+
+- **Nalaz:** nad Sokrat Studyjem pravilo `unmerged_branches` prijavljuje 8 prekršitelja i **Alert**
+  (prag `unmerged_alert_count = 3`), a pet ih je sadržano u `feat/f6-mcp` (Leon svaku sesiju grana od
+  prethodne), jedna je 1 commit odvojena; stvarno odvojene su dvije. Izlazni kod 2 je ugovor za
+  pre-flight skripte — lažni Alert zaustavlja tuđi proces. Fixture pravila gradi samo nezavisne grane,
+  pa je kvar bio nevidljiv testovima.
+- **Model:** `BranchInfo` += `tip` (puni SHA vrha, iz istog `for-each-ref`) i `contained_in:
+  Option<String>` (ime **vrha lanca** koji granu sadrži; `None` = grana je vrh). `ReportInput` +=
+  `branch_graph: String` — tekst `git log --branches --not <zadana> --format=%H|%P` (bez prozora;
+  **jedan** dodatni proces, i to samo kad postoji nespojena grana — Sokratis sam ne plaća ništa).
+  Jezgra (`core/src/chains.rs`, čisto) iz tog teksta računa sadržanost: X je sadržana u Y ako je vrh
+  X predak vrha Y unutar nespojenih commita; vrh se bira deterministički (više commita ispred, pa
+  manje ime; dvije grane na istom commitu → manje ime). **`Report` se ne mijenja** — `BranchInfo` je
+  ulaz pravila, ne izlaz.
+- **Pravilo:** `offenders` = **vrhovi** stariji od `unmerged_warn_days`; sadržane grane nikad ne ulaze
+  u brojanje ni u prag; dokaz po vrhu nosi sadržane (`+5 grana unutar: …`). Vrh mlađi od praga
+  utišava lanac — rad je živ. Perf granica 8 ostaje (izmjereno 7 + 1). Cigla **T64** u planu.
+- **Nusprodukti (BACKLOG, ne 1.0.0):** signal „živa grana predugo izvan zadane" (starost od točke
+  grananja, ne od zadnjeg commita — `feat/f6-mcp` je 108 commita ispred tjednima) · pravilo docs-a
+  „citirana brojka/verzija u `.md` slaže se s izvorom istine" (uhvatilo bi `README.md` s `pre.1`).
 
 ---
 
@@ -251,6 +274,8 @@ zaglavlju. Pravilo u `RUST.md`: svaki budući `Command` u `io`/desktopu ide kroz
 | profil `branch_scope` | `"all"`/`"default"` OK, `"x"` → greška s imenom polja; zadano `"all"` | `core/src/profile.rs` |
 | CLI `--scope` | tablica/JSON nose opseg; nad pravim repoom (temp git s 2 grane) commiti obiju grana | `cli/tests/` |
 | performanse | Sokrat Study: broj git-procesa po izvještaju ≤ 8; trajanje izmjereno u izvještaju cigle | `io/tests/perf.rs` |
+| lanci grana (§1.4, T64) | fixture LANCA `a ⊂ b ⊂ c ⊂ d` + odvojena `e` → 2 vrha, **Warn ne Alert**, dokaz `d` nabraja `a, b, c`; tekst `%H\|%P` → `contained_in`; pravi repo s lancem od tri grane | `core/src/rules/unmerged_branches.rs`, `core/src/chains.rs`, `io/tests/git_cli.rs` |
+| CLI zaglavlje imenuje mjereni doseg (T51, dopuna) | `Report { scope: all, 2 grane }` → zaglavlje sadrži `opseg: sve lokalne grane`, ne `grana main · N commita` | `cli/src/table.rs` (unit) |
 | `bucket.ts` | 10 dana preko prijelaza godine → tjedni ISO, mjeseci; prazno → prazno | vitest |
 | `scales.ts` | raspon 7 dana → dnevni ticksi, 6 mjeseci → mjesečni; HR nazivi mjeseci | vitest |
 | `layout.ts` (raspored grafova) | svaki graf: iz podataka + okvira → koordinate, ticksovi s datumima, legenda; prazan ulaz → prazan raspored bez NaN | vitest |

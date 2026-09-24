@@ -78,14 +78,17 @@ Testovi i brane: `docs/workflow/TESTING.md`.
   Leon je nakon instalacije tražio veće promjene (`docs/product/NALAZI_LEON_2026-09-23.md`) →
   brainstorming dao **drugi rez do 1.0.0**: S-032…S-037.
 - **Aktivan spec `docs/plan/ARHITEKTURA_1_0.md`** (spec M2 arhiviran, `docs/archive/ARHITEKTURA_M2.md`).
-  **Aktivan plan `docs/superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md`**: T44–T63, šest tokova
-  (DESKTOP-2 · JEZGRA-2 · IO-2 · GRAFOVI · PLOČA · IZDANJE), pet sesija; tok IZDANJE preuzima T35/T43
+  **Aktivan plan `docs/superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md`**: T44–T64, sedam tokova
+  (DESKTOP-2 · JEZGRA-2 · IO-2 · GRAFOVI · PLOČA · LANCI · IZDANJE), pet sesija; tok IZDANJE preuzima T35/T43
   iz plana M2 (ostaje u `superpowers/plans/`, nije arhiviran).
 - **Sesije 1–3 gotove:** DESKTOP-2 (T44–T45) · JEZGRA-2 (T46–T48) · GRAFOVI (T53–T55) · IO-2 (T49–T50)
   spojeni, vrh `main`-a `9a0e98f`, verzija u kodu `1.0.0-pre.3` (Leon nije stigao instalirati pre.2).
   Mjerenje po zadanom profilu sad ide preko **svih lokalnih grana** (S-032), dnevnik je unija svih
   radnih stabala (S-033). **Sesija 4 slijedi:** T51 (CLI `--scope`) · T52 (mjerenje procesa/trajanja) ·
   T56–T57 (GRAFOVI kraj) · T58 (PLOČA — tok kreće).
+- **Vanjska analiza 2026-09-24/25** (`DECISIONS.md` S-038, `PROGRESS.md`): CLI tablica tvrdi krivi doseg
+  (`grana main · 334`) → T51 dobiva padajući test; lažni Alert na lancu grana → **nova cigla T64** (tok
+  LANCI, sesija 5 prije T63; plan sad ide T44–T64); 14 prijedloga → `BACKLOG.md`, **ništa u 1.0.0** (Leon).
 - **Dva stabla:** `sokratis` (`main`) i `sokratis.rel` (`feat/release`, T35 napola, necommitano, ne
   dirati do toka IZDANJE). Tag traži Leonov izričit OK.
 - Druga verzija (M3) i kasnije: `docs/records/BACKLOG.md`.
@@ -115,7 +118,8 @@ hrvatski · **S-031** dokumentacija: točnost se čuva smanjivanjem, ispunjeno i
 **[drugi rez do 1.0.0]** **S-032** metrike nad svim lokalnim granama, oznaka grane po commitu ·
 **S-033** dnevnik = unija radnih stabala, plan/`docs/` iz vodećeg stabla · **S-034** klik na karticu →
 nadzorna ploča projekta · **S-035** grafovi: d3-matematika + naš SVG · **S-036** X = upit → izlaz, tray
-uklonjen, autostart otvara prozor · **S-037** sve prije 1.0.0, instalater „1.0.0-pre.N" nakon svake
+uklonjen, autostart otvara prozor · **S-038** nespojene grane su lanci: signal broji vrhove, sadržane su
+dokaz (T64 prije 1.0.0; vanjska lista od 14 prijedloga → BACKLOG) · **S-037** sve prije 1.0.0, instalater „1.0.0-pre.N" nakon svake
 sesije.
 
 ## Agenti — više grana, jedan orkestrator
@@ -125,7 +129,7 @@ u dva prolaza, čuvar dokumentacije piše zapise; **samo orkestrator spaja u `ma
 `sokratis` (`main`) i `sokratis.rel` (`feat/release`, T35 napola, necommitano) — potpuno spojena se
 brišu (pravilo #1), ali `sokratis.rel` NIJE spojeno, pa ga nova sesija ne dira ni ne briše, samo
 nastavlja T35 ondje kad tok IZDANJE dođe na red. Popis tokova i vlasništvo datoteka:
-`docs/superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md` (T44–T63); T35/T43 su u starijem
+`docs/superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md` (T44–T64; T64 dodan 2026-09-25, S-038); T35/T43 su u starijem
 `docs/superpowers/plans/2026-09-18-m2-desktop.md`.
 
 ## Dokumentacija — ulaz je SAMO `docs/README.md`

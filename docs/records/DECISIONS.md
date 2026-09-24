@@ -442,3 +442,22 @@ IZDANJE; nakon svake sesije instalater „1.0.0-pre.N" (S-029) da Leon vidi goto
 **Posljedice:** etapa 3 iz M2 §13 (T35, završna recenzija, T43) seli na kraj ovog reza; T35 ostaje
 napola u stablu `sokratis.rel` do tada; spec M2 arhiviran, aktivan je
 [plan/ARHITEKTURA_1_0.md](../plan/ARHITEKTURA_1_0.md).
+
+## S-038 — nespojene grane su lanci: signal broji vrhove, sadržane grane su dokaz (2026-09-25)
+
+**Kontekst:** vanjska analiza (24. 9.) pustila je `sokratis signals` nad Sokrat Studyjem: 8 prekršitelja
+i **Alert** (prag 3), a `git merge-base --is-ancestor` kaže da je pet grana (`feat/f2-slike`,
+`feat/f2-tema-racun`, `feat/f2-zid`, `feat/f2-mail`, `feat/f3-dvojezicnost`) SADRŽANO u `feat/f6-mcp`,
+`feat/f2-zid-radionica` je 1 commit odvojena, a stvarno odvojene su samo `feat/tinder-kadar` i
+`fix/kadar-nalicje`. Leon svaku sesiju grana od prethodne, pa su grane ulančane; pravilo ih gleda kao
+ravan popis. Fixture pravila gradi četiri nezavisne grane — kvar je bio strukturno nevidljiv. Izlazni
+kod 2 (Alert) je ugovor za pre-flight skripte, pa lažni Alert može zaustaviti tuđi proces. Isti
+kvar u drugom obliku: `--table` zaglavlje tvrdi `grana main · 334 commita` (nalaz ide u T51).
+**Odluka (Leon, 2026-09-25):** lanac = **jedan vrh**; pravilo broji vrhove, sadržane grane su dokaz
+(`+5 grana unutar feat/f6-mcp`); vrh mlađi od praga utišava lanac. Ide **prije 1.0.0** kao cigla
+**T64** (sesija 5, prije T35/T63) jer dira ugovor `ReportInput`/`BranchInfo`; `Report` ostaje isti.
+Ujedno potvrđeno: **ništa s vanjske liste od 14 prijedloga ne ulazi u 1.0.0** — sve u `BACKLOG.md`.
+**Posljedice:** `BranchInfo` += `tip`, `contained_in`; `ReportInput` += `branch_graph` (jedan git
+proces, samo kad postoji nespojena grana; granica 8 ostaje); nov `core/src/chains.rs`; spec §1.4; plan
+tok LANCI. Nusprodukti u BACKLOG: signal „živa grana predugo izvan zadane" · pravilo docs-a „citirana
+brojka/verzija = izvor istine". `include_unmerged` (mrtvo polje) ostaje odluka T63.

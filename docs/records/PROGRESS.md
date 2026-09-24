@@ -1156,3 +1156,32 @@ IZDANJE ne dođe na red.
 ### Što slijedi
 Sljedeća sesija (4. izvedbena): T51 (CLI `--scope`) · T52 (mjerenje procesa/trajanja nad Sokrat
 Studyjem) · T56 · T57 (GRAFOVI kraj) · T58 (PLOČA — tok kreće), pa instalater „1.0.0-pre.4".
+
+## 2026-09-25 (FABLE) — Vanjska analiza nad Sokrat Studyjem: dva stvarna kvara okvira, jedna nova cigla (T64), lista za poslije
+
+### Što je stiglo
+Leon je donio vanjsku analizu (24. 9.) koja je pustila `sokratis` nad Sokrat Studyjem i svaki broj usporedila s gitom.
+Brojke su potvrđene u komad (334 commita, 24 radna dana, 8 deploya, docs 100/100, izvedba 2 s po izvještaju, 163 testa zelena).
+Sve nalaze orkestrator je **ponovno izmjerio** prije rasprave (samo čitanje: `signals`, `merge-base --is-ancestor`, grep koda).
+
+### Nalazi (potvrđeni)
+1. **`--table` zaglavlje tvrdi krivi doseg:** `table.rs:44` ispisuje `grana main · 334 commita`, a `main` ima 190 — od T49 je brojka nad svim
+   granama, natpis nije. Nije „doseg se ne prikazuje", nego netočna tvrdnja → **T51 dobiva test koji pada danas** (dopuna u planu).
+2. **Signal nespojenih grana broji lanac kao popis:** 8 prekršitelja i Alert (prag 3); `merge-base` kaže da je pet grana sadržano u `feat/f6-mcp`,
+   jedna 1 commit odvojena, stvarno odvojene dvije. Vrh lanca (`feat/f6-mcp`, 108 ispred, zadnji commit jučer) uopće nije na popisu — mlađi je od
+   praga. Fixture pravila gradi samo nezavisne grane → kvar strukturno nevidljiv. Izlazni kod 2 je ugovor pre-flighta → lažni Alert.
+3. `README.md` tvrdio `1.0.0-pre.1` uz `pre.3` u kodu (README nije bio u čuvarovu brifu) — ispravljeno; `include_unmerged` mrtvo polje (T63).
+
+### Odluke (Leon, 2026-09-25)
+- **S-038:** nespojene grane su **lanci** — pravilo broji **vrhove**, sadržane grane su dokaz (`+5 grana unutar feat/f6-mcp`); vrh mlađi od praga
+  utišava lanac. Ide **prije 1.0.0** kao **T64** (nov tok LANCI u planu, sesija 5, prije T35/T63, usporedno s PLOČOM): `BranchInfo` += `tip`,
+  `contained_in`; `ReportInput` += `branch_graph` (`git log --branches --not <zadana> --format=%H|%P`, jedan proces samo kad ima nespojenih grana;
+  granica 8 ostaje); nov `core/src/chains.rs`; `Report` nepromijenjen. Spec §1.4.
+- **Ništa s vanjske liste od 14 prijedloga ne ulazi u 1.0.0** — lista, provjerena prema kodu (npr. `CREATE_NO_WINDOW` je već `#[cfg(windows)]`,
+  klasifikator već hvata `^fix`/`^docs`; ali zadani `since = 2026-08-29` je stvaran kvar onboardinga za strance), stoji u `BACKLOG.md`
+  „Nakon 1.0.0 — vanjska lista" s predloženim redoslijedom. Nusprodukti: signal „živa grana predugo izvan zadane", pravilo docs-a „citirana
+  brojka = izvor istine".
+
+### Isporučeno (samo dokumentacija; kod nedirnut)
+`DECISIONS.md` S-038 · spec `ARHITEKTURA_1_0.md` §1.4 + §5 · plan: tok LANCI/T64, vlasništvo, ovisnosti, dopuna T51 · `BACKLOG.md` nova sekcija ·
+`CLAUDE.md` Stanje + odluke · `README.md` verzija. Sesija 4 (T51 · T52 · T56 · T57 · T58) ostaje kako je zapisana u promptu.

@@ -97,6 +97,29 @@ Ovdje ostaju samo dvije stavke koje M2 **ne** uzima:
 |---|---|
 | `sokratstudy.dev/scripts/rad-xlsx.py`: dodati ` 00:00` uz `--since` (retci 154, 178) | S-011 — bez sata `git log --since` uzima trenutno doba dana; `RAD.xlsx` zato ovisi o satu pokretanja skripte, dnevni zadatak u 23:45 gubi gotovo cijeli tekući dan |
 
+## Nakon 1.0.0 — vanjska lista 2026-09-24 (Leon, 2026-09-25: **ništa od ovoga ne ulazi u 1.0.0**)
+
+Lista prijedloga iz vanjske analize (nije vidjela kod uživo), provjerena prema kodu; redoslijed po
+omjeru učinka i cijene je orkestratorov prijedlog, Leon ga nije mijenjao. Vrijedi tek nakon prvih
+stranih korisnika — oni će promijeniti redoslijed.
+
+| # | stavka | što kod danas stvarno radi | bilješka |
+|---|---|---|---|
+| 1 | više signala s dokazom, prazna stanja koja uče | dva pravila (`unmerged_branches`, `docs_lag`); prazna stanja su goli natpisi (`tempo.empty`) | najjeftinije, pogađa jezgru vrijednosti; pravila iz „Čeka milestone" gore; prazno stanje = „Sokratis čita X iz Y; primjer retka" (obrazac S-027) |
+| 2 | profil za tuđe projekte kao **preset**, ne čarobnjak | klasifikator VEĆ hvata `^fix`, `^docs`, `^ci:`, `^test:`, `refactor`; ali zadani `since` je **`2026-08-29`** (početak pariteta) → stranac s dvogodišnjim projektom vidi tri tjedna | `since` = pametna zadana vrijednost (prvi commit ili 90 dana) · `"preset": "conventional"` · detekcija dnevnika po obliku naslova; čarobnjak s UI-jem tek ako preset ne bude dovoljan (srodno: red „Profil za tuđe projekte" gore) |
+| 3 | licenca | neodlučena, sva prava pridržana | odlučuje se kod taga 1.0.0 (red „LICENCA" gore); MIT/Apache-2.0 za korisnike, AGPL-3.0 protiv SaaS-klonova |
+| 4 | prvi strani korisnik | — | Leonov prijatelj s 1.0.0; jeftinije od bilo koje cigle |
+| 5 | sati koji ne lažu | pragovi `session_gap_hours`/`session_start_hours` SU polja profila, nema sučelja; proxy označen (S-007) | prvo ručna korekcija po danu (mehanika kao `overrides.json`), pa senzor mtime-a |
+| 6 | izvoz | CLI već daje JSON | JSON/CSV = gumb + dijalog; PNG grafa kasnije |
+| 7 | tjedni izvještaj, „ovaj tjedan vs. prošli" | računljivo iz `days` bez snimki | usporedba projekata = zajednički graf (red gore) |
+| 8 | cross-platform | `CREATE_NO_WINDOW` je `#[cfg(windows)]`, autostart kroz `tauri-plugin-autostart` (sva tri OS-a), NSIS je samo odabrani bundle-cilj (S-029) | trošak: CI-matrica + `.dmg`/`.AppImage` + testovi putanja; nema Mac/Linux stroja za ručnu provjeru |
+| 9 | automatsko ažuriranje | instalater ručno | `tauri-plugin-updater` + GitHub Release `latest.json` + potpisni ključ; ide s prvim tagom (red „Potpisan instalater" gore) |
+| 10 | performanse na velikom repou | mjereno ≈ 330 commita u prozoru; keš po SHA-i i `--since` prozor bi trebali držati | jedan `#[ignore]` test nad velikim javnim repoom (50 000 commita, 30 grana) — „trebali" nije mjerenje |
+| 11 | engleski `docs/` | README EN (S-030), sučelje HR/EN; `docs/` HR po odluci i zbog učenja Rusta | najviše: engleski sažetak `ARCHITECTURE.md`; puni prijevod ne |
+| 12 | izvori izvan gita (editor, PR-ovi, CI) | — | lokalno čitanje editorskih podataka ne ruši „bez oblaka, bez računa"; GitHub API ruši → svjesna odluka, ne nuspojava |
+| 13 | signal „živa grana predugo izvan zadane" | pravilo gleda starost od ZADNJEG commita, pa `feat/f6-mcp` (108 ispred, tjednima) šuti | starost od točke grananja; nusprodukt S-038 |
+| 14 | pravilo docs-a „citirana brojka/verzija u `.md` = izvor istine" (`Cargo.toml`, `package.json`, git) | `docs` provjerava strukturu, ne tvrdnje — Sokrat Study 100/100, a vlastiti `README.md` je tvrdio `pre.1` uz `pre.3` u kodu | jezgra ne čita `Cargo.toml` — `io` predaje izvore kao tekst, pravilo uspoređuje (S-010 kao pravilo u alatu, ne samo načelo); nitko drugi to ne mjeri |
+
 ## Ideje, bez datuma
 
 | stavka | bilješka |

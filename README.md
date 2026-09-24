@@ -7,7 +7,7 @@ heading — always with evidence. Built to watch several projects at once.
 > 🚧 **Work in progress (September 2026).** Milestone 1 is closed — version 0.1.0: `core`, `io` and
 > `cli` run against real git history, and parity with the spreadsheet it replaces is a test, not a
 > claim. **Milestone 2 (the desktop app) is being built and will ship as 1.0.0** (currently
-> `1.0.0-pre.1` in `main`, untagged). The Svelte interface is wired to the real Tauri commands, a
+> `1.0.0-pre.3` in `main`, untagged). The Svelte interface is wired to the real Tauri commands, a
 > Windows installer (NSIS, unsigned, for the author only) builds from source, and the interface has
 > its Settings view, motion and an explanation card on every measurement — remaining work is
 > measurements and a final release pass before anyone else installs it. Where things stand:
