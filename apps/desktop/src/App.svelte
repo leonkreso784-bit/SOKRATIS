@@ -25,6 +25,9 @@
   // novi, a `Skeleton` zamjenjuje poglede SAMO dok prvi izvještaj još nije stigao.
   // Dopunjeno M2/41 — `<ExplainCard />` sjedi IZVAN `{#key}`, na dnu korijenskog `<div>`: promjena
   // pogleda ne smije remontirati karticu s objašnjenjem dok se ona sama zatvara.
+  // Dopunjeno M2/45 — X na prozoru više ne skriva tray (ukinut, S-036): `api.onCloseRequested`
+  // postavlja `quitOpen`, `<ConfirmQuit />` pita, a potvrda zove `api.quit()`. Dijalog je IZA
+  // `<ExplainCard />`, iz istog razloga kao ona — ništa se ne smije remontirati oko njega.
   import { onDestroy, onMount } from 'svelte';
   import { getCurrentWindow } from '@tauri-apps/api/window';
   import { api } from './lib/api';
@@ -45,10 +48,13 @@
   import Settings from './views/Settings.svelte';
   import Skeleton from './lib/shell/Skeleton.svelte';
   import ExplainCard from './lib/explain/ExplainCard.svelte';
+  import ConfirmQuit from './lib/shell/ConfirmQuit.svelte';
 
   let unsubscribeReportUpdated: (() => void) | null = null;
+  let unsubscribeClose: (() => void) | null = null;
   let motionQuery: MediaQueryList | undefined;
   let unlistenFocus: (() => void) | null = null;
+  let quitOpen = $state(false);
 
   // Prvi čuvar (svugdje, uklj. preglednik): dokument je vidljiv od početka u `npm run dev`, pa
   // `epoch` odmah pređe na 1 i animacija se vidi pri montiranju — to je ispravno ondje gdje splash
@@ -76,6 +82,10 @@
       if (id === app.currentId) void loadReport();
     });
 
+    unsubscribeClose = api.onCloseRequested(() => {
+      quitOpen = true;
+    });
+
     document.addEventListener('visibilitychange', onVisible);
     // Drugi čuvar, SAMO unutar Taurija (isti test kao `api.ts`/`Splash.svelte`): `onFocusChanged`
     // stiže sa `splash.rs` `main.show()` + `main.set_focus()`, neovisno o tome je li WebView2 uopće
@@ -93,6 +103,7 @@
 
   onDestroy(() => {
     unsubscribeReportUpdated?.();
+    unsubscribeClose?.();
     motionQuery?.removeEventListener('change', syncMotion);
     document.removeEventListener('visibilitychange', onVisible);
     unlistenFocus?.();
@@ -151,4 +162,7 @@
     </main>
   </div>
   <ExplainCard />
+  {#if quitOpen}
+    <ConfirmQuit onconfirm={() => void api.quit()} oncancel={() => (quitOpen = false)} />
+  {/if}
 </div>

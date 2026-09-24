@@ -28,7 +28,7 @@ tempfile = "3"
 rusqlite = { version = "0.40.2", features = ["bundled"] }
 notify = "8.2.0"
 insta = { version = "1.48.0", features = ["json"] }
-tauri = { version = "2.11.5", features = ["tray-icon", "image-png"] }
+tauri = { version = "2.11.5", features = ["image-png"] }
 tauri-build = "2.6.3"
 tauri-plugin-dialog = "2.7.3"
 tauri-plugin-notification = "2.4.0"
