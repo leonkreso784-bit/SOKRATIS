@@ -286,10 +286,16 @@ Korak po korak, redoslijed je u `core/src/report.rs` (`build_report`) i nigdje d
 10. `Report` se sastavi i serializira (`serde`); `vision_totals` (zbroj vizija po stanju, M2/4) se
     računa u istom koraku iz `input.visions`.
 
-**Grana:** metrike se računaju nad `profile.default_branch` ako ta grana postoji, inače nad trenutnom
-granom (`io/src/project.rs::input`). Ostale grane ulaze **samo u signale**. Ako ni jedna ni druga ne
-postoji kao referenca (repo nakon `git init`, bez commita), `io` vraća `IoError::NoCommits` →
-`<putanja>: repozitorij nema commita` i izlaz 3; prije je korisnik dobivao gitov savjet o `--`.
+**Grana (od M2/49, S-032):** po zadanom profilu (`branch_scope = "all"`) metrike se računaju nad
+**svim lokalnim granama** (`git log --branches`, svaki commit jednom; remote-tracking reference i
+tagovi ne ulaze), a svaki commit nosi granu kojom ga je git dosegao (`commit_sources`, karta
+`sha → grana` samo za commite izvan zadane; ostali su na zadanoj). S `branch_scope = "default"`
+mjeri se kao do 1.0.0-pre.2: samo `profile.default_branch` ako postoji, inače trenutna grana
+(`io/src/project.rs::input_with`). Referenca „zadana grana" (`ref_name`) i dalje odlučuje što je
+`Report.branch`, prema čemu su grane „spojene"/„ispred" i koji su commiti u karti. Ako ni zadana
+ni trenutna ne postoji kao referenca (repo nakon `git init`, bez commita), `io` vraća
+`IoError::NoCommits` → `<putanja>: repozitorij nema commita` i izlaz 3; prije je korisnik dobivao
+gitov savjet o `--`. Paritet s `RAD.xlsx` ostaje test nad logom `main`-a (`scope = default`).
 
 ## 3 · Što `Report` nosi
 
@@ -572,8 +578,9 @@ preuzeo M2 u [`../archive/ARHITEKTURA_M2.md`](../archive/ARHITEKTURA_M2.md) §8 
 
 **Rezervirano polje profila** (deklarirano, jezgra ga ne čita):
 
-- **`include_unmerged`** — metrike su uvijek samo nad zadanom granom, a nespojene grane ulaze
-  isključivo u signale.
+- **`include_unmerged`** — nikad nije proradilo; od M2/48–49 (S-032) njegovu ulogu igra
+  `branch_scope` (§4), pa je polje mrtvo i kandidat za brisanje u T63 (deklarirano ostaje da
+  `deny_unknown_fields` ne sruši stare profile koji ga imaju).
 
 (`phase_tag` je do M2/6 bilo ovdje — sad radi, §4 i §6.)
 
