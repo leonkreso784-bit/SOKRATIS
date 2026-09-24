@@ -9,7 +9,7 @@
 (T44–T64, napisan 2026-09-24 nakon Leonova pregleda speca; T64 dodan 2026-09-25, §1.4).
 
 Što je STVARNO izgrađeno do ovog speca opisuje
-[architecture/ARCHITECTURE.md](../architecture/ARCHITECTURE.md) (verzija `1.0.0-pre.1` u `main`-u);
+[architecture/ARCHITECTURE.md](../architecture/ARCHITECTURE.md) (u trenutku pisanja verzija `1.0.0-pre.1` u `main`-u; danas `1.0.0-pre.3`);
 status milestonea [ROADMAP.md](./ROADMAP.md); što ostaje za kasnije
 [records/BACKLOG.md](../records/BACKLOG.md).
 
@@ -98,7 +98,7 @@ struct BranchStats { name: String, commits: u32, lines: u64, hours: f64, merged:
   ukupno) odbijene.
 - `Report.branch` i dalje = ime zadane grane (prema njoj „spojeno" / „ispred"). `Report.scope` kaže
   je li mjereno sve ili samo ona.
-- Pravila (`rules/`) nepromijenjena: `unmerged_branches` gleda `BranchInfo` kao dosad.
+- Pravila (`rules/`) nepromijenjena u ovom odjeljku: `unmerged_branches` gleda `BranchInfo` kao dosad — do §1.4 (T64), gdje dobiva vrh i sadržanost.
 - **Paritet s `RAD.xlsx` ostaje isti test:** fixture je tekst loga `main`-a, jezgra ne zna odakle je.
 - Snapshot `Report`-a (S-022) se mijenja **namjerno** (`cargo insta review`), jednom, s obrazloženjem.
 
