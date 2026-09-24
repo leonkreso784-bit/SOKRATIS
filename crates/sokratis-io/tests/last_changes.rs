@@ -77,7 +77,7 @@ fn last_changes_matches_last_change_across_a_real_merge_conflict() {
     assert_ne!(expected_conflict, expected_plain);
     assert_ne!(expected_branch_only, expected_plain);
 
-    let batch = g.last_changes(&["docs"]).unwrap();
+    let batch = g.last_changes("HEAD", &["docs"]).unwrap();
     assert_eq!(
         batch.get("docs/conflict.md").copied(),
         Some(expected_conflict),
@@ -103,7 +103,7 @@ fn last_changes_reads_non_ascii_file_names() {
     );
     let g = GitCli::new(r.path());
     let expected = g.last_change("docs/čšž.md").unwrap().unwrap();
-    let batch = g.last_changes(&["docs"]).unwrap();
+    let batch = g.last_changes("HEAD", &["docs"]).unwrap();
     assert_eq!(
         batch.get("docs/čšž.md").copied(),
         Some(expected),

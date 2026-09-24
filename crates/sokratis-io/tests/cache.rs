@@ -8,7 +8,9 @@ mod common;
 use common::Repo;
 use sokratis_core::parse::parse_git_log;
 use sokratis_core::{BranchInfo, Commit};
-use sokratis_io::{CacheError, CommitCache, GitCli, GitSource, IoError, Project, cached_log};
+use sokratis_io::{
+    CacheError, CommitCache, GitCli, GitSource, IoError, Project, Scope, WorktreeHead, cached_log,
+};
 use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -117,7 +119,12 @@ impl CommitCache for FailingCache {
 struct PartialGit;
 
 impl GitSource for PartialGit {
-    fn log(&self, _branch: &str, _since: &str, _until: Option<&str>) -> Result<String, IoError> {
+    fn log(
+        &self,
+        _scope: Scope<'_>,
+        _since: &str,
+        _until: Option<&str>,
+    ) -> Result<String, IoError> {
         unimplemented!()
     }
     fn branches(&self, _default_branch: &str) -> Result<Vec<BranchInfo>, IoError> {
@@ -126,10 +133,20 @@ impl GitSource for PartialGit {
     fn worktrees(&self) -> Result<Vec<PathBuf>, IoError> {
         unimplemented!()
     }
+    fn worktree_heads(&self) -> Result<Vec<WorktreeHead>, IoError> {
+        unimplemented!()
+    }
+    fn commit_times(&self, _shas: &[String]) -> Result<HashMap<String, i64>, IoError> {
+        unimplemented!()
+    }
     fn last_change(&self, _path: &str) -> Result<Option<i64>, IoError> {
         unimplemented!()
     }
-    fn last_changes(&self, _pathspecs: &[&str]) -> Result<HashMap<String, i64>, IoError> {
+    fn last_changes(
+        &self,
+        _rev: &str,
+        _pathspecs: &[&str],
+    ) -> Result<HashMap<String, i64>, IoError> {
         unimplemented!()
     }
     fn common_dir(&self) -> Result<PathBuf, IoError> {
@@ -149,11 +166,19 @@ impl GitSource for PartialGit {
     }
     fn rev_list(
         &self,
-        _branch: &str,
+        _scope: Scope<'_>,
         _since: &str,
         _until: Option<&str>,
     ) -> Result<Vec<String>, IoError> {
         Ok(vec!["aaa1111".to_string(), "bbb2222".to_string()])
+    }
+    fn commit_sources(
+        &self,
+        _default_ref: &str,
+        _since: &str,
+        _until: Option<&str>,
+    ) -> Result<HashMap<String, String>, IoError> {
+        unimplemented!("test ga ne zove")
     }
     fn log_commits(&self, _shas: &[String]) -> Result<String, IoError> {
         Ok("@@aaa1111|1|1|2026-09-01|2026-09-01|samo prvi\n".to_string())
@@ -236,7 +261,13 @@ fn warm_cache_fetches_only_what_is_new() {
         store_calls_after_warmup,
         "nema novih commita: store se NE zove ponovo"
     );
-    assert!(spawned <= 4, "topao poziv bez novih commita: {spawned}");
+    // M2/49: zadani profil (nema `.sokratis/profile.json` s `branch_scope`) je `all` (T48) — svaki
+    // `input_with` plaća JEDAN dodatan proces (`commit_sources`) bez obzira na toplinu keša, jer
+    // karta `sha → grana` nije dio keša commita. Granica je zato +1 u odnosu na prijašnjih 4.
+    // M2/50 (S-033, odstupanje od brifa): `input_with` sad UVIJEK plaća i DVA procesa za vodeće
+    // stablo (`worktree_heads` + `commit_times`), bez obzira na toplinu keša — nije dio keša
+    // commita niti opsega grana. Izmjereno: 7 (5+2), ne 5 kako je pisalo prije T50.
+    assert!(spawned <= 7, "topao poziv bez novih commita: {spawned}");
 
     r.commit(
         "d.txt",
@@ -254,8 +285,10 @@ fn warm_cache_fetches_only_what_is_new() {
         store_calls_after_warmup + 1,
         "jedan novi commit: tocno jedan novi poziv store"
     );
+    // M2/49: isti +1 kao gore, jer `commit_sources` nije dio keša — mjerodavno je +1 na 5.
+    // M2/50 (S-033, odstupanje od brifa): isti +2 kao gore (vodeće stablo) — mjerodavno je 8 (6+2).
     assert!(
-        spawned <= 5,
+        spawned <= 8,
         "topao poziv s jednim novim commitom: {spawned}"
     );
 }
@@ -428,8 +461,10 @@ fn rev_list_matches_log_in_shas_and_order() {
         "2026-09-04T10:00:00+02:00",
     );
     let g = GitCli::new(r.path());
-    let shas = g.rev_list("main", "2026-09-01", None).unwrap();
-    let log = g.log("main", "2026-09-01", None).unwrap();
+    let shas = g
+        .rev_list(Scope::Branch("main"), "2026-09-01", None)
+        .unwrap();
+    let log = g.log(Scope::Branch("main"), "2026-09-01", None).unwrap();
     let log_shas: Vec<&str> = log
         .lines()
         .filter_map(|l| l.strip_prefix("@@"))
@@ -459,7 +494,7 @@ fn cache_error_is_visible_not_swallowed() {
 fn git_that_omits_a_reachable_commit_is_an_error_not_a_smaller_report() {
     let git = PartialGit;
     let cache = MemoryCache::new();
-    let err = cached_log(&git, &cache, "main", "2026-09-01", None).unwrap_err();
+    let err = cached_log(&git, &cache, Scope::Branch("main"), "2026-09-01", None).unwrap_err();
     match err {
         IoError::CacheIncomplete { sha } => assert_eq!(sha, "bbb2222"),
         other => panic!("ocekivan IoError::CacheIncomplete, dobiven {other}"),

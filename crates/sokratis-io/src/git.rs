@@ -37,6 +37,22 @@
 //! gradi `Command::new("git")` i na Windowsu postavlja `CREATE_NO_WINDOW` kroz `CommandExt`
 //! (`#[cfg(windows)]` — kod za drugu platformu se ne kompilira, ne samo ne izvršava). Zastavica se
 //! ne može pročitati natrag, pa test `command_new_lives_only_inside_git_command` čita IZVOR.
+//!
+//! Cigla M2/49 (S-032): `Scope<'a>` je enum s LIFETIMEOM umjesto `String` — posuđuje ime grane od
+//! pozivatelja (`&self.profile.default_branch`) umjesto da ga klonira pri svakom pozivu `log`.
+//! `commit_sources` zove `git log --branches --not <default_ref>`: `--not` negira SVE reference
+//! iza sebe do kraja retka, pa `--branches` MORA doći PRIJE njega, inače bi negirao i sve grane.
+//! `parse_commit_sources` je čista funkcija (tekst → karta) izdvojena iz metode zbog testa: SHA
+//! nikad ne sadrži `|`, pa `split_once('|')` dijeli na PRVOM — ostatak retka, i s `|` u imenu,
+//! pripada grani (Windows ne dopušta `|` u imenu grane, ali linux/macOS repozitorij može).
+//!
+//! Cigla M2/50 (S-033): `worktree_heads` parsira `git worktree list --porcelain` s let-chainom
+//! (`if let … && let …`) — čita se kao JEDNA provjera „imam sha I čekam putanju", a `Option::take`
+//! na drugom retku prazni `path` čim se par upari, pa isti buffer služi za SVAKI blok bez ručnog
+//! resetiranja. Detached stablo nema redak `branch` — parser ga i ne traži, pa mu ništa ne smeta.
+//! `commit_times` zove `git log --no-walk=unsorted`: `--no-walk` gasi šetnju roditeljima (čitamo
+//! TOČNO navedene SHA-ove, ne njihovu povijest), `unsorted` gasi i sortiranje po topologiji — za
+//! kartu `sha → vrijeme` redoslijed ispisa ionako ne igra ulogu, pa se ne plaća njegova cijena.
 use crate::IoError;
 use sokratis_core::BranchInfo;
 use std::collections::HashMap;
@@ -129,6 +145,43 @@ fn window_args(since: &str, until: Option<&str>) -> (String, Option<String>) {
     (since_arg, until_arg)
 }
 
+/// Koje reference `log`/`rev_list` obilaze (S-032). `Branch(ime)` je današnje ponašanje (paritet,
+/// `--scope default`); `AllBranches` je `--branches`: sve lokalne grane, svaki commit JEDNOM (git ga
+/// dedupira po SHA-i), bez remote-tracking referenci i tagova. Lifetime `'a` posuđuje ime grane od
+/// pozivatelja (`&self.profile.default_branch`) umjesto da ga klonira za svaki poziv.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Scope<'a> {
+    Branch(&'a str),
+    AllBranches,
+}
+
+impl<'a> Scope<'a> {
+    /// Argument revizije koji git razumije: ime grane ili `--branches`.
+    fn rev_arg(self) -> &'a str {
+        match self {
+            Scope::Branch(name) => name,
+            Scope::AllBranches => "--branches",
+        }
+    }
+}
+
+/// Tekst `git log --format=%h|%S` → karta `sha → grana`. Dijeli na PRVOM `|` (`split_once`): SHA
+/// nikad ne sadrži `|`, pa ostatak retka — i s `|` u imenu — pripada grani. Prazni retci preskaču.
+fn parse_commit_sources(text: &str) -> HashMap<String, String> {
+    text.lines()
+        .filter_map(|l| l.split_once('|'))
+        .map(|(sha, branch)| (sha.trim().to_string(), branch.trim().to_string()))
+        .collect()
+}
+
+/// Jedno radno stablo iz `git worktree list --porcelain`: putanja + PUNI SHA HEAD-a (grana može
+/// nedostajati — detached).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct WorktreeHead {
+    pub path: PathBuf,
+    pub head: String,
+}
+
 pub trait GitSource {
     /// `since` je goli datum `YYYY-MM-DD`. Implementacija MORA dodati sat `00:00:00`: git-ov
     /// parser datuma bez sata uzima TRENUTNO DOBA DANA (sat kad se naredba pokreće), ne ponoć —
@@ -143,14 +196,24 @@ pub trait GitSource {
     /// vidi doc-komentar `window_args` za izračun. Jezgra presuđuje
     /// `commit_date <= until`, pa rezerva ovdje ne mijenja nijednu brojku, samo osigurava da git
     /// ne odbaci commit prije nego što jezgra stigne odlučiti.
-    fn log(&self, branch: &str, since: &str, until: Option<&str>) -> Result<String, IoError>;
+    fn log(&self, scope: Scope<'_>, since: &str, until: Option<&str>) -> Result<String, IoError>;
     fn branches(&self, default_branch: &str) -> Result<Vec<BranchInfo>, IoError>;
     fn worktrees(&self) -> Result<Vec<PathBuf>, IoError>;
+    /// Sva radna stabla s PUNIM SHA-om HEAD-a (cigla M2/50, S-033) — `worktrees()` daje samo
+    /// putanje (registar), ovo dodaje HEAD po stablu da se moglo presuditi koje je VODEĆE
+    /// (`Project::lead`, najnoviji `author_time`).
+    fn worktree_heads(&self) -> Result<Vec<WorktreeHead>, IoError>;
+    /// `puni sha → author_time`, jednim `git log --no-walk=unsorted` za SVE navedene SHA-ove
+    /// odjednom — prazan popis ulaza vraća praznu kartu BEZ pokretanja procesa (isti obrazac kao
+    /// `log_commits`: keš/pozivatelj koji već zna sve ne smije platiti cijenu procesa za ništa).
+    fn commit_times(&self, shas: &[String]) -> Result<HashMap<String, i64>, IoError>;
     fn last_change(&self, path: &str) -> Result<Option<i64>, IoError>;
     /// Zadnja promjena (unix-vrijeme) za SVAKU putanju koju je git ikad dirnuo pod danim
     /// pathspecovima — jednim `git log --name-only` (cigla M2/11, dug M11). Zamjenjuje poziv
     /// `last_change` po datoteci: `docs()` je s 60 dokumenata trošio 60 procesa na isto pitanje.
-    fn last_changes(&self, pathspecs: &[&str]) -> Result<HashMap<String, i64>, IoError>;
+    /// `rev` je revizija od koje se čita (cigla M2/50): `"HEAD"` za glavno stablo, ili puni SHA
+    /// vodećeg radnog stabla — detached stablo (bez grane) tako ipak ima povijest.
+    fn last_changes(&self, rev: &str, pathspecs: &[&str]) -> Result<HashMap<String, i64>, IoError>;
     fn common_dir(&self) -> Result<PathBuf, IoError>;
     fn toplevel(&self) -> Result<PathBuf, IoError>;
     fn branch_exists(&self, name: &str) -> Result<bool, IoError>;
@@ -162,7 +225,7 @@ pub trait GitSource {
     /// M2/14b, potrošač keša) — brz poziv bez `--numstat` da presudi ŠTO je dostižno.
     fn rev_list(
         &self,
-        branch: &str,
+        scope: Scope<'_>,
         since: &str,
         until: Option<&str>,
     ) -> Result<Vec<String>, IoError>;
@@ -170,6 +233,16 @@ pub trait GitSource {
     /// Prazan popis → prazan tekst BEZ pokretanja procesa (keš koji već zna sve ne smije platiti
     /// cijenu procesa za ništa).
     fn log_commits(&self, shas: &[String]) -> Result<String, IoError>;
+    /// `sha → grana` SAMO za commite izvan `default_ref` (S-032): `git log --branches --not
+    /// <default_ref> --format=%h|%S`. `%S` = kratko ime reference kojom je git commit DOSEGAO; commit
+    /// dostižan iz dviju nespojenih grana dobiva jednu od njih (gitov obilazak presuđuje). Commit
+    /// kojeg nema u karti je na zadanoj grani. Isti prozor (`window_args`) kao `log`/`rev_list`.
+    fn commit_sources(
+        &self,
+        default_ref: &str,
+        since: &str,
+        until: Option<&str>,
+    ) -> Result<HashMap<String, String>, IoError>;
 }
 #[derive(Debug)]
 pub struct GitCli {
@@ -331,14 +404,14 @@ fn parse_ahead_behind(out: &str, default_branch: &str) -> Vec<BranchInfo> {
     result
 }
 impl GitSource for GitCli {
-    fn log(&self, branch: &str, since: &str, until: Option<&str>) -> Result<String, IoError> {
+    fn log(&self, scope: Scope<'_>, since: &str, until: Option<&str>) -> Result<String, IoError> {
         // `window_args` fiksira sat na ponoć i dodaje rezervu zone (dan unatrag za `since`, dva
         // dana unaprijed za `until`) — vidi doc-komentar `GitSource::log` (trait) i `window_args`
         // (gore) za oba razloga. Jezgra presuđuje `since <= commit_date <= until` string-usporedbom,
         // pa rezerva ovdje ne mijenja nijednu brojku, samo osigurava da git ne odbaci commit prije
         // nego što jezgra stigne odlučiti.
         let (since_arg, until_arg) = window_args(since, until);
-        let mut args = vec!["log", branch, &since_arg];
+        let mut args = vec!["log", scope.rev_arg(), &since_arg];
         if let Some(a) = &until_arg {
             args.push(a);
         }
@@ -352,7 +425,7 @@ impl GitSource for GitCli {
     }
     fn rev_list(
         &self,
-        branch: &str,
+        scope: Scope<'_>,
         since: &str,
         until: Option<&str>,
     ) -> Result<Vec<String>, IoError> {
@@ -360,7 +433,7 @@ impl GitSource for GitCli {
         // razići jer dolaze iz iste funkcije. `--abbrev-commit` daje `%h`-duljinu SHA-ova, isto što
         // `log`-ov `--format=@@%h|…` ispisuje u zaglavlju.
         let (since_arg, until_arg) = window_args(since, until);
-        let mut args = vec!["rev-list", branch, &since_arg];
+        let mut args = vec!["rev-list", scope.rev_arg(), &since_arg];
         if let Some(a) = &until_arg {
             args.push(a);
         }
@@ -372,6 +445,21 @@ impl GitSource for GitCli {
             .filter(|l| !l.is_empty())
             .map(str::to_string)
             .collect())
+    }
+    fn commit_sources(
+        &self,
+        default_ref: &str,
+        since: &str,
+        until: Option<&str>,
+    ) -> Result<HashMap<String, String>, IoError> {
+        let (since_arg, until_arg) = window_args(since, until);
+        // `--not` negira SVE reference iza sebe do kraja: `--branches` mora doći PRIJE njega.
+        let mut args = vec!["log", "--branches", "--not", default_ref, &since_arg];
+        if let Some(a) = &until_arg {
+            args.push(a);
+        }
+        args.extend(["--format=%h|%S", "--"]);
+        Ok(parse_commit_sources(&self.run(&args)?))
     }
     fn log_commits(&self, shas: &[String]) -> Result<String, IoError> {
         // Prazan popis → prazan tekst BEZ pokretanja procesa: keš koji već zna sve ne smije
@@ -410,13 +498,55 @@ impl GitSource for GitCli {
             .map(|p| PathBuf::from(p.trim()))
             .collect())
     }
+    fn worktree_heads(&self) -> Result<Vec<WorktreeHead>, IoError> {
+        // Porcelain: blokovi `worktree <put>` / `HEAD <sha>` / (`branch …` | `detached`), prazan
+        // redak između. Detached stablo NEMA redak `branch` — parser gleda samo prva dva.
+        let out = self.run(&["worktree", "list", "--porcelain"])?;
+        let mut heads = Vec::new();
+        let mut path: Option<PathBuf> = None;
+        for line in out.lines() {
+            if let Some(p) = line.strip_prefix("worktree ") {
+                path = Some(PathBuf::from(p.trim()));
+            } else if let Some(sha) = line.strip_prefix("HEAD ")
+                && let Some(p) = path.take()
+            {
+                heads.push(WorktreeHead {
+                    path: p,
+                    head: sha.trim().to_string(),
+                });
+            }
+        }
+        Ok(heads)
+    }
+    fn commit_times(&self, shas: &[String]) -> Result<HashMap<String, i64>, IoError> {
+        if shas.is_empty() {
+            return Ok(HashMap::new());
+        }
+        let mut args = vec!["log", "--no-walk=unsorted", "--format=%H|%at"];
+        let owned: Vec<&str> = shas.iter().map(String::as_str).collect();
+        args.extend(owned);
+        args.push("--");
+        Ok(self
+            .run(&args)?
+            .lines()
+            .filter_map(|l| l.split_once('|'))
+            .filter_map(|(sha, at)| {
+                at.trim()
+                    .parse::<i64>()
+                    .ok()
+                    .map(|t| (sha.trim().to_string(), t))
+            })
+            .collect())
+    }
     fn last_change(&self, path: &str) -> Result<Option<i64>, IoError> {
         let s = self.run(&["log", "-1", "--format=%at", "--", path])?;
         Ok(s.trim().parse().ok())
     }
-    fn last_changes(&self, pathspecs: &[&str]) -> Result<HashMap<String, i64>, IoError> {
+    fn last_changes(&self, rev: &str, pathspecs: &[&str]) -> Result<HashMap<String, i64>, IoError> {
         // Log je od najnovijeg prema starijem, pa je PRVA pojava putanje njezina zadnja promjena.
         // Jedan proces za SVE putanje odjednom (cigla M2/11) umjesto `last_change` po datoteci.
+        // `rev` (cigla M2/50) je ODMAH iza `"log"`: revizija od koje se čita — `"HEAD"` za glavno
+        // stablo, puni SHA vodećeg stabla za sve ostale (detached HEAD nema granu, ali SHA vrijedi).
         //
         // Krug popravka 1 (recenzija, dokazano pokusom nad Sokrat Studyjem — docs/README.md):
         // - `-c core.quotepath=false` je GIT-OVA GLOBALNA opcija, MORA doći PRIJE `log`: bez nje
@@ -435,6 +565,7 @@ impl GitSource for GitCli {
             "-c",
             "core.quotepath=false",
             "log",
+            rev,
             "--format=@@%at",
             "--diff-merges=combined",
             "--name-only",
@@ -515,5 +646,15 @@ mod tests {
             helper.contains("0x0800_0000"),
             "CREATE_NO_WINDOW = 0x08000000"
         );
+    }
+
+    /// Review Focus #3 (Ruling R49): grana `y|z` se na Windowsu ne može stvoriti, pa rub `|` u
+    /// imenu čuva parser, ne repo. SHA nema `|`, ostatak retka je grana.
+    #[test]
+    fn parse_commit_sources_keeps_pipe_inside_branch_name() {
+        let map = super::parse_commit_sources("abc123|y|z\ndef456|feat/x\n\n");
+        assert_eq!(map.get("abc123").map(String::as_str), Some("y|z"));
+        assert_eq!(map.get("def456").map(String::as_str), Some("feat/x"));
+        assert_eq!(map.len(), 2);
     }
 }

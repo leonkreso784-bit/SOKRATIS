@@ -4,6 +4,10 @@
 //! Cigla M2/11, krug popravka 1 (last_changes i merge-commiti): `try_merge` i `commit_merge` grade
 //! PRAVI merge sa sudarom u testnom repou — `try_merge` namjerno NE puca na sudaru (za razliku od
 //! `git()`, koji puca na svakoj grešci), jer je sudar OČEKIVAN ishod fixturea.
+//!
+//! Cigla M2/50 (S-033): `add_worktree` dodaje DRUGO radno stablo (za testove vodećeg stabla i
+//! unije dnevnika); `commit_at` je tijelo koje `commit` sad samo poziva sa `self.path()` — jedan
+//! kod za „commitaj u OVOM ili u DRUGOM stablu", umjesto dvije skoro-iste funkcije.
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use tempfile::TempDir;
@@ -45,24 +49,54 @@ impl Repo {
 
     /// Commit s datumom autora `a` i commita `c` (ISO 8601 s pomakom), datoteka `path` dobiva `content`.
     pub fn commit(&self, path: &str, content: &str, msg: &str, a: &str, c: &str) -> String {
-        let full: PathBuf = self.path().join(path);
+        self.commit_at(self.path(), path, content, msg, a, c)
+    }
+
+    /// Drugo radno stablo na novoj grani `branch` u vlastitoj privremenoj mapi (RAII kao `dir`).
+    /// `#[allow(dead_code)]`: koristi ga samo `project.rs`/`git_cli.rs` (vidi napomenu o
+    /// `#[allow(dead_code)]` uz `try_merge` — `mod common` se prevodi zasebno po test-binariju).
+    #[allow(dead_code)]
+    pub fn add_worktree(&self, branch: &str) -> TempDir {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let wt = dir.path().join("wt");
+        self.git(&["worktree", "add", "-q", "-b", branch, &wt.to_string_lossy()]);
+        dir
+    }
+
+    /// Kao `commit`, ali u zadanoj mapi (drugo radno stablo). `commit` je tanka omotnica oko ovoga
+    /// sa `self.path()`.
+    #[allow(dead_code)]
+    pub fn commit_at(
+        &self,
+        dir: &Path,
+        path: &str,
+        content: &str,
+        msg: &str,
+        a: &str,
+        c: &str,
+    ) -> String {
+        let full: PathBuf = dir.join(path);
         std::fs::create_dir_all(full.parent().expect("parent")).expect("mkdir");
         std::fs::write(&full, content).expect("write");
-        self.git(&["add", "-A"]);
-        let out = Command::new("git")
-            .arg("-C")
-            .arg(self.path())
-            .env("GIT_AUTHOR_DATE", a)
-            .env("GIT_COMMITTER_DATE", c)
-            .args(["commit", "-q", "-m", msg])
-            .output()
-            .expect("git commit");
-        assert!(
-            out.status.success(),
-            "{}",
-            String::from_utf8_lossy(&out.stderr)
-        );
-        self.git(&["rev-parse", "--short", "HEAD"])
+        let run = |args: &[&str]| {
+            let out = Command::new("git")
+                .arg("-C")
+                .arg(dir)
+                .env("GIT_AUTHOR_DATE", a)
+                .env("GIT_COMMITTER_DATE", c)
+                .args(args)
+                .output()
+                .expect("git");
+            assert!(
+                out.status.success(),
+                "{}",
+                String::from_utf8_lossy(&out.stderr)
+            );
+            String::from_utf8_lossy(&out.stdout).trim().to_string()
+        };
+        run(&["add", "-A"]);
+        run(&["commit", "-q", "-m", msg]);
+        run(&["rev-parse", "--short", "HEAD"])
     }
 
     /// Pokreće `git merge --no-commit --no-ff <branch>` i NE PUCA na sudaru (za razliku od `git()`

@@ -12,6 +12,13 @@
 //!
 //! Cigla M2/29b: `today` se pridružuje izvozu — desktop treba današnji datum bez vlastite
 //! ovisnosti o `chrono` (S-013).
+//!
+//! Cigla M2/49 (S-032): `Scope` se pridružuje izvozu — pozivatelji `log`/`rev_list`/`cached_log`
+//! izvan `io` (testovi) ga trebaju da uopće mogu sastaviti poziv.
+//!
+//! Cigla M2/50 (S-033): `WorktreeHead` (put + puni SHA HEAD-a) i `Lead` (vodeće stablo) se
+//! pridružuju izvozu — pozivatelji izvan `io` (testovi, kasnije desktop) trebaju oba tipa da
+//! uopće mogu izraziti „koje je stablo vodeće" bez posezanja u privatno polje.
 pub mod cache;
 pub mod error;
 pub mod git;
@@ -19,6 +26,6 @@ pub mod project;
 pub mod watch;
 pub use cache::{CacheError, CommitCache, cached_log};
 pub use error::IoError;
-pub use git::{GitCli, GitSource};
-pub use project::{Project, today};
+pub use git::{GitCli, GitSource, Scope, WorktreeHead};
+pub use project::{Lead, Project, today};
 pub use watch::{RefreshQueue, WatchEvent, WatchReason, Watcher};

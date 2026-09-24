@@ -483,3 +483,146 @@ fn input_between_passes_until_to_the_core_and_fetches_with_reserve() {
         "tri dana kasnije je izvan rezerve od dva dana"
     );
 }
+
+/// M2/50 (S-033): dnevnik se čita iz SVAKOG stabla (unija; vodeće prvo → njegov `model` pobjeđuje),
+/// plan i docs iz VODEĆEG (najnoviji HEAD); `touched.worktrees` = broj stabala.
+#[test]
+fn input_unites_diaries_and_reads_docs_from_lead_worktree() {
+    let r = Repo::init();
+    r.commit(
+        "docs/records/PROGRESS.md",
+        "## 2026-09-10 (OPUS) — F1/1 prvi\n",
+        "docs: dnevnik",
+        "2026-09-10T10:00:00+02:00",
+        "2026-09-10T10:00:00+02:00",
+    );
+    let wt = r.add_worktree("feat/x");
+    let wt_root = wt.path().join("wt");
+    r.commit_at(
+        &wt_root,
+        "docs/records/PROGRESS.md",
+        "## 2026-09-10 (FABLE) — F1/1 prvi\n\n## 2026-09-12 (FABLE) — F1/2 u grani\n",
+        "docs: dnevnik u grani",
+        "2026-09-12T10:00:00+02:00",
+        "2026-09-12T10:00:00+02:00",
+    );
+    r.commit_at(
+        &wt_root,
+        "docs/plan/RASPORED.md",
+        "### F1 · Prva\n| **F1/1** ✅ |\n",
+        "plan u grani",
+        "2026-09-12T11:00:00+02:00",
+        "2026-09-12T11:00:00+02:00",
+    );
+
+    let p = Project::open(r.path()).unwrap();
+    let lead = p.lead().unwrap();
+    assert_eq!(lead.root, wt_root, "stablo s najnovijim HEAD-om vodi");
+    let input = p.input(Some("2026-09-01")).unwrap();
+    assert_eq!(input.worktrees, 2);
+    assert_eq!(input.diaries.len(), 2);
+    assert!(
+        input.diaries[0].contains("F1/2 u grani"),
+        "vodeće stablo je PRVO"
+    );
+    assert!(
+        input.plan.as_deref().unwrap_or("").contains("F1/1"),
+        "plan iz vodećeg stabla"
+    );
+    assert!(
+        input.docs.iter().any(|d| d.path == "docs/plan/RASPORED.md"),
+        "docs iz vodećeg stabla"
+    );
+    let r = sokratis_core::build_report(&input, &p.profile).unwrap();
+    assert_eq!(r.deliveries.len(), 2, "unija: preklop jednom");
+    assert_eq!(r.deliveries[0].model, "FABLE", "vodeće stablo pobjeđuje");
+}
+
+/// Review Focus #5: dnevnik postoji SAMO u sporednom stablu.
+#[test]
+fn diary_only_in_secondary_worktree_still_counts() {
+    let r = Repo::init();
+    r.commit(
+        "js/a.js",
+        "1",
+        "F1/1 kod",
+        "2026-09-10T10:00:00+02:00",
+        "2026-09-10T10:00:00+02:00",
+    );
+    let wt = r.add_worktree("feat/x");
+    let wt_root = wt.path().join("wt");
+    r.commit_at(
+        &wt_root,
+        "docs/records/PROGRESS.md",
+        "## 2026-09-12 (FABLE) — F1/2 u grani\n",
+        "docs",
+        "2026-09-12T10:00:00+02:00",
+        "2026-09-12T10:00:00+02:00",
+    );
+    let p = Project::open(r.path()).unwrap();
+    let input = p.input(Some("2026-09-01")).unwrap();
+    assert_eq!(input.diaries.len(), 1);
+    let r = sokratis_core::build_report(&input, &p.profile).unwrap();
+    assert_eq!(r.deliveries.len(), 1);
+    assert_eq!(r.touched.diaries, 1);
+}
+
+/// Review Focus #1: jedno stablo → vodeće je `root`, HEAD.
+#[test]
+fn lead_is_root_when_there_is_one_worktree() {
+    let r = Repo::init();
+    r.commit(
+        "a.txt",
+        "1",
+        "prvi",
+        "2026-09-10T10:00:00+02:00",
+        "2026-09-10T10:00:00+02:00",
+    );
+    let p = Project::open(r.path()).unwrap();
+    let lead = p.lead().unwrap();
+    assert_eq!(lead.root, p.root);
+    assert_eq!(p.input(None).unwrap().worktrees, 1);
+}
+
+/// M2/49: `input()` po zadanom profilu (`branch_scope = all`) vidi commit iz feature-grane i zna mu
+/// granu; profil `"branch_scope": "default"` vraća današnje ponašanje (samo `main`, prazna karta).
+#[test]
+fn input_follows_branch_scope_from_profile() {
+    let r = Repo::init();
+    r.commit(
+        "js/a.js",
+        "1",
+        "F1/1 main",
+        "2026-09-10T10:00:00+02:00",
+        "2026-09-10T10:00:00+02:00",
+    );
+    r.git(&["checkout", "-q", "-b", "feat/x"]);
+    let b = r.commit(
+        "js/b.js",
+        "2",
+        "F1/2 grana",
+        "2026-09-11T10:00:00+02:00",
+        "2026-09-11T10:00:00+02:00",
+    );
+    r.git(&["checkout", "-q", "main"]);
+
+    let p = Project::open(r.path()).unwrap();
+    let input = p.input(Some("2026-09-01")).unwrap();
+    assert_eq!(input.scope, sokratis_core::BranchScope::AllBranches);
+    assert!(input.git_log.contains(&b));
+    assert_eq!(
+        input.commit_branches.get(&b).map(String::as_str),
+        Some("feat/x")
+    );
+
+    write(
+        &r,
+        ".sokratis/profile.json",
+        r#"{ "branch_scope": "default" }"#,
+    );
+    let p = Project::open(r.path()).unwrap();
+    let input = p.input(Some("2026-09-01")).unwrap();
+    assert_eq!(input.scope, sokratis_core::BranchScope::DefaultBranch);
+    assert!(!input.git_log.contains(&b));
+    assert!(input.commit_branches.is_empty());
+}
