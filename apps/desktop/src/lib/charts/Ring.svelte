@@ -6,7 +6,8 @@
 <!-- postojeće segmente. `uid` iz `$props.id()` (Svelte 5) drži `id` maske jedinstvenim po instanci, -->
 <!-- inače bi dva prstena na istom ekranu dijelila `<mask>` preko `id`-a i jedan bi ostao skriven. -->
 <script lang="ts">
-  import { arcPath, ringSegments, svgA11y } from './scale';
+  // dopunjeno M2/55 — uvoz iz `scales.ts` umjesto obrisanog `scale.ts` (S-035); ponašanje nepromijenjeno.
+  import { arcPath, ringSegments, svgA11y } from './scales';
 
   type Segment = { value: number; label: string; color: string };
   type Props = { segments: Segment[]; size?: number; label?: string };

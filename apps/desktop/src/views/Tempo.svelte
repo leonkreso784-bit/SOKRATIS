@@ -1,15 +1,18 @@
 <script lang="ts">
   // ZAŠTO OVAKO (cigla M2/27 — Tempo: dani u razdoblju, commiti/sati, kumulativa)
   // Prekidač commiti/sati je dva `<button aria-pressed>` (natpis iz rječnika, S-021) koji samo BIRA
-  // koji stupac `DayStats` ide u `Bars` — ništa se ovdje ne zbraja ni ne dijeli. Kumulativna linija
-  // crta `d.commits_cumulative` izravno: to polje jezgra već izračuna (S-012), sučelje ga NE
-  // ponovno zbraja preko `cumulative()` iz `scale.ts` (Ruling orkestratora M2/27 #2).
+  // koji stupac ide u `Bars` — ništa se ovdje ne zbraja ni ne dijeli. Kumulativna linija crta
+  // `d.commits_cumulative` izravno: to polje jezgra već izračuna (S-012), sučelje ga ne računa samo.
   // Dopunjeno M2/42 — oba grafa dobivaju `<Explainable block>` (S-027), a zaglavlje stupca sati u
   // tablici svoj `<Explainable>` (jedini stupac tablice s vlastitim mjerenjem koje pokazatelj ne
   // ponavlja negdje drugdje — ostala zaglavlja nemaju id pa se ne omataju, dopuna T42).
+  // Dopunjeno M2/55 (S-035) — `Bars`/`Line` sad primaju `buckets`/`series` (temelji iz T54): stupci
+  // i linija dobivaju stvarne datume na X-osi umjesto redoslijeda; prekidač dan/tjedan/mjesec dolazi
+  // tek u T59 (PLOČA), ovdje je zrnatost fiksno `'day'` kao i dosad.
   import { app } from '../lib/state.svelte';
   import { getLang, t } from '../lib/i18n/index.svelte';
   import { hours, num, ymd } from '../lib/format';
+  import { bucketDays } from '../lib/charts/bucket';
   import Bars from '../lib/charts/Bars.svelte';
   import Line from '../lib/charts/Line.svelte';
   import Explainable from '../lib/explain/Explainable.svelte';
@@ -17,9 +20,9 @@
   let mode = $state<'commits' | 'hours'>('commits');
 
   const days = $derived(app.report?.days ?? []);
-  const barValues = $derived(days.map((d) => (mode === 'commits' ? d.commits : d.hours)));
-  const barLabels = $derived(days.map((d) => ymd(d.date, getLang())));
-  const cumulativeValues = $derived(days.map((d) => d.commits_cumulative));
+  const buckets = $derived(
+    bucketDays(days, 'day').map((b) => ({ start: b.start, values: { [mode]: mode === 'commits' ? b.commits : b.hours } })),
+  );
 </script>
 
 <div class="flex flex-col gap-4">
@@ -49,8 +52,27 @@
       </button>
     </div>
 
-    <Explainable id="tempo.bars" block><Bars values={barValues} labels={barLabels} label={t(`tempo.${mode}`)} /></Explainable>
-    <Explainable id="tempo.cumulative" block><Line values={cumulativeValues} label={t('tempo.cumulative')} /></Explainable>
+    <Explainable id="tempo.bars" block>
+      <Bars
+        {buckets}
+        series={[{ id: mode, label: t(`tempo.${mode}`), color: 'var(--color-brand-500)' }]}
+        granularity="day"
+        label={t(`tempo.${mode}`)}
+      />
+    </Explainable>
+    <Explainable id="tempo.cumulative" block>
+      <Line
+        series={[
+          {
+            id: 'cum',
+            label: t('tempo.cumulative'),
+            color: 'var(--color-brand-500)',
+            points: days.map((d) => ({ date: d.date, value: d.commits_cumulative })),
+          },
+        ]}
+        label={t('tempo.cumulative')}
+      />
+    </Explainable>
 
     <table class="w-full text-left text-sm">
       <thead>

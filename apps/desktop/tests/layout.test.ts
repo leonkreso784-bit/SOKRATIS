@@ -3,7 +3,7 @@
 // najbliža točka za tooltip. Svelte komponente koje ovo crtaju nemaju vlastiti test (R37) — sve što
 // se može pogrešno izračunati mora biti pokriveno ovdje.
 import { describe, expect, it } from 'vitest';
-import { barsLayout, frame, lineLayout, nearestIndex } from '../src/lib/charts/layout';
+import { barsLayout, frame, lineLayout, linePath, nearestIndex } from '../src/lib/charts/layout';
 
 const S = [{ id: 'commits', label: 'commiti', color: 'var(--color-brand-500)' }];
 
@@ -68,5 +68,29 @@ describe('nearestIndex', () => {
   it('najbliži x, −1 za prazno', () => {
     expect(nearestIndex([10, 20, 30], 22)).toBe(1);
     expect(nearestIndex([], 5)).toBe(-1);
+  });
+});
+
+// Preseljeno iz scale.test.ts (M2/23, obrisan M2/55) — `linePath` živi u `layout.ts` (T54), pa i
+// njezin test uz modul (R52), ne uz `scales.ts`.
+describe('linePath', () => {
+  it('M-L put po konačnim točkama, prazno je prazan niz', () => {
+    expect(linePath([])).toBe('');
+    expect(
+      linePath([
+        { x: 0, y: 1 },
+        { x: 2, y: 3 },
+      ]),
+    ).toBe('M0 1 L2 3');
+    expect(linePath([{ x: 0, y: 1 }])).toBe('M0 1');
+  });
+  it('preskoči točke čiji x ili y nije konačan', () => {
+    expect(
+      linePath([
+        { x: 0, y: 0 },
+        { x: 1, y: Number.NaN },
+        { x: 2, y: 2 },
+      ]),
+    ).toBe('M0 0 L2 2');
   });
 });

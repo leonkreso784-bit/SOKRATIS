@@ -2,8 +2,12 @@
 <!-- (promjena profila) dobiva boju `accent` da se razlikuje od trenda (S-018). -->
 <!-- dopunjeno M2/39 — isti par klasa kao Line: `chart-line` na putanji (`pathLength="1"`), -->
 <!-- `chart-dot` samo na označenoj točki jer to je jedina koja se ovdje uopće iscrtava. -->
+<!-- dopunjeno M2/55 — crta po INDEKSU (bez datuma), pa ne prolazi kroz `layout.ts`; `linear`/ -->
+<!-- `finiteMax`/`niceMax`/`svgA11y` sad dolaze iz `scales.ts` (obrisan `scale.ts`), `linePath` iz -->
+<!-- `layout.ts` gdje već živi od T54 — ponašanje se ne mijenja (S-035, Ruling R51). -->
 <script lang="ts">
-  import { finiteMax, linear, linePath, niceMax, svgA11y } from './scale';
+  import { finiteMax, linear, niceMax, svgA11y } from './scales';
+  import { linePath } from './layout';
 
   type Point = { value: number; marked?: boolean };
   type Props = { points: Point[]; width?: number; height?: number; label?: string };
