@@ -81,8 +81,8 @@ Testovi i brane: `docs/workflow/TESTING.md`.
   (DESKTOP-2 · JEZGRA-2 · IO-2 · GRAFOVI · PLOČA · IZDANJE), pet sesija; tok IZDANJE preuzima T35/T43
   iz plana M2 (ostaje u `superpowers/plans/`, nije arhiviran).
 - **Sesija 1 gotova:** DESKTOP-2 (T44–T45) · JEZGRA-2 (T46–T47) · GRAFOVI (T53) spojeni, vrh `main`-a
-  `cedbf20`, verzija u kodu `1.0.0-pre.2`. **Sesija 2 u tijeku:** T48 → T49 · T50 (IO-2) · T54 (PLOČA).
-- **Dva stabla:** `sokratis` (`main`) i `sokratis.rel` (`feat/release`, T35 napola, necommitano, ne
+  `cb62454`, verzija u kodu `1.0.0-pre.2`, instalater pre.2 izgrađen. **Sesija 2 prekinuta:** T48 (`c226bd8`) i T54 (`459d9e4`, GRAFOVI) izgrađeni i **čekaju recenziju**; dalje T49 · T50 (IO-2) · T55.
+- **Četiri stabla:** `sokratis` (`main`), `sokratis.jezgra2` (`feat/core-profile`, T48), `sokratis.grafovi` (`feat/charts-2`, T54) i `sokratis.rel` (`feat/release`, T35 napola, necommitano, ne
   dirati do toka IZDANJE); nova sesija ih ne briše. Tag traži Leonov izričit OK.
 - Druga verzija (M3) i kasnije: `docs/records/BACKLOG.md`.
 - Brane, brojke i tijek sesija: `PROGRESS.md`; isporuke: `CHANGELOG.md`. Ovaj odjeljak to ne ponavlja.
@@ -117,7 +117,7 @@ sesije.
 ## Agenti — više grana, jedan orkestrator
 Uloge i protokol: `docs/workflow/AGENTI.md`. Graditelj radi **jednu ciglu u svom stablu**, recenzent presuđuje
 u dva prolaza, čuvar dokumentacije piše zapise; **samo orkestrator spaja u `main`**. Nakon compacta stanje se
-čita iz gita (`git log --oneline -15` · `git worktree list`), ne iz sjećanja. **Otvorena su dva stabla:**
+čita iz gita (`git log --oneline -15` · `git worktree list`), ne iz sjećanja. **Otvorena su četiri stabla** (v. „Stanje"); trajna dva:
 `sokratis` (`main`) i `sokratis.rel` (`feat/release`, T35 napola, necommitano) — potpuno spojena se
 brišu (pravilo #1), ali `sokratis.rel` NIJE spojeno, pa ga nova sesija ne dira ni ne briše, samo
 nastavlja T35 ondje kad tok IZDANJE dođe na red. Popis tokova i vlasništvo datoteka:
