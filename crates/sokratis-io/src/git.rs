@@ -32,6 +32,11 @@
 //! se MORA zatvoriti (drop) prije `wait_with_output()`, inače `git --stdin` čeka EOF zauvijek.
 //! Mapiranje ishoda procesa u `IoError` je izdvojeno u `output_to_result`/`spawn_error` — isto za
 //! `run` i `run_with_stdin`, da se ne kopira.
+//!
+//! Cigla M2/44 (konzolni prozor, kvar 4 iz Leonovih nalaza): `git_command` je JEDINO mjesto koje
+//! gradi `Command::new("git")` i na Windowsu postavlja `CREATE_NO_WINDOW` kroz `CommandExt`
+//! (`#[cfg(windows)]` — kod za drugu platformu se ne kompilira, ne samo ne izvršava). Zastavica se
+//! ne može pročitati natrag, pa test `command_new_lives_only_inside_git_command` čita IZVOR.
 use crate::IoError;
 use sokratis_core::BranchInfo;
 use std::collections::HashMap;
@@ -46,6 +51,24 @@ const LOG_FORMAT_ARGS: [&str; 3] = [
     "--format=@@%h|%at|%ct|%ad|%cd|%s",
     "--numstat",
 ];
+
+/// JEDINO mjesto koje gradi `git` proces (kvar 4, spec 1.0.0 §4.2). Instalirana aplikacija je
+/// `windows_subsystem = "windows"` (`main.rs`), pa bi svaki dijete-proces bez zastavice na Windowsu
+/// nakratko otvorio konzolni prozor — pri svakom osvježenju, watcheru, promjeni raspona.
+/// `CREATE_NO_WINDOW` (0x08000000, `winbase.h`) to gasi; na drugim sustavima ništa se ne mijenja.
+/// `#[cfg(windows)]` bira kod PRI KOMPILACIJI, pa `CommandExt` ne postoji na Linuxu ni u `cargo check`
+/// za druge mete — nema `if cfg!` s mrtvom granom.
+fn git_command(repo: &Path) -> Command {
+    let mut cmd = Command::new("git");
+    cmd.arg("-C").arg(repo);
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+        cmd.creation_flags(CREATE_NO_WINDOW);
+    }
+    cmd
+}
 
 /// Greška spawn-a procesa (`git` nije na PATH-u ili druga IO greška) — dijeli je `run` i
 /// `run_with_stdin`.
@@ -172,9 +195,7 @@ impl GitCli {
     /// Pokreće `git` u repozitoriju bez shella i mapira ishod u `IoError`.
     fn run(&self, args: &[&str]) -> Result<String, IoError> {
         self.calls.set(self.calls.get() + 1);
-        let out = Command::new("git")
-            .arg("-C")
-            .arg(&self.repo)
+        let out = git_command(&self.repo)
             .args(args)
             .output()
             .map_err(spawn_error)?;
@@ -193,9 +214,7 @@ impl GitCli {
     /// bi ispis slala USPOREDO s čitanjem stdina bi se mogla zaglaviti kad stdout napuni cijev.
     fn run_with_stdin(&self, args: &[&str], input: &str) -> Result<String, IoError> {
         self.calls.set(self.calls.get() + 1);
-        let mut child = Command::new("git")
-            .arg("-C")
-            .arg(&self.repo)
+        let mut child = git_command(&self.repo)
             .args(args)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
@@ -458,5 +477,43 @@ impl GitSource for GitCli {
             .run(&["rev-parse", "--short", "HEAD"])?
             .trim()
             .to_string())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    /// Zastavica `CREATE_NO_WINDOW` se iz `Command`-a ne može pročitati natrag (std nema getter),
+    /// pa test čita IZVOR: `Command::new` smije postojati SAMO unutar `git_command`. Igla se slaže
+    /// u runtimeu (`concat!`) i broje se samo redci koji NISU komentari — inače bi test brojao
+    /// vlastiti tekst i zaglavlje datoteke (Ruling R38). Pošteno ograničenje, zapisano u zaglavlju.
+    #[test]
+    fn command_new_lives_only_inside_git_command() {
+        let src = include_str!("git.rs");
+        let needle = concat!("Command::", "new(");
+        let occurrences = src
+            .lines()
+            .filter(|line| !line.trim_start().starts_with("//"))
+            .filter(|line| line.contains(needle))
+            .count();
+        assert_eq!(
+            occurrences, 1,
+            "Command::new smije postojati samo u git_command()"
+        );
+        let helper_start = src.find("fn git_command(").expect("git_command postoji");
+        let helper_end =
+            src[helper_start..].find("\n}\n").expect("kraj git_command") + helper_start;
+        let helper = &src[helper_start..helper_end];
+        assert!(
+            helper.contains(needle),
+            "Command::new je unutar git_command"
+        );
+        assert!(
+            helper.contains("creation_flags("),
+            "git_command postavlja creation_flags"
+        );
+        assert!(
+            helper.contains("0x0800_0000"),
+            "CREATE_NO_WINDOW = 0x08000000"
+        );
     }
 }
