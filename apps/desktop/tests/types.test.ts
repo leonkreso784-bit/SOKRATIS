@@ -36,5 +36,6 @@ describe('ugovor Report', () => {
     });
     expect(r.scope).toBe('default');
     expect(r.branches[0]).toMatchObject({ name: 'main', merged: true });
+    expect(r.touched).toMatchObject({ worktrees: 1, diaries: 1 });
   });
 });

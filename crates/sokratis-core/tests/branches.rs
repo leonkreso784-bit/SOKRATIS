@@ -17,7 +17,7 @@ const LOG: &str = "\
 fn input(scope: BranchScope, map: &[(&str, &str)]) -> ReportInput {
     ReportInput {
         git_log: LOG.into(),
-        diary: None,
+        diaries: vec![],
         plan: None,
         docs: vec![],
         branches: vec![
@@ -46,6 +46,7 @@ fn input(scope: BranchScope, map: &[(&str, &str)]) -> ReportInput {
             .iter()
             .map(|(s, b)| (s.to_string(), b.to_string()))
             .collect(),
+        worktrees: 1,
     }
 }
 

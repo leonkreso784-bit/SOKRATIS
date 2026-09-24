@@ -149,8 +149,6 @@ pub fn render_signals(signals: &[Signal]) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    // Samo testovi grade `Report` ručno i trebaju `scope` — proizvodni kod `table.rs` ga ne čita.
-    use sokratis_core::BranchScope;
     use sokratis_core::*;
 
     #[test]
@@ -168,6 +166,8 @@ mod tests {
                 lines: 10,
                 files: 2,
                 skipped_lines: 0,
+                worktrees: 1,
+                diaries: 1,
             },
             days: vec![DayStats {
                 date: "2026-09-01".into(),
@@ -243,6 +243,8 @@ mod tests {
                 lines: 0,
                 files: 0,
                 skipped_lines: 0,
+                worktrees: 0,
+                diaries: 0,
             },
             days: vec![],
             kinds: vec![],

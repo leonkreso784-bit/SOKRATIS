@@ -11,6 +11,11 @@
 //! izgubljenog u prijenosu. `ReportInput.commit_branches` je `HashMap` jer jezgra ne zna git —
 //! kartu `sha → grana` joj donosi `io`. `CommitRow.branch` je ZADNJE polje: dodatak na kraju
 //! strukture je diff od jednog retka u snapshotu (S-022), ne pomak svih polja iza njega.
+//!
+//! Dopuna (cigla M2/47, S-033): `ReportInput.diary: Option<String>` postaje `diaries: Vec<String>`
+//! — jedan tekst po radnom stablu, ne jedan tekst ukupno. `Vec` (ne `Option<Vec>`) jer prazan
+//! popis već znači „nema dnevnika", isto kao prije `None`; `parse::parse_diaries` radi uniju.
+//! `worktrees`/`diaries` u `Touched` su ZADNJA dva polja iz istog razloga kao `CommitRow.branch`.
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -178,6 +183,10 @@ pub struct Touched {
     pub lines: u64,
     pub files: usize,
     pub skipped_lines: usize,
+    /// broj radnih stabala koje je `io` obišao (S-033) — 1 dok T50 ne doda sva.
+    pub worktrees: u32,
+    /// broj tekstova dnevnika koje je `parse_diaries` unirao (dužina `ReportInput.diaries`).
+    pub diaries: u32,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -315,7 +324,9 @@ pub struct Report {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ReportInput {
     pub git_log: String,
-    pub diary: Option<String>,
+    /// Tekst dnevnika iz SVAKOG radnog stabla, od vodećeg prema starijima (S-033); prazno = nema
+    /// dnevnika. Unija po (datum, naslov) je u `parse::parse_diaries`.
+    pub diaries: Vec<String>,
     pub plan: Option<String>,
     pub docs: Vec<DocFile>,
     pub branches: Vec<BranchInfo>,
@@ -334,6 +345,8 @@ pub struct ReportInput {
     /// --format=%h|%S`); commit kojeg nema u karti je na zadanoj grani. Prazno kad je
     /// `scope == DefaultBranch`.
     pub commit_branches: HashMap<String, String>,
+    /// broj radnih stabala koje je `io` obišao (S-033) — u `Touched` (mjerač kaže koliko je dotaknuo).
+    pub worktrees: u32,
 }
 
 /// Sve što pravilo smije vidjeti — u vlasništvu, bez lifetimeova (gradi se jednom u `build_report`).

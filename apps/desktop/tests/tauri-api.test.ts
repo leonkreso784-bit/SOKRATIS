@@ -166,7 +166,7 @@ function fakeReport(commits: number): Report {
     until: null,
     branch: 'main',
     scope: 'default',
-    touched: { commits, lines: 0, files: 0, skipped_lines: 0 },
+    touched: { commits, lines: 0, files: 0, skipped_lines: 0, worktrees: 1, diaries: 1 },
     days: [],
     kinds: [],
     branches: [],

@@ -306,7 +306,8 @@ impl Project {
         };
         Ok(ReportInput {
             git_log,
-            diary: read_opt(&self.profile.diary_path),
+            // M2/47: privremeno jedno stablo; IO-2 (T50) čita sva.
+            diaries: read_opt(&self.profile.diary_path).into_iter().collect(),
             plan: read_opt(&self.profile.plan_path),
             docs: self.docs()?,
             branches: self.git.branches(&ref_name)?,
@@ -323,6 +324,8 @@ impl Project {
             // M2/46: privremeno; IO-2 (T49) puni iz profila i gita.
             scope: BranchScope::DefaultBranch,
             commit_branches: HashMap::new(),
+            // M2/47: privremeno jedno stablo; IO-2 (T50) čita sva.
+            worktrees: 1,
         })
     }
 

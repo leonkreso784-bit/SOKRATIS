@@ -21,7 +21,7 @@ fn fx(suffix: &str) -> String {
 fn report_json_shape_is_locked() {
     let input = ReportInput {
         git_log: fx("log"),
-        diary: Some(fx("PROGRESS.md")),
+        diaries: vec![fx("PROGRESS.md")],
         plan: Some(fx("RASPORED.md")),
         docs: vec![],
         branches: vec![],
@@ -34,6 +34,7 @@ fn report_json_shape_is_locked() {
         branch: "main".into(),
         scope: BranchScope::DefaultBranch,
         commit_branches: HashMap::new(),
+        worktrees: 1,
     };
     let r = build_report(&input, &Profile::default()).expect("fixture je čist ulaz");
     insta::assert_json_snapshot!("report-sokratstudy-2026-09-17", r);

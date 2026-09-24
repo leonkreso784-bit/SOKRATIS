@@ -12,7 +12,9 @@ expression: r
     "commits": 190,
     "lines": 70164,
     "files": 1801,
-    "skipped_lines": 0
+    "skipped_lines": 0,
+    "worktrees": 1,
+    "diaries": 1
   },
   "days": [
     {

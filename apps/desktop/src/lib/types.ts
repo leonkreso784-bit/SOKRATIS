@@ -8,6 +8,8 @@
 // (popis projekata, raspon, postavke), sučelje ih drži samo za sebe.
 // Dopunjeno M2/46 (S-032) — `BranchScope`, `BranchStats`, `CommitRow.branch`, `Report.scope`/
 // `branches`: ista dva teksta ("all"/"default") kao Rustov `#[serde(rename)]`.
+// Dopunjeno M2/47 (S-033) — `Touched.worktrees`/`diaries`: mjerač kaže koliko je stabala i tekstova
+// dnevnika dotaknuo (isto polje kao Rustov `Touched`, zadnja dva polja).
 import type { Lang } from './i18n/index.svelte';
 
 export type { Lang };
@@ -23,6 +25,8 @@ export interface Touched {
   lines: number;
   files: number;
   skipped_lines: number;
+  worktrees: number;
+  diaries: number;
 }
 
 export interface DayStats {

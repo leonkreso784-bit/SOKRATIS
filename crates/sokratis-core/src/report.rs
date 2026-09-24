@@ -21,13 +21,17 @@
 //! Dopuna (cigla M2/46, S-032): `branch_stats` je pozvan nakon `rows`/`days`, kao svaki drugi korak
 //! mjerenja — sastavljanje ostaje jedino mjesto koje zna redoslijed, `branch_stats` sam ne zna ni
 //! za `commit_rows` ni za `day_stats`.
+//!
+//! Dopuna (cigla M2/47, S-033): `input.diary.map(parse_diary)` (jedan `Option`) postaje
+//! `parse_diaries(&input.diaries, …)` (poziv koji sam zna raditi s praznim popisom) — jedan poziv
+//! manje grana nego prije, jer unija PRIHVAĆA nula tekstova bez posebnog slučaja.
 use crate::docs::docs_health;
 use crate::metrics::indicators::IndicatorInput;
 use crate::metrics::{
     active_phases, branch_stats, closed_phases, commit_rows, day_stats, hours_per_day, indicators,
     kind_stats, vision_totals,
 };
-use crate::parse::{parse_diary, parse_git_log, parse_plan};
+use crate::parse::{parse_diaries, parse_git_log, parse_plan};
 use crate::rules::{default_rules, evaluate_all};
 use crate::{Commit, Context, ParseError, Patterns, Profile, Report, ReportInput, Touched};
 
@@ -79,11 +83,7 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
         })
         .cloned()
         .collect();
-    let deliveries: Vec<_> = input
-        .diary
-        .as_deref()
-        .map(|d| parse_diary(d, &p, &input.since))
-        .unwrap_or_default()
+    let deliveries: Vec<_> = parse_diaries(&input.diaries, &p, &input.since)
         .into_iter()
         .filter(|d| input.until.as_deref().is_none_or(|u| d.date.as_str() <= u))
         .collect();
@@ -154,6 +154,8 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
                 .sum(),
             files: commits.iter().map(|c| c.files.len()).sum(),
             skipped_lines: parsed.skipped_lines,
+            worktrees: input.worktrees,
+            diaries: input.diaries.len() as u32,
         },
         days,
         kinds,
@@ -184,7 +186,7 @@ pub(crate) mod tests {
     pub(crate) fn input() -> ReportInput {
         ReportInput {
             git_log: LOG.into(),
-            diary: Some("## 2026-09-04 (X) — 🚀 deploy nečega\n".into()),
+            diaries: vec!["## 2026-09-04 (X) — 🚀 deploy nečega\n".into()],
             plan: Some("| **F1/1** ✅ |\n| **F1/2** |\n".into()),
             docs: vec![DocFile {
                 path: "docs/records/PROGRESS.md".into(),
@@ -206,6 +208,7 @@ pub(crate) mod tests {
             branch: "main".into(),
             scope: BranchScope::DefaultBranch,
             commit_branches: HashMap::new(),
+            worktrees: 1,
         }
     }
 
@@ -260,7 +263,7 @@ pub(crate) mod tests {
         let mut empty = input();
         empty.git_log = String::new();
         empty.plan = None;
-        empty.diary = None;
+        empty.diaries = vec![];
         let r = build_report(&empty, &Profile::default()).expect("prazan log je valjan ulaz");
         let value = |id: &str| {
             r.indicators
@@ -361,7 +364,7 @@ pub(crate) mod tests {
         const LOG_WITH_LATER_COMMIT: &str = "@@a1|1788700000|1788700000|2026-08-28|2026-08-28|F1/1 prije since\n1\t0\tjs/a.js\n\n@@b2|1788854400|1788854400|2026-09-04|2026-09-04|fix: kvar u js\n5\t1\tjs/b.js\n\n@@c3|1788858000|1788858000|2026-09-04|2026-09-04|docs: zapis\n3\t0\tdocs/records/PROGRESS.md\n\n@@d4|1789000000|1789000000|2026-09-06|2026-09-06|F1/2 poslije\n1\t0\tjs/d.js\n";
         let mut i = input();
         i.git_log = LOG_WITH_LATER_COMMIT.into();
-        i.diary = Some("## 2026-09-04 (X) — unutar\n## 2026-09-05 (X) — poslije\n".into());
+        i.diaries = vec!["## 2026-09-04 (X) — unutar\n## 2026-09-05 (X) — poslije\n".into()];
         i.until = Some("2026-09-04".into());
         let r = build_report(&i, &Profile::default()).unwrap();
         assert_eq!(r.until.as_deref(), Some("2026-09-04"));

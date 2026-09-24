@@ -26,7 +26,7 @@ fn matches_rad_xlsx_except_fixed_hours() {
         serde_json::from_str(&fx("expected.json")).expect("expected.json je valjani JSON");
     let input = ReportInput {
         git_log: fx("log"),
-        diary: Some(fx("PROGRESS.md")),
+        diaries: vec![fx("PROGRESS.md")],
         plan: Some(fx("RASPORED.md")),
         docs: vec![],
         branches: vec![],
@@ -39,6 +39,7 @@ fn matches_rad_xlsx_except_fixed_hours() {
         branch: "main".into(),
         scope: BranchScope::DefaultBranch,
         commit_branches: HashMap::new(),
+        worktrees: 1,
     };
     let r =
         build_report(&input, &Profile::default()).expect("fixture je čist ulaz za build_report");
