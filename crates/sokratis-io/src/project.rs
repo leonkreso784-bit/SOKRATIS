@@ -33,7 +33,12 @@
 //! ISTO kao `profile_path` (I5) — usporedba TEKSTA (ne `PathBuf ==`) inače vidi glavno i sporedno
 //! radno stablo kao dva projekta. `today()` postaje slobodna funkcija jer je desktopu treba bez
 //! vlastite ovisnosti o `chrono`.
-use crate::{CommitCache, GitCli, GitSource, IoError, cached_log};
+//!
+//! Cigla M2/49 (S-032): `input_with` prevodi `Profile.branch_scope` (T48) u `Scope` (T49) i, SAMO
+//! kad je opseg sve grane, plaća jedan dodatan proces (`commit_sources`) da napuni kartu `sha →
+//! grana` — Leonov rad izvan zadane grane time ulazi u brojke, ali repo koji ostaje pri paritetu
+//! (`branch_scope = default`) ne plaća ništa novo.
+use crate::{CommitCache, GitCli, GitSource, IoError, Scope, cached_log};
 use sokratis_core::{BranchScope, DocFile, Profile, ReportInput, Vision, WorkKind};
 use std::collections::{BTreeMap, HashMap};
 use std::path::{Path, PathBuf};
@@ -298,11 +303,22 @@ impl Project {
         // i početke zatvorenih faza) i korisnikova `--since`. Bez tog `min`-a je `--since`
         // stariji od profila tiho dobivao kraći log nego što `Report.since` tvrdi.
         let fetch_since = self.profile.log_since().min(since.clone());
+        // S-032: profil bira opseg; `ref_name` je ista referenca kao do sada (zadana → trenutna →
+        // HEAD), pa detached HEAD i repo bez zadane grane rade kao prije.
+        let scope = match self.profile.branch_scope {
+            BranchScope::AllBranches => Scope::AllBranches,
+            BranchScope::DefaultBranch => Scope::Branch(&ref_name),
+        };
         // Jedina razlika između dva puta (cigla M2/14b): `Some(cache)` ide kroz `cached_log`
         // (dovlači SAMO nedostajuće commite), `None` čita git izravno kao prije.
         let git_log = match cache {
-            Some(cache) => cached_log(&self.git, cache, &ref_name, &fetch_since, until)?,
-            None => self.git.log(&ref_name, &fetch_since, until)?,
+            Some(cache) => cached_log(&self.git, cache, scope, &fetch_since, until)?,
+            None => self.git.log(scope, &fetch_since, until)?,
+        };
+        // Karta `sha → grana` postoji SAMO kad se mjere sve grane — jedan proces više (spec §1.1).
+        let commit_branches = match self.profile.branch_scope {
+            BranchScope::AllBranches => self.git.commit_sources(&ref_name, &fetch_since, until)?,
+            BranchScope::DefaultBranch => HashMap::new(),
         };
         Ok(ReportInput {
             git_log,
@@ -321,9 +337,8 @@ impl Project {
             since,
             until: until.map(str::to_string),
             branch: label,
-            // M2/46: privremeno; IO-2 (T49) puni iz profila i gita.
-            scope: BranchScope::DefaultBranch,
-            commit_branches: HashMap::new(),
+            scope: self.profile.branch_scope,
+            commit_branches,
             // M2/47: privremeno jedno stablo; IO-2 (T50) čita sva.
             worktrees: 1,
         })

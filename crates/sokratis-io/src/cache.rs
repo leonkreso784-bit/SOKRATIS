@@ -5,7 +5,10 @@
 //! iz stranog cratea, dodaje se u desktopu T29) — jedini ispravan potpis je „bilo koja greška koja
 //! smije putovati između dretvi". Poznato ograničenje: `touched.skipped_lines` na keširanom putu
 //! ne broji retke preskočene pri PRVOM čitanju commita, jer keš pamti commite, ne sirovi tekst.
-use crate::{GitSource, IoError};
+//!
+//! Cigla M2/49 (S-032): `cached_log` dobiva `scope: Scope<'_>` umjesto imena grane — prosljeđuje
+//! ga izravno `rev_list`-u, ne odlučuje o njemu (odluka je profila, u `project.rs`).
+use crate::{GitSource, IoError, Scope};
 use sokratis_core::Commit;
 use std::collections::HashMap;
 
@@ -29,13 +32,13 @@ pub trait CommitCache {
 pub fn cached_log(
     git: &dyn GitSource,
     cache: &dyn CommitCache,
-    branch: &str,
+    scope: Scope<'_>,
     since: &str,
     until: Option<&str>,
 ) -> Result<String, IoError> {
     // 1. Prozor presuđuje `rev_list`, ne keš — ISTIM argumentima kao `log` (`window_args` u
     // `git.rs`), da se dva puta ne mogu razići.
-    let reachable = git.rev_list(branch, since, until)?;
+    let reachable = git.rev_list(scope, since, until)?;
     // 2. Što keš već zna, indeksirano po SHA-i za brzo pitanje „imam li ovaj".
     let mut known: HashMap<String, Commit> = cache
         .cached()

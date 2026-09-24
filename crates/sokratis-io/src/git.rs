@@ -37,6 +37,14 @@
 //! gradi `Command::new("git")` i na Windowsu postavlja `CREATE_NO_WINDOW` kroz `CommandExt`
 //! (`#[cfg(windows)]` — kod za drugu platformu se ne kompilira, ne samo ne izvršava). Zastavica se
 //! ne može pročitati natrag, pa test `command_new_lives_only_inside_git_command` čita IZVOR.
+//!
+//! Cigla M2/49 (S-032): `Scope<'a>` je enum s LIFETIMEOM umjesto `String` — posuđuje ime grane od
+//! pozivatelja (`&self.profile.default_branch`) umjesto da ga klonira pri svakom pozivu `log`.
+//! `commit_sources` zove `git log --branches --not <default_ref>`: `--not` negira SVE reference
+//! iza sebe do kraja retka, pa `--branches` MORA doći PRIJE njega, inače bi negirao i sve grane.
+//! `parse_commit_sources` je čista funkcija (tekst → karta) izdvojena iz metode zbog testa: SHA
+//! nikad ne sadrži `|`, pa `split_once('|')` dijeli na PRVOM — ostatak retka, i s `|` u imenu,
+//! pripada grani (Windows ne dopušta `|` u imenu grane, ali linux/macOS repozitorij može).
 use crate::IoError;
 use sokratis_core::BranchInfo;
 use std::collections::HashMap;
@@ -129,6 +137,35 @@ fn window_args(since: &str, until: Option<&str>) -> (String, Option<String>) {
     (since_arg, until_arg)
 }
 
+/// Koje reference `log`/`rev_list` obilaze (S-032). `Branch(ime)` je današnje ponašanje (paritet,
+/// `--scope default`); `AllBranches` je `--branches`: sve lokalne grane, svaki commit JEDNOM (git ga
+/// dedupira po SHA-i), bez remote-tracking referenci i tagova. Lifetime `'a` posuđuje ime grane od
+/// pozivatelja (`&self.profile.default_branch`) umjesto da ga klonira za svaki poziv.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Scope<'a> {
+    Branch(&'a str),
+    AllBranches,
+}
+
+impl<'a> Scope<'a> {
+    /// Argument revizije koji git razumije: ime grane ili `--branches`.
+    fn rev_arg(self) -> &'a str {
+        match self {
+            Scope::Branch(name) => name,
+            Scope::AllBranches => "--branches",
+        }
+    }
+}
+
+/// Tekst `git log --format=%h|%S` → karta `sha → grana`. Dijeli na PRVOM `|` (`split_once`): SHA
+/// nikad ne sadrži `|`, pa ostatak retka — i s `|` u imenu — pripada grani. Prazni retci preskaču.
+fn parse_commit_sources(text: &str) -> HashMap<String, String> {
+    text.lines()
+        .filter_map(|l| l.split_once('|'))
+        .map(|(sha, branch)| (sha.trim().to_string(), branch.trim().to_string()))
+        .collect()
+}
+
 pub trait GitSource {
     /// `since` je goli datum `YYYY-MM-DD`. Implementacija MORA dodati sat `00:00:00`: git-ov
     /// parser datuma bez sata uzima TRENUTNO DOBA DANA (sat kad se naredba pokreće), ne ponoć —
@@ -143,7 +180,7 @@ pub trait GitSource {
     /// vidi doc-komentar `window_args` za izračun. Jezgra presuđuje
     /// `commit_date <= until`, pa rezerva ovdje ne mijenja nijednu brojku, samo osigurava da git
     /// ne odbaci commit prije nego što jezgra stigne odlučiti.
-    fn log(&self, branch: &str, since: &str, until: Option<&str>) -> Result<String, IoError>;
+    fn log(&self, scope: Scope<'_>, since: &str, until: Option<&str>) -> Result<String, IoError>;
     fn branches(&self, default_branch: &str) -> Result<Vec<BranchInfo>, IoError>;
     fn worktrees(&self) -> Result<Vec<PathBuf>, IoError>;
     fn last_change(&self, path: &str) -> Result<Option<i64>, IoError>;
@@ -162,7 +199,7 @@ pub trait GitSource {
     /// M2/14b, potrošač keša) — brz poziv bez `--numstat` da presudi ŠTO je dostižno.
     fn rev_list(
         &self,
-        branch: &str,
+        scope: Scope<'_>,
         since: &str,
         until: Option<&str>,
     ) -> Result<Vec<String>, IoError>;
@@ -170,6 +207,16 @@ pub trait GitSource {
     /// Prazan popis → prazan tekst BEZ pokretanja procesa (keš koji već zna sve ne smije platiti
     /// cijenu procesa za ništa).
     fn log_commits(&self, shas: &[String]) -> Result<String, IoError>;
+    /// `sha → grana` SAMO za commite izvan `default_ref` (S-032): `git log --branches --not
+    /// <default_ref> --format=%h|%S`. `%S` = kratko ime reference kojom je git commit DOSEGAO; commit
+    /// dostižan iz dviju nespojenih grana dobiva jednu od njih (gitov obilazak presuđuje). Commit
+    /// kojeg nema u karti je na zadanoj grani. Isti prozor (`window_args`) kao `log`/`rev_list`.
+    fn commit_sources(
+        &self,
+        default_ref: &str,
+        since: &str,
+        until: Option<&str>,
+    ) -> Result<HashMap<String, String>, IoError>;
 }
 #[derive(Debug)]
 pub struct GitCli {
@@ -331,14 +378,14 @@ fn parse_ahead_behind(out: &str, default_branch: &str) -> Vec<BranchInfo> {
     result
 }
 impl GitSource for GitCli {
-    fn log(&self, branch: &str, since: &str, until: Option<&str>) -> Result<String, IoError> {
+    fn log(&self, scope: Scope<'_>, since: &str, until: Option<&str>) -> Result<String, IoError> {
         // `window_args` fiksira sat na ponoć i dodaje rezervu zone (dan unatrag za `since`, dva
         // dana unaprijed za `until`) — vidi doc-komentar `GitSource::log` (trait) i `window_args`
         // (gore) za oba razloga. Jezgra presuđuje `since <= commit_date <= until` string-usporedbom,
         // pa rezerva ovdje ne mijenja nijednu brojku, samo osigurava da git ne odbaci commit prije
         // nego što jezgra stigne odlučiti.
         let (since_arg, until_arg) = window_args(since, until);
-        let mut args = vec!["log", branch, &since_arg];
+        let mut args = vec!["log", scope.rev_arg(), &since_arg];
         if let Some(a) = &until_arg {
             args.push(a);
         }
@@ -352,7 +399,7 @@ impl GitSource for GitCli {
     }
     fn rev_list(
         &self,
-        branch: &str,
+        scope: Scope<'_>,
         since: &str,
         until: Option<&str>,
     ) -> Result<Vec<String>, IoError> {
@@ -360,7 +407,7 @@ impl GitSource for GitCli {
         // razići jer dolaze iz iste funkcije. `--abbrev-commit` daje `%h`-duljinu SHA-ova, isto što
         // `log`-ov `--format=@@%h|…` ispisuje u zaglavlju.
         let (since_arg, until_arg) = window_args(since, until);
-        let mut args = vec!["rev-list", branch, &since_arg];
+        let mut args = vec!["rev-list", scope.rev_arg(), &since_arg];
         if let Some(a) = &until_arg {
             args.push(a);
         }
@@ -372,6 +419,21 @@ impl GitSource for GitCli {
             .filter(|l| !l.is_empty())
             .map(str::to_string)
             .collect())
+    }
+    fn commit_sources(
+        &self,
+        default_ref: &str,
+        since: &str,
+        until: Option<&str>,
+    ) -> Result<HashMap<String, String>, IoError> {
+        let (since_arg, until_arg) = window_args(since, until);
+        // `--not` negira SVE reference iza sebe do kraja: `--branches` mora doći PRIJE njega.
+        let mut args = vec!["log", "--branches", "--not", default_ref, &since_arg];
+        if let Some(a) = &until_arg {
+            args.push(a);
+        }
+        args.extend(["--format=%h|%S", "--"]);
+        Ok(parse_commit_sources(&self.run(&args)?))
     }
     fn log_commits(&self, shas: &[String]) -> Result<String, IoError> {
         // Prazan popis → prazan tekst BEZ pokretanja procesa: keš koji već zna sve ne smije
@@ -515,5 +577,15 @@ mod tests {
             helper.contains("0x0800_0000"),
             "CREATE_NO_WINDOW = 0x08000000"
         );
+    }
+
+    /// Review Focus #3 (Ruling R49): grana `y|z` se na Windowsu ne može stvoriti, pa rub `|` u
+    /// imenu čuva parser, ne repo. SHA nema `|`, ostatak retka je grana.
+    #[test]
+    fn parse_commit_sources_keeps_pipe_inside_branch_name() {
+        let map = super::parse_commit_sources("abc123|y|z\ndef456|feat/x\n\n");
+        assert_eq!(map.get("abc123").map(String::as_str), Some("y|z"));
+        assert_eq!(map.get("def456").map(String::as_str), Some("feat/x"));
+        assert_eq!(map.len(), 2);
     }
 }

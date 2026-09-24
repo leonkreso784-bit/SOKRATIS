@@ -8,7 +8,7 @@
 //! ovi testovi trebali čuvati).
 mod common;
 use common::Repo;
-use sokratis_io::{GitCli, GitSource, IoError, Project};
+use sokratis_io::{GitCli, GitSource, IoError, Project, Scope};
 
 #[test]
 fn log_has_fixture_format_and_since_filters_by_commit_date() {
@@ -28,7 +28,7 @@ fn log_has_fixture_format_and_since_filters_by_commit_date() {
         "2026-09-08T21:19:43+02:00",
     );
     let g = GitCli::new(r.path());
-    let log = g.log("main", "2026-08-29", None).unwrap();
+    let log = g.log(Scope::Branch("main"), "2026-08-29", None).unwrap();
     assert!(
         !log.contains(&old),
         "commit s committer-datumom prije since otpada"
@@ -78,7 +78,7 @@ fn since_is_fetched_with_one_day_of_reserve_so_the_boundary_is_zone_neutral() {
         "2026-09-08T00:05:00+02:00",
     );
     let g = GitCli::new(r.path());
-    let log = g.log("main", "2026-09-08", None).unwrap();
+    let log = g.log(Scope::Branch("main"), "2026-09-08", None).unwrap();
     assert!(
         log.contains(&after_midnight),
         "00:05 na since-datum mora uci bez obzira na sat i zonu stroja"
@@ -239,4 +239,85 @@ fn last_change_of_path() {
     // NAPOMENA: brif navodi 1788681600 + 8*3600, ali izračunato (`date -u -d …`) je 1788336000.
     assert_eq!(g.last_change("docs/PROGRESS.md").unwrap(), Some(1788336000));
     assert_eq!(g.last_change("nema.md").unwrap(), None);
+}
+
+/// M2/49 (S-032): `--branches` obiđe SVE lokalne grane, svaki commit jednom; `commit_sources` daje
+/// granu SAMO za commite izvan zadane. Ruling R49: grana `y|z` se na Windowsu ne može stvoriti
+/// (`fatal: cannot lock ref 'refs/heads/y|z'`, NTFS ne dopušta `|` u imenu datoteke), pa treći
+/// commit ide na `feat/a/b` (rub `/` u imenu); rub `|` dokazuje unit test parsera na dnu `git.rs`.
+#[test]
+fn all_branches_scope_sees_feature_commits_and_commit_sources_labels_them() {
+    let r = Repo::init();
+    let a = r.commit(
+        "a.txt",
+        "1",
+        "na mainu",
+        "2026-09-10T10:00:00+02:00",
+        "2026-09-10T10:00:00+02:00",
+    );
+    r.git(&["checkout", "-q", "-b", "feat/x"]);
+    let b = r.commit(
+        "b.txt",
+        "2",
+        "u grani",
+        "2026-09-11T10:00:00+02:00",
+        "2026-09-11T10:00:00+02:00",
+    );
+    r.git(&["checkout", "-q", "-b", "feat/a/b", "main"]);
+    let c = r.commit(
+        "c.txt",
+        "3",
+        "u grani s kosom crtom",
+        "2026-09-12T10:00:00+02:00",
+        "2026-09-12T10:00:00+02:00",
+    );
+    r.git(&["checkout", "-q", "main"]);
+    let g = GitCli::new(r.path());
+
+    let only_main = g.log(Scope::Branch("main"), "2026-09-01", None).unwrap();
+    assert!(only_main.contains(&a) && !only_main.contains(&b) && !only_main.contains(&c));
+
+    let all = g.log(Scope::AllBranches, "2026-09-01", None).unwrap();
+    assert!(all.contains(&a) && all.contains(&b) && all.contains(&c));
+    assert_eq!(all.matches("@@").count(), 3, "svaki commit točno jednom");
+
+    let revs = g.rev_list(Scope::AllBranches, "2026-09-01", None).unwrap();
+    assert_eq!(revs.len(), 3);
+
+    let map = g.commit_sources("main", "2026-09-01", None).unwrap();
+    assert_eq!(map.get(&b).map(String::as_str), Some("feat/x"));
+    assert_eq!(
+        map.get(&c).map(String::as_str),
+        Some("feat/a/b"),
+        "ime grane s kosom crtom preživi"
+    );
+    assert!(
+        !map.contains_key(&a),
+        "commit na zadanoj grani nije u karti"
+    );
+}
+
+#[test]
+fn commit_sources_is_empty_when_only_default_branch_exists() {
+    let r = Repo::init();
+    r.commit(
+        "a.txt",
+        "1",
+        "sam",
+        "2026-09-10T10:00:00+02:00",
+        "2026-09-10T10:00:00+02:00",
+    );
+    let g = GitCli::new(r.path());
+    assert!(
+        g.commit_sources("main", "2026-09-01", None)
+            .unwrap()
+            .is_empty()
+    );
+    assert_eq!(
+        g.log(Scope::AllBranches, "2026-09-01", None)
+            .unwrap()
+            .matches("@@")
+            .count(),
+        1
+    );
 }

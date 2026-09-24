@@ -483,3 +483,46 @@ fn input_between_passes_until_to_the_core_and_fetches_with_reserve() {
         "tri dana kasnije je izvan rezerve od dva dana"
     );
 }
+
+/// M2/49: `input()` po zadanom profilu (`branch_scope = all`) vidi commit iz feature-grane i zna mu
+/// granu; profil `"branch_scope": "default"` vraća današnje ponašanje (samo `main`, prazna karta).
+#[test]
+fn input_follows_branch_scope_from_profile() {
+    let r = Repo::init();
+    r.commit(
+        "js/a.js",
+        "1",
+        "F1/1 main",
+        "2026-09-10T10:00:00+02:00",
+        "2026-09-10T10:00:00+02:00",
+    );
+    r.git(&["checkout", "-q", "-b", "feat/x"]);
+    let b = r.commit(
+        "js/b.js",
+        "2",
+        "F1/2 grana",
+        "2026-09-11T10:00:00+02:00",
+        "2026-09-11T10:00:00+02:00",
+    );
+    r.git(&["checkout", "-q", "main"]);
+
+    let p = Project::open(r.path()).unwrap();
+    let input = p.input(Some("2026-09-01")).unwrap();
+    assert_eq!(input.scope, sokratis_core::BranchScope::AllBranches);
+    assert!(input.git_log.contains(&b));
+    assert_eq!(
+        input.commit_branches.get(&b).map(String::as_str),
+        Some("feat/x")
+    );
+
+    write(
+        &r,
+        ".sokratis/profile.json",
+        r#"{ "branch_scope": "default" }"#,
+    );
+    let p = Project::open(r.path()).unwrap();
+    let input = p.input(Some("2026-09-01")).unwrap();
+    assert_eq!(input.scope, sokratis_core::BranchScope::DefaultBranch);
+    assert!(!input.git_log.contains(&b));
+    assert!(input.commit_branches.is_empty());
+}
