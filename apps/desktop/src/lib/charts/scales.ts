@@ -60,6 +60,21 @@ export function formatDate(ymd: string, lang: Lang, g: 'day' | 'week' | 'month')
   return l.utcFormat('%b %Y')(d);
 }
 
+// Dopunjeno M2/56 — `formatDate(…, 'month')` vraća „ruj 2026" (mjesec + godina za osi grafova s
+// duljim rasponom); toplinska karta treba SAMO skraćeni mjesec bez godine za stupac koji otvara novi
+// mjesec, i naziv dana bez ijednog datuma (redovi kalendara su „pon/sri/pet", ne datumi) — otud dvije
+// male funkcije umjesto pregovora s postojećom `formatDate`.
+export function formatMonth(ymd: string, lang: Lang): string {
+  return locale(lang).utcFormat('%b')(parseYmd(ymd));
+}
+// `isoDay`: pon = 0 … ned = 6. `2024-01-01` je poznat ponedjeljak (provjeren kalendarom) — dan u
+// tjednu ne ovisi o TOM konkretnom datumu, samo o pomaku od njega, pa je siguran kao referentna točka.
+const KNOWN_MONDAY = parseYmd('2024-01-01');
+export function formatWeekday(isoDay: number, lang: Lang): string {
+  const d = new Date(KNOWN_MONDAY.getTime() + isoDay * 86_400_000);
+  return locale(lang).utcFormat('%a')(d);
+}
+
 // Dopunjeno M2/55 (S-035) — `linear`, `finiteMax`, `arcPath`, `ringSegments`, `svgA11y` preseljeni
 // ovamo iz `scale.ts` (M2/23, sada obrisan): `Sparkline`/`Ring` trebaju čistu linearnu skalu i SVG
 // pristupačnost bez datuma na osi, pa ne prolaze kroz `layout.ts`. Stari `niceMax`/`ticks` iz

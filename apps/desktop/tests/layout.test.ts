@@ -3,7 +3,7 @@
 // najbliža točka za tooltip. Svelte komponente koje ovo crtaju nemaju vlastiti test (R37) — sve što
 // se može pogrešno izračunati mora biti pokriveno ovdje.
 import { describe, expect, it } from 'vitest';
-import { barsLayout, frame, lineLayout, linePath, nearestIndex } from '../src/lib/charts/layout';
+import { barsLayout, frame, heatmapLayout, histogramLayout, lineLayout, linePath, nearestIndex } from '../src/lib/charts/layout';
 
 const S = [{ id: 'commits', label: 'commiti', color: 'var(--color-brand-500)' }];
 
@@ -61,6 +61,49 @@ describe('lineLayout', () => {
     expect(l.paths[0]!.d.startsWith('M')).toBe(true);
     expect(l.xTicks.length).toBeGreaterThan(1);
     expect(lineLayout(frame(600, 200), [], 'en').paths).toEqual([]);
+  });
+});
+
+// M2/56 — kalendar po ISO tjednima (stupac = tjedan, red = dan u tjednu, razina = kvantil 0–4).
+describe('heatmapLayout', () => {
+  const RANGE: [string, string] = ['2026-08-31', '2026-09-27']; // 31.8. pon … 27.9. ned = 4 puna ISO tjedna
+  it('4 tjedna → 28 ćelija, 4 stupca, 7 redaka, razine po kvantilu, natpis mjeseca', () => {
+    const days = [
+      { date: '2026-09-10', value: 10 },
+      { date: '2026-09-11', value: 1 },
+    ];
+    const l = heatmapLayout(frame(600, 200), days, RANGE, 'hr');
+    expect(l.cells).toHaveLength(28);
+    expect(new Set(l.cells.map((c) => c.x)).size).toBe(4);
+    expect(new Set(l.cells.map((c) => c.y)).size).toBe(7);
+    expect(l.cells.find((c) => c.date === '2026-09-10')?.level).toBe(4);
+    expect(l.cells.find((c) => c.date === '2026-09-11')?.level).toBe(1);
+    expect(l.cells.find((c) => c.date === '2026-09-12')?.level).toBe(0);
+    expect(l.monthLabels.some((m) => m.label === 'ruj')).toBe(true);
+  });
+  it('prazan days → sve level 0, bez NaN', () => {
+    const l = heatmapLayout(frame(600, 200), [], RANGE, 'hr');
+    expect(l.cells).toHaveLength(28);
+    expect(l.cells.every((c) => c.level === 0)).toBe(true);
+    expect(l.cells.every((c) => [c.x, c.y, c.w, c.h].every(Number.isFinite))).toBe(true);
+  });
+});
+
+// M2/56 — doba dana, 24 bina, `scaleBand` iste vrste kao `barsLayout`.
+describe('histogramLayout', () => {
+  it('sve nule → 24 stupca visine 0, x ticksi na 0/6/12/18 h', () => {
+    const l = histogramLayout(frame(600, 200), Array(24).fill(0));
+    expect(l.bars).toHaveLength(24);
+    expect(l.bars.every((b) => b.h === 0)).toBe(true);
+    expect(l.xTicks.map((t) => t.label)).toEqual(['0 h', '6 h', '12 h', '18 h']);
+  });
+  it('vršni sat (9) → najviši stupac', () => {
+    const counts = Array(24).fill(0);
+    counts[9] = 5;
+    const l = histogramLayout(frame(600, 200), counts);
+    const maxH = Math.max(...l.bars.map((b) => b.h));
+    expect(l.bars[9]?.h).toBe(maxH);
+    expect(l.bars[9]?.h).toBeGreaterThan(0);
   });
 });
 
