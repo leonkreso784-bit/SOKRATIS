@@ -9,17 +9,20 @@
   // — "FABLE, SESIJA F2/2 U STABLU `SOKRATSTUDY.F22`"), pa suženje ne gubi podatak, samo ga skraćuje.
   // Dopunjeno M2/42 — zaglavlje "naslov" nosi `<Explainable id="deliveries.list">` (objašnjava
   // odakle cijela tablica dolazi, ne samo stupac; dopuna T42).
-  import { app } from '../lib/state.svelte';
-  import { getDict, getLang, t } from '../lib/i18n/index.svelte';
-  import { kindLabel, ymd } from '../lib/format';
-  import { sortDeliveries } from './helpers';
-  import Explainable from '../lib/explain/Explainable.svelte';
+  // Preseljeno M2/58 iz views/Deliveries.svelte — sadržaj nepromijenjen, samo <h1> → <h2 id> i
+  // putanje uvoza (S-034).
+  import { app } from '../../lib/state.svelte';
+  import { getDict, getLang, t } from '../../lib/i18n/index.svelte';
+  import { kindLabel, ymd } from '../../lib/format';
+  import { sortDeliveries } from '../helpers';
+  import Explainable from '../../lib/explain/Explainable.svelte';
+  import { sectionId, sectionKey } from './sections';
 
   const rows = $derived(sortDeliveries(app.report?.deliveries ?? []));
 </script>
 
 <div class="flex flex-col gap-4">
-  <h1 class="text-xl font-semibold text-ink-0">{t('nav.deliveries')}</h1>
+  <h2 id={sectionId('deliveries')} class="text-xl font-semibold text-ink-0">{t(sectionKey('deliveries'))}</h2>
 
   {#if !app.report}
     <p class="text-sm text-ink-2">{t('common.loading')}</p>

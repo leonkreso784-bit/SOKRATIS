@@ -4,7 +4,10 @@
 // `syncMotion` je OVDJE, ne u `App.svelte`, jer `Settings.svelte` treba istu odluku bez pristupa
 // lokalnoj `MediaQueryList` iz tuđeg `onMount`; dopunjeno M2/39 — `epoch` broji koliko je puta
 // glavni prozor postao vidljiv korisniku; `App.svelte` njime omata poglede u `{#key}` da se ulazna
-// animacija grafova (S-026) prikaže tek kad ima tko gledati, ne dok je prozor skriven iza splasha)
+// animacija grafova (S-026) prikaže tek kad ima tko gledati, ne dok je prozor skriven iza splasha;
+// dopunjeno M2/58 (S-034) — `selectProject` je zamijenjen s `enterProject` (klik na karticu Pregleda
+// otvara ploču `project`) i `leaveProject` („‹ Pregled"); stari `selectProject` je obrisan jer je
+// nakon ove cigle ostao bez ijednog pozivatelja (R58, S-010))
 // `$state` izvan komponente treba nastavak `.svelte.ts` da ga kompajler prepozna kao rune-modul
 // (isti obrazac kao `src/lib/i18n/index.svelte.ts`). Jedan objekt `app` je jedini izvor istine za
 // okvir — Topbar/Sidebar/pogledi ga čitaju izravno, bez proslijeđivanja kroz propse; promjena jednog
@@ -71,10 +74,18 @@ export async function loadProjects(): Promise<void> {
   }
 }
 
-// Odabir projekta u gornjoj traci: postavlja trenutni projekt i odmah učita njegov izvještaj.
-export async function selectProject(id: number): Promise<void> {
+// Ulaz u projekt s Pregleda (S-034): klik na karticu otvara ploču `project` s njegovim izvještajem —
+// jedini put u taj pogled (nema više birača u gornjoj traci).
+export async function enterProject(id: number): Promise<void> {
   app.currentId = id;
+  app.view = 'project';
   await loadReport();
+}
+
+// „‹ Pregled" u gornjoj traci: samo mijenja pogled, `currentId` OSTAJE — brz povratak u Dnevnik/
+// Vizije ili ponovni ulazak u istu ploču ne traži nov odabir projekta.
+export function leaveProject(): void {
+  app.view = 'overview';
 }
 
 // Brojač raste sa svakim pozivom; odgovor se prihvaća SAMO ako je njegov token i dalje najnoviji —

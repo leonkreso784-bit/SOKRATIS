@@ -9,8 +9,10 @@
   // Dopunjeno M2/42 — kartica projekta gubi ugniježđene gumbe (R26): gumb odabira sad omata SAMO
   // naslov, a tri crte (stabla · zadnji commit · signali) su mu sestre, svaka u vlastitom
   // `<Explainable>` — `<button>` unutar `<button>` je nevaljan HTML.
+  // Dopunjeno M2/58 (S-034) — klik na naslov kartice sad zove `enterProject` (ne `selectProject`):
+  // vodi izravno na ploču projekta, ne samo na odabir bez promjene pogleda.
   import { api } from '../lib/api';
-  import { app, loadProjects, selectProject, setError } from '../lib/state.svelte';
+  import { app, enterProject, loadProjects, setError } from '../lib/state.svelte';
   import { getDict, t } from '../lib/i18n/index.svelte';
   import { relative } from '../lib/format';
   import { severityClass, signalSummary, sortProjects } from './helpers';
@@ -76,7 +78,7 @@
             type="button"
             class="w-full pr-6 text-left"
             aria-label={project.name}
-            onclick={() => void selectProject(project.id)}
+            onclick={() => void enterProject(project.id)}
           >
             <h2 class="text-lg font-semibold text-ink-0">{project.name}</h2>
           </button>

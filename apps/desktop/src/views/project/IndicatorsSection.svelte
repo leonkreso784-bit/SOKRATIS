@@ -8,13 +8,16 @@
   // Dopunjeno M2/41 — prekidač formule (`<details>`) je zamijenjen karticom s objašnjenjem: vrijednost
   // svake kartice je `Explainable`, a `Indicator.formula` (polje koje jezgra izračuna) ide u karticu
   // kao dodatni redak, ne kao vlastiti prikaz.
-  import { app, setError } from '../lib/state.svelte';
-  import { api } from '../lib/api';
-  import { getLang, t } from '../lib/i18n/index.svelte';
-  import { hours, num, percent } from '../lib/format';
-  import Sparkline from '../lib/charts/Sparkline.svelte';
-  import Explainable from '../lib/explain/Explainable.svelte';
-  import type { Indicator, Range, TrendPoint } from '../lib/types';
+  // Preseljeno M2/58 iz views/Indicators.svelte — sadržaj nepromijenjen, samo <h1> → <h2 id> i
+  // putanje uvoza (S-034).
+  import { app, setError } from '../../lib/state.svelte';
+  import { api } from '../../lib/api';
+  import { getLang, t } from '../../lib/i18n/index.svelte';
+  import { hours, num, percent } from '../../lib/format';
+  import Sparkline from '../../lib/charts/Sparkline.svelte';
+  import Explainable from '../../lib/explain/Explainable.svelte';
+  import type { Indicator, Range, TrendPoint } from '../../lib/types';
+  import { sectionId, sectionKey } from './sections';
 
   let trends = $state<Record<string, TrendPoint[]>>({});
   let requestToken = 0;
@@ -58,7 +61,7 @@
 </script>
 
 <div class="flex flex-col gap-4">
-  <h1 class="text-xl font-semibold text-ink-0">{t('nav.indicators')}</h1>
+  <h2 id={sectionId('indicators')} class="text-xl font-semibold text-ink-0">{t(sectionKey('indicators'))}</h2>
 
   {#if !app.report}
     <p class="text-sm text-ink-2">{t('common.loading')}</p>

@@ -7,12 +7,19 @@
 // dopuna M2/28 (uređivanje vizije) — `replaceVisionAt` (spec 6.2 "dodaj · uredi · promijeni stanje");
 // krug popravka 1 — `parsePercent` izdvojen iz `Visions.svelte` (nalaz recenzije koda: čista funkcija
 // s rubovima bez testa)
+// Dopunjeno M2/58 (S-034) — ploča projekta: `SECTIONS`/`sectionId`/`sectionKey` (`views/project/
+// sections.ts`) su popis osam sekcija na JEDNOM mjestu, provjeren protiv oba rječnika; `VIEWS`
+// (`lib/types.ts`) više nema šest prikaznih pogleda (postali su sekcije); `signalCounts` (novo u
+// `views/helpers.ts`) broji signale po težini za kartice sažetka.
 // Čiste funkcije, čist test bez DOM-a i bez Svelte runa: `hr.json` uvezen izravno kao `Dict`, isti
 // obrazac kao `tests/format.test.ts` — `signalSummary` tako vidi PRAVI rječnik, ne ručno prepisan
 // tekst (S-010), a hrvatska množina (jedan/dva-četiri/pet i više) se provjerava na stvarnim ključevima.
 import { describe, expect, it, vi } from 'vitest';
 import hr from '../src/lib/i18n/hr.json';
-import type { CommitRow, Delivery, Phase, ProjectSummary, Vision, WorkKind } from '../src/lib/types';
+import en from '../src/lib/i18n/en.json';
+import type { CommitRow, Delivery, Phase, ProjectSummary, Signal, Vision, WorkKind } from '../src/lib/types';
+import { VIEWS } from '../src/lib/types';
+import { SECTIONS, sectionId, sectionKey } from '../src/views/project/sections';
 import {
   bricksPerDay,
   copyText,
@@ -22,6 +29,7 @@ import {
   phaseRows,
   replaceVisionAt,
   severityClass,
+  signalCounts,
   signalSummary,
   sortDeliveries,
   sortDiary,
@@ -269,5 +277,41 @@ describe('parsePercent', () => {
   it('izvan raspona 0-100 se steže — <input min/max> su samo UI-nagovještaj, ne brana', () => {
     expect(parsePercent('150')).toBe(100);
     expect(parsePercent('-5')).toBe(0);
+  });
+});
+
+// Minimalan signal — polja koja test ne provjerava dobivaju neutralnu vrijednost (isti duh kao
+// `phase()`/`commitRow()` iznad: prava vrijednost tipa, ne `as Signal`).
+const signal = (severity: Signal['severity']): Signal => ({
+  rule: 'test-rule',
+  severity,
+  title_key: 'rule.test-rule',
+  evidence: [],
+  since: null,
+});
+
+describe('signalCounts', () => {
+  it('prazan niz signala -> sve na 0', () => {
+    expect(signalCounts([])).toEqual({ info: 0, warn: 0, alert: 0 });
+  });
+  it('broji po težini bez obzira na redoslijed ulaza', () => {
+    const signals = [signal('alert'), signal('warn'), signal('alert')];
+    expect(signalCounts(signals)).toEqual({ info: 0, warn: 1, alert: 2 });
+  });
+});
+
+describe('ploča projekta — sekcije', () => {
+  it('osam sekcija, svaka s naslovom u oba jezika i jedinstvenim sidrom', () => {
+    expect(SECTIONS).toHaveLength(8);
+    const ids = new Set(SECTIONS.map(sectionId));
+    expect(ids.size).toBe(8);
+    for (const s of SECTIONS) {
+      const key = sectionKey(s);
+      expect((hr as Record<string, string>)[key], key).toBeTruthy();
+      expect((en as Record<string, string>)[key], key).toBeTruthy();
+    }
+  });
+  it('VIEWS više nema šest prikaznih pogleda', () => {
+    expect(VIEWS).toEqual(['overview', 'project', 'diary', 'visions']);
   });
 });

@@ -9,13 +9,16 @@
   // Dopunjeno M2/55 (S-035) — `Bars`/`Line` sad primaju `buckets`/`series` (temelji iz T54): stupci
   // i linija dobivaju stvarne datume na X-osi umjesto redoslijeda; prekidač dan/tjedan/mjesec dolazi
   // tek u T59 (PLOČA), ovdje je zrnatost fiksno `'day'` kao i dosad.
-  import { app } from '../lib/state.svelte';
-  import { getLang, t } from '../lib/i18n/index.svelte';
-  import { hours, num, ymd } from '../lib/format';
-  import { bucketDays } from '../lib/charts/bucket';
-  import Bars from '../lib/charts/Bars.svelte';
-  import Line from '../lib/charts/Line.svelte';
-  import Explainable from '../lib/explain/Explainable.svelte';
+  // Preseljeno M2/58 iz views/Tempo.svelte — sadržaj nepromijenjen, samo <h1> → <h2 id> i putanje
+  // uvoza (S-034).
+  import { app } from '../../lib/state.svelte';
+  import { getLang, t } from '../../lib/i18n/index.svelte';
+  import { hours, num, ymd } from '../../lib/format';
+  import { bucketDays } from '../../lib/charts/bucket';
+  import Bars from '../../lib/charts/Bars.svelte';
+  import Line from '../../lib/charts/Line.svelte';
+  import Explainable from '../../lib/explain/Explainable.svelte';
+  import { sectionId, sectionKey } from './sections';
 
   let mode = $state<'commits' | 'hours'>('commits');
 
@@ -26,7 +29,7 @@
 </script>
 
 <div class="flex flex-col gap-4">
-  <h1 class="text-xl font-semibold text-ink-0">{t('nav.tempo')}</h1>
+  <h2 id={sectionId('tempo')} class="text-xl font-semibold text-ink-0">{t(sectionKey('tempo'))}</h2>
 
   {#if !app.report}
     <p class="text-sm text-ink-2">{t('common.loading')}</p>

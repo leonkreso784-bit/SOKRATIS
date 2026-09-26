@@ -11,12 +11,15 @@
   // `aria-label` gumba ga sad sva tri čitaju odavde, umjesto da svaki ponovi istu ternarnu logiku.
   // Dopunjeno M2/42 — ocjena, redak kašnjenja i naslov nalaza dobivaju svoj `<Explainable>`
   // (tekst/brojka omotana, ne `<p>`/`<h2>` sam — dopuna T42).
-  import { app } from '../lib/state.svelte';
-  import { getLang, t } from '../lib/i18n/index.svelte';
-  import { num } from '../lib/format';
-  import { copyText, joinRepoPath } from './helpers';
-  import Explainable from '../lib/explain/Explainable.svelte';
-  import type { Finding, ProjectSummary } from '../lib/types';
+  // Preseljeno M2/58 iz views/Docs.svelte — sadržaj nepromijenjen, samo <h1> → <h2 id> i putanje
+  // uvoza (S-034).
+  import { app } from '../../lib/state.svelte';
+  import { getLang, t } from '../../lib/i18n/index.svelte';
+  import { num } from '../../lib/format';
+  import { copyText, joinRepoPath } from '../helpers';
+  import Explainable from '../../lib/explain/Explainable.svelte';
+  import type { Finding, ProjectSummary } from '../../lib/types';
+  import { sectionId, sectionKey } from './sections';
 
   let copiedPath = $state<string | null>(null);
   let copyTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -47,7 +50,7 @@
 </script>
 
 <div class="flex flex-col gap-4">
-  <h1 class="text-xl font-semibold text-ink-0">{t('nav.docs')}</h1>
+  <h2 id={sectionId('docs')} class="text-xl font-semibold text-ink-0">{t(sectionKey('docs'))}</h2>
 
   {#if !app.report}
     <p class="text-sm text-ink-2">{t('common.loading')}</p>

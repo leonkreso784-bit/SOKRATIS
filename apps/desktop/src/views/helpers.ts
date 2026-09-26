@@ -1,10 +1,11 @@
-// ZAŠTO OVAKO (cigla M2/26 — čisti izračuni odvojeni od Overview.svelte)
+// ZAŠTO OVAKO (cigla M2/26 — čisti izračuni odvojeni od Overview.svelte; dopunjeno M2/58 —
+// `signalCounts` broji signale po težini za kartice sažetka ploče projekta, S-034)
 // Sortiranje, boja po težini i sažetak signala su čisti izračuni bez DOM-a/Svelte runa — žive u
 // `.ts` modulu da ih vitest testira izravno (isti obrazac kao `format.ts`, S-012), a `Overview.svelte`
 // ostaje tanak prikaz koji samo poziva ove funkcije. Množina ide iz rječnika (S-021), ova datoteka
 // samo bira KOJI oblik (jedan/dva-četiri/pet-i-više) — sam tekst nikad nije ovdje ušiven.
 import { translate, type Dict } from '../lib/i18n/t';
-import type { CommitRow, Delivery, Phase, ProjectSummary, Severity, Vision, WorkKind } from '../lib/types';
+import type { CommitRow, Delivery, Phase, ProjectSummary, Severity, Signal, Vision, WorkKind } from '../lib/types';
 
 const SEVERITY_RANK: Record<Severity, number> = { alert: 0, warn: 1, info: 2 };
 const NO_SIGNAL_RANK = 3;
@@ -43,6 +44,16 @@ function pluralCategory(n: number): 'one' | 'few' | 'many' {
 
 // "2 uzbune · 1 upozorenje" — samo težine koje se stvarno pojavljuju, uzbuna prvo; bez ijedne signal
 // je t('signals.none'). Razdjelnik "·" je ovdje jer nije natpis nego interpunkcija između natpisa.
+// ZAŠTO OVAKO (cigla M2/58 — kartica sažetka Signali na ploči projekta, S-034)
+// `Report.signals` je popis pojedinačnih signala (svaki s dokazom, za traku signala) — ploča projekta
+// treba samo BROJ po težini za jednu kartica (isti oblik koji `signalSummary` ispod već zna ispisati,
+// pa kartica Pregleda i kartica Sažetka na ploči dijele istu funkciju umjesto dvije kopije brojanja).
+export function signalCounts(signals: Signal[]): { info: number; warn: number; alert: number } {
+  const counts = { info: 0, warn: 0, alert: 0 };
+  for (const s of signals) counts[s.severity] += 1;
+  return counts;
+}
+
 export function signalSummary(c: { info: number; warn: number; alert: number }, dict: Dict): string {
   const parts = (['alert', 'warn', 'info'] as const)
     .filter((sev) => c[sev] > 0)
