@@ -3,7 +3,8 @@
 // najbliža točka za tooltip. Svelte komponente koje ovo crtaju nemaju vlastiti test (R37) — sve što
 // se može pogrešno izračunati mora biti pokriveno ovdje.
 import { describe, expect, it } from 'vitest';
-import { barsLayout, frame, heatmapLayout, histogramLayout, lineLayout, linePath, nearestIndex } from '../src/lib/charts/layout';
+import { barsLayout, frame, ganttLayout, hbarsLayout, heatmapLayout, histogramLayout, lineLayout, linePath, nearestIndex } from '../src/lib/charts/layout';
+import type { Phase } from '../src/lib/types';
 
 const S = [{ id: 'commits', label: 'commiti', color: 'var(--color-brand-500)' }];
 
@@ -135,5 +136,55 @@ describe('linePath', () => {
         { x: 2, y: 2 },
       ]),
     ).toBe('M0 0 L2 2');
+  });
+});
+
+// M2/57 — Gantt (faze od–do, „danas" kao crta) i HBars (grane, spojene prigušene). `m: { left: 140 }`
+// jer redovi imaju natpis lijevo (R59, isti okvir kao komponenta).
+function phase(p: Partial<Phase> & Pick<Phase, 'id' | 'name' | 'state' | 'from' | 'to'>): Phase {
+  return { total_bricks: 0, done_bricks: 0, days: null, commits: 0, ...p };
+}
+
+describe('ganttLayout', () => {
+  const TODAY = '2026-09-23';
+  const PHASES: Phase[] = [
+    phase({ id: 'p1', name: 'Zatvorena', state: 'closed', from: '2026-09-01', to: '2026-09-15' }),
+    phase({ id: 'p2', name: 'U tijeku', state: 'running', from: '2026-09-16', to: null }),
+    phase({ id: 'p3', name: 'Planirana', state: 'planned', from: null, to: null }),
+  ];
+  it('tri faze → tri reda; zatvorena ima traku, u tijeku doseže danas, planirana bez trake', () => {
+    const l = ganttLayout(frame(600, 200, { left: 140 }), PHASES, TODAY, 'hr');
+    expect(l.rows).toHaveLength(3);
+    // Tri reda su upravo tvrđena iznad — `!` je siguran, bez šireg suženja tipa.
+    const closed = l.rows[0]!;
+    const running = l.rows[1]!;
+    const planned = l.rows[2]!;
+    expect(closed.x1).toBeGreaterThan(closed.x0);
+    expect(running.x1).toBe(l.todayX);
+    expect(planned.x0).toBe(planned.x1);
+    expect(l.xTicks.length).toBeGreaterThan(0);
+    for (const t of l.xTicks) expect(typeof t.label).toBe('string');
+  });
+  it('prazan ulaz → bez redaka, bez ticksova, bez danas-crte', () => {
+    const l = ganttLayout(frame(600, 200, { left: 140 }), [], TODAY, 'hr');
+    expect(l.rows).toEqual([]);
+    expect(l.xTicks).toEqual([]);
+    expect(l.todayX).toBeNull();
+  });
+});
+
+describe('hbarsLayout', () => {
+  it('tri stavke → širine proporcionalne, prva spojena, nula → w=0', () => {
+    const l = hbarsLayout(frame(600, 200, { left: 140 }), [
+      { label: 'main', value: 10, merged: true },
+      { label: 'feat/a', value: 4, merged: false },
+      { label: 'feat/b', value: 0, merged: false },
+    ]);
+    expect(l.bars).toHaveLength(3);
+    // Tri stupca su upravo tvrđena iznad — `!` je siguran, bez šireg suženja tipa.
+    expect(l.bars[0]!.merged).toBe(true);
+    expect(l.bars[2]!.w).toBe(0);
+    expect(l.bars[0]!.w).toBeGreaterThan(l.bars[1]!.w);
+    expect(l.bars[1]!.w).toBeGreaterThan(l.bars[2]!.w);
   });
 });
