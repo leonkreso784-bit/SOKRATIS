@@ -175,6 +175,118 @@ fn report_until_limits_the_window_and_is_echoed_in_json() {
     assert!(String::from_utf8_lossy(&bad.stderr).contains("until"));
 }
 
+/// Repozitorij s 1 commitom na `main` i 1 na `feat/x`: mjeri razliku između `--scope all`
+/// (zadano, S-032) i `--scope default` (paritet s 1.0.0-pre, samo zadana grana).
+fn repo_with_feature_branch() -> Repo {
+    let r = Repo::init();
+    r.commit(
+        "js/a.js",
+        "1",
+        "F1/1 main",
+        "2026-09-10T10:00:00+02:00",
+        "2026-09-10T10:00:00+02:00",
+    );
+    r.git(&["checkout", "-q", "-b", "feat/x"]);
+    r.commit(
+        "js/b.js",
+        "2",
+        "F1/2 grana",
+        "2026-09-11T10:00:00+02:00",
+        "2026-09-11T10:00:00+02:00",
+    );
+    r.git(&["checkout", "-q", "main"]);
+    r
+}
+
+/// M2/51 (S-032): zadano (bez `--scope`) broji sve lokalne grane — commit na `feat/x` ulazi u
+/// `touched.commits` i `branches`, s oznakom grane na retku commita.
+#[test]
+fn report_counts_all_branches_by_default_and_labels_rows() {
+    let r = repo_with_feature_branch();
+    let out = bin()
+        .args(["report", "--json", "--since", "2026-09-01"])
+        .arg(r.path())
+        .output()
+        .unwrap();
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let v: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(v["scope"], "all");
+    assert_eq!(v["touched"]["commits"], 2);
+    assert_eq!(v["branches"].as_array().unwrap().len(), 2);
+    assert!(
+        v["commits"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|c| c["branch"] == "feat/x"),
+        "{v}"
+    );
+}
+
+/// `--scope default` pregazi zadano iz profila (S-032) i vraća ponašanje 1.0.0-pre: samo zadana
+/// grana ulazi u brojke, kao paritet s `RAD.xlsx`.
+#[test]
+fn scope_default_matches_pre_1_0_behaviour() {
+    let r = repo_with_feature_branch();
+    let out = bin()
+        .args([
+            "report",
+            "--json",
+            "--since",
+            "2026-09-01",
+            "--scope",
+            "default",
+        ])
+        .arg(r.path())
+        .output()
+        .unwrap();
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let v: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(v["scope"], "default");
+    assert_eq!(v["touched"]["commits"], 1, "samo main, kao 1.0.0-pre");
+    assert_eq!(v["branches"].as_array().unwrap().len(), 1);
+    assert_eq!(v["days"].as_array().unwrap().len(), 1);
+}
+
+/// `--scope` prima SAMO `all`/`default` (`value_parser`) — bilo što drugo je pogrešna uporaba
+/// (izlaz 3), ne ALERT (2, nalaz I4).
+#[test]
+fn scope_rejects_unknown_value_as_usage_error() {
+    let r = repo_with_feature_branch();
+    let out = bin()
+        .args(["report", "--scope", "worktrees"])
+        .arg(r.path())
+        .output()
+        .unwrap();
+    assert_eq!(
+        out.status.code(),
+        Some(3),
+        "pogrešna uporaba = 3, ne 2 (Alert)"
+    );
+}
+
+/// Tablica (bez `--json`) mora imenovati opseg i pokazati granu koja nije zadana.
+#[test]
+fn table_shows_scope_and_branches() {
+    let r = repo_with_feature_branch();
+    let out = bin()
+        .args(["report", "--table", "--since", "2026-09-01"])
+        .arg(r.path())
+        .output()
+        .unwrap();
+    let s = String::from_utf8_lossy(&out.stdout);
+    assert!(s.contains("opseg"), "{s}");
+    assert!(s.contains("feat/x"), "{s}");
+}
+
 #[test]
 fn not_a_repo_exits_3_with_message() {
     let dir = tempfile::tempdir().unwrap();

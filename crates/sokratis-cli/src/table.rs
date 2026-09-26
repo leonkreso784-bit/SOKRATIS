@@ -3,8 +3,25 @@
 //! ovdje, u sučelju, a ne u jezgri (S-008). `writeln!(s, …)` na `String` kroz `std::fmt::Write`
 //! gradi izlaz bez međuvektora — nema `unwrap()`: `write!` na `String` ne može stvarno pasti,
 //! ali potpis vraća `Result` pa se ignorira eksplicitno kroz `let _ =`.
-use sokratis_core::{DocsHealth, IndicatorKind, PhaseState, Report, Severity, Signal};
+//!
+//! (cigla M2/51 — `--scope` i opseg u tablici, S-032): `branch_word` je čista funkcija nad
+//! `usize` (hrvatski paucal — 1/2-4/5+ imaju različit nastavak) umjesto tablice stringova, jer
+//! pravilo je aritmetičko, ne rječničko. Zaglavlje se PREPIŠE (ne dopunjuje) da imenuje stvarno
+//! mjereni doseg (`opseg: …`) umjesto same zadane grane — nalaz vanjske analize: `grana main ·
+//! 334 commita` je tvrdio krivu brojku (334 su commiti SVIH grana, ne samo `main`-a).
+use sokratis_core::{BranchScope, DocsHealth, IndicatorKind, PhaseState, Report, Severity, Signal};
 use std::fmt::Write;
+
+/// Hrvatski paucal: 1 → „grana", 2–4 (osim 12–14, npr. „12 grana") → „grane", inače → „grana".
+fn branch_word(n: usize) -> &'static str {
+    let last_one = n % 10;
+    let last_two = n % 100;
+    if (2..=4).contains(&last_one) && !(12..=14).contains(&last_two) {
+        "grane"
+    } else {
+        "grana"
+    }
+}
 
 /// Hrvatski natpis za engleski identifikator pokazatelja/vrste/provjere. Nepoznat id se ispisuje
 /// kakav jest (S-008: identifikatori su ugovor, natpisi su ukras sučelja).
@@ -39,10 +56,19 @@ pub fn label(id: &str) -> &str {
 
 pub fn render(r: &Report) -> String {
     let mut s = String::new();
+    let scope = match r.scope {
+        BranchScope::AllBranches => format!(
+            "opseg: sve lokalne grane ({} {}) · zadana: {}",
+            r.branches.len(),
+            branch_word(r.branches.len()),
+            r.branch
+        ),
+        BranchScope::DefaultBranch => format!("opseg: samo zadana grana ({})", r.branch),
+    };
     let _ = writeln!(
         s,
-        "Sokratis — analiza rada · grana {} · od {} · dotaknuto: {} commita, {} redaka, {} izmjena datoteka, preskočeno {} redaka\n",
-        r.branch,
+        "Sokratis — analiza rada · {} · od {} · dotaknuto: {} commita, {} redaka, {} izmjena datoteka, preskočeno {} redaka\n",
+        scope,
         r.since,
         r.touched.commits,
         r.touched.lines,
@@ -78,6 +104,26 @@ pub fn render(r: &Report) -> String {
             k.share * 100.0,
             k.lines
         );
+    }
+    // Sekcija se preskače kad nema commita u razdoblju (isti obrazac kao `docs: None`) — prazna
+    // tablica s naslovom i zaglavljem bez ijednog retka bi bila šum, ne dokaz.
+    if !r.branches.is_empty() {
+        let _ = writeln!(
+            s,
+            "\nGRANE\n{:<12}{:>8}{:>7}{:>8}{:>9}",
+            "grana", "commiti", "sati", "redci", "spojena"
+        );
+        for b in &r.branches {
+            let _ = writeln!(
+                s,
+                "{:<12}{:>8}{:>7.1}{:>8}{:>9}",
+                b.name,
+                b.commits,
+                b.hours,
+                b.lines,
+                if b.merged { "da" } else { "ne" }
+            );
+        }
     }
     let _ = writeln!(s, "\nKVALITETA I BRZINA");
     for i in &r.indicators {
@@ -215,6 +261,87 @@ mod tests {
         }]);
         assert!(sig.contains("WARN") && sig.contains("docs-lag") && sig.contains("  - dokaz"));
         assert_eq!(render_signals(&[]), "nema signala");
+    }
+
+    /// Gradi minimalan `Report` s danim opsegom i granama — zajednički temelj za testove
+    /// zaglavlja/sekcije GRANE (T51), da se literal iz `labels_are_croatian_…` ne duplicira.
+    fn report_with(scope: BranchScope, branches: Vec<BranchStats>, commits: usize) -> Report {
+        Report {
+            generated_at: 0,
+            since: "2026-08-29".into(),
+            until: None,
+            branch: "main".into(),
+            scope,
+            touched: Touched {
+                commits,
+                lines: 0,
+                files: 0,
+                skipped_lines: 0,
+                worktrees: 1,
+                diaries: 0,
+            },
+            days: vec![],
+            kinds: vec![],
+            branches,
+            commits: vec![],
+            deliveries: vec![],
+            indicators: vec![],
+            phases: vec![],
+            visions: vec![],
+            vision_totals: vec![],
+            docs: None,
+            signals: vec![],
+        }
+    }
+
+    /// Nalaz vanjske analize (dopuna plana 2026-09-25): zaglavlje je tvrdilo `grana main · 334
+    /// commita` nad Sokrat Studyjem — ime ZADANE grane uz brojku SVIH grana. Zaglavlje mora
+    /// imenovati stvarno mjereni doseg, ne samo granu.
+    #[test]
+    fn header_names_the_measured_scope_not_just_the_default_branch() {
+        let all = report_with(
+            BranchScope::AllBranches,
+            vec![
+                BranchStats {
+                    name: "main".into(),
+                    commits: 1,
+                    lines: 1,
+                    hours: 0.5,
+                    merged: true,
+                },
+                BranchStats {
+                    name: "feat/x".into(),
+                    commits: 1,
+                    lines: 2,
+                    hours: 0.5,
+                    merged: false,
+                },
+            ],
+            2,
+        );
+        let s = render(&all);
+        assert!(
+            s.contains("opseg: sve lokalne grane (2 grane) · zadana: main"),
+            "{s}"
+        );
+        assert!(!s.contains("grana main ·"), "{s}");
+        assert!(s.contains("GRANE"), "{s}");
+        let branch_line = s.lines().find(|l| l.contains("feat/x")).unwrap_or("");
+        assert!(branch_line.contains("ne"), "{s}");
+
+        let default = report_with(BranchScope::DefaultBranch, vec![], 1);
+        let s2 = render(&default);
+        assert!(s2.contains("opseg: samo zadana grana (main)"), "{s2}");
+    }
+
+    /// Hrvatski paucal: 1 → „grana", 2–4 (osim 12–14) → „grane", inače „grana".
+    #[test]
+    fn branch_word_follows_croatian_paucal() {
+        assert_eq!(branch_word(1), "grana");
+        assert_eq!(branch_word(2), "grane");
+        assert_eq!(branch_word(5), "grana");
+        assert_eq!(branch_word(10), "grana");
+        assert_eq!(branch_word(22), "grane");
     }
 
     /// I8: zatvorena faza bez pogođenih commita je tuđa povijest — pokazatelji je ne broje, pa je
