@@ -16,6 +16,16 @@
   import DocsSection from './project/DocsSection.svelte';
 </script>
 
+<!-- Krug popravka 1 (M2/58, vizualni dimni test): ljepljivi izbornik ispod (`py-2` + `text-sm` +
+     `border-b`, ≈2.15rem) prekriva `<h2 id="sec-…">` odmah nakon skoka na sidro — `scroll-margin-top`
+     na JEDNOM mjestu (S-010), ne u osam sekcija, jer `:global` ovdje pogađa SVAKI `<h2 id^="sec-">`
+     bez obzira gdje ga koja podkomponenta iscrta (Svelteov scope ne dopire u djecu bez `:global`). -->
+<style>
+  :global(h2[id^='sec-']) {
+    scroll-margin-top: 3.5rem;
+  }
+</style>
+
 <div class="flex flex-col gap-8">
   <nav
     class="sticky top-0 z-10 -mx-4 -mt-4 flex flex-wrap gap-1 border-b border-line bg-surface-0/95 px-4 py-2 text-sm"
