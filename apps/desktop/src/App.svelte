@@ -28,6 +28,9 @@
   // Dopunjeno M2/45 — X na prozoru više ne skriva tray (ukinut, S-036): `api.onCloseRequested`
   // postavlja `quitOpen`, `<ConfirmQuit />` pita, a potvrda zove `api.quit()`. Dijalog je IZA
   // `<ExplainCard />`, iz istog razloga kao ona — ništa se ne smije remontirati oko njega.
+  // Dopunjeno M2/58 (S-034) — šest prikaznih pogleda (Tempo · Vrste rada · Pokazatelji · Faze ·
+  // Isporuke · Dokumentacija) postaju sekcije JEDNE ploče, `views/Project.svelte`; lanac pogleda
+  // ovdje ima sad PET grana: `overview | project | diary | visions | settings`.
   import { onDestroy, onMount } from 'svelte';
   import { getCurrentWindow } from '@tauri-apps/api/window';
   import { api } from './lib/api';
@@ -37,14 +40,9 @@
   import Sidebar from './lib/shell/Sidebar.svelte';
   import SignalBar from './lib/shell/SignalBar.svelte';
   import Overview from './views/Overview.svelte';
-  import Tempo from './views/Tempo.svelte';
-  import Kinds from './views/Kinds.svelte';
-  import Indicators from './views/Indicators.svelte';
-  import Phases from './views/Phases.svelte';
+  import Project from './views/Project.svelte';
   import Diary from './views/Diary.svelte';
-  import Deliveries from './views/Deliveries.svelte';
   import Visions from './views/Visions.svelte';
-  import Docs from './views/Docs.svelte';
   import Settings from './views/Settings.svelte';
   import Skeleton from './lib/shell/Skeleton.svelte';
   import ExplainCard from './lib/explain/ExplainCard.svelte';
@@ -138,22 +136,12 @@
             <Skeleton />
           {:else if app.view === 'overview'}
             <Overview />
-          {:else if app.view === 'tempo'}
-            <Tempo />
-          {:else if app.view === 'kinds'}
-            <Kinds />
-          {:else if app.view === 'indicators'}
-            <Indicators />
-          {:else if app.view === 'phases'}
-            <Phases />
+          {:else if app.view === 'project'}
+            <Project />
           {:else if app.view === 'diary'}
             <Diary />
-          {:else if app.view === 'deliveries'}
-            <Deliveries />
           {:else if app.view === 'visions'}
             <Visions />
-          {:else if app.view === 'docs'}
-            <Docs />
           {:else if app.view === 'settings'}
             <Settings />
           {/if}

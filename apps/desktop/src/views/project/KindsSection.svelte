@@ -10,12 +10,15 @@
   // segment prstena i oznaka u retku tablice — legenda je tablica sama, ne druga kopija (S-010).
   // Dopunjeno M2/42 — prsten dobiva `<Explainable block>` (S-027), zaglavlje stupca udjela svoj
   // `<Explainable>` (dopuna T42): ostala zaglavlja (vrsta, commita, redaka) nemaju vlastiti id.
-  import { app } from '../lib/state.svelte';
-  import { getDict, getLang, t } from '../lib/i18n/index.svelte';
-  import { kindLabel, num, percent } from '../lib/format';
-  import { kindColor } from './helpers';
-  import Ring from '../lib/charts/Ring.svelte';
-  import Explainable from '../lib/explain/Explainable.svelte';
+  // Preseljeno M2/58 iz views/Kinds.svelte — sadržaj nepromijenjen, samo <h1> → <h2 id> i putanje
+  // uvoza (S-034).
+  import { app } from '../../lib/state.svelte';
+  import { getDict, getLang, t } from '../../lib/i18n/index.svelte';
+  import { kindLabel, num, percent } from '../../lib/format';
+  import { kindColor } from '../helpers';
+  import Ring from '../../lib/charts/Ring.svelte';
+  import Explainable from '../../lib/explain/Explainable.svelte';
+  import { sectionId, sectionKey } from './sections';
 
   const kinds = $derived(app.report?.kinds ?? []);
   const segments = $derived(
@@ -28,7 +31,7 @@
 </script>
 
 <div class="flex flex-col gap-4">
-  <h1 class="text-xl font-semibold text-ink-0">{t('nav.kinds')}</h1>
+  <h2 id={sectionId('kinds')} class="text-xl font-semibold text-ink-0">{t(sectionKey('kinds'))}</h2>
 
   {#if !app.report}
     <p class="text-sm text-ink-2">{t('common.loading')}</p>

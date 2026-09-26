@@ -3,16 +3,17 @@
   // `ThemeSwitch`/`LangSwitch` sele u pogled Postavke, gornja traka ih više ne crta, R23)
   // `<Topbar>` čita/piše izravno globalnu runu `app` (`state.svelte.ts`) — bez callback-propsa kao
   // u starijem Svelteu: promjena `app.currentId` ovdje se odmah vidi u `<Sidebar>` i `<main>`.
+  // Dopunjeno M2/58 (S-034): birač projekta (`<select>`) je OBRISAN — ulaz u projekt je sad SAMO
+  // klik na karticu Pregleda (`enterProject`). Na njegovo mjesto dolazi gumb „‹ Pregled" (`leaveProject`)
+  // koji se vidi kad je korisnik unutar ploče projekta ili Dnevnika/Vizija — ime projekta uz njega
+  // čita se iz `app.projects` po `app.currentId` (isti popis koji je select ranije crtao kao opcije).
   import markUrl from '../../assets/intro/mark.webp';
-  import { app, loadReport, selectProject, setError } from '../state.svelte';
+  import { app, leaveProject, loadReport, setError } from '../state.svelte';
   import { api } from '../api';
   import { t } from '../i18n/index.svelte';
   import RangePicker from './RangePicker.svelte';
 
-  function onProjectChange(e: Event & { currentTarget: HTMLSelectElement }): void {
-    const id = Number(e.currentTarget.value);
-    if (!Number.isNaN(id)) void selectProject(id);
-  }
+  const currentProjectName = $derived(app.projects.find((p) => p.id === app.currentId)?.name ?? '');
 
   async function refresh(): Promise<void> {
     try {
@@ -32,18 +33,12 @@
     <span>KRATIS</span>
   </div>
 
-  {#if app.projects.length > 0}
-    <select
-      class="rounded-md border border-line bg-surface-1 px-2 py-1 text-sm text-ink-0"
-      aria-label={t('top.project')}
-      value={app.currentId ?? ''}
-      onchange={onProjectChange}
-    >
-      <option value="" disabled>{t('top.project')}</option>
-      {#each app.projects as project (project.id)}
-        <option value={project.id}>{project.name}</option>
-      {/each}
-    </select>
+  {#if app.view !== 'overview' && app.view !== 'settings' && app.currentId !== null}
+    <button type="button" class="rounded-md px-2 py-1 text-sm text-ink-1 hover:bg-surface-2" onclick={leaveProject}>
+      <!-- „‹" je interpunkcija (strelica natrag), ne natpis — ne ide kroz t(). -->
+      ‹ {t('top.back')}
+    </button>
+    <span class="text-sm font-medium text-ink-0">{currentProjectName}</span>
   {/if}
 
   <div class="flex flex-1 items-center justify-end gap-4">

@@ -190,30 +190,11 @@ export interface Settings {
   motion: boolean;
 }
 
-// Devet stavki lijevog izbornika (spec 6.2: Pregled + osam pogleda); imena prate ključeve `nav.*`
-// u `src/lib/i18n/{hr,en}.json` tako da `t(\`nav.${view}\`)` uvijek pogodi postojeći natpis.
-// `'settings'` je deseti, globalni pogled izvan popisa (M2/38): `Sidebar` ga crta zasebno, NIJE u
-// `VIEWS` niže, jer radi i bez odabranog projekta (R22, spec §13.2).
-export type View =
-  | 'overview'
-  | 'tempo'
-  | 'kinds'
-  | 'indicators'
-  | 'phases'
-  | 'diary'
-  | 'deliveries'
-  | 'visions'
-  | 'docs'
-  | 'settings';
+// Dopunjeno M2/58 (S-034): šest prikaznih pogleda (Tempo · Vrste rada · Pokazatelji · Faze ·
+// Isporuke · Dokumentacija) postaju SEKCIJE jedne duge ploče `views/Project.svelte` — vidi
+// `views/project/sections.ts`. Pet stavki lijevog izbornika ostaje: Pregled + `project`/`diary`/
+// `visions` iz `VIEWS` niže + `settings` (deseti, globalni pogled, i dalje IZVAN `VIEWS`, jer radi
+// i bez odabranog projekta, R22, spec §13.2). Imena i dalje prate ključeve `nav.*`.
+export type View = 'overview' | 'project' | 'diary' | 'visions' | 'settings';
 
-export const VIEWS: readonly View[] = [
-  'overview',
-  'tempo',
-  'kinds',
-  'indicators',
-  'phases',
-  'diary',
-  'deliveries',
-  'visions',
-  'docs',
-];
+export const VIEWS: readonly View[] = ['overview', 'project', 'diary', 'visions'];
