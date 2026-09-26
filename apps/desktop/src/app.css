@@ -9,3 +9,13 @@
 :root[data-theme="chalk"], :root[data-theme="mint"], :root[data-theme="carbon"] { color-scheme: dark; }
 html, body { height: 100%; }
 body { margin: 0; background: var(--color-surface-0); color: var(--color-ink-0); font-family: var(--font-sans); }
+
+/* M2/56 — razine toplinske karte (R57): `tokens.css` ima SAMO tri stepenice brand boje
+   (brand-400/500/600), a na tamnim temama je brand-400 SVJETLIJI od brand-600, pa „rastuća tamnoća"
+   nije monotona na svim četiri teme. Zato sve razine dijele JEDNU boju (brand-500) i razlikuju se
+   samo `fill-opacity`-em — opacitet ostaje monoton (0,3 → 1) bez obzira na temu. */
+.heat-0 { fill: var(--color-surface-2); }
+.heat-1 { fill: var(--color-brand-500); fill-opacity: .3; }
+.heat-2 { fill: var(--color-brand-500); fill-opacity: .55; }
+.heat-3 { fill: var(--color-brand-500); fill-opacity: .8; }
+.heat-4 { fill: var(--color-brand-500); fill-opacity: 1; }

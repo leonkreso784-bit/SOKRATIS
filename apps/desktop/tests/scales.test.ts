@@ -7,6 +7,8 @@ import {
   dateTicks,
   finiteMax,
   formatDate,
+  formatMonth,
+  formatWeekday,
   linear,
   niceMax,
   parseYmd,
@@ -47,6 +49,14 @@ describe('scales', () => {
     expect(formatDate('2026-09-07', 'hr', 'week')).toBe('tj. 37');
     expect(formatDate('2026-09-01', 'hr', 'month')).toBe('ruj 2026');
     expect(formatDate('2026-09-01', 'en', 'month')).toBe('Sep 2026');
+  });
+  // Dopunjeno M2/56 (dopuna T56) — toplinska karta treba mjesec BEZ godine i dan BEZ datuma.
+  it('formatMonth vraća skraćeni mjesec bez godine', () => {
+    expect(formatMonth('2026-09-01', 'hr')).toBe('ruj');
+  });
+  it('formatWeekday po ISO danu (pon = 0 … ned = 6), neovisno o jeziku', () => {
+    expect(formatWeekday(0, 'hr')).toBe('pon');
+    expect(formatWeekday(2, 'en')).toBe('Wed');
   });
 });
 
