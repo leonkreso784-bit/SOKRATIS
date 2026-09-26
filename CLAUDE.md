@@ -67,28 +67,21 @@ sati zbog cherry-pickova — se u Sokratisu **ispravlja, ne prenosi** (S-007).
 
 ## Komande
 `cargo build` · `cargo test` · `cargo clippy --all-targets -- -D warnings` · `cargo fmt` ·
-`cargo run -p sokratis-cli -- report <putanja> [--since YYYY-MM-DD] [--until YYYY-MM-DD] [--json|--table]` ·
+`cargo run -p sokratis-cli -- report <putanja> [--since YYYY-MM-DD] [--until YYYY-MM-DD] [--scope all|default] [--json|--table]` ·
 `… docs <putanja>` · `… signals <putanja>` (izlazni kod 0 nema · 1 Warn · 2 Alert · 3 greška **ili
 pogrešna uporaba**; `--help`/`--version` = 0) — sve rade nad pravim repozitorijem (potvrđeno nad
 Sokrat Studyjem).
 Testovi i brane: `docs/workflow/TESTING.md`.
 
-## Stanje — TRENUTNO (2026-09-24 — drugi rez do 1.0.0: izvedbe sesija 1–3 gotove)
-- **M0 gotov, M1 zatvoren** (0.1.0); etape 1+2 M2 cjelovite u kodu (svih devet tokova + SUČELJE-2).
-  Leon je nakon instalacije tražio veće promjene (`docs/product/NALAZI_LEON_2026-09-23.md`) →
-  brainstorming dao **drugi rez do 1.0.0**: S-032…S-037.
-- **Aktivan spec `docs/plan/ARHITEKTURA_1_0.md`** (spec M2 arhiviran, `docs/archive/ARHITEKTURA_M2.md`).
-  **Aktivan plan `docs/superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md`**: T44–T64, sedam tokova
-  (DESKTOP-2 · JEZGRA-2 · IO-2 · GRAFOVI · PLOČA · LANCI · IZDANJE), pet sesija; tok IZDANJE preuzima T35/T43
-  iz plana M2 (ostaje u `superpowers/plans/`, nije arhiviran).
-- **Sesije 1–3 gotove:** DESKTOP-2 (T44–T45) · JEZGRA-2 (T46–T48) · GRAFOVI (T53–T55) · IO-2 (T49–T50)
-  spojeni, vrh `main`-a `9a0e98f`, verzija u kodu `1.0.0-pre.3` (Leon nije stigao instalirati pre.2).
-  Mjerenje po zadanom profilu sad ide preko **svih lokalnih grana** (S-032), dnevnik je unija svih
-  radnih stabala (S-033). **Sesija 4 slijedi:** T51 (CLI `--scope`) · T52 (mjerenje procesa/trajanja) ·
-  T56–T57 (GRAFOVI kraj) · T58 (PLOČA — tok kreće).
-- **Vanjska analiza 2026-09-24/25** (`DECISIONS.md` S-038, `PROGRESS.md`): CLI tablica tvrdi krivi doseg
-  (`grana main · 334`) → T51 dobiva padajući test; lažni Alert na lancu grana → **nova cigla T64** (tok
-  LANCI, sesija 5 prije T63; plan sad ide T44–T64); 14 prijedloga → `BACKLOG.md`, **ništa u 1.0.0** (Leon).
+## Stanje — TRENUTNO (2026-09-26 — drugi rez do 1.0.0: izvedbe sesija 1–4 gotove)
+- **M0 gotov, M1 zatvoren** (0.1.0). Aktivan spec `docs/plan/ARHITEKTURA_1_0.md`; aktivan plan
+  `docs/superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md`: T44–T64, sedam tokova.
+- **Sesije 1–4 gotove:** T44–T58 spojeni (grane u mjerenju svih lokalnih grana S-032, dnevnik unija
+  stabala S-033, CLI `--scope`, PLOČA — klik na karticu otvara nadzornu ploču projekta), vrh `main`-a
+  `93f1180`, verzija `1.0.0-pre.4`. **Sesija 5 slijedi:** T59–T62 (PLOČA kraj) ∥ **T64** (tok LANCI,
+  S-038), pa tok IZDANJE (T35, T63, T43).
+- **Sokrat Study `sokratstudy.dev` je od 2026-09-26 `core.bare = true`** (Leonova okolina, ne kod) —
+  posljedice i mjerenje umjesto toga: `docs/records/PROGRESS.md`, nalaz: `docs/records/BACKLOG.md`.
 - **Dva stabla:** `sokratis` (`main`) i `sokratis.rel` (`feat/release`, T35 napola, necommitano, ne
   dirati do toka IZDANJE). Tag traži Leonov izričit OK.
 - Druga verzija (M3) i kasnije: `docs/records/BACKLOG.md`.

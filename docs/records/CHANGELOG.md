@@ -10,7 +10,7 @@ Isporuka = ono što je u `main`-u; sesije su u `PROGRESS.md`.
 **drugi rez do 1.0.0** (S-032…S-037) nastavlja po
 [`../plan/ARHITEKTURA_1_0.md`](../plan/ARHITEKTURA_1_0.md).
 **Ovaj odjeljak izlazi kao 1.0.0, ne 0.2.0** (S-024; rez i dopuna speca §13 od 2026-09-21).
-**Na disku je `main` verzije `1.0.0-pre.3`** (jedan izvor: `[workspace.package]` u korijenskom
+**Na disku je `main` verzije `1.0.0-pre.4`** (jedan izvor: `[workspace.package]` u korijenskom
 `Cargo.toml`, M2/37, S-037) — netagirano, neobjavljeno; tag traži Leonov izričit OK na kraju etape
 izdanja (S-025). Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek sesije:
 [`PROGRESS.md`](./PROGRESS.md).
@@ -321,6 +321,79 @@ izdanja (S-025). Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek ses
   reza (T48–T50, T54–T55); `Cargo.toml` je izvor broja verzije, `package.json`/lockovi ga zrcale
   (samo redak verzije, bez `npm install`). Leon nije stigao instalirati `1.0.0-pre.2` (registar je
   još pokazivao pre.1) — pre.3 zamjenjuje obje.
+- **`M2/51` — CLI `--scope`, zaglavlje tablice imenuje mjereni doseg (2026-09-26, IO-2, S-032).**
+  Korisnik CLI-ja dobiva `sokratis report --scope all|default`: `all` (zadano) mjeri sve lokalne
+  grane, `default` samo `default_branch` iz profila (paritet s `RAD.xlsx`); nepoznata vrijednost je
+  pogrešna uporaba (izlazni kod 3). `--table` zaglavlje sad imenuje mjereni doseg —
+  `opseg: sve lokalne grane (N grana) · zadana: main` ili `opseg: samo zadana grana (main)` — umjesto
+  dosadašnjeg `grana main · N commita`, koje je od T49 tvrdilo krivi doseg (ime zadane grane uz
+  brojku SVIH grana; nalaz vanjske analize 2026-09-25). Nova sekcija GRANE (iza VRSTE RADA,
+  preskočena bez commita) ispisuje `Report.branches` s hrvatskim paucalom (1 grana · 2–4 grane ·
+  5+ grana). `--scope` pregazi `profile.branch_scope` **u memoriji** — datoteka profila se ne dira.
+- **`M2/52` — mjerenje procesa/trajanja nad Sokrat Studyjem (2026-09-26, IO-2).** Korisnik CLI-ja ne
+  vidi ništa novo — `crates/sokratis-io/tests/perf.rs` dobio drugi test,
+  `measure_real_repo_both_scopes` (`#[ignore]`, ručno pokretanje: `SOKRATIS_MEASURE_REPO=<putanja>
+  cargo test -p sokratis-io --test perf -- --ignored --nocapture`). **Kanonsko mjesto brojki (S-010).**
+  Mjereno nad radnim stablom `sokratstudy.f6`, ne `sokratstudy.dev`: glavna mapa je od 2026-09-26
+  03:17 postala `core.bare = true` (Leonova okolina, izvan Sokratisa) — `Project::open` na bare mapu
+  pada, `.f6` dijeli isti `git-common-dir`/refove pa je isti projekt (S-015); nalaz i posljedice u
+  `records/BACKLOG.md`.
+
+  | mjera | `all` | `default` |
+  |---|---|---|
+  | git-procesa (`input()`) | 7 (≤ 8) | 6 (≤ 8) |
+  | trajanje `input()` | 4,47 s | 1,19 s |
+  | trajanje CLI-ja (`report --json`) | 3,03 s | 2,07 s |
+  | `touched.commits` | 339 | 190 |
+  | `touched.worktrees` / `touched.diaries` | 5 / 5 | 5 / 5 |
+  | broj grana | 10 | 1 |
+  | isporuke | 128 | 128 |
+  | zadnji dan | 2026-09-25 | 2026-09-13 |
+  | docs.score | 100 | 100 |
+
+  Deset grana (opseg `all`, sortirano commiti↓): `main` 190 c / 85,3 h · `feat/f6-mcp` 58 / 18,9 h ·
+  `feat/tinder-kadar` 29 / 12,0 h · `feat/f3-dvojezicnost` 25 / 14,5 h · `feat/f2-mail` 9 / 3,2 h ·
+  `feat/f2-tema-racun` 9 / 3,8 h · `feat/f2-zid` 9 / 3,2 h · `fix/kadar-nalicje` 6 / 1,9 h ·
+  `feat/f2-slike` 3 / 1,0 h · `feat/f2-zid-radionica` 1 / 0,4 h — sve osim `main` nespojene.
+- **`M2/56` — temelji grafova Heatmap/Histogram (2026-09-26, GRAFOVI, S-035).** Korisnik i dalje ne
+  vidi ništa novo (nitko još ne uvozi). `layout.ts` += `heatmapLayout` (ćelija za svaki dan raspona,
+  stupac = ISO tjedan, 5 razina) i `histogramLayout` (24 bina, doba dana); `scales.ts` +=
+  `formatMonth`/`formatWeekday`; `Chart` dobio opcionalni prop `m` (margine po grafu, R59); nove
+  `Heatmap`/`Histogram`. Razine toplinske karte su `.heat-0…4` u `app.css` — jedna boja (`brand-500`)
+  razlikovana samo `fill-opacity`-em (0,3–1), jedini niz monoton na sve četiri teme (R57).
+- **`M2/57` — temelji grafova Gantt/HBars (2026-09-26, GRAFOVI, S-035).** Korisnik i dalje ne vidi
+  ništa novo. `layout.ts` += `ganttLayout` (faze od-do, „danas" kao crta) i `hbarsLayout` (grane,
+  spojene prigušene); nove `Gantt`/`HBars` (boje kroz postojeće tokene `--color-ok` /
+  `--color-brand-500` / `--color-ink-2`, R60; stanje faze bez datuma kroz postojeći `phaseState`).
+  `lib/charts/` sad ima temelje + **8 komponenata** (`Bars`/`Line`/`Ring`/`Sparkline`/`Heatmap`/
+  `Histogram`/`Gantt`/`HBars`); nitko izvan `lib/charts` ih još ne uvozi (T59/T60).
+- **`M2/58` — nadzorna ploča projekta (2026-09-26, PLOČA, S-034, + popravak 1).** Korisnik dobiva
+  novo ponašanje: klik na karticu projekta u Pregledu otvara pogled **Projekt** — osam sekcija
+  (Sažetak, Tempo, Grane, Vrste rada, Faze, Isporuke, Pokazatelji, Dokumentacija) na jednoj dugoj
+  stranici, s ljepljivim skok-izbornikom iznad sidara. Gornja traka gubi birač projekta (`<select>`);
+  u projektu pokazuje „‹ Pregled" + ime projekta. Šest bivših pogleda preseljeno `git mv` u
+  `views/project/*Section.svelte` (sadržaj isti, samo uvozi i `<h1>`→`<h2>`); dvije nove sekcije:
+  **Sažetak** (šest kartica: commiti, sati, radni dani, isporuke, docs-ocjena, signali — kroz
+  postojeće `<Explainable>` id-eve) i **Grane** (tablica `Report.branches`, natpis „Mjerena je samo
+  zadana grana." kad je opseg `default`). `selectProject`/`top.project` obrisani (bez pozivatelja
+  nakon T58, R58). i18n **287 → 304** ključa. **Popravak 1** (isti dan, vizualni dimni test): sidra
+  sekcija dobivaju `scroll-margin-top` da ih ljepljivi izbornik ne prekrije nakon skoka; kartice
+  Sažetka razmaknute u šest stupaca tek od `xl` (1280 px, ne `lg`) da najdulji tekst signala stane bez
+  vodoravnog klizača.
+
+  Brane nakon sve tri spojene cigle (`6501deb` IO-2 → `e656457` GRAFOVI → `dd5c3d4` PLOČA): `cargo fmt
+  --check` OK · `cargo clippy --workspace --all-targets -- -D warnings` OK · `cargo test --workspace`
+  **0 padova** (`sokratis-cli`: 4 unit + 11 integracijskih; `sokratis-io`: 52 + **2** ignorirana —
+  `perf`/`cache`; `sokratis-core`: 65 unit + 4 + 2 + 1 + 1; `sokratis-store` zelen) · `npm run check`
+  (svelte-check **256** datoteka 0/0 · `check:i18n` **304** ključa hr=en, bilo 287 · kontrast 4/4 ·
+  **vitest 125**, **15** datoteka, bilo 112) · `npm run build` `main.js` **265,59 kB** / gzip
+  **72,01 kB** (bilo 258,67 kB / gzip 70,57 kB) · `sokratis docs .` 100/100 · `signals .` nema
+  signala. Vizualni dimni test ploče (vite + Playwright nad `MockApi`, **bez Tauri-ja**): Pregled →
+  kartica → ploča s 8 sekcija, skok-izbornik, „‹ Pregled", zasivljene stavke bez projekta — prošao
+  nakon popravka 1.
+- **Bump verzije `1.0.0-pre.4` (2026-09-26, S-037).** Instalater nakon četvrte izvedbene sesije
+  drugog reza (T51–T52, T56–T58); `Cargo.toml` je izvor broja verzije, `package.json`/lockovi ga
+  zrcale (samo redak verzije, bez `npm install`).
 
 ## [0.1.0] — 2026-09-17 — Jezgra i CLI (Milestone 1)
 

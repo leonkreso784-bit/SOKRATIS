@@ -120,6 +120,15 @@ stranih korisnika — oni će promijeniti redoslijed.
 | 13 | signal „živa grana predugo izvan zadane" | pravilo gleda starost od ZADNJEG commita, pa `feat/f6-mcp` (108 ispred, tjednima) šuti | starost od točke grananja; nusprodukt S-038 |
 | 14 | pravilo docs-a „citirana brojka/verzija u `.md` = izvor istine" (`Cargo.toml`, `package.json`, git) | `docs` provjerava strukturu, ne tvrdnje — Sokrat Study 100/100, a vlastiti `README.md` je tvrdio `pre.1` uz `pre.3` u kodu | jezgra ne čita `Cargo.toml` — `io` predaje izvore kao tekst, pravilo uspoređuje (S-010 kao pravilo u alatu, ne samo načelo); nitko drugi to ne mjeri |
 
+## Nakon 1.0.0 — nalaz sesije 4 drugog reza (2026-09-26, Leon odlučuje)
+
+- **Repo čija je glavna mapa označena `core.bare = true` a ima radne datoteke** (Sokrat Study
+  `sokratstudy.dev` od 2026-09-26): `Project::open` nad njom pada (`fatal: this operation must be run
+  in a work tree`), `worktree_heads` preskače blok bez retka `HEAD`, dnevnik s diska te mape se ne čita
+  — treba li Sokratis to prepoznati i javiti (signal/kartica) ili je to Leonova okolina? Bez rješenja
+  danas; T52 je zato mjerio nad povezanim radnim stablom `sokratstudy.f6` (isti `git-common-dir`,
+  S-015). Detalji: `records/PROGRESS.md` (2026-09-26).
+
 ## Ideje, bez datuma
 
 | stavka | bilješka |

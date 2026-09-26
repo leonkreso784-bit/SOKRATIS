@@ -17,7 +17,8 @@ INTEGRACIJA (T34, T36, T37, spojeno 2026-09-22, merge `b560f7c`): sučelje sad z
 odvojena od instalirane · **SUČELJE-2** (T38–T42, spojeno 2026-09-23, merge `6947189`): **deseti
 pogled Postavke** (tema · jezik · autostart · animacije, S-028), **animacije** (S-026: `data-motion`
 gasi ulaz grafova, prijelaz pogleda i kostur učitavanja preko jedne varijable), **kartica s
-objašnjenjem** (S-027: 37 objašnjivih `id`-eva u svih devet pogleda i traci signala) — §1, §11.
+objašnjenjem** (S-027: 37 objašnjivih `id`-eva u svih devet pogleda i traci signala; od T58 šest od
+tih devet su sekcije unutar pogleda Projekt, §1) — §1, §11.
 **Time je etapa 2 „izgled" (S-025) cjelovita u kodu**; preostaje etapa 3 „izdanje".
 **Drugi rez do 1.0.0** (S-032…S-037, aktivan spec [`../plan/ARHITEKTURA_1_0.md`](../plan/ARHITEKTURA_1_0.md))
 je u izvedbi — sesija 1 (2026-09-24) spojila je tri toka: **DESKTOP-2** (T44–T45: `git_command()`
@@ -30,11 +31,18 @@ zatim spojila **JEZGRA-2 T48** (`Profile.branch_scope`, zadano `"all"`), **GRAFO
 `scale.ts` obrisan, d3 prvi put stvarno u snopu) i **IO-2 T49–T50** (`Scope::AllBranches`,
 `commit_sources`, `cached_log(scope)` puni `scope`/kartu grana iz profila — `GitSource` sad ima **15**
 metoda; `worktree_heads`/`commit_times`, vodeće stablo `Project::lead`, dnevnik kao unija SVIH radnih
-stabala s diska, plan/`docs`/zadnja promjena datoteke iz vodećeg stabla) — §1, §3, §4, §11. Verzija u
-kodu `1.0.0-pre.3`; sesija 4 nastavlja T51 (CLI `--scope`), T52 (mjerenje procesa/trajanja), T56–T57
-(GRAFOVI kraj) i T58 (PLOČA — tok kreće).
+stabala s diska, plan/`docs`/zadnja promjena datoteke iz vodećeg stabla) — §1, §3, §4, §11. Sesija 4
+(2026-09-26) je zatim spojila **IO-2 T51–T52** (CLI `report --scope all|default` pregazi
+`branch_scope` iz profila u memoriji; zaglavlje tablice sad imenuje mjereni doseg umjesto same zadane
+grane, nova sekcija GRANE; mjerenje procesa/trajanja nad Sokrat Studyjem), **GRAFOVI T56–T57**
+(`Heatmap`/`Histogram`/`Gantt`/`HBars` — `lib/charts/` sad ima temelje + **8** komponenata, nitko
+izvan `lib/charts` ih još ne uvozi) i **PLOČA T58** (S-034: klik na karticu Pregleda otvara pogled
+Projekt — osam sekcija iz `views/project/sections.ts`, skok-izbornik, birač projekta u gornjoj traci
+obrisan) — §1, §3, §9, §11. Verzija u kodu `1.0.0-pre.4`; sesija 5 nastavlja T59–T62 (PLOČA kraj:
+prekidač dan/tjedan/mjesec, grafovi u sekcijama, 7 novih `explain` id-eva, dimni test) i T64 (tok
+LANCI, S-038), pa IZDANJE.
 Što od koda još stoji bez pokrića ili s poznatim rubom je u §11 ·
-**Zadnja provjera:** 2026-09-24
+**Zadnja provjera:** 2026-09-26
 
 > **Što ovaj dokument JEST:** opis sustava kakav stoji u `crates/` i `apps/` — granice između crateova, tok
 > podataka, formati koje čita i ugovori prema korisniku CLI-ja. **Što NIJE:** kronologija (to su
@@ -158,14 +166,14 @@ Dokaz da se ljuska stvarno pokreće je **dimni test** (`npm run tauri dev`, ruč
 | `styles/motion.css` | **jedino mjesto pokreta sučelja** (S-026): `--motion-dur: 250ms`, `:root[data-motion="off"]` svodi svaku `animation-`/`transition-duration` na `0s !important`; `lib/motion.ts::motionOff` je čista odluka bez DOM-a, `state.svelte.ts::syncMotion` je upisuje kao `data-motion` na `<html>` — isti obrazac kao `data-theme` |
 | `lib/i18n/` (`hr.json`, `en.json`, `t.ts`, `index.svelte.ts`) | HR/EN rječnik (S-021); `scripts/check-i18n.mjs` brani da oba jezika imaju isti skup ključeva |
 | `lib/format.ts` | jedino mjesto oblikovanja brojki, datuma i postotaka za sučelje |
-| `lib/charts/` (`layout.ts`, `scales.ts`, `bucket.ts`, `Chart`/`Axis`/`Grid`/`Legend`/`Tooltip`/`Bars`/`Line`/`Ring`/`Sparkline`) | vlastiti SVG grafovi (S-018) s d3-matematikom za osi (S-035 dopunjena, Leonov OK: `d3-scale`/`d3-shape`/`d3-array`/`d3-time-format`, UTC datumski ticksi, grupiranje po danu/tjednu/mjesecu); izgled i boje ostaju naši; ulaze animirano (M2/39, §11 niže). **T54** (2026-09-24) donio temelje — `layout.ts` (okvir/margine, grupirani/naslagani stupci nad `scaleBand`, X-ticksi prorijeđeni na ≤ 10, linija s datumskom skalom, najbliža točka za tooltip) + pet tankih komponenata `Chart`/`Axis`/`Grid`/`Legend`/`Tooltip`. **T55** prepisao `Bars`/`Line` na te temelje (datumi na X-osi, mreža, legenda, tooltip miš+tipkovnica) i `Ring`/`Sparkline` na `scales.ts`; stari `scale.ts` **obrisan** — `linear`/`finiteMax`/`arcPath`/`ringSegments`/`svgA11y` sele u `scales.ts`. `main.js` sad stvarno uvozi d3 (258,67 kB, `CHANGELOG.md`). Prekidač dan/tjedan/mjesec dolazi u T59 |
+| `lib/charts/` — temelji (`layout.ts`, `scales.ts`, `bucket.ts`, `Chart`/`Axis`/`Grid`/`Legend`/`Tooltip`) + **8 komponenata** (`Bars`/`Line`/`Ring`/`Sparkline`/`Heatmap`/`Histogram`/`Gantt`/`HBars`) | vlastiti SVG grafovi (S-018) s d3-matematikom za osi (S-035 dopunjena, Leonov OK: `d3-scale`/`d3-shape`/`d3-array`/`d3-time-format`, UTC datumski ticksi, grupiranje po danu/tjednu/mjesecu); izgled i boje ostaju naši; ulaze animirano (M2/39, §11 niže). **T54** (2026-09-24) donio temelje — `layout.ts` (okvir/margine, grupirani/naslagani stupci nad `scaleBand`, X-ticksi prorijeđeni na ≤ 10, linija s datumskom skalom, najbliža točka za tooltip) + pet tankih komponenata `Chart`/`Axis`/`Grid`/`Legend`/`Tooltip`. **T55** prepisao `Bars`/`Line` na te temelje (datumi na X-osi, mreža, legenda, tooltip miš+tipkovnica) i `Ring`/`Sparkline` na `scales.ts`; stari `scale.ts` **obrisan** — `linear`/`finiteMax`/`arcPath`/`ringSegments`/`svgA11y` sele u `scales.ts`. `main.js` sad stvarno uvozi d3 (258,67 kB, `CHANGELOG.md`). **T56** (2026-09-26) dodao `heatmapLayout` (ćelija po danu, stupac = ISO tjedan, 5 razina) i `histogramLayout` (24 bina, doba dana) u `layout.ts`, `formatMonth`/`formatWeekday` u `scales.ts`, `Chart` dobio opcionalni prop `m?: Partial<Margins>` (margine po grafu), nove `Heatmap`/`Histogram`; razine toplinske karte su `.heat-0…4` u `src/app.css` (jedna boja `brand-500`, `fill-opacity` 0,3–1 — jedini niz monoton na sve četiri teme, R57). **T57** dodao `ganttLayout`/`hbarsLayout` i nove `Gantt`/`HBars` (boje kroz `--color-ok`/`--color-brand-500`/`--color-ink-2`, stanje bez datuma kroz postojeći `phaseState`). Nitko izvan `lib/charts` još ne uvozi ova četiri nova grafa — sekcije ih dobivaju u T59/T60. Prekidač dan/tjedan/mjesec dolazi u T59 |
 | `lib/explain/` (`ids.ts`, `explain.svelte.ts`, `Explainable.svelte`, `ExplainCard.svelte`) | **kartica s objašnjenjem** (S-027, M2/41–42): `EXPLAIN_IDS` (37) + `explainKeys(id)` → ključevi `explain.<id>.what\|how\|read`; `Explainable` je okidač (`<button aria-haspopup="dialog">`), `ExplainCard` (`role="dialog" aria-modal="false"`) prikazuje tekst; test pokrivenosti veže popis na OBA rječnika u oba smjera i na 18 id-eva pokazatelja iz prave snimke jezgre |
 | `splash/` (`Splash.svelte`, `intro.ts`) | animacija pokretanja, 4,2 s, preskočiva (S-019); zaseban Vite-ulaz `splash.html` |
 | `lib/api.ts` | sučelje `Api`; `MockApi` čita insta snapshot jezgre kroz Viteov `?raw` uvoz — dev-prikaz i vitest vide TOČNO brojke koje bi jezgra izračunala, ne ručno prepisanu kopiju (S-010); `TauriApi` (T34) svaku metodu prevodi u `invoke('<naredba>', {…})` prema `commands.rs`, `onReportUpdated`/`onSignalRaised` idu preko `listen()`; `createApi()` bira izvedbu po `'__TAURI_INTERNALS__' in window`; **od T45 (M2/45, S-036) += `quit()`/`onCloseRequested(cb)`** — `TauriApi` zove naredbu `quit` i sluša događaj `close_requested`, `MockApi` oboje nema-op (preglednik nema proces za ugasiti) |
 | `lib/shell/ConfirmQuit.svelte` (T45, S-036) | upit „Zatvoriti Sokratis?" nakon `close_requested`; `role="dialog" aria-modal="true"`, fokus na „Odustani", Esc = odustani; NE testira se vitestom (nema jsdom-a, isti razlog kao T39/R37) — ponašanje dokazuje dimni test |
 | `lib/types.ts` | TS zrcalo `Report`-a; `tests/types.test.ts` ga veže na isti insta snapshot da se oblik ne razmine s Rustom |
-| `lib/state.svelte.ts` | Svelte 5 rune (`$state`) drže odabrani projekt, raspon, postavke, izvještaj, `epoch` (0 → 1 jednom kad glavni prozor prvi put postane vidljiv, M2/39) |
-| `views/` (**deset** pogleda) + `views/helpers.ts` | Pregled, Tempo, Vrste rada, Pokazatelji, Faze, Dnevnik, Isporuke, Vizije, Dokumentacija — svih devet traže odabran projekt — i **Postavke** (M2/38, S-028): tema · jezik · autostart · animacije, jedini pogled koji NE čita `app.report`, radi i bez projekta; `helpers.ts` drži čiste funkcije testirane odvojeno od komponenata (sortiranje, boja po vrsti/težini, i18n-množina, kopiranje i spajanje putanje, zamjena vizije po indeksu) |
+| `lib/state.svelte.ts` | Svelte 5 rune (`$state`) drže odabrani projekt, raspon, postavke, izvještaj, `epoch` (0 → 1 jednom kad glavni prozor prvi put postane vidljiv, M2/39). **Od T58 (S-034)** `enterProject(id)` (postavi `currentId`, `view = 'project'`, učitaj izvještaj) i `leaveProject()` (`view = 'overview'`, `currentId` ostaje) zamjenjuju stari `selectProject` — **obrisan**, nakon T58 bez pozivatelja (R58) |
+| `views/` — **pet** pogleda (Pregled, **Projekt**, Dnevnik, Vizije, Postavke) + `views/helpers.ts` + `views/project/` | Pregled i Postavke rade bez odabranog projekta (Postavke jedini pogled koji NE čita `app.report`); Dnevnik i Vizije traže odabran projekt. **Od T58 (S-034) šest bivših pogleda** (Tempo, Vrste rada, Pokazatelji, Faze, Isporuke, Dokumentacija) **su sekcije unutar `views/Project.svelte`**, preseljene `git mv` u `views/project/{Tempo,Kinds,Phases,Deliveries,Indicators,Docs}Section.svelte` (sadržaj isti, samo putanje uvoza i `<h1>` → `<h2 id={sectionId(…)}>`); uz njih dvije nove, `SummarySection` (šest kartica iz `app.report` kroz postojeće `<Explainable>` id-eve) i `BranchesSection` (tablica `Report.branches`, natpis kad je opseg `default`). Osam sekcija nabraja `views/project/sections.ts` (`SECTIONS`, `sectionId`, `sectionKey`) — JEDAN popis za skok-izbornik, sidra (`id="sec-…"`) i naslove; izbornik je `position: sticky` unutar `<main>`, sidra dobivaju `scroll-margin-top` kroz `:global(h2[id^='sec-'])` u `Project.svelte` (jedno mjesto, ne osam) da ljepljivi izbornik ne prekrije naslov nakon skoka. **`lib/shell/Topbar.svelte`** izgubio `<select>` birač projekta — ulaz u projekt je klik na karticu Pregleda (`enterProject`); u projektu traka pokazuje „‹ Pregled" (`top.back`) + ime projekta. **`lib/shell/Sidebar.svelte`**: pet stavki, `project`/`diary`/`visions` su `disabled` + `aria-disabled` + zasivljene (`opacity-50`) dok nema odabranog projekta, `overview` uvijek aktivan, `settings` na dnu. `helpers.ts` drži čiste funkcije testirane odvojeno od komponenata (sortiranje, boja po vrsti/težini, i18n-množina, kopiranje i spajanje putanje, zamjena vizije po indeksu, **od T58** `signalCounts(signals)`) |
 
 Dnevnik uređuje vrstu rada po commitu (`setOverride`, oznaka „ručno"); Vizije se dodaju, uređuju i
 brišu u mjestu istim obrascem (Svelte 5 `{#snippet}`, `saveVisions` uvijek šalje cijeli popis, ne
@@ -211,6 +219,11 @@ ga ožiči nad `sokratis-store`, `commands.rs::compute_input` ga zove za svaki i
 (`report_for`) i dalje zove `input_between`, BEZ keša (§11). **Od IO-2 (T49, S-032) `cached_log` prima
 `scope: Scope<'_>`** — isti enum kao `log`/`rev_list` (`Scope::Branch(ime)` ili `Scope::AllBranches`,
 lifetime posuđuje ime grane) — pa keš vrijedi i za mjerenje preko svih grana, ne samo zadane.
+
+**`tests/perf.rs`** (M2/52, T52) dobio drugi test, `measure_real_repo_both_scopes` — `#[ignore]`, jer
+ovisi o pravom repozitoriju na disku; ručno se pokreće s `SOKRATIS_MEASURE_REPO=<putanja>` (obje
+vrijednosti `scope` u istom pokretanju). Brojke izmjerene nad Sokrat Studyjem (procesi, trajanje,
+`touched`) su u [`../records/CHANGELOG.md`](../records/CHANGELOG.md), ne ovdje (S-010).
 
 **Grane i radna stabla ulaze u mjerenje** (T49–T50, S-032, S-033): `input_with` čita
 `profile.branch_scope` i bira `Scope` — `"all"` (zadano) šalje `git log --branches` i puni kartu
@@ -314,9 +327,13 @@ strukturi, dodatak na kraju — S-022, snapshot-diff ostaje malen) bilježi gran
 dospio; commit koji nije u `ReportInput.commit_branches` dobiva zadanu granu. **Od IO-2 (T49, S-032)
 `io` čita `profile.branch_scope`** i stvarno šalje `scope: AllBranches` (zadano) s popunjenom kartom
 `commit_branches`, ili `scope: DefaultBranch` s praznom kartom ako profil to traži — mjerenje po
-zadanom profilu je od `1.0.0-pre.3` preko SVIH lokalnih grana, ne samo zadane. **CLI-tablica
-(`table.rs`) `scope`/`branches` i dalje ne ispisuje** (dolazi s T51); sučelje ih isto još ne crta
-(§11).
+zadanom profilu je od `1.0.0-pre.3` preko SVIH lokalnih grana, ne samo zadane. **Od T51 (M2/51,
+2026-09-26) CLI-tablica (`table.rs`) ispisuje oba polja**: zaglavlje imenuje mjereni doseg
+(`opseg: sve lokalne grane (N grana) · zadana: main` za `AllBranches`, `opseg: samo zadana grana
+(main)` za `DefaultBranch` — do T51 je zaglavlje tvrdilo `grana main · N commita`, ime zadane grane
+uz brojku SVIH grana, netočno; nalaz vanjske analize 2026-09-25) i nova sekcija GRANE (iza VRSTE
+RADA, preskočena kad nema commita). **Sučelje crta tablicu grana od T58** (`BranchesSection`, §1); graf
+(`HBars`, §1) dolazi u T59.
 
 **Tri polja koja je `M2/1a` deklarirala prazna sad jezgra puni** (M2/4, M2/5) — deklarirana su prije
 potrošača da sučelje i snapshot ugovora (S-022) ne mijenjaju oblik svakom ciglom:
@@ -537,7 +554,7 @@ radnog stabla — korijen se dobiva iz `git rev-parse --show-toplevel`.
 
 | naredba | ispis | izlazni kod |
 |---|---|---|
-| `sokratis report [putanja] [--since YYYY-MM-DD] [--until YYYY-MM-DD] [--json\|--table]` | cijeli `Report`; **bez zastavice je JSON**, `--table` daje tablicu s hrvatskim natpisima (zaglavlje pokazuje samo `since` — `until` se u tablici ne vidi, `docs/records/BACKLOG.md`); zastavice su **isključive** (`--json --table` je pogrešna uporaba, ne „zadnja pobjeđuje") | 0 (`until < since` → prazan izvještaj, i dalje 0) |
+| `sokratis report [putanja] [--since YYYY-MM-DD] [--until YYYY-MM-DD] [--scope all\|default] [--json\|--table]` | cijeli `Report`; **bez zastavice je JSON**, `--table` daje tablicu s hrvatskim natpisima (zaglavlje pokazuje samo `since` — `until` se u tablici ne vidi, `docs/records/BACKLOG.md` — ali **od T51, M2/51** imenuje mjereni doseg: `opseg: sve lokalne grane (N grana) · zadana: main` ili `opseg: samo zadana grana (main)`, uz novu sekciju GRANE, §3); `--scope` (M2/51) pregazi `profile.branch_scope` **u memoriji** (datoteka profila se ne dira), nepoznata vrijednost je pogrešna uporaba; zastavice su **isključive** (`--json --table` je pogrešna uporaba, ne „zadnja pobjeđuje") | 0 (`until < since` → prazan izvještaj, i dalje 0) |
 | `sokratis docs [putanja] [--json]` | ocjena, broj nalaza, kašnjenje; bez `docs_dir` poruka `docs: nema mape s dokumentacijom (n/a)` | 0 |
 | `sokratis signals [putanja] [--json]` | signali s dokazom, ili `nema signala` | **0** nema · **1** Warn · **2** Alert |
 
@@ -550,7 +567,8 @@ pokvaren profil, tipfeler u datumu ili regex bez grupe) ispisuje se na stderr ka
 ugovor prema preflightu, a ne nuspojava.
 
 `--since` i `--until` (M2/19) postoje samo na `report`; `docs` i `signals` uzimaju `since` iz profila
-i `until` ne primaju (uvijek `None`).
+i `until` ne primaju (uvijek `None`). `--scope` (M2/51) postoji samo na `report`; nepoznata vrijednost
+je pogrešna uporaba (izlazni kod 3), ne panika.
 
 ## 10 · Dvije zamke koje je otkrio dogfooding
 
@@ -592,9 +610,17 @@ preuzeo M2 u [`../archive/ARHITEKTURA_M2.md`](../archive/ARHITEKTURA_M2.md) §8 
   ispisuje — redak po commitu (uz `classify_sub`, sad `CommitRow.sub`), redak po isporuci i zbroj
   vizija po stanju čekaju pogled Dnevnik/Isporuke/Vizije u sučelju M2.
 - **`Report.scope`/`branches` (M2/46, S-032) postoje u JSON-u i `io` ih od T49/T50 stvarno puni** iz
-  profila (§1, §3), ali NITKO ih još ne prikazuje: CLI-tablica nema ispis (`--scope` na CLI-ju dolazi
-  s T51), a sučelje (SUČELJE-2, §1 tablica) ih još ne crta ni jednim pogledom — dolazi s PLOČOM
-  (T58+).
+  profila (§1, §3) — **od T51 CLI-tablica ih ispisuje** (zaglavlje + sekcija GRANE), **od T58 sučelje
+  crta tablicu grana** (`BranchesSection`, §1); graf (`HBars`) i prekidač dan/tjedan/mjesec dolaze u
+  T59.
+- **Četiri nova grafa (T56–T57: `Heatmap`/`Histogram`/`Gantt`/`HBars`) postoje u `lib/charts/` i imaju
+  testove, ali nitko izvan `lib/charts` ih ne uvozi** — sekcije ih dobivaju u T59/T60 (§1).
+- **7 novih `explain` id-eva koje T58 uvodi (šest kartica Sažetka, tablica Grane) nema u
+  `EXPLAIN_IDS`** — `SummarySection` posuđuje POSTOJEĆE id-eve pokazatelja (S-010, §1); pravih 7 novih
+  stiže u T61.
+- **Prekidač dan/tjedan/mjesec ne postoji** — grafovi (uklj. `Tempo`) crtaju po danu; grupiranje po
+  tjednu/mjesecu (`lib/charts/bucket.ts`, od T53) postoji kao čista funkcija bez pozivatelja u
+  sučelju, dolazi u T59.
 
 **Rubovi koje kod danas ne pokriva:**
 

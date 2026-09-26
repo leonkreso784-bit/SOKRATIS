@@ -1185,3 +1185,28 @@ Sve nalaze orkestrator je **ponovno izmjerio** prije rasprave (samo čitanje: `s
 ### Isporučeno (samo dokumentacija; kod nedirnut)
 `DECISIONS.md` S-038 · spec `ARHITEKTURA_1_0.md` §1.4 + §5 · plan: tok LANCI/T64, vlasništvo, ovisnosti, dopuna T51 · `BACKLOG.md` nova sekcija ·
 `CLAUDE.md` Stanje + odluke · `README.md` verzija. Sesija 4 (T51 · T52 · T56 · T57 · T58) ostaje kako je zapisana u promptu.
+
+## 2026-09-26 (FABLE) — IZVEDBA sesija 4 drugog reza 1.0.0: IO-2 (T51–T52) · GRAFOVI (T56–T57) · PLOČA (T58) spojeni, instalater pre.4
+
+**Osma sesija.** Tri toka poslana usporedno (BASE `9fb9dcd`), recenzirana i spojena redom IO-2 → GRAFOVI → PLOČA; brojke, snapshot-promjene i sadržaj svake cigle: [`CHANGELOG.md`](./CHANGELOG.md) `[Unreleased]` (S-010, ne ponavlja se ovdje).
+
+- **IO-2 → `main` `6501deb`** (T51 `9830b9c` + T52 `96a95f0`): `sokratis report --scope all|default` pregazi `branch_scope` iz profila u memoriji; `--table` zaglavlje sad imenuje mjereni doseg umjesto krive tvrdnje `grana main · 334` (nalaz vanjske analize 2026-09-25) i nova sekcija GRANE; `#[ignore]` mjerenje procesa/trajanja nad pravim repoom (`SOKRATIS_MEASURE_REPO`).
+- **GRAFOVI → `main` `e656457`** (T56 `1ef9634` + T57 `34d3323`): temelji i komponente `Heatmap`/`Histogram`/`Gantt`/`HBars` — `lib/charts/` sad ima temelje + **8 komponenata**; nitko izvan `lib/charts` ih još ne uvozi (T59/T60).
+- **PLOČA → `main` `dd5c3d4`** (T58 `7d7940c` + popravak 1 `76321a3`): klik na karticu Pregleda → pogled Projekt (8 sekcija, ljepljivi skok-izbornik); birač projekta u gornjoj traci obrisan; šest bivših pogleda preseljeno `git mv` u sekcije, dvije nove (Sažetak, Grane).
+- **Bump verzije `1.0.0-pre.4`** (`93f1180`, S-037): `Cargo.toml` izvor, `package.json`/lockovi zrcale, `README.md` redak s verzijom.
+
+**Rulinzi (puni tekst: `.superpowers/sdd/2026-09-18-m2-desktop/progress.md`, sesija 4):**
+R55 deferred `bucketTotal` (T54) zatvoren unutar T57 · R56 `.heat-*` smije u `app.css` iako je PLOČA vlasnik te datoteke (presedan `motion.css`) · R57 razine toplinske karte kroz `fill-opacity` nad JEDNOM bojom (`brand-500`), jer stepenice `brand-400/500/600` nisu monotone na sve četiri teme · R58 `selectProject`/`top.project` obrisani (bez pozivatelja nakon T58) · R59 `Chart` dobio opcionalni prop `m` (margine po grafu) · R60 `planned` → `var(--color-ink-2)` (`ink-3` ne postoji), bez teksta izvan i18n-rječnika u `Gantt`/`HBars`.
+
+**Odstupanja od plana:** izvještaj T52 pisan u novom workspaceu; mjerenje T52 izvedeno nad `sokratstudy.f6` umjesto `sokratstudy.dev` (vidi nalaz niže); brifov `chart-cell` ne postoji ni u jednoj datoteci pa graditelj T56 ga nije koristio; ćelije toplinske karte bez ulazne animacije (nije traženo, nije dodano); `summary.commits` kao i18n ključ brif nije naveo — graditelj ga svejedno dodao (dosljedno s ostalih pet kartica).
+
+**Dva nalaza vizualnog dimnog testa ploče (vite + Playwright nad `MockApi`, bez Tauri-ja) i popravak 1:** (1) ljepljivi skok-izbornik prekrivao je naslov sekcije odmah nakon skoka na sidro → `scroll-margin-top` na jednom mjestu (`:global(h2[id^='sec-'])` u `Project.svelte`); (2) šest kartica Sažetka se stiskalo na `lg:` (1024 px) prije nego što je stao najdulji tekst signala → `xl:grid-cols-6` (1280 px) + `min-w-0` + `break-words`. Re-recenzija oba nalaza ADDRESSED; vizualna potvrda na 1300 px bez vodoravnog klizača.
+
+**Nalaz o Sokrat Studyju (posljedica Leonove okoline, ne koda):** glavna mapa `sokratstudy.dev` je od 2026-09-26 03:17 postala `core.bare = true` u `.git/config` — Sokratis to nije napisao (samo čita), promjena je nastala prije ove sesije. Posljedice: `git -C .../sokratstudy.dev rev-parse --show-toplevel` puca s „must be run in a work tree", pa `Project::open(.dev)` i CLI `report` nad njom ne rade; `worktree_heads`/dnevnik-parser preskaču blok bez retka `HEAD` (bare u porcelainu nema taj redak), pa su `touched.worktrees`/`touched.diaries` **5**, ne **6** kako je izmjereno u sesiji 3. T52 je zato mjerio nad povezanim radnim stablom `sokratstudy.f6` (isti `git-common-dir`, isti refovi — isti projekt po S-015); brojke: [`CHANGELOG.md`](./CHANGELOG.md). Nalaz upisan u [`BACKLOG.md`](./BACKLOG.md) (treba li Sokratis to javiti signalom/karticom — Leon odlučuje).
+
+**Leon JE instalirao `pre.3`** (registar `HKCU…Uninstall\Sokratis` DisplayVersion pokazivao `1.0.0-pre.3` prije nego je sesija 4 počela) — potvrđeno prije gradnje instalatera pre.4.
+
+**Stabla `sokratis.io3`, `sokratis.grafovi` i `sokratis.ploca` (i njihove grane) obrisani** nakon provjere (`--merged main` + `merge-base --is-ancestor`). **Na disku ostaju dva stabla:** `sokratis` (`main`, vrh `93f1180`) i `sokratis.rel` (`feat/release`, T35 napola, necommitano) — i dalje se ne dira dok tok IZDANJE ne dođe na red.
+
+### Što slijedi
+Sljedeća sesija (5.): T59–T62 (PLOČA kraj — prekidač dan/tjedan/mjesec, grafovi u sekcijama, 7 novih `explain` id-eva, dimni test) usporedno s T64 (tok LANCI, S-038), pa tok IZDANJE (T35, T63, T43) i 1.0.0.
