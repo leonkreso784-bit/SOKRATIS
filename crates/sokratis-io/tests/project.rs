@@ -626,3 +626,104 @@ fn input_follows_branch_scope_from_profile() {
     assert!(!input.git_log.contains(&b));
     assert!(input.commit_branches.is_empty());
 }
+
+/// Cigla M2/64 (S-038): lanac `feat/a ⊂ feat/b ⊂ feat/c` (svaka sesija grana od prethodne) + odvojena
+/// `feat/x` — dokazuje da `io` (`commit_parents` + `branches().tip`) preda TOČAN graf jezgri
+/// (`chains::assign_containment`), i da pravilo `unmerged-branches` na kraju vidi SAMO dva vrha.
+/// Datumi su daleko u prošlosti da su OBJE grane starije od `unmerged_warn_days` bez obzira na
+/// stvarni datum pokretanja testa (dopuna, ispravak 5) — težinu (Warn/Alert) test NE tvrdi.
+#[test]
+fn chain_of_branches_collapses_to_its_top_in_input_and_signals() {
+    let r = Repo::init();
+    r.commit(
+        "a.txt",
+        "1",
+        "F1/1 main",
+        "2026-09-01T10:00:00+02:00",
+        "2026-09-01T10:00:00+02:00",
+    );
+    r.git(&["checkout", "-q", "-b", "feat/a"]);
+    r.commit(
+        "b.txt",
+        "1",
+        "F1/2 a",
+        "2026-09-01T11:00:00+02:00",
+        "2026-09-01T11:00:00+02:00",
+    );
+    r.git(&["checkout", "-q", "-b", "feat/b"]);
+    r.commit(
+        "c.txt",
+        "1",
+        "F1/3 b",
+        "2026-09-01T12:00:00+02:00",
+        "2026-09-01T12:00:00+02:00",
+    );
+    r.git(&["checkout", "-q", "-b", "feat/c"]);
+    r.commit(
+        "d.txt",
+        "1",
+        "F1/4 c",
+        "2026-09-01T13:00:00+02:00",
+        "2026-09-01T13:00:00+02:00",
+    );
+    r.git(&["checkout", "-q", "main"]);
+    r.git(&["checkout", "-q", "-b", "feat/x"]);
+    r.commit(
+        "e.txt",
+        "1",
+        "F1/5 x",
+        "2026-09-01T14:00:00+02:00",
+        "2026-09-01T14:00:00+02:00",
+    );
+    r.git(&["checkout", "-q", "main"]);
+
+    let p = Project::open(r.path()).unwrap();
+    let input = p.input(None).unwrap();
+
+    // Isti obrazac kao `report::build_report` (S-012): sadržanost se računa nad KOPIJOM grana,
+    // `ReportInput.branches` ostaje sirov — ovdje ga test radi RUČNO da provjeri baš ono što `io`
+    // preda kroz `branch_graph`.
+    let mut with_containment = input.branches.clone();
+    sokratis_core::chains::assign_containment(
+        &mut with_containment,
+        &sokratis_core::chains::parse_parents(&input.branch_graph),
+    );
+    let contained_in_of = |name: &str| {
+        with_containment
+            .iter()
+            .find(|b| b.name == name)
+            .unwrap_or_else(|| panic!("grana {name} postoji"))
+            .contained_in
+            .clone()
+    };
+    assert_eq!(contained_in_of("feat/a"), Some("feat/c".to_string()));
+    assert_eq!(contained_in_of("feat/b"), Some("feat/c".to_string()));
+    assert_eq!(contained_in_of("feat/c"), None, "feat/c je vrh lanca");
+    assert_eq!(
+        contained_in_of("feat/x"),
+        None,
+        "feat/x je odvojena, sama vrh"
+    );
+
+    let report = sokratis_core::build_report(&input, &p.profile).unwrap();
+    let signal = report
+        .signals
+        .iter()
+        .find(|s| s.rule == "unmerged-branches")
+        .expect("signal unmerged-branches postoji");
+    assert_eq!(
+        signal.evidence.len(),
+        2,
+        "samo dva vrha ulaze u dokaz: {:?}",
+        signal.evidence
+    );
+    let top_c = signal
+        .evidence
+        .iter()
+        .find(|l| l.starts_with("feat/c: "))
+        .unwrap_or_else(|| panic!("dokaz za feat/c nedostaje: {:?}", signal.evidence));
+    assert!(
+        top_c.contains("(+2 grane unutar: feat/a, feat/b)"),
+        "{top_c}"
+    );
+}

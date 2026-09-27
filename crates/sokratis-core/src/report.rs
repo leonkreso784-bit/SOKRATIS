@@ -25,6 +25,12 @@
 //! Dopuna (cigla M2/47, S-033): `input.diary.map(parse_diary)` (jedan `Option`) postaje
 //! `parse_diaries(&input.diaries, …)` (poziv koji sam zna raditi s praznim popisom) — jedan poziv
 //! manje grana nego prije, jer unija PRIHVAĆA nula tekstova bez posebnog slučaja.
+//!
+//! Dopunjeno M2/64 (S-038): `assign_containment` puni `contained_in` nad KOPIJOM grana namijenjenom
+//! pravilima, PRIJE `Context`-a — isti obrazac kao svaki drugi korak mjerenja (sastavljanje ostaje
+//! jedino mjesto koje zna redoslijed). `Report.branches` (sekcija Grane) ostaje nedirnuta jer čita
+//! `input.branches` izravno (`branch_stats`, red iznad) — `contained_in` je novost SAMO za pravila.
+use crate::chains::{assign_containment, parse_parents};
 use crate::docs::docs_health;
 use crate::metrics::indicators::IndicatorInput;
 use crate::metrics::{
@@ -130,11 +136,15 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
         profile,
         &p,
     );
+    // M2/64: sadržanost se računa nad KOPIJOM namijenjenom pravilima — `Report.branches` (gore,
+    // `branch_stats`) čita `input.branches` izravno i ostaje nepromijenjen (ugovor `Report`, S-012).
+    let mut rule_branches = input.branches.clone();
+    assign_containment(&mut rule_branches, &parse_parents(&input.branch_graph));
     let ctx = Context {
         profile: profile.clone(),
         now: input.now,
         commits: commits.clone(),
-        branches: input.branches.clone(),
+        branches: rule_branches,
         docs: input.docs.clone(),
         last_code_commit: last_code,
     };
@@ -198,6 +208,8 @@ pub(crate) mod tests {
                 last_commit_time: 1788854400 - 20 * 86_400,
                 ahead_of_default: 4,
                 merged: false,
+                tip: "feat/stara".into(),
+                contained_in: None,
             }],
             overrides: HashMap::from([("b2".to_string(), WorkKind::Polish)]),
             visions: vec![],
@@ -209,6 +221,7 @@ pub(crate) mod tests {
             scope: BranchScope::DefaultBranch,
             commit_branches: HashMap::new(),
             worktrees: 1,
+            branch_graph: String::new(),
         }
     }
 

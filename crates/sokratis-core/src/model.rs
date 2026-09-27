@@ -16,6 +16,10 @@
 //! — jedan tekst po radnom stablu, ne jedan tekst ukupno. `Vec` (ne `Option<Vec>`) jer prazan
 //! popis već znači „nema dnevnika", isto kao prije `None`; `parse::parse_diaries` radi uniju.
 //! `worktrees`/`diaries` u `Touched` su ZADNJA dva polja iz istog razloga kao `CommitRow.branch`.
+//!
+//! Dopunjeno M2/64 (S-038): `BranchInfo` dobiva `tip` (puni SHA) i `contained_in` — ključ i rezultat
+//! sadržanosti grana u lancu (`chains::assign_containment`). `ReportInput.branch_graph` je ZADNJE
+//! polje iz istog razloga kao `CommitRow.branch` gore: dodatak na kraju je diff jednog retka.
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -262,6 +266,12 @@ pub struct BranchInfo {
     pub last_commit_time: i64,
     pub ahead_of_default: u32,
     pub merged: bool,
+    /// Puni SHA vrha (`%(objectname)`); ključ za sadržanost (cigla M2/64, S-038).
+    pub tip: String,
+    /// Ime VRHA lanca koji ovu granu sadrži (nespojena grana čiji je vrh potomak našeg vrha, a sama
+    /// nije sadržana). `None` = ova grana je vrh (ili je spojena/zadana). Vrh se bira deterministički:
+    /// više commita ispred zadane, pa manje ime; dvije grane na ISTOM commitu → manje ime je vrh.
+    pub contained_in: Option<String>,
 }
 
 /// Koje su grane ušle u mjerenje (S-032). JSON `"all"` / `"default"` — isti tekst u profilu
@@ -347,6 +357,10 @@ pub struct ReportInput {
     pub commit_branches: HashMap<String, String>,
     /// broj radnih stabala koje je `io` obišao (S-033) — u `Touched` (mjerač kaže koliko je dotaknuo).
     pub worktrees: u32,
+    /// Cigla M2/64 (S-038): tekst `git log --branches --not <zadana> --format=%H|%P` (bez prozora
+    /// vremena — sadržanost traži cijelu nespojenu povijest) — `chains::parse_parents` ga čita u
+    /// kartu `commit → roditelji`. Prazan tekst = nema nespojenih grana (ili samo jedna).
+    pub branch_graph: String,
 }
 
 /// Sve što pravilo smije vidjeti — u vlasništvu, bez lifetimeova (gradi se jednom u `build_report`).

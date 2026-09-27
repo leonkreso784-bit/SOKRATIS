@@ -44,6 +44,10 @@
 //! sort, silazno bez ručnog komparatora) po `author_time` HEAD-a: vodeće stablo VODI plan i
 //! `docs/` (tamo se radi), a dnevnik se ipak ČITA IZ SVIH (necommitani unos u bilo kojem stablu je
 //! vidljiv) — pisanje ostaje isključivo u glavno (`main_root`, S-015), čitanje je šire.
+//!
+//! Dopunjeno M2/64 (S-038): `branches` je izvučen u `let` PRIJE konstrukcije `ReportInput` (bio je
+//! unutra) da `branch_graph` može pitati ISTI popis „ima li koja nespojena grana osim zadane" —
+//! repo s jednom granom (paritet, Review Focus #1) tako i dalje ne plaća `commit_parents`.
 use crate::{CommitCache, GitCli, GitSource, IoError, Scope, WorktreeHead, cached_log};
 use sokratis_core::{BranchScope, DocFile, Profile, ReportInput, Vision, WorkKind};
 use std::collections::{BTreeMap, HashMap};
@@ -396,6 +400,14 @@ impl Project {
             BranchScope::AllBranches => self.git.commit_sources(&ref_name, &fetch_since, until)?,
             BranchScope::DefaultBranch => HashMap::new(),
         };
+        // M2/64 (S-038): `branch_graph` se puni SAMO kad postoji BAR JEDNA nespojena grana osim
+        // zadane — repo s jednom granom (paritet) ne plaća proces za graf koji bi bio prazan.
+        let branches = self.git.branches(&ref_name)?;
+        let branch_graph = if branches.iter().any(|b| !b.merged && b.name != ref_name) {
+            self.git.commit_parents(&ref_name)?
+        } else {
+            String::new()
+        };
         Ok(ReportInput {
             git_log,
             // S-033: unija dnevnika iz SVIH stabala, vodeće prvo (`parse_diaries` unira po datum+
@@ -404,7 +416,7 @@ impl Project {
             // Plan i docs dolaze SAMO iz vodećeg stabla: ondje se trenutno radi.
             plan: read_lead(&self.profile.plan_path),
             docs: self.docs_in(&lead.root, &lead.head)?,
-            branches: self.git.branches(&ref_name)?,
+            branches,
             overrides: self.overrides()?,
             visions: self.visions()?,
             now: SystemTime::now()
@@ -418,6 +430,7 @@ impl Project {
             scope: self.profile.branch_scope,
             commit_branches,
             worktrees: ordered.len().max(1) as u32,
+            branch_graph,
         })
     }
 

@@ -183,6 +183,9 @@ impl GitSource for PartialGit {
     fn log_commits(&self, _shas: &[String]) -> Result<String, IoError> {
         Ok("@@aaa1111|1|1|2026-09-01|2026-09-01|samo prvi\n".to_string())
     }
+    fn commit_parents(&self, _default_ref: &str) -> Result<String, IoError> {
+        unimplemented!("test ga ne zove")
+    }
 }
 
 #[test]

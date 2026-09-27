@@ -32,6 +32,7 @@ fn input(diaries: Vec<String>) -> ReportInput {
         scope: BranchScope::AllBranches,
         commit_branches: HashMap::new(),
         worktrees: 2,
+        branch_graph: String::new(),
     }
 }
 

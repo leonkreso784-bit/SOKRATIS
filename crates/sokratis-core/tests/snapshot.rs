@@ -35,6 +35,7 @@ fn report_json_shape_is_locked() {
         scope: BranchScope::DefaultBranch,
         commit_branches: HashMap::new(),
         worktrees: 1,
+        branch_graph: String::new(),
     };
     let r = build_report(&input, &Profile::default()).expect("fixture je čist ulaz");
     insta::assert_json_snapshot!("report-sokratstudy-2026-09-17", r);
