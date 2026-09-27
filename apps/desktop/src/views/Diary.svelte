@@ -16,11 +16,14 @@
   // Dopunjeno M2/42 — zaglavlje "vrsta" dobiva `<Explainable id="diary.kind">` (objašnjava i
   // podvrstu i oznaku "ručno"); NE svaka ćelija (190 gumba u ovoj tablici bi bio šum, ne
   // pristupačnost — dopuna T42).
-  // Dopunjeno M2/59 (R61, R64) — nov stupac "grana" (`CommitRow.branch`, S-032) IZA "datuma": ime
-  // grane je PODATAK, ispisuje se kakvo jest, bez `<Explainable>` (nije mjerenje, samo natpis). Da
-  // "naslov" preživi u rasponu 1024–1279 px uz novi stupac, prag širokih stupaca "vrsta"/"podvrsta"
-  // seli s `lg:` (≥1024 px) na `xl:` (≥1280 px) — "grana" dobiva vlastitu usku širinu koja raste tek
-  // na istom pragu.
+  // Dopunjeno M2/59 (R61) — nov stupac "grana" (`CommitRow.branch`, S-032) IZA "datuma": ime grane je
+  // PODATAK, ispisuje se kakvo jest, bez `<Explainable>` (nije mjerenje, samo natpis).
+  // Popravak 1 (V2, Ruling R71 — mijenja prvotni R64): mjereno na 960 px "naslov" je pao na 137 px
+  // (cilj ≥ 240 px, M2/28) jer je stupac grane oduzeo prostor i na uskom prozoru. Zato stupac grane
+  // POSTOJI tek od `lg:` (`hidden lg:table-cell`, širine ostaju `w-[84px] xl:w-[140px]`); ispod `lg`
+  // se ime grane ispisuje kao DRUGI redak u ćeliji "datum" (`lg:hidden`) — ista informacija, ne novi
+  // stupac koji bi opet stiskao "naslov". Prag širokih "vrsta"/"podvrsta" ostaje na `xl:` (≥1280 px,
+  // R64) jer novi stupac grane i dalje postoji na `xl` širini pored njih.
   import { app, loadReport, setError } from '../lib/state.svelte';
   import { api } from '../lib/api';
   import { getDict, getLang, t } from '../lib/i18n/index.svelte';
@@ -78,13 +81,15 @@
     <!-- `table-fixed` + stupci sa zadanom širinom drže tablicu unutar `main` (pouka T27, #9): stupac
          `naslov` je JEDINI bez zadane širine pa uzima sav preostali prostor (CSS `table-layout:fixed`
          raspodjeljuje ostatak na stupce bez `width`). Zaglavlje je `sticky` unutar `main`-ovog
-         vlastitog skrola (stotine redaka u snimci) — nema omotača s `overflow` koji bi to pokvario. -->
+         vlastitog skrola (stotine redaka u snimci) — nema omotača s `overflow` koji bi to pokvario.
+         Popravak 1 (V4, isti uzrok kao R65): `<main>` nosi `p-4`, pa `top-0` ostavlja prazan pojas od
+         ≈16 px kroz koji se vide redci koji prolaze iznad zaglavlja — `-top-4` ga poništava. -->
     <table class="w-full table-fixed text-left text-sm">
-      <thead class="sticky top-0 z-10 bg-surface-1">
+      <thead class="sticky -top-4 z-10 bg-surface-1">
         <tr class="text-ink-2">
           <th scope="col" class="w-[72px] py-1 pl-1 pr-3">{t('diary.sha')}</th>
           <th scope="col" class="w-[92px] py-1 pr-3">{t('diary.date')}</th>
-          <th scope="col" class="w-[84px] py-1 pr-3 xl:w-[140px]">{t('diary.branch')}</th>
+          <th scope="col" class="hidden w-[84px] py-1 pr-3 lg:table-cell xl:w-[140px]">{t('diary.branch')}</th>
           <th scope="col" class="py-1 pr-3">{t('diary.subject')}</th>
           <th scope="col" class="w-[140px] py-1 pr-3 xl:w-[224px]">
             <Explainable id="diary.kind">{t('diary.kind')}</Explainable>
@@ -97,8 +102,11 @@
         {#each rows as commit (commit.sha)}
           <tr class="border-t border-line text-ink-1">
             <td class="py-1 pl-1 pr-3 font-mono text-xs">{commit.sha}</td>
-            <td class="py-1 pr-3">{ymd(commit.date, getLang())}</td>
             <td class="py-1 pr-3">
+              {ymd(commit.date, getLang())}
+              <span class="block truncate text-xs text-ink-2 lg:hidden" title={commit.branch}>{commit.branch}</span>
+            </td>
+            <td class="hidden py-1 pr-3 lg:table-cell">
               <span class="block truncate" title={commit.branch}>{commit.branch}</span>
             </td>
             <td class="py-1 pr-3">

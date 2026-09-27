@@ -49,9 +49,14 @@
       </button>
     </div>
 
-    <Explainable id="branches.bars" block>
-      <HBars {items} label={t('branches.chart')} {valueText} mergedLabel={t('branches.merged')} />
-    </Explainable>
+    <!-- Popravak 1 (V1, Ruling R70): vidljiv naslov iznad grafa, isti izraz kao `label` (bez novog
+         ključa) — naslov je IZVAN `<Explainable>` da klik na naslov ne otvara karticu. -->
+    <div class="flex flex-col gap-2">
+      <h3 class="text-sm font-semibold text-ink-1">{t('branches.chart')}</h3>
+      <Explainable id="branches.bars" block>
+        <HBars {items} label={t('branches.chart')} {valueText} mergedLabel={t('branches.merged')} />
+      </Explainable>
+    </div>
   {/if}
 
   <table class="w-full text-left text-sm">

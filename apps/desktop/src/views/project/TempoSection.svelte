@@ -36,9 +36,9 @@
     bucketDays(days, granularity).map((b) => ({ start: b.start, values: { [mode]: mode === 'commits' ? b.commits : b.hours } })),
   );
   const valueText = (v: number): string => (mode === 'commits' ? num(v, getLang()) : hours(v, getLang()));
-  // `today` je ISKLJUČIVO granica prikaza (donji kraj toplinske karte kad `Report.until` nije
-  // postavljen, tj. raspon „sve") — Rust (`metrics/days.rs`) vraća baš ovu vrijednost kad je `until`
-  // `null` (spec 3.2), pa se sučelje ovdje ne domišlja ničemu novom, samo ponavlja isto pravilo.
+  // Ruling R72 (popravak 1) — ispravlja pogrešnu tvrdnju iz teksta plana: jezgra (`Report.until`,
+  // `report.rs`) NE upisuje današnji datum kad je raspon „sve", ostaje `null`. `today` je pomoćna
+  // vrijednost SUČELJA za gornju granicu toplinske karte u tom slučaju (prikaz, ne mjerenje).
   const today = new Date().toISOString().slice(0, 10);
 </script>
 
@@ -84,39 +84,55 @@
       </div>
     </div>
 
-    <Explainable id="tempo.bars" block>
-      <Bars
-        {buckets}
-        series={[{ id: mode, label: t(`tempo.${mode}`), color: 'var(--color-brand-500)' }]}
-        {granularity}
-        label={t(`tempo.${mode}`)}
-      />
-    </Explainable>
-    <Explainable id="tempo.cumulative" block>
-      <Line
-        series={[
-          {
-            id: 'cum',
-            label: t('tempo.cumulative'),
-            color: 'var(--color-brand-500)',
-            points: days.map((d) => ({ date: d.date, value: d.commits_cumulative })),
-          },
-        ]}
-        label={t('tempo.cumulative')}
-      />
-    </Explainable>
+    <!-- Popravak 1 (V1, Ruling R70): svaki graf dobiva VIDLJIV naslov iznad sebe, isti izraz koji graf
+         već prima kao `label` (bez novog ključa rječnika) — dosad je natpis bio SAMO `aria-label`,
+         nevidljiv na ekranu, pa su četiri grafa zaredom izgledala bez ijednog naslova. Naslov je IZVAN
+         `<Explainable>` da klik na naslov ne otvara karticu s objašnjenjem. -->
+    <div class="flex flex-col gap-2">
+      <h3 class="text-sm font-semibold text-ink-1">{t(`tempo.${mode}`)}</h3>
+      <Explainable id="tempo.bars" block>
+        <Bars
+          {buckets}
+          series={[{ id: mode, label: t(`tempo.${mode}`), color: 'var(--color-brand-500)' }]}
+          {granularity}
+          label={t(`tempo.${mode}`)}
+        />
+      </Explainable>
+    </div>
+    <div class="flex flex-col gap-2">
+      <h3 class="text-sm font-semibold text-ink-1">{t('tempo.cumulative')}</h3>
+      <Explainable id="tempo.cumulative" block>
+        <Line
+          series={[
+            {
+              id: 'cum',
+              label: t('tempo.cumulative'),
+              color: 'var(--color-brand-500)',
+              points: days.map((d) => ({ date: d.date, value: d.commits_cumulative })),
+            },
+          ]}
+          label={t('tempo.cumulative')}
+        />
+      </Explainable>
+    </div>
 
-    <Explainable id="tempo.heatmap" block>
-      <Heatmap
-        days={days.map((d) => ({ date: d.date, value: mode === 'commits' ? d.commits : d.hours }))}
-        range={[app.report.since, app.report.until ?? today]}
-        label={t('tempo.heatmap')}
-        {valueText}
-      />
-    </Explainable>
-    <Explainable id="tempo.hours_of_day" block>
-      <Histogram counts={hourHistogram(app.report.commits)} label={t('tempo.hoursOfDay')} />
-    </Explainable>
+    <div class="flex flex-col gap-2">
+      <h3 class="text-sm font-semibold text-ink-1">{t('tempo.heatmap')}</h3>
+      <Explainable id="tempo.heatmap" block>
+        <Heatmap
+          days={days.map((d) => ({ date: d.date, value: mode === 'commits' ? d.commits : d.hours }))}
+          range={[app.report.since, app.report.until ?? today]}
+          label={t('tempo.heatmap')}
+          {valueText}
+        />
+      </Explainable>
+    </div>
+    <div class="flex flex-col gap-2">
+      <h3 class="text-sm font-semibold text-ink-1">{t('tempo.hoursOfDay')}</h3>
+      <Explainable id="tempo.hours_of_day" block>
+        <Histogram counts={hourHistogram(app.report.commits)} label={t('tempo.hoursOfDay')} />
+      </Explainable>
+    </div>
 
     <table class="w-full text-left text-sm">
       <thead>

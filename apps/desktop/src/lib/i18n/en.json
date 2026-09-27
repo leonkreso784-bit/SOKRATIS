@@ -201,7 +201,7 @@
   "explain.tempo.hours.how": "The table column reads `DayStats.hours`, which `metrics/hours.rs` (`hours_per_day`) computes from the gaps between commits sorted by `author_time` (S-007: sorting prevents negative hours from a cherry-pick); the pause threshold (`session_gap_hours`) and session start (`session_start_hours`) come from the profile.",
   "explain.tempo.hours.read": "A proxy, not measured time — the same caveat as the \"hours worked\" indicator in Indicators.",
   "explain.tempo.heatmap.what": "A heatmap of commits or hours per day in the selected range, laid out by ISO week (column = week, row = weekday).",
-  "explain.tempo.heatmap.how": "`layout.ts` (`heatmapLayout`) sorts `DayStats.date`/`.commits`/`.hours` into a calendar; the colour level (0-4) is a quantile WITHIN the shown range, not an absolute scale that would mean the same for every project.",
+  "explain.tempo.heatmap.how": "`layout.ts` (`heatmapLayout`, `heatLevel`) colours each day LINEARLY by its value's share of the LARGEST value in the shown range, in four steps: `min(4, 1 + floor(3 × value / largest))` — a day with no commits stays at level 0.",
   "explain.tempo.heatmap.read": "An empty (lightest) cell means NO commit that day, not zero hours — a day with no commit at all is not in `Report.days`, colour is the only trace of \"a little\" versus \"nothing\"; the exact list of days is in the table below.",
   "explain.tempo.hours_of_day.what": "The number of commits per hour of day (0-23) in the selected range.",
   "explain.tempo.hours_of_day.how": "`bucket.ts` (`hourHistogram`) reads `CommitRow.author_time` (the commit's moment in unix seconds) and converts it to an hour through `Date.getHours()`.",

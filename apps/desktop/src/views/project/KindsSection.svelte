@@ -50,7 +50,10 @@
     <!-- Prsten uz tablicu na širokom prozoru (`lg:`), jedno ispod drugog na uskom — tablica mora
          ostati vidljiva bez pomicanja pri 1280×900 (vizualna provjera, krug popravka 1). -->
     <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
-      <div class="w-[260px] shrink-0">
+      <div class="flex w-[260px] shrink-0 flex-col gap-2">
+        <!-- Popravak 1 (V1, Ruling R70): vidljiv naslov iznad prstena — bez njega legenda vrsta rada
+             (tablica desno) izgleda kao da pripada prstenu bez ijednog imena. -->
+        <h3 class="text-sm font-semibold text-ink-1">{t('kinds.title')}</h3>
         <Explainable id="kinds.ring" block><Ring {segments} label={t('kinds.title')} /></Explainable>
       </div>
 
@@ -86,8 +89,11 @@
       </table>
     </div>
 
-    <Explainable id="kinds.over_time" block>
-      <Bars buckets={overTimeBuckets} series={kindSeries(getDict())} granularity="week" stacked label={t('kinds.overTime')} />
-    </Explainable>
+    <div class="flex flex-col gap-2">
+      <h3 class="text-sm font-semibold text-ink-1">{t('kinds.overTime')}</h3>
+      <Explainable id="kinds.over_time" block>
+        <Bars buckets={overTimeBuckets} series={kindSeries(getDict())} granularity="week" stacked label={t('kinds.overTime')} />
+      </Explainable>
+    </div>
   {/if}
 </div>

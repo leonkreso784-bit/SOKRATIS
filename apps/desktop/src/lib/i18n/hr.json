@@ -201,7 +201,7 @@
   "explain.tempo.hours.how": "Stupac tablice čita `DayStats.hours` koji `metrics/hours.rs` (`hours_per_day`) izračuna iz razmaka između commita, sortiranih po `author_time` (S-007: sortiranje sprječava negativne sate kod cherry-picka); prag stanke (`session_gap_hours`) i početak sesije (`session_start_hours`) dolaze iz profila.",
   "explain.tempo.hours.read": "Proxy, ne izmjereno vrijeme — ista granica kao pokazatelj „sati rada“ u Pokazateljima.",
   "explain.tempo.heatmap.what": "Toplinska karta commita ili sati po danu u odabranom razdoblju, raspoređena po ISO tjednima (stupac = tjedan, redak = dan u tjednu).",
-  "explain.tempo.heatmap.how": "`layout.ts` (`heatmapLayout`) razvrstava `DayStats.date`/`.commits`/`.hours` u kalendar; razina boje (0–4) je kvantil UNUTAR prikazanog razdoblja, ne apsolutna ljestvica koja bi vrijedila za svaki projekt jednako.",
+  "explain.tempo.heatmap.how": "`layout.ts` (`heatmapLayout`, `heatLevel`) boji svaki dan LINEARNO prema udjelu njegove vrijednosti u NAJVEĆOJ vrijednosti prikazanog razdoblja, u četiri stupnja: `min(4, 1 + floor(3 × vrijednost / najveća))` — dan bez commita ostaje razina 0.",
   "explain.tempo.heatmap.read": "Prazna (najsvjetlija) ćelija znači BEZ commita taj dan, ne nula sati — dan bez ijednog commita uopće nije u `Report.days`, boja je jedini trag da je razlika „malo“ prema „ništa“; točan popis dana je u tablici ispod.",
   "explain.tempo.hours_of_day.what": "Broj commita po satu u danu (0–23) u odabranom razdoblju.",
   "explain.tempo.hours_of_day.how": "`bucket.ts` (`hourHistogram`) čita `CommitRow.author_time` (trenutak commita u unix sekundama) i pretvara ga u sat kroz `Date.getHours()`.",
