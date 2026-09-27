@@ -30,8 +30,8 @@ IO-2 (`--branches`, stabla, dnevnik po stablima, CLI) · GRAFOVI (d3-temelji + 8
 (T53–T57) · IO-2 (T49–T52) · PLOČA (T58) spojeni u `main`, vrh `93f1180`; verzija u kodu je bumpana na
 `1.0.0-pre.4`. Sesija 4 dodala je CLI `--scope all|default` s ispravnim zaglavljem tablice (do T51 je
 tvrdilo krivi doseg, nalaz vanjske analize 2026-09-25) i sekcijom GRANE, mjerenje procesa/trajanja nad
-Sokrat Studyjem (`.f6`, jer je glavna mapa `.dev` od 2026-09-26 postala `core.bare = true` —
-`BACKLOG.md`), dva nova grafa temeljna sloja (`Heatmap`, `Histogram`, `Gantt`, `HBars`, nitko ih još ne
+Sokrat Studyjem (`.f6`, jer je glavna mapa `.dev` u trenutku mjerenja privremeno bila `core.bare = true` —
+`PROGRESS.md`), dva nova grafa temeljna sloja (`Heatmap`, `Histogram`, `Gantt`, `HBars`, nitko ih još ne
 uvozi) i prvu nadzornu ploču projekta (klik na karticu Pregleda → 8 sekcija, skok-izbornik). Brojke i
 sadržaj svake cigle: `records/CHANGELOG.md`; tijek i rulinzi sesija: `records/PROGRESS.md`.
 **Sljedeća je sesija 5:** T59–T62 (PLOČA kraj: prekidač dan/tjedan/mjesec, grafovi u sekcijama, 7 novih

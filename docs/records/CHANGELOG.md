@@ -334,10 +334,10 @@ izdanja (S-025). Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek ses
   vidi ništa novo — `crates/sokratis-io/tests/perf.rs` dobio drugi test,
   `measure_real_repo_both_scopes` (`#[ignore]`, ručno pokretanje: `SOKRATIS_MEASURE_REPO=<putanja>
   cargo test -p sokratis-io --test perf -- --ignored --nocapture`). **Kanonsko mjesto brojki (S-010).**
-  Mjereno nad radnim stablom `sokratstudy.f6`, ne `sokratstudy.dev`: glavna mapa je od 2026-09-26
-  03:17 postala `core.bare = true` (Leonova okolina, izvan Sokratisa) — `Project::open` na bare mapu
-  pada, `.f6` dijeli isti `git-common-dir`/refove pa je isti projekt (S-015); nalaz i posljedice u
-  `records/BACKLOG.md`.
+  Mjereno nad radnim stablom `sokratstudy.f6`, ne `sokratstudy.dev`: glavna mapa je 2026-09-26 između
+  03:17 i 04:35 privremeno bila `core.bare = true` (Leonova okolina, izvan Sokratisa; vraćeno) —
+  `Project::open` na bare mapu pada, `.f6` dijeli isti `git-common-dir`/refove pa je isti projekt
+  (S-015); nalaz i posljedice u `PROGRESS.md`, kandidat za prepoznavanje u `BACKLOG.md`.
 
   | mjera | `all` | `default` |
   |---|---|---|

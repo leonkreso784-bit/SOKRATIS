@@ -80,8 +80,8 @@ Testovi i brane: `docs/workflow/TESTING.md`.
   stabala S-033, CLI `--scope`, PLOČA — klik na karticu otvara nadzornu ploču projekta), vrh `main`-a
   `93f1180`, verzija `1.0.0-pre.4`. **Sesija 5 slijedi:** T59–T62 (PLOČA kraj) ∥ **T64** (tok LANCI,
   S-038), pa tok IZDANJE (T35, T63, T43).
-- **Sokrat Study `sokratstudy.dev` je od 2026-09-26 `core.bare = true`** (Leonova okolina, ne kod) —
-  posljedice i mjerenje umjesto toga: `docs/records/PROGRESS.md`, nalaz: `docs/records/BACKLOG.md`.
+- **Sokrat Study `sokratstudy.dev` je 2026-09-26 (03:17–04:35) privremeno bio `core.bare = true`** (Leonova okolina,
+  ne kod; vraćeno) — T52 je zato mjerio nad `.f6`: `docs/records/PROGRESS.md`; kandidat za prepoznavanje: `docs/records/BACKLOG.md`.
 - **Dva stabla:** `sokratis` (`main`) i `sokratis.rel` (`feat/release`, T35 napola, necommitano, ne
   dirati do toka IZDANJE). Tag traži Leonov izričit OK.
 - Druga verzija (M3) i kasnije: `docs/records/BACKLOG.md`.

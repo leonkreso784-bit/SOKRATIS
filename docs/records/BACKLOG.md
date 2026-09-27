@@ -123,7 +123,7 @@ stranih korisnika — oni će promijeniti redoslijed.
 ## Nakon 1.0.0 — nalaz sesije 4 drugog reza (2026-09-26, Leon odlučuje)
 
 - **Repo čija je glavna mapa označena `core.bare = true` a ima radne datoteke** (Sokrat Study
-  `sokratstudy.dev` od 2026-09-26): `Project::open` nad njom pada (`fatal: this operation must be run
+  `sokratstudy.dev` 2026-09-26 03:17–04:35, privremeno): `Project::open` nad njom pada (`fatal: this operation must be run
   in a work tree`), `worktree_heads` preskače blok bez retka `HEAD`, dnevnik s diska te mape se ne čita
   — treba li Sokratis to prepoznati i javiti (signal/kartica) ili je to Leonova okolina? Bez rješenja
   danas; T52 je zato mjerio nad povezanim radnim stablom `sokratstudy.f6` (isti `git-common-dir`,
