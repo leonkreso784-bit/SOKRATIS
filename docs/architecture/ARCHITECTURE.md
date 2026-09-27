@@ -38,11 +38,17 @@ grane, nova sekcija GRANE; mjerenje procesa/trajanja nad Sokrat Studyjem), **GRA
 (`Heatmap`/`Histogram`/`Gantt`/`HBars` — `lib/charts/` sad ima temelje + **8** komponenata, nitko
 izvan `lib/charts` ih još ne uvozi) i **PLOČA T58** (S-034: klik na karticu Pregleda otvara pogled
 Projekt — osam sekcija iz `views/project/sections.ts`, skok-izbornik, birač projekta u gornjoj traci
-obrisan) — §1, §3, §9, §11. Verzija u kodu `1.0.0-pre.4`; sesija 5 nastavlja T59–T62 (PLOČA kraj:
-prekidač dan/tjedan/mjesec, grafovi u sekcijama, 7 novih `explain` id-eva, dimni test) i T64 (tok
-LANCI, S-038), pa IZDANJE.
+obrisan) — §1, §3, §9, §11. Verzija u kodu `1.0.0-pre.4`. **Sesija 5 (2026-09-27, zatvorena ranije na
+Leonov zahtjev) je spojila SAMO LANCI T64** (S-038: `BranchInfo` += `tip`/`contained_in`,
+`ReportInput` += `branch_graph`, nov `core/src/chains.rs`, pravilo `unmerged-branches` broji vrhove
+lanaca umjesto svake grane, `GitSource` naraslo na **16** metoda — §1, §3, §8) — **`Report`
+nepromijenjen**. **PLOČA T59–T61 (prekidač dan/tjedan/mjesec, grafovi u sekcijama, 7 novih `explain`
+id-eva) je izgrađena na grani `feat/ploca-2`, NIJE spojena**: T62 dimni test prošao, ali je otkrio tri
+nalaza u `lib/charts/**` (krug popravaka `M2/62`) koji čekaju recenziju — dok se ne spoji, ništa ispod
+o grafovima u sekcijama Ploče, 7 novih `explain` id-eva ni prekidaču dan/tjedan/mjesec ne vrijedi za
+`main`. Sljedeća sesija: recenzija `M2/62` → spajanje PLOČE → tok IZDANJE.
 Što od koda još stoji bez pokrića ili s poznatim rubom je u §11 ·
-**Zadnja provjera:** 2026-09-26
+**Zadnja provjera:** 2026-09-27
 
 > **Što ovaj dokument JEST:** opis sustava kakav stoji u `crates/` i `apps/` — granice između crateova, tok
 > podataka, formati koje čita i ugovori prema korisniku CLI-ja. **Što NIJE:** kronologija (to su
@@ -238,22 +244,38 @@ root, &lead.head)`) i `GitSource::last_changes(rev, pathspecs)` čitaju SAMO iz 
 je `"HEAD"` za glavno stablo ili puni SHA vodećeg radnog stabla — detached stablo tako ipak ima
 povijest). Ručni podaci se i dalje pišu SAMO u glavno stablo (S-015, nepromijenjeno).
 
+**Nespojene grane su lanci, ne ravan popis** (T64, S-038, spec §1.4): `BranchInfo` dobiva `tip` (puni
+SHA vrha, `%(objectname)`) i `contained_in: Option<String>` (ime VRHA lanca koji tu granu sadrži;
+`None` = grana je sama vrh). `ReportInput.branch_graph` nosi tekst
+`git log --branches --not <default_ref> --format=%H|%P` (`GitSource::commit_parents`, **jedan
+dodatni git-proces, SAMO kad postoji nespojena grana osim zadane** — repo s jednom granom ne plaća
+ništa); `core/src/chains.rs::parse_parents` ga čita u `HashMap<String, Vec<String>>` (commit →
+roditelji), a `assign_containment` obilazi svaku granu unatrag prema roditeljima **iterativno, sa
+stogom `Vec`** (ne rekurzijom — dugačka povijest ne smije prepuniti stog poziva), s `HashSet`
+posjećenih protiv beskonačne petlje; rezultat je deterministički, neovisan o redoslijedu grana ulaza
+(dvije grane na istom commitu → manje ime je vrh). Sadržanost se računa u `report.rs` nad KOPIJOM
+grana prije nego se sastavi `Context` — pravilo `unmerged-branches` (§8) je onda samo filtar nad
+gotovim poljem, ne računa graf. **`Report` ovim nije dirnut** (snapshot ugovora i paritet netaknuti,
+S-022) — sadržanost je ulazni podatak pravilu, ne izlazno polje.
+
 **Granica S-002:** jezgra ne zna odakle su podaci došli. Sve što joj treba dolazi u jednoj strukturi
 (`ReportInput`: `git_log` kao tekst, `diaries: Vec<String>` — **od M2/47 (S-033) više od jednog
 teksta**, jedan po radnom stablu od vodećeg prema starijima, bilo `diary: Option<String>` — i plan kao
 tekst, docs, grane, ručni podaci, `now`, `today`, `since`, `until`, `branch`, `scope: BranchScope` i
 `commit_branches: HashMap<String, String>` — **od M2/46 (S-032)**, karta `sha → grana` SAMO za
-commite izvan zadane grane, prazna kad je `scope == DefaultBranch` — te `worktrees: u32`) i vraća se
-jedna struktura (`Report`). Zato se jezgra testira bez gita, i zato će je Tauri u M2 koristiti bez
-ijedne izmjene (S-012).
+commite izvan zadane grane, prazna kad je `scope == DefaultBranch` — `worktrees: u32` te
+`branch_graph: String` — **od T64 (S-038)**, tekst `%H|%P` za sadržanost lanaca, prazan kad nema
+nespojene grane osim zadane) i vraća se jedna struktura (`Report`). Zato se jezgra testira bez gita, i
+zato će je Tauri u M2 koristiti bez ijedne izmjene (S-012).
 
 **Granica S-003:** git se čita **kroz proces**, ne kroz biblioteku. Poziv se gradi bez shella, kroz
 `git_command(repo)` (`git.rs`, M2/44, kvar 4) — **jedino mjesto** koje smije zvati `Command::new("git")`
 (test `command_new_lives_only_inside_git_command` to čuva čitanjem izvora); na Windowsu ista funkcija
 postavlja `CREATE_NO_WINDOW`, jer bi instalirana aplikacija (`windows_subsystem = "windows"`) inače
-bljesnula konzolu `git.exe` pri svakom osvježenju. Iza traita `GitSource` (**15** metoda — T49 dodao
-`commit_sources`, T50 `worktree_heads`/`commit_times` i novi parametar `rev` na `last_changes`; jedna
-implementacija `GitCli`) stoji mjesto na koje kasnije može ući `gix` bez dizanja jezgre.
+bljesnula konzolu `git.exe` pri svakom osvježenju. Iza traita `GitSource` (**16** metoda — T49 dodao
+`commit_sources`, T50 `worktree_heads`/`commit_times` i novi parametar `rev` na `last_changes`, T64
+dodao `commit_parents`; jedna implementacija `GitCli`) stoji mjesto na koje kasnije može ući `gix` bez
+dizanja jezgre.
 
 ## 2 · Tok podataka
 
@@ -540,11 +562,18 @@ provjera je namjerno preskače.
 
 | pravilo | Warn | Alert | dokaz |
 |---|---|---|---|
-| `unmerged-branches` | nespojena grana izvan zadane starija od `unmerged_warn_days` | najstarija starija od `unmerged_alert_days` **ili** više od `unmerged_alert_count` takvih grana | ime grane · dana od zadnjeg commita · commita ispred zadane |
+| `unmerged-branches` | nespojen VRH lanca izvan zadane starija od `unmerged_warn_days` | najstariji vrh stariji od `unmerged_alert_days` **ili** više od `unmerged_alert_count` takvih vrhova | ime vrha · dana od zadnjeg commita · commita ispred zadane · sadržane grane abecedno (hrvatski paucal, `+N grane unutar: a, b`) |
 | `docs-lag` | dnevnik/changelog `docs_lag_warn_days`+ dana iza zadnjeg commita koda | `docs_lag_alert_days`+ dana | SHA i datum zadnjeg commita koda · koliko dana kasni dnevnik |
 
 **Commit koda** = commit koji dira bar jednu putanju koju profil ne isključuje
 (`code_exclude_prefixes`/`code_exclude_suffixes`) — zadano: sve osim `docs/` i `*.md`.
+
+**Od T64 (S-038) `unmerged-branches` broji VRHOVE lanaca, ne svaku nespojenu granu:** Leon grana svaku
+sesiju od prethodne, pa su grane ulančane (`a ⊂ b ⊂ c`) — stari popis je svaku granu u lancu brojio
+zasebno, pa je jedna sesija znala sama dići Alert po broju (`unmerged_alert_count`), i vrh lanca
+(najstariji, obično daleko ispred) je mogao izostati s popisa jer je njegov ZADNJI commit nov, iako je
+lanac star. Sadržana grana (`contained_in.is_some()`, §1) ne ulazi ni u brojanje ni u prag; vrh mlađi
+od `unmerged_warn_days` utišava cijeli lanac koji sadrži.
 
 ## 9 · CLI — naredbe i izlazni kodovi
 

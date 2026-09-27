@@ -222,6 +222,8 @@ Test za pravilo: **Leon može pročitati datoteku i reći što radi.** Ako ne mo
 | pregazivanje `pub` polja u memoriji nakon `Project::open` | M2/51 (`cli/src/main.rs::report_for`) | `project.profile.branch_scope = …` mijenja VEĆ učitanu strukturu u RAM-u, ne datoteku na disku — `--scope` tako nema nuspojavu na `.sokratis/profile.json`, za razliku od naredbe koja bi profil pisala |
 | paucal kao čista funkcija (`fn branch_word(n: usize) -> &'static str`) | M2/51 (`cli/src/table.rs`) | hrvatska množina (1 grana · 2–4 grane · 5+ grana) izdvojena iz ispisa u funkciju bez nuspojava — testira se sama, bez građenja cijele tablice |
 | `#[ignore]` + `std::env::var_os` za test koji ovisi o stroju | M2/52 (`io/tests/perf.rs::measure_real_repo_both_scopes`) | `#[ignore]` isključuje test iz običnog `cargo test` (repozitorij na disku ne postoji na svakom stroju); `var_os` (ne `var`) jer je putanja s diska `OsString`, bez jamstva UTF-8 — isti razlog kao `String::from_utf8_lossy` (§4 gore), na drugom smjeru pretvorbe |
+| graf kao `HashMap<String, Vec<String>>` (susjedni popis) | M2/64 (`core/src/chains.rs::parse_parents`) | commit → njegovi roditelji je najjednostavniji prikaz grafa nad TEKSTOM (`%H\|%P`) koji `io` preda — jezgra ne zna za git proces (S-002), samo za ovu strukturu |
+| iterativni obilazak sa stogom (`Vec::push`/`pop`) umjesto rekurzije | M2/64 (`core/src/chains.rs::assign_containment`) | repo može imati tisuće commita, pa bi rekurzija za dugu granu mogla prepuniti stog poziva; `HashSet` posjećenih uz to sprječava ponovni obilazak istog commita (dvije grane mogu dijeliti dio povijesti) i beskonačnu petlju |
 
 Redak se dodaje **u cigli u kojoj se pojam prvi put pojavi**, s referencom na datoteku.
 

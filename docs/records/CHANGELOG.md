@@ -394,6 +394,24 @@ izdanja (S-025). Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek ses
 - **Bump verzije `1.0.0-pre.4` (2026-09-26, S-037).** Instalater nakon četvrte izvedbene sesije
   drugog reza (T51–T52, T56–T58); `Cargo.toml` je izvor broja verzije, `package.json`/lockovi ga
   zrcale (samo redak verzije, bez `npm install`).
+- **`M2/64` — signal nespojenih grana broji lance, ne pojedinačne grane (2026-09-27, LANCI, S-038).**
+  Korisnik CLI-ja i sučelja dobiva ispravljen signal `unmerged-branches`: grana koja u sebi sadrži
+  drugu nespojenu granu (Leon grana svaku sesiju iz prethodne, pa su grane ulančane) se više ne broji
+  kao zaseban prekršitelj — pravilo broji SAMO vrhove lanaca, dokaz vrha nabraja sadržane grane
+  abecedno hrvatskim paucalom (`+2 grane unutar: a, b`). Ispod: `BranchInfo` += `tip` (puni SHA vrha),
+  `contained_in` (ime vrha koji granu sadrži); `ReportInput` += `branch_graph` (tekst
+  `git log --branches --not <zadana> --format=%H|%P`, jedan dodatni git-proces samo kad postoji
+  nespojena grana osim zadane); nov `core/src/chains.rs` (iterativna sadržanost sa stogom, bez
+  rekurzije); `GitSource` dobiva 16. metodu `commit_parents`. `Report` nepromijenjen (snapshot i
+  paritet netaknuti). **Mjereno nad Sokrat Studyjem** (samo čitanje, 2026-09-27): Alert
+  `unmerged-branches` sad ima **tri vrha** (`fix/kadar-nalicje` 20 dana/12 ispred ·
+  `feat/tinder-kadar` 18 dana/34 ispred · `feat/f2-zid-radionica` 12 dana/11 ispred), Alert ostaje po
+  STAROSTI najstarijeg vrha (20 ≥ `unmerged_alert_days` 10), ne više po BROJU (prije T64: 8
+  prekršitelja i Alert po pragu broja). Brane: `cargo fmt --check` OK · `cargo clippy --all-targets --
+  -D warnings` OK (uklj. desktop) · `cargo test --workspace` 0 padova · `npm run check` (i18n 304,
+  vitest 125) · `npm run build` · `sokratis docs .` 100/100 · `signals .` nema signala (nad
+  Sokratisom samim). Verzija u kodu ostaje `1.0.0-pre.4` (u `main`-u nema promjene sučelja koja bi
+  tražila novi instalater).
 
 ## [0.1.0] — 2026-09-17 — Jezgra i CLI (Milestone 1)
 

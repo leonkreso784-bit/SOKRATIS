@@ -138,6 +138,8 @@ stranih korisnika — oni će promijeniti redoslijed.
 | `gix` umjesto `git` procesa | tek kad mjerenje kaže da je sporo (S-003) |
 | Vektorizacija znaka (danas raster WebP/PNG iz Leonove datoteke) | kad tray na 16 px ili instalater to zatraže; M2 rješava pojednostavljenim rasterom |
 | Otvaranje nalaza dokumentacije u editoru (danas klik kopira putanju) | M3; traži `tauri-plugin-opener` — jedna ovisnost više |
+| Dani bez commita nemaju prazan stupac u grafu stupaca | `Report.days` ih ne sadrži — graf preskače rupu umjesto da je crta praznu |
+| Tekst u grafovima raste sa širinom prozora (`viewBox` 600) | natpisi redaka/osi se ne skaliraju s prozorom — na širem ekranu ostaju istog piksela dok se sam graf rasteže |
 
 ## Odbijeno (s razlogom)
 
