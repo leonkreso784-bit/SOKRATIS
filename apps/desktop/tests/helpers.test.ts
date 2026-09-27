@@ -17,6 +17,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import hr from '../src/lib/i18n/hr.json';
 import en from '../src/lib/i18n/en.json';
+import { kindLabel } from '../src/lib/format';
 import type { CommitRow, Delivery, Phase, ProjectSummary, Signal, Vision, WorkKind } from '../src/lib/types';
 import { VIEWS } from '../src/lib/types';
 import { SECTIONS, sectionId, sectionKey } from '../src/views/project/sections';
@@ -25,6 +26,7 @@ import {
   copyText,
   joinRepoPath,
   kindColor,
+  kindSeries,
   parsePercent,
   phaseRows,
   replaceVisionAt,
@@ -149,6 +151,26 @@ describe('kindColor', () => {
   });
   it('nepoznata vrsta ne pogađa tiho na krivu boju iz mape — vraća neutralni fallback', () => {
     expect(kindColor('nepostojeca' as WorkKind)).toBe('var(--color-ink-2)');
+  });
+});
+
+// Test PRVI (Korak 1 cigle M2/59): `kindSeries` još ne postoji u `views/helpers.ts` u ovom trenutku —
+// ovaj `describe` mora pasti prije implementacije (poziv na uvoz koji ne postoji), tek onda ide kod.
+describe('kindSeries', () => {
+  it('pet stavki redom planning…debugging, boja iz kindColor, natpis iz kindLabel (hr)', () => {
+    const series = kindSeries(hr);
+    expect(series.map((s) => s.id)).toEqual(['planning', 'documentation', 'execution', 'polish', 'debugging']);
+    for (const s of series) {
+      expect(s.color).toBe(kindColor(s.id as WorkKind));
+      expect(s.label).toBe(kindLabel(s.id, hr));
+    }
+  });
+  it('natpis prati JEZIK rječnika, redoslijed i boja ostaju isti (en)', () => {
+    const hrSeries = kindSeries(hr);
+    const enSeries = kindSeries(en);
+    expect(enSeries.map((s) => s.id)).toEqual(hrSeries.map((s) => s.id));
+    expect(enSeries.map((s) => s.color)).toEqual(hrSeries.map((s) => s.color));
+    expect(enSeries.map((s) => s.label)).not.toEqual(hrSeries.map((s) => s.label));
   });
 });
 

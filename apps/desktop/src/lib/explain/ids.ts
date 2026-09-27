@@ -5,6 +5,8 @@
 // ključa rječnika umjesto da ih netko ručno slaže na tri mjesta i jednom pogriješi nastavak.
 // Dopunjeno M2/42 — 19 novih id-eva pokriva preostalih devet pogleda i traku signala (spec §13.4): svaki
 // graf i svaka brojka s vlastitim mjerenjem dobiva karticu, ne svaka ćelija tablice (R26/R28 iz dopune).
+// Dopunjeno M2/59 — četiri nova grafa ploče projekta (S-034, spec §3.2): toplinska karta i doba dana
+// u Tempu, vodoravni stupci u Granama, naslagani stupci u Vrstama rada kroz vrijeme.
 export const EXPLAIN_IDS: readonly string[] = [
   'ind.working_days',
   'ind.commits',
@@ -30,8 +32,12 @@ export const EXPLAIN_IDS: readonly string[] = [
   'tempo.bars',
   'tempo.cumulative',
   'tempo.hours',
+  'tempo.heatmap',
+  'tempo.hours_of_day',
+  'branches.bars',
   'kinds.ring',
   'kinds.share',
+  'kinds.over_time',
   'phases.days',
   'phases.commits',
   'phases.bricks_per_day',

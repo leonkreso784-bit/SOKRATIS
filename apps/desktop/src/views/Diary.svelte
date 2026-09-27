@@ -16,6 +16,11 @@
   // Dopunjeno M2/42 — zaglavlje "vrsta" dobiva `<Explainable id="diary.kind">` (objašnjava i
   // podvrstu i oznaku "ručno"); NE svaka ćelija (190 gumba u ovoj tablici bi bio šum, ne
   // pristupačnost — dopuna T42).
+  // Dopunjeno M2/59 (R61, R64) — nov stupac "grana" (`CommitRow.branch`, S-032) IZA "datuma": ime
+  // grane je PODATAK, ispisuje se kakvo jest, bez `<Explainable>` (nije mjerenje, samo natpis). Da
+  // "naslov" preživi u rasponu 1024–1279 px uz novi stupac, prag širokih stupaca "vrsta"/"podvrsta"
+  // seli s `lg:` (≥1024 px) na `xl:` (≥1280 px) — "grana" dobiva vlastitu usku širinu koja raste tek
+  // na istom pragu.
   import { app, loadReport, setError } from '../lib/state.svelte';
   import { api } from '../lib/api';
   import { getDict, getLang, t } from '../lib/i18n/index.svelte';
@@ -79,11 +84,12 @@
         <tr class="text-ink-2">
           <th scope="col" class="w-[72px] py-1 pl-1 pr-3">{t('diary.sha')}</th>
           <th scope="col" class="w-[92px] py-1 pr-3">{t('diary.date')}</th>
+          <th scope="col" class="w-[84px] py-1 pr-3 xl:w-[140px]">{t('diary.branch')}</th>
           <th scope="col" class="py-1 pr-3">{t('diary.subject')}</th>
-          <th scope="col" class="w-[140px] py-1 pr-3 lg:w-[224px]">
+          <th scope="col" class="w-[140px] py-1 pr-3 xl:w-[224px]">
             <Explainable id="diary.kind">{t('diary.kind')}</Explainable>
           </th>
-          <th scope="col" class="w-[100px] py-1 pr-3 lg:w-[140px]">{t('diary.sub')}</th>
+          <th scope="col" class="w-[100px] py-1 pr-3 xl:w-[140px]">{t('diary.sub')}</th>
           <th scope="col" class="w-[64px] py-1 pr-3">{t('diary.overridden')}</th>
         </tr>
       </thead>
@@ -92,6 +98,9 @@
           <tr class="border-t border-line text-ink-1">
             <td class="py-1 pl-1 pr-3 font-mono text-xs">{commit.sha}</td>
             <td class="py-1 pr-3">{ymd(commit.date, getLang())}</td>
+            <td class="py-1 pr-3">
+              <span class="block truncate" title={commit.branch}>{commit.branch}</span>
+            </td>
             <td class="py-1 pr-3">
               <span class="line-clamp-2 break-words" title={commit.subject}>{commit.subject}</span>
             </td>

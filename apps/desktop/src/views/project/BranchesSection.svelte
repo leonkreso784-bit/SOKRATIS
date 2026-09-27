@@ -5,17 +5,54 @@
   // `lib/charts` da ne preduhitri tu ciglu. Kad je `Report.scope` „default" ili postoji samo jedna
   // grana, dodatna rečenica javlja da mjerenje NIJE obuhvatilo sve grane (spec §3.2) — bez nje bi
   // prazna/kratka tablica izgledala kao da projekt stvarno ima samo jednu granu.
+  // Dopunjeno M2/59 — graf `HBars` (S-035, T57) iznad tablice: isti prekidač commiti/sati kao u
+  // `TempoSection`, ali s POSTOJEĆIM ključevima `branches.commits`/`branches.hours` (nema novog
+  // natpisa samo za prekidač). Bez ijedne grane (raspon bez commita) graf se uopće ne crta — prazna
+  // tablica i rečenica ispod ostaju jedini prikaz (Review Focus #4).
   import { app } from '../../lib/state.svelte';
   import { getLang, t } from '../../lib/i18n/index.svelte';
   import { hours, num } from '../../lib/format';
+  import HBars from '../../lib/charts/HBars.svelte';
+  import Explainable from '../../lib/explain/Explainable.svelte';
   import { sectionId, sectionKey } from './sections';
+
+  let mode = $state<'commits' | 'hours'>('commits');
 
   const branches = $derived(app.report?.branches ?? []);
   const defaultOnly = $derived(app.report ? app.report.scope === 'default' || app.report.branches.length <= 1 : false);
+  const items = $derived(
+    branches.map((b) => ({ label: b.name, value: mode === 'commits' ? b.commits : b.hours, merged: b.merged })),
+  );
+  const valueText = (v: number): string => (mode === 'commits' ? num(v, getLang()) : hours(v, getLang()));
 </script>
 
 <div class="flex flex-col gap-4">
   <h2 id={sectionId('branches')} class="text-xl font-semibold text-ink-0">{t(sectionKey('branches'))}</h2>
+
+  {#if branches.length > 0}
+    <div class="flex gap-1" role="group" aria-label={t(sectionKey('branches'))}>
+      <button
+        type="button"
+        class="rounded-md px-3 py-1.5 text-sm {mode === 'commits' ? 'bg-brand-500 text-on-brand' : 'text-ink-1 hover:bg-surface-2'}"
+        aria-pressed={mode === 'commits'}
+        onclick={() => (mode = 'commits')}
+      >
+        {t('branches.commits')}
+      </button>
+      <button
+        type="button"
+        class="rounded-md px-3 py-1.5 text-sm {mode === 'hours' ? 'bg-brand-500 text-on-brand' : 'text-ink-1 hover:bg-surface-2'}"
+        aria-pressed={mode === 'hours'}
+        onclick={() => (mode = 'hours')}
+      >
+        {t('branches.hours')}
+      </button>
+    </div>
+
+    <Explainable id="branches.bars" block>
+      <HBars {items} label={t('branches.chart')} {valueText} mergedLabel={t('branches.merged')} />
+    </Explainable>
+  {/if}
 
   <table class="w-full text-left text-sm">
     <thead>

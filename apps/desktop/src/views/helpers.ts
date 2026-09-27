@@ -5,6 +5,8 @@
 // ostaje tanak prikaz koji samo poziva ove funkcije. Množina ide iz rječnika (S-021), ova datoteka
 // samo bira KOJI oblik (jedan/dva-četiri/pet-i-više) — sam tekst nikad nije ovdje ušiven.
 import { translate, type Dict } from '../lib/i18n/t';
+import { kindLabel } from '../lib/format';
+import type { Series } from '../lib/charts/layout';
 import type { CommitRow, Delivery, Phase, ProjectSummary, Severity, Signal, Vision, WorkKind } from '../lib/types';
 
 const SEVERITY_RANK: Record<Severity, number> = { alert: 0, warn: 1, info: 2 };
@@ -97,6 +99,19 @@ const KIND_COLORS: Record<WorkKind, string> = {
 // na neutralnu tintu umjesto pukog `KIND_COLORS[kind]` bez zaštite.
 export function kindColor(kind: WorkKind): string {
   return KIND_COLORS[kind] ?? 'var(--color-ink-2)';
+}
+
+// ZAŠTO OVAKO (cigla M2/59 — Vrste rada kroz vrijeme, sekcija ploče projekta, S-034)
+// `Bars` (naslagani graf, T55/T59) treba niz `Series` (`id`/`label`/`color`) — jedan po vrsti rada,
+// istim redom kojim se stupci slažu. Boja i natpis se ČITAJU, ne izmišljaju: `kindColor` je već
+// jedina mapa boja (krug popravka 1, S-010), `kindLabel` već čita rječnik (S-021). Fiksan redoslijed
+// pet vrsta (isti niz kao `KINDS` u `bucket.ts`/Diary.svelte — jezgra ne jamči redoslijed u
+// `Report.kinds`) osigurava da legenda i naslagani stupci uvijek idu istim slijedom bez obzira što
+// jezgra vrati.
+const WORK_KINDS: readonly WorkKind[] = ['planning', 'documentation', 'execution', 'polish', 'debugging'];
+
+export function kindSeries(dict: Dict): Series[] {
+  return WORK_KINDS.map((kind) => ({ id: kind, label: kindLabel(kind, dict), color: kindColor(kind) }));
 }
 
 // ── Dnevnik i Isporuke (cigla M2/28) — najnovije prvo, jedan komparator dijele oba pogleda ──

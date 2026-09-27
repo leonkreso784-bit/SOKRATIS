@@ -20,6 +20,10 @@
      `border-b`, ≈2.15rem) prekriva `<h2 id="sec-…">` odmah nakon skoka na sidro — `scroll-margin-top`
      na JEDNOM mjestu (S-010), ne u osam sekcija, jer `:global` ovdje pogađa SVAKI `<h2 id^="sec-">`
      bez obzira gdje ga koja podkomponenta iscrta (Svelteov scope ne dopire u djecu bez `:global`). -->
+<!-- Dopunjeno M2/59 (R65) — `<main>` (`App.svelte`) nosi `p-4`, a `<nav>` ispod ga poništava s
+     `-mt-4` da izbornik sjedne uz sam vrh; sticky "top: 0" ipak fiksira izbornik jedan `rem` NIŽE od
+     tog vrha, pa se kroz prazan pojas od ≈16 px vidi sadržaj koji prolazi ispod — `-top-4` pomiče
+     "zalijepljenu" točku za isti razmak i pojas nestaje. -->
 <style>
   :global(h2[id^='sec-']) {
     scroll-margin-top: 3.5rem;
@@ -28,7 +32,7 @@
 
 <div class="flex flex-col gap-8">
   <nav
-    class="sticky top-0 z-10 -mx-4 -mt-4 flex flex-wrap gap-1 border-b border-line bg-surface-0/95 px-4 py-2 text-sm"
+    class="sticky -top-4 z-10 -mx-4 -mt-4 flex flex-wrap gap-1 border-b border-line bg-surface-0/95 px-4 py-2 text-sm"
     aria-label={t('nav.project')}
   >
     {#each SECTIONS as s (s)}
