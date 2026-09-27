@@ -339,5 +339,6 @@
   "common.na": "—",
   "common.confirm": "Confirm",
   "common.error": "Error: {msg}",
-  "common.dismiss": "Dismiss"
+  "common.dismiss": "Dismiss",
+  "chart.week": "wk {n}"
 }

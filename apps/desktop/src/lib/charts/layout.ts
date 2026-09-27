@@ -4,8 +4,9 @@
 // `scaleBand` (d3-scale) dijeli širinu na jednake trake s razmakom — isti obrazac za dane, tjedne i
 // mjesece. `stack` iz d3-shape nije potreban: naslagani stupci su jedno zbrajanje po nizu.
 // Dopunjeno M2/56 — `heatmapLayout` mapira dan u (stupac = ISO tjedan, red = dan u tjednu) pa razinu
-// boje svodi na kvantil u 4 koraka; `histogramLayout` je `scaleBand` nad 24 sata, isti obrazac kao
-// stupci iznad, samo bez datuma.
+// boje svodi LINEARNO na udio vrijednosti dana u najvećoj vrijednosti prikazanog razdoblja, u 4
+// koraka (`heatLevel`, ispravljeno M2/61 — ranija rečenica ovdje je krivo tvrdila „kvantil");
+// `histogramLayout` je `scaleBand` nad 24 sata, isti obrazac kao stupci iznad, samo bez datuma.
 // Dopunjeno M2/57 — `ganttLayout` je vremenska skala (kao `lineLayout`) nad trakama faza umjesto
 // točaka, s „danas" kao dodatnom okomicom; `hbarsLayout` je vodoravni stupac po grani, `linear` bez
 // `scaleBand` jer redovi nisu jednako razmaknuti kategorije nego već poredan popis (grane su

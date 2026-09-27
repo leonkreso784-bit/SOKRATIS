@@ -339,5 +339,6 @@
   "common.na": "—",
   "common.confirm": "Potvrdi",
   "common.error": "Greška: {msg}",
-  "common.dismiss": "Zatvori"
+  "common.dismiss": "Zatvori",
+  "chart.week": "tj. {n}"
 }

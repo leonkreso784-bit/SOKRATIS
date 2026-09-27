@@ -4,8 +4,15 @@
 // `scaleTime`): datumi u `Report` su civilni (`YYYY-MM-DD`), bez zone; UTC ponoć drži ticksove na
 // istom mjestu bez obzira na ljetno vrijeme računala. `timeFormatLocale` nosi HR nazive mjeseci i
 // dana; `d3-time` se NE uvozi izravno (tranzitivan, nije pinan) — ticksove daje sama skala.
+// Dopunjeno M2/61 (Ruling R45/R68) — prefiks „tj."/"wk" pred brojem tjedna je bio natpis izvan
+// rječnika (S-021 kršenje); sad ga čita ČISTA `translate()` (`i18n/t.ts`) nad rječnicima uvezenim
+// izravno (`hr.json`/`en.json`), bez Svelte stanja — modul ostaje testiv vitestom bez runa. Nazivi
+// mjeseci/dana (HR/EN objekti gore) OSTAJU ovdje: to je locale-podatak za d3, ne natpis sučelja.
 import { scaleLinear, scaleUtc, type ScaleTime } from 'd3-scale';
 import { timeFormatLocale, type TimeLocaleDefinition } from 'd3-time-format';
+import { translate } from '../i18n/t';
+import hrDict from '../i18n/hr.json';
+import enDict from '../i18n/en.json';
 import type { Lang } from '../types';
 
 const HR: TimeLocaleDefinition = {
@@ -56,7 +63,7 @@ export function formatDate(ymd: string, lang: Lang, g: 'day' | 'week' | 'month')
   const d = parseYmd(ymd);
   const l = locale(lang);
   if (g === 'day') return l.utcFormat(lang === 'hr' ? '%d.%m.' : '%b %d')(d);
-  if (g === 'week') return (lang === 'hr' ? 'tj. ' : 'wk ') + l.utcFormat('%V')(d);
+  if (g === 'week') return translate(lang === 'hr' ? hrDict : enDict, 'chart.week', { n: l.utcFormat('%V')(d) });
   return l.utcFormat('%b %Y')(d);
 }
 
