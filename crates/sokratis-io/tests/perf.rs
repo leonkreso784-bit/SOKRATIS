@@ -2,6 +2,14 @@
 //! Pravilo #4: prvo brojka, onda popravak. `Cell<u32>` u `GitCli` broji procese kroz `&self` —
 //! unutarnja promjenjivost bez `mut`, jer `GitSource` metode posuđuju nepromjenjivo. Test tvrdi
 //! GORNJU GRANICU poziva, ne vrijeme: vrijeme ovisi o stroju, broj procesa ne.
+//!
+//! Cigla M2/52 (mjerenje nad PRAVIM repoom — Sokrat Study): `measure_real_repo_both_scopes` je
+//! `#[ignore]` jer ovisi o stroju (repozitorij mora postojati na disku); pokreće se ručno preko
+//! `SOKRATIS_MEASURE_REPO` (v. doc-komentar testa niže).
+//!
+//! Dopunjeno M2/64 (S-038): `branch_graph` (pa i `commit_parents`) se pita SAMO kad postoji bar
+//! jedna nespojena grana OSIM zadane — fixture ovog testa ima 30 grana na ISTOM commitu kao `main`
+//! (sve `merged`), pa proces se NE pokreće i broj procesa ostaje 7 (granica i dalje 8, rezerva 1).
 mod common;
 use common::Repo;
 use sokratis_io::Project;
@@ -41,13 +49,11 @@ fn input_over_sixty_docs_and_thirty_branches_spawns_at_most_eight_git_processes(
         spawned <= 8,
         "input() je pokrenuo {spawned} git procesa, dopušteno 8 — 4 osnovna \
          (log, branches, docs last_changes, HEAD/branch_exists rub) + 1 commit_sources (M2/49) \
-         + 2 vodeće stablo (M2/50: worktree list + commit_times)"
+         + 2 vodeće stablo (M2/50: worktree list + commit_times) + 1 lanci (M2/64: commit_parents, \
+         uvjetno — 30 grana ovog fixturea su SVE na commitu main-a, pa se ovdje NE pokreće)"
     );
 }
 
-/// Cigla M2/52 — mjerenje nad PRAVIM repoom (Sokrat Study), samo čitanje: broj git-procesa i
-/// trajanje `input()` za oba opsega. `#[ignore]` jer ovisi o stroju (repozitorij mora postojati na
-/// disku); pokreće se ručno: `var_os` jer je putanja s diska `OsString`, ne UTF-8 jamstvo.
 /// `SOKRATIS_MEASURE_REPO=C:/Users/leonk/Documents/sokratstudy.dev cargo test -p sokratis-io --test perf -- --ignored --nocapture`
 #[test]
 #[ignore]

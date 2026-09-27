@@ -26,12 +26,16 @@ fn input(scope: BranchScope, map: &[(&str, &str)]) -> ReportInput {
                 last_commit_time: 1789106400,
                 ahead_of_default: 2,
                 merged: false,
+                tip: "feat/x".into(),
+                contained_in: None,
             },
             BranchInfo {
                 name: "y|z".into(),
                 last_commit_time: 1789111800,
                 ahead_of_default: 1,
                 merged: false,
+                tip: "y|z".into(),
+                contained_in: None,
             },
         ],
         overrides: HashMap::new(),
@@ -47,6 +51,7 @@ fn input(scope: BranchScope, map: &[(&str, &str)]) -> ReportInput {
             .map(|(s, b)| (s.to_string(), b.to_string()))
             .collect(),
         worktrees: 1,
+        branch_graph: String::new(),
     }
 }
 

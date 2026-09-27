@@ -53,6 +53,13 @@
 //! `commit_times` zove `git log --no-walk=unsorted`: `--no-walk` gasi šetnju roditeljima (čitamo
 //! TOČNO navedene SHA-ove, ne njihovu povijest), `unsorted` gasi i sortiranje po topologiji — za
 //! kartu `sha → vrijeme` redoslijed ispisa ionako ne igra ulogu, pa se ne plaća njegova cijena.
+//!
+//! Dopunjeno M2/64 (S-038): `branches()` dobiva `%(objectname)` (puni SHA vrha — ključ sadržanosti
+//! u `chains.rs`) na KRAJ formata, a `commit_parents` dodaje `git log --branches --not <zadana>
+//! --format=%H|%P` BEZ `window_args`: sadržanost traži cijelu nespojenu povijest, ne prozor
+//! vremena mjerenja. Ruling R63: ime grane SMIJE sadržavati `|`, pa oba parsera (`parse_ahead_behind`,
+//! `branches_per_ref`) čitaju redak ZDESNA (`rsplitn`) — polja s FIKSNIM oblikom (broj, SHA) su
+//! zadnja, ime je „sve što ostane", isti obrazac kao `parse_commit_sources` gore (Review Focus #3).
 use crate::IoError;
 use sokratis_core::BranchInfo;
 use std::collections::HashMap;
@@ -243,6 +250,11 @@ pub trait GitSource {
         since: &str,
         until: Option<&str>,
     ) -> Result<HashMap<String, String>, IoError>;
+    /// Tekst `git log --branches --not <default_ref> --format=%H|%P` (cigla M2/64, S-038): svaki
+    /// nespojeni commit i NJEGOVI roditelji, puni SHA-ovi (`chains::parse_parents` ih čita u kartu).
+    /// BEZ `window_args` — sadržanost lanca traži CIJELU nespojenu povijest, ne prozor mjerenja
+    /// (`since`/`until`): grana stara mjesecima ostaje u lancu i kad je izvještaj za zadnji tjedan.
+    fn commit_parents(&self, default_ref: &str) -> Result<String, IoError>;
 }
 #[derive(Debug)]
 pub struct GitCli {
@@ -345,11 +357,20 @@ impl GitCli {
             .run(&[
                 "for-each-ref",
                 "refs/heads",
-                "--format=%(refname:short)|%(authordate:unix)",
+                "--format=%(refname:short)|%(authordate:unix)|%(objectname)",
             ])?
             .lines()
         {
-            let Some((name, t)) = line.trim().split_once('|') else {
+            let trimmed = line.trim();
+            if trimmed.is_empty() {
+                continue;
+            }
+            // R63: ime grane SMIJE sadržavati `|` — čita se ZDESNA (`rsplitn`), jer zadnja DVA
+            // polja (unix, puni SHA) imaju fiksan oblik, a ime je „sve što ostane" s lijeva.
+            let mut parts = trimmed.rsplitn(3, '|');
+            let (Some(objectname), Some(t), Some(name)) =
+                (parts.next(), parts.next(), parts.next())
+            else {
                 continue;
             };
             // `unwrap_or(0)` je svjesna odluka: git nikad ne ispisuje ne-broj u
@@ -369,22 +390,34 @@ impl GitCli {
                 last_commit_time,
                 ahead_of_default,
                 merged: name == default_branch || merged.contains(name),
+                tip: objectname.trim().to_string(),
+                contained_in: None,
             });
         }
         Ok(out)
     }
 }
 
-/// Parsira jedan redak `for-each-ref --format=ime|unix|ahead behind` u `BranchInfo`. `ahead` je
-/// broj commitova koje grana ima a zadana nema (isto što je stari kod računao s
+/// Parsira jedan redak `for-each-ref --format=ime|unix|ahead behind|objectname` u `BranchInfo`.
+/// `ahead` je broj commitova koje grana ima a zadana nema (isto što je stari kod računao s
 /// `rev-list default..name --count`), pa je `ahead == 0` istovjetno onome što je `git branch
 /// --merged` govorio — zadana grana provjerava se i imenom, za slučaj da git ikad vrati drukčiji
 /// rezultat za samo-usporedbu.
+///
+/// Ruling R63: ime grane SMIJE sadržavati `|` (git to dopušta), a ono je PRVO polje u retku — zato
+/// se redak čita ZDESNA (`rsplitn`): zadnja tri polja (objectname, ahead-behind, unix) imaju fiksan
+/// oblik i nikad ne sadrže `|`, pa je ono što `rsplitn` vrati POSLJEDNJE — cijeli ostatak s lijeva —
+/// uvijek pravo ime, čak i s `|` unutra.
 fn parse_ahead_behind(out: &str, default_branch: &str) -> Vec<BranchInfo> {
     let mut result = Vec::new();
     for line in out.lines() {
-        let mut parts = line.trim().splitn(3, '|');
-        let (Some(name), Some(t), Some(ahead_behind)) = (parts.next(), parts.next(), parts.next())
+        let trimmed = line.trim();
+        if trimmed.is_empty() {
+            continue;
+        }
+        let mut parts = trimmed.rsplitn(4, '|');
+        let (Some(objectname), Some(ahead_behind), Some(t), Some(name)) =
+            (parts.next(), parts.next(), parts.next(), parts.next())
         else {
             continue;
         };
@@ -399,6 +432,8 @@ fn parse_ahead_behind(out: &str, default_branch: &str) -> Vec<BranchInfo> {
             last_commit_time,
             ahead_of_default,
             merged: name == default_branch || ahead_of_default == 0,
+            tip: objectname.trim().to_string(),
+            contained_in: None,
         });
     }
     result
@@ -480,7 +515,7 @@ impl GitSource for GitCli {
         // cigla M2/11, dug M11. Ako git ne zna atom (stariji od 2.41), poruka o grešci sadrži
         // ime atoma; rezerva je stari put, sporiji ali dokazano isti rezultat (test ostaje zelen).
         let fmt = format!(
-            "--format=%(refname:short)|%(authordate:unix)|%(ahead-behind:{default_branch})"
+            "--format=%(refname:short)|%(authordate:unix)|%(ahead-behind:{default_branch})|%(objectname)"
         );
         match self.run(&["for-each-ref", "refs/heads", &fmt]) {
             Ok(out) => Ok(parse_ahead_behind(&out, default_branch)),
@@ -609,6 +644,18 @@ impl GitSource for GitCli {
             .trim()
             .to_string())
     }
+    fn commit_parents(&self, default_ref: &str) -> Result<String, IoError> {
+        // Isti obrazac `--not` kao `commit_sources`: `--branches` MORA doći PRIJE `--not`, jer
+        // `--not` negira SVE reference iza sebe do kraja retka. BEZ `window_args` — vidi trait.
+        self.run(&[
+            "log",
+            "--branches",
+            "--not",
+            default_ref,
+            "--format=%H|%P",
+            "--",
+        ])
+    }
 }
 
 #[cfg(test)]
@@ -656,5 +703,19 @@ mod tests {
         assert_eq!(map.get("abc123").map(String::as_str), Some("y|z"));
         assert_eq!(map.get("def456").map(String::as_str), Some("feat/x"));
         assert_eq!(map.len(), 2);
+    }
+
+    /// Ruling R63 (dopuna T64): ime grane s `|` preživi `for-each-ref` jer se redak čita ZDESNA —
+    /// isti duh kao `parse_commit_sources_keeps_pipe_inside_branch_name` iznad, drugi format retka.
+    #[test]
+    fn parse_ahead_behind_keeps_pipe_inside_branch_name() {
+        let sha = "a".repeat(40);
+        let line = format!("x|y|1789020000|2 0|{sha}");
+        let result = super::parse_ahead_behind(&line, "main");
+        assert_eq!(result.len(), 1);
+        assert_eq!(result[0].name, "x|y");
+        assert_eq!(result[0].tip, sha);
+        assert_eq!(result[0].ahead_of_default, 2);
+        assert_eq!(result[0].last_commit_time, 1789020000);
     }
 }

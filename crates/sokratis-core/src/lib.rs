@@ -2,6 +2,7 @@
 //! Jezgra nema I/O: ni `std::fs`, ni `std::process`. Sve što treba dolazi kao `&str` ili
 //! struktura kroz `ReportInput`. To je granica S-002 i razlog zašto se testira bez gita.
 //! `pub mod` = modul je datoteka; `pub use` = kraći put do tipova za pozivatelja.
+pub mod chains;
 pub mod civil;
 pub mod classify;
 pub mod docs;
