@@ -11,14 +11,27 @@
   // odakle cijela tablica dolazi, ne samo stupac; dopuna T42).
   // Preseljeno M2/58 iz views/Deliveries.svelte — sadržaj nepromijenjen, samo <h1> → <h2 id> i
   // putanje uvoza (S-034).
+  // Dopunjeno M2/60 — stupci po tjednu (spec §3.2, `bucket.ts::bucketDeliveries`, T57) iznad tablice.
+  // Ruling R67 (dopuna orkestratora): niz `count` čita natpis `nav.deliveries` ("Isporuke"), NE
+  // `deliveries.title` (taj ključ je zaglavlje stupca "naslov" u tablici — pisalo bi "naslov" u
+  // legendi). Stupci su GRUPIRANI, bez `stacked`: deploy je PODSKUP isporuka, naslagani bi ga
+  // zbrojio dvaput.
   import { app } from '../../lib/state.svelte';
   import { getDict, getLang, t } from '../../lib/i18n/index.svelte';
-  import { kindLabel, ymd } from '../../lib/format';
+  import { kindLabel, num, ymd } from '../../lib/format';
   import { sortDeliveries } from '../helpers';
+  import { bucketDeliveries } from '../../lib/charts/bucket';
+  import Bars from '../../lib/charts/Bars.svelte';
   import Explainable from '../../lib/explain/Explainable.svelte';
   import { sectionId, sectionKey } from './sections';
 
   const rows = $derived(sortDeliveries(app.report?.deliveries ?? []));
+  const buckets = $derived(
+    bucketDeliveries(app.report?.deliveries ?? [], 'week').map((b) => ({
+      start: b.start,
+      values: { count: b.count, deploys: b.deploys },
+    })),
+  );
 </script>
 
 <div class="flex flex-col gap-4">
@@ -29,6 +42,22 @@
   {:else if rows.length === 0}
     <p class="text-sm text-ink-2">{t('deliveries.empty')}</p>
   {:else}
+    <div class="flex flex-col gap-2">
+      <h3 class="text-sm font-semibold text-ink-1">{t('deliveries.weekly')}</h3>
+      <Explainable id="deliveries.weekly" block>
+        <Bars
+          {buckets}
+          series={[
+            { id: 'count', label: t('nav.deliveries'), color: 'var(--color-brand-500)' },
+            { id: 'deploys', label: t('deliveries.deploy'), color: 'var(--color-accent)' },
+          ]}
+          granularity="week"
+          label={t('deliveries.weekly')}
+          valueText={(v) => num(v, getLang())}
+        />
+      </Explainable>
+    </div>
+
     <!-- Isti obrazac kao Dnevnik (T27/T28, #9): `table-fixed`, "naslov" bez zadane širine uzima
          preostali prostor i dugačak tekst se reže elipsom (`truncate` + `title` za cijeli tekst). -->
     <table class="w-full table-fixed text-left text-sm">

@@ -7,10 +7,15 @@
   // (dopuna T42); "cigle" i raspon datuma nemaju id pa ostaju bez kartice.
   // Preseljeno M2/58 iz views/Phases.svelte — sadržaj nepromijenjen, samo <h1> → <h2 id> i putanje
   // uvoza (S-034).
+  // Dopunjeno M2/60 — Gantt (spec §3.2, `layout.ts::ganttLayout`, T57) iznad tri tablice: traka po
+  // fazi od-do, „danas" kao crta. `Report` nema polje „danas" (Ruling R72: `Report.until` ostaje
+  // `null` kad je raspon „sve", jezgra ga NE upisuje) — `today` je pomoćna vrijednost SUČELJA, samo
+  // za prikaz, izračunata jednom ovdje iz sata ovog računala.
   import { app } from '../../lib/state.svelte';
   import { getDict, getLang, t } from '../../lib/i18n/index.svelte';
   import { num, phaseState, ymd } from '../../lib/format';
   import { bricksPerDay, phaseRows } from '../helpers';
+  import Gantt from '../../lib/charts/Gantt.svelte';
   import Explainable from '../../lib/explain/Explainable.svelte';
   import type { Phase, PhaseState } from '../../lib/types';
   import { sectionId, sectionKey } from './sections';
@@ -20,6 +25,8 @@
   const SECTIONS: readonly PhaseState[] = ['closed', 'running', 'planned'];
 
   const rows = $derived(phaseRows(app.report?.phases ?? []));
+  const phases = $derived(app.report?.phases ?? []);
+  const today = new Date().toISOString().slice(0, 10);
 
   function sectionRows(state: PhaseState): Phase[] {
     return rows[state];
@@ -34,6 +41,13 @@
   {:else if app.report.phases.length === 0}
     <p class="text-sm text-ink-2">{t('phases.none')}</p>
   {:else}
+    <div class="flex flex-col gap-2">
+      <h3 class="text-sm font-semibold text-ink-1">{t('phases.gantt')}</h3>
+      <Explainable id="phases.gantt" block>
+        <Gantt {phases} {today} label={t('phases.gantt')} />
+      </Explainable>
+    </div>
+
     {#each SECTIONS as state (state)}
       {@const list = sectionRows(state)}
       {#if list.length > 0}
