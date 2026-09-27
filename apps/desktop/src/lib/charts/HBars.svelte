@@ -4,6 +4,9 @@
   // sortiran po commitima silazno), ne kategorije koje `scaleBand` treba razmaknuti jednako. Spojena
   // grana dobiva nižu prozirnost kao STATIČNO svojstvo (ne pokret), zato izravan `opacity` atribut, a
   // ne klasa iz `motion.css` (S-026 vodi animacije, ne boje/prozirnost u mirovanju).
+  // Dopunjeno M2/62 (nalaz G1) — natpis retka crta `bar.shortLabel` (skraćen za marginu, `layout.ts`),
+  // ne `bar.label`; PUNI naziv grane ostaje dostupan kroz `<title>` unutar `<text>` (hover, čitač
+  // ekrana), uz postojeći `<title>` na `<rect>` koji već nosi puni naziv + vrijednost.
   import Chart from './Chart.svelte';
   import Axis from './Axis.svelte';
   import { frame, hbarsLayout, type HBar, type Margins } from './layout';
@@ -28,7 +31,10 @@
   {#snippet children(f)}
     <Axis {f} xTicks={layout.xTicks} yTicks={[]} />
     {#each layout.bars as bar, i (i)}
-      <text x={f.m.left - 6} y={bar.y + bar.h / 2} text-anchor="end" dominant-baseline="middle" font-size="10" fill="var(--color-ink-1)">{bar.label}</text>
+      <text x={f.m.left - 6} y={bar.y + bar.h / 2} text-anchor="end" dominant-baseline="middle" font-size="10" fill="var(--color-ink-1)">
+        {bar.shortLabel}
+        <title>{bar.label}</title>
+      </text>
       <rect class="chart-bar" x={bar.x} y={bar.y} width={Math.max(1, bar.w)} height={bar.h} rx="2" fill="var(--color-brand-500)" opacity={bar.merged ? 0.6 : 1}>
         <title>{titleFor(bar)}</title>
       </rect>

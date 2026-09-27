@@ -60,6 +60,28 @@ describe('scales', () => {
   });
 });
 
+// Dopunjeno M2/62 (nalaz G3, dimni test ploče) — `dateTicks` je za kratak raspon (1-2 dana) tražio od
+// d3 skale ticksove ISPOD dana dok je format ostao dnevni, pa se ista oznaka („27.09.") ponavljala i
+// do osam puta. Testovi dokazuju da je popravak (`dayLevelTicks` u `layout.ts`, poziva se ovdje kroz
+// javni `dateTicks`) uklonio ponavljanje, a da dulji rasponi (koji su već radili) ostaju nepromijenjeni.
+describe('dateTicks — G3 (T62): bez ponavljanja oznaka na kratkom rasponu', () => {
+  it('raspon jedan dan (27.09.–28.09.) → tocno dvije razlicite oznake', () => {
+    const t = dateTicks([parseYmd('2026-09-27'), parseYmd('2026-09-28')], 560, 'hr');
+    expect(t.map((x) => x.label)).toEqual(['27.09.', '28.09.']);
+  });
+  it('domena od jedne tocke (pocetak = kraj) → tocno jedna oznaka', () => {
+    const t = dateTicks([parseYmd('2026-09-27'), parseYmd('2026-09-27')], 560, 'hr');
+    expect(t).toHaveLength(1);
+    expect(t[0]?.label).toBe('27.09.');
+  });
+  it('30 dana → sve oznake i dalje razlicite (postojece ponasanje ostaje)', () => {
+    const t = dateTicks([parseYmd('2026-08-01'), parseYmd('2026-08-31')], 600, 'hr');
+    const labels = t.map((x) => x.label);
+    expect(new Set(labels).size).toBe(labels.length);
+    expect(labels.length).toBeGreaterThan(1);
+  });
+});
+
 // Preseljeno iz scale.ts (M2/23, obrisan M2/55) — `linear`, `finiteMax`, `arcPath`, `ringSegments`,
 // `svgA11y` i dalje trebaju vlastiti test jer `Sparkline`/`Ring` ne prolaze kroz `layout.ts` (S-035).
 describe('preseljeno iz scale.ts (M2/55)', () => {

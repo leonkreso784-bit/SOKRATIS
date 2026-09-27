@@ -3,7 +3,7 @@
 // najbliža točka za tooltip. Svelte komponente koje ovo crtaju nemaju vlastiti test (R37) — sve što
 // se može pogrešno izračunati mora biti pokriveno ovdje.
 import { describe, expect, it } from 'vitest';
-import { barsLayout, frame, ganttLayout, hbarsLayout, heatmapLayout, histogramLayout, lineLayout, linePath, nearestIndex } from '../src/lib/charts/layout';
+import { barsLayout, fitLabel, frame, ganttLayout, hbarsLayout, heatmapLayout, histogramLayout, lineLayout, linePath, nearestIndex } from '../src/lib/charts/layout';
 import type { Phase } from '../src/lib/types';
 
 const S = [{ id: 'commits', label: 'commiti', color: 'var(--color-brand-500)' }];
@@ -62,6 +62,28 @@ describe('lineLayout', () => {
     expect(l.paths[0]!.d.startsWith('M')).toBe(true);
     expect(l.xTicks.length).toBeGreaterThan(1);
     expect(lineLayout(frame(600, 200), [], 'en').paths).toEqual([]);
+  });
+  // Nalaz G3 (T62) — jedna tocka u nizu je ranije umjetno širila domenu na idući (nepostojeći) dan,
+  // sto je kroz `dateTicks` davalo ticksove ispod dana i ponovljene oznake. Ovdje samo provjeravamo da
+  // vise NEMA duplikata/NaN-a; tocna gustoca ticksova za takav slucaj je test uz `dateTicks` izravno.
+  it('niz od jedne tocke → xTicks bez duplikata, bez NaN', () => {
+    const l = lineLayout(frame(600, 200), [{ ...S[0]!, points: [{ date: '2026-09-27', value: 3 }] }], 'hr');
+    const labels = l.xTicks.map((t) => t.label);
+    expect(new Set(labels).size).toBe(labels.length);
+    for (const t of l.xTicks) expect(Number.isFinite(t.x)).toBe(true);
+    expect(l.paths).toHaveLength(1);
+    for (const p of l.paths[0]!.points) expect([p.x, p.y].every(Number.isFinite)).toBe(true);
+  });
+  // Nalaz G2 (T62) — centriran zadnji tick prelazi izvan viewBoxa jer m.right (12) ne ostavlja dovoljno
+  // mjesta za pola sirine oznake. Zadnji tick uvijek pada na desni rub okvira (`dateTicks` ga uvijek
+  // ukljuci, T62/G3), pa dobiva `anchor: 'end'`; ostali ticksi ostaju necentrirano-pomaknuti ('middle').
+  it('zadnji X-tick je anchor "end" (unutar viewBoxa), ostali nisu', () => {
+    const l = lineLayout(frame(600, 200), [
+      { ...S[0]!, points: [{ date: '2026-09-07', value: 1 }, { date: '2026-09-13', value: 5 }] },
+    ], 'hr');
+    expect(l.xTicks.length).toBeGreaterThan(1);
+    expect(l.xTicks.at(-1)?.anchor).toBe('end');
+    for (const t of l.xTicks.slice(0, -1)) expect(t.anchor).not.toBe('end');
   });
 });
 
@@ -171,6 +193,23 @@ describe('ganttLayout', () => {
     expect(l.xTicks).toEqual([]);
     expect(l.todayX).toBeNull();
   });
+  // Nalaz G2 (T62) — isti popravak kao kod `lineLayout`: zadnji X-tick dobiva `anchor: 'end'`.
+  it('zadnji X-tick je anchor "end", ostali nisu', () => {
+    const l = ganttLayout(frame(600, 200, { left: 140 }), PHASES, TODAY, 'hr');
+    expect(l.xTicks.length).toBeGreaterThan(1);
+    expect(l.xTicks.at(-1)?.anchor).toBe('end');
+    for (const t of l.xTicks.slice(0, -1)) expect(t.anchor).not.toBe('end');
+  });
+  // Nalaz G1 (T62) — dugi naziv faze se ne smije odrezati slijeva; `shortLabel` je skraćen natpis za
+  // uski margin ulijevo (140), `label` ostaje PUN naziv (koristi ga `<title>` reda u komponenti).
+  it('dug naziv faze → shortLabel skracen na granicu, label ostaje pun', () => {
+    const long = 'Frontend redizajn C0-C7 + KOSTUR-TELEFON-POLICA-SEO'; // 52 znaka, nalaz G1
+    const l = ganttLayout(frame(600, 200, { left: 140 }), [phase({ id: 'p1', name: long, state: 'running', from: '2026-09-01', to: null })], TODAY, 'hr');
+    const row = l.rows[0]!;
+    expect(row.label).toBe(long);
+    expect(row.shortLabel.length).toBeLessThan(long.length);
+    expect(row.shortLabel.endsWith('…')).toBe(true);
+  });
 });
 
 describe('hbarsLayout', () => {
@@ -186,5 +225,36 @@ describe('hbarsLayout', () => {
     expect(l.bars[2]!.w).toBe(0);
     expect(l.bars[0]!.w).toBeGreaterThan(l.bars[1]!.w);
     expect(l.bars[1]!.w).toBeGreaterThan(l.bars[2]!.w);
+  });
+  // Nalaz G1 (T62) — isti popravak kao kod `ganttLayout`: dugo ime grane dobiva `shortLabel`,
+  // `label` (koristi ga `<title>` retka u `HBars.svelte`) ostaje pun naziv.
+  it('dugo ime grane → shortLabel skracen, label ostaje pun', () => {
+    const long = 'feat/frontend-redizajn-c0-c7-kostur-telefon-polica-seo'; // 55 znakova
+    const l = hbarsLayout(frame(600, 200, { left: 140 }), [{ label: long, value: 5, merged: false }]);
+    const bar = l.bars[0]!;
+    expect(bar.label).toBe(long);
+    expect(bar.shortLabel.length).toBeLessThan(long.length);
+    expect(bar.shortLabel.endsWith('…')).toBe(true);
+  });
+});
+
+// Nalaz G1 (T62) — `fitLabel` je čista funkcija (bez ovisnosti o margini/fontu konkretne komponente)
+// koja krati tekst na `maxChars` znakova i dodaje „…" na kraj; komponente (Gantt/HBars) joj proslijede
+// granicu izvedenu iz vlastite lijeve margine (`ganttLayout`/`hbarsLayout` iznad).
+describe('fitLabel', () => {
+  it('51 znak, granica 20 → skracen, zavrsava "…", duljina <= granice', () => {
+    const long = 'A'.repeat(51);
+    const out = fitLabel(long, 20);
+    expect(out.length).toBeLessThanOrEqual(20);
+    expect(out.endsWith('…')).toBe(true);
+  });
+  it('10 znakova, granica 20 → nepromijenjen', () => {
+    expect(fitLabel('A'.repeat(10), 20)).toBe('A'.repeat(10));
+  });
+  it('prazan naziv → prazan', () => {
+    expect(fitLabel('', 20)).toBe('');
+  });
+  it('naziv TOCNO na granici (20 znakova, granica 20) → nepromijenjen', () => {
+    expect(fitLabel('A'.repeat(20), 20)).toBe('A'.repeat(20));
   });
 });
