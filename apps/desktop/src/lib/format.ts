@@ -4,6 +4,10 @@
 // `Intl.NumberFormat` zna zarez/točku po jeziku bez ručnih zamjena; razmak i predznak se dodatno
 // normaliziraju jer `hr-HR` u Node/ICU vraća nedjeljivi razmak (U+00A0) i pravi predznak minus
 // (U+2212) — WebView2 ima svoj ICU pa ponašanje mora biti izmjereno i osigurano kodom, ne pretpostavljeno.
+//
+// Dopunjeno M2/63 — m1: `localYmd` dodan jer je „danas" u Ganttu i toplinskoj karti računao UTC dan
+// (`toISOString().slice(0, 10)`), a natpisi obećavaju datum OVOG računala — vidi poziv u
+// `TempoSection.svelte`/`PhasesSection.svelte`.
 import type { Lang } from './i18n/index.svelte';
 import { translate, type Dict } from './i18n/t';
 
@@ -30,6 +34,16 @@ export function percent(x: number | null | undefined, lang: Lang, digits = 1): s
 
 export function hours(h: number | null | undefined, lang: Lang): string {
   return bad(h) ? DASH : `${num(h, lang, 1)} h`;
+}
+
+// Dopunjeno M2/63 — m1: `getFullYear`/`getMonth`/`getDate` čitaju LOKALNO vrijeme računala (za
+// razliku od `toISOString`, koji prvo pretvara u UTC) — Gantt i toplinska karta crtaju „danas" po
+// satu stroja na kojem Sokratis radi, pa oko ponoći ne smiju iskočiti u sutrašnji (UTC) dan.
+export function localYmd(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 }
 
 export function ymd(d: string | null | undefined, lang: Lang): string {

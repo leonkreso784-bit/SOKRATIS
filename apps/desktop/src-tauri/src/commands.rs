@@ -9,6 +9,10 @@
 //! (M2/38: `Settings` dobiva četvrti ključ `motion: bool`, `SETTING_KEYS` postaje `[&str; 4]` —
 //! `set_setting` ga upisuje kroz istu opću granu kao `theme`/`lang`, bez novog `if`.)
 //! (M2/45: naredba `quit` je nova — tray je ukinut, S-036.)
+//! Dopunjeno M2/63 — I1: `get_report`/`set_override`/`save_visions`/`refresh` su `(async)`, jer
+//! naredba bez `async` u Tauriju 2 radi na GLAVNOJ niti (petlja događaja prozora) i smrzava prozor
+//! dok traje git+jezgra; `(async)` je šalje na nit izvršitelja, tijela ostaju sinkrona. I2: `add_project`
+//! sad pokreće prvi izračun u novoj niti (ne čeka ga) — komentar uz `add_project` niže.
 use crate::cache::StoreCache;
 use crate::state::{AppState, text};
 use crate::summary::{ProjectSummary, summarize};
@@ -206,6 +210,12 @@ pub async fn add_project(
     let summary = track_project(&state, &dir)?;
     // N5: nov projekt još nema nadzor — `engine::watch` ga prvi put registrira.
     crate::engine::watch(&app, summary.id);
+    // I2 (M2/63): naredba se ne smije čekati na prvi izračun (može trajati sekunde), pa ga
+    // pokrećemo u NOVOJ niti kroz isti `request_refresh` koji zove i watcher (isti red čekanja,
+    // S-010) — motor na kraju emitira `report_updated`, sučelje samo osvježi popis.
+    let handle = app.clone();
+    let id = summary.id;
+    std::thread::spawn(move || crate::engine::request_refresh(&handle, id));
     Ok(Some(summary))
 }
 
@@ -242,7 +252,7 @@ pub fn remove_project(
 
 // ── izvještaj i trend ────────────────────────────────────────────────────────────────────────────
 
-#[tauri::command]
+#[tauri::command(async)]
 pub fn get_report(
     state: tauri::State<'_, AppState>,
     id: i64,
@@ -281,7 +291,7 @@ pub fn get_trend(
 /// osvježavanje kroz `request_refresh` — isti red kao watcher, pa se ne računa usporedno s njim
 /// (Ruling R10, spec §3.3 t. 3). Greška SAMOG izračuna ide na `stderr`, ne ovamo (sučelje je svejedno
 /// vidi na svom sljedećem `get_report`); greška UPISA i dalje ide van kao tekst.
-#[tauri::command]
+#[tauri::command(async)]
 pub fn set_override(
     app: tauri::AppHandle,
     state: tauri::State<'_, AppState>,
@@ -305,7 +315,7 @@ pub fn set_override(
 }
 
 /// Isti obrazac kao `set_override` iznad — potisni, upiši, ponovno nadziri, zatraži osvježavanje.
-#[tauri::command]
+#[tauri::command(async)]
 pub fn save_visions(
     app: tauri::AppHandle,
     state: tauri::State<'_, AppState>,
@@ -333,7 +343,7 @@ pub fn save_visions(
 /// „Osvježi" i vanjska promjena datoteke nikad ne računaju isti projekt istodobno (Ruling R10).
 /// Petlja „svi projekti" je `engine::refresh_all` (dopuna T32 #5) — `refresh(None)` je jedini
 /// pozivatelj, pa ta petlja ne postoji na dva mjesta (S-010).
-#[tauri::command]
+#[tauri::command(async)]
 pub fn refresh(app: tauri::AppHandle, id: Option<i64>) -> Result<(), String> {
     match id {
         Some(id) => crate::engine::request_refresh(&app, id),
