@@ -77,8 +77,8 @@ npm ci
 npm run tauri build
 ```
 
-This produces an NSIS installer in `target/release/bundle/nsis/` (per-user install, unsigned). The version number has a single source: `[workspace.package]` in the root
-`Cargo.toml`.
+This produces an NSIS installer in `target/release/bundle/nsis/` (per-user install, unsigned). The
+version number has a single source: `[workspace.package]` in the root `Cargo.toml`.
 
 ## Conventions and the project profile
 

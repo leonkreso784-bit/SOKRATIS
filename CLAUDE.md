@@ -77,7 +77,7 @@ Testovi i brane: `docs/workflow/TESTING.md`.
   krug popravaka završne recenzije (`M2/63`) su u `main`-u; verzija u `Cargo.toml` je `1.0.0`.
 - **Nema aktivnog speca ni plana** — ispunjeni su u `docs/archive/`; sljedeći nastaje kad M3 krene
   (kandidati: `docs/records/BACKLOG.md`).
-- **Instalater 1.0.0** gradi orkestrator iz `main`-a; sha256 i veličina se zapisuju u ledger (izvan gita).
+- **Instalater 1.0.0 je sagrađen** 2026-09-28 iz `82ad10e` (`target/release/bundle/nsis/`; veličina i sha256: `PROGRESS.md`, unos sesije 6 dio B); instalira ga Leon.
 - **Čeka Leonov izričit OK:** tag `v1.0.0`, izdanje na GitHubu, licenca; odluka o M1 sesijama u
   `PROGRESS.md` (seljenje u arhivu izmjereno i odgođeno — mijenja isporuke, v. BACKLOG).
 - **Jedno radno stablo:** `sokratis` (`main`), grana osim `main`-a nema (`git worktree list`).

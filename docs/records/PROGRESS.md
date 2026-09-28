@@ -1273,8 +1273,7 @@ na GitHubu i licenca čekaju Leonov izričit OK.
   `[1.0.0]`, README (EN) za 1.0.0, BACKLOG dopunjen. **Seljenje M1 sesija iz ovog dnevnika u arhivu je
   izmjereno i odgođeno:** isporuke u mjerenju Sokratisa samog pale bi s 18 na 16 (`diary_path` čita
   jednu datoteku) — odluka čeka Leona (ruling R84; kandidat „dnevnik iz više datoteka" u `BACKLOG.md`).
-- Instalater 1.0.0 gradi orkestrator iz `main`-a; sha256 i veličina su u ledgeru
-  `.superpowers/sdd/2026-09-18-m2-desktop/progress.md` (izvan gita).
+- **Instalater 1.0.0 je sagrađen** iz `main`-a (`82ad10e`; commiti nakon njega diraju samo dokumentaciju): `target/release/bundle/nsis/Sokratis_1.0.0_x64-setup.exe`, 3 738 407 B, sha256 `67c73d28a30508905fc216175522dd3154cf3e92a94c3f41711f35e4de798060`; NSIS, po korisniku, nepotpisan (S-029). Instalira ga Leon preko `1.0.0-pre.4`.
 
 ### Što slijedi
 **STANI i javi Leonu.** Čeka njegov izričit OK: tag `v1.0.0` i izdanje na GitHubu, licenca, odluka o
