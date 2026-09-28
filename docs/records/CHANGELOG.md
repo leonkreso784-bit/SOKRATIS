@@ -412,11 +412,11 @@ izdanja (S-025). Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek ses
   vitest 125) · `npm run build` · `sokratis docs .` 100/100 · `signals .` nema signala (nad
   Sokratisom samim). Verzija u kodu ostaje `1.0.0-pre.4` (u `main`-u nema promjene sučelja koja bi
   tražila novi instalater).
-- **`M2/59`–`M2/61` — grafovi u svih osam sekcija ploče projekta (2026-09-27/28, PLOČA-2, S-034, S-035).**
+- **`M2/59`–`M2/61` — grafovi u šest sekcija ploče projekta (2026-09-27/28, PLOČA-2, S-034, S-035).**
   Korisnik dobiva sedam novih grafova, sve unutar ploče Projekt otvorene klikom na karticu: **Tempo**
   dobiva prekidač dan/tjedan/mjesec (stupci commita), kalendarsku toplinsku kartu i histogram doba dana
   (sat iz `author_time` u zoni ovog računala); **Grane** prekidač commiti/sati i vodoravne stupce po
-  grani (spojene prigušene), sekcija se crta samo kad ima barem jednu granu; **Vrste rada** naslagane
+  grani (spojene prigušene), graf se crta samo kad ima barem jednu granu (tablica ostaje uvijek); **Vrste rada** naslagane
   stupce po tjednu ispod postojećeg prstena; **Faze** Gantt s crtom „danas" (faza bez datuma nosi
   prevedenu riječ stanja umjesto trake); **Isporuke** grupirane stupce po tjednu s deployom kao
   posebnim nizom; **Dokumentacija** liniju trenda triju metrika (docs-ocjena, upozorenja, uzbune) iz
@@ -424,9 +424,8 @@ izdanja (S-025). Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek ses
   (`<h3>`), svaki ima karticu s objašnjenjem — **`EXPLAIN_IDS` 37 → 44** (7 novih: `tempo.heatmap`,
   `tempo.hours_of_day`, `branches.bars`, `kinds.over_time`, `phases.gantt`, `deliveries.weekly`,
   `docs.trend`). **Dnevnik** dobiva stupac „grana" (poseban stupac od `lg`, ispod toga drugi redak u
-  ćeliji datuma). i18n **304 → 342** ključa. Ispod: `lib/charts/` temelji dobili `XTick.anchor` i
-  `fitLabel`/`shortLabel` (priprema za `M2/62`); prefiks tjedna („tj. "/„wk ") seli iz golog stringa u
-  rječnik (`chart.week`, R45/R68). Brane: `npm run check` (svelte-check 256/0/0 · i18n 342 · kontrast
+  ćeliji datuma). i18n **304 → 342** ključa. Ispod: prefiks tjedna („tj. "/„wk ") seli iz golog stringa
+  u rječnik (`chart.week`, R45/R68). Brane: `npm run check` (svelte-check 256/0/0 · i18n 342 · kontrast
   4/4 · vitest 128/15) · `npm run build` OK; nema Rust-izmjena (tok je isključivo `apps/desktop/src`).
 - **`M2/62` — krug popravaka nakon dimnog testa ploče nad pravim podacima (2026-09-27/28, PLOČA-2).**
   Korisnik dobiva ispravljen izgled triju grafova, nađen dimnim testom `tauri dev` nad klonom Sokrat
@@ -438,7 +437,7 @@ izdanja (S-025). Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek ses
   trake („planirana") više ne izlazi iz margine natpisa — riječ stanja seli iz natpisa u PODRUČJE
   CRTANJA retka (R77). Brane: `npm run check` (svelte-check 256/0/0 · i18n 342 · kontrast 4/4 ·
   **vitest 140/15**, bilo 128) · `npm run build` OK.
-- **Spojeno u `main` `b698611` (2026-09-28): PLOČA-2 (T59–T62).** 21 datoteka, +672/−77, sedam
+- **Spojeno u `main` `b698611` (2026-09-28): PLOČA-2 (T59–T62).** 21 datoteka, +672/−77, šest
   commita. Prvi prolaz punih brana na `main`-u bio je crven (`cargo test --workspace`) zbog zastarjelih
   artefakata u zajedničkom `target`-u iz dimnog testa T62 (gradnja iz drugog radnog stabla u isti
   `target`, ne kvar u kodu — `PROGRESS.md`, ruling R78); nakon čišćenja artefakata sve zeleno. Verzija

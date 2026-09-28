@@ -40,7 +40,7 @@ metoda), vrh `main`-a `fd3b452`. PLOČA T59–T61 je ostala izgrađena na grani,
 popravaka `M2/62`.
 
 **Sesija 6 (2026-09-28) je spojila PLOČA-2 (T59–T62) → `main` `b698611`**: prekidač dan/tjedan/mjesec,
-grafovi u svih osam sekcija ploče Projekt, stupac „grana" u Dnevniku, `EXPLAIN_IDS` 37 → 44; krug
+grafovi u šest od osam sekcija ploče Projekt, stupac „grana" u Dnevniku, `EXPLAIN_IDS` 37 → 44; krug
 popravaka `M2/62` (recenziran, dva prolaza popravaka) nakon dimnog testa nad klonom Sokrat Studyja.
 Verzija u kodu ostaje `1.0.0-pre.4`. Sljedeće: tok IZDANJE (T35, T63, T43) i 1.0.0.
 

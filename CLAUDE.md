@@ -79,7 +79,7 @@ Testovi i brane: `docs/workflow/TESTING.md`.
 - **T44–T62 + T64 u `main`-u** (vrh `b698611`, verzija `1.0.0-pre.4`, nepromijenjena): grane u
   mjerenju svih lokalnih grana (S-032), dnevnik unija stabala (S-033), **LANCI T64** — nespojene grane
   su lanci, signal broji vrhove ne svaku granu (S-038); **PLOČA T59–T62 spojena** — prekidač
-  dan/tjedan/mjesec, grafovi u svih osam sekcija ploče Projekt, stupac grane u Dnevniku,
+  dan/tjedan/mjesec, grafovi u šest od osam sekcija ploče Projekt, stupac grane u Dnevniku,
   `EXPLAIN_IDS` 37 → 44, krug popravaka `M2/62` nakon dimnog testa.
 - **Dva stabla:** `sokratis` (`main`) · `sokratis.rel` (`feat/release`, T35 napola, necommitano) —
   ne dirati dok tok IZDANJE ne dođe na red. **Sljedeće:** tok IZDANJE (T35, T63, T43, instalater
