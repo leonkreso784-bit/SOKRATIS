@@ -1,16 +1,19 @@
 # ARHITEKTURA 1.0.0 — grane · ploča · izlaz (drugi rez, nakon Leonovih nalaza)
 
+> **✅ ISPUNJEN 2026-09-28 — referenca, ne izvor istine.** Spec drugog reza do 1.0.0 (S-032…S-038); arhiviran na
+> izdanju 1.0.0 (S-031). Što je izgrađeno: [architecture/ARCHITECTURE.md](../architecture/ARCHITECTURE.md). Status ispod je izvorni.
+
 **Status:** 🟩 AKTIVAN SPEC — napisan 2026-09-24 iz brainstorminga s Leonom nad
 [product/NALAZI_LEON_2026-09-23.md](../product/NALAZI_LEON_2026-09-23.md) (pitanje po pitanje, odluke
 **S-032…S-037** u [records/DECISIONS.md](../records/DECISIONS.md)) · jedini aktivni spec u `plan/` ·
 **preuzima etapu 3 „izdanje"** iz speca M2 (§13.1, §13.8), koji je istoga dana arhiviran:
 [archive/ARHITEKTURA_M2.md](../archive/ARHITEKTURA_M2.md) · plan cigli:
-[superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md](../superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md)
+[superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md](2026-09-24-1-0-0-grane-i-ploca.md)
 (T44–T64, napisan 2026-09-24 nakon Leonova pregleda speca; T64 dodan 2026-09-25, §1.4).
 
 Što je STVARNO izgrađeno do ovog speca opisuje
 [architecture/ARCHITECTURE.md](../architecture/ARCHITECTURE.md) (u trenutku pisanja verzija `1.0.0-pre.1` u `main`-u; danas `1.0.0-pre.3`);
-status milestonea [ROADMAP.md](./ROADMAP.md); što ostaje za kasnije
+status milestonea [ROADMAP.md](../plan/ROADMAP.md); što ostaje za kasnije
 [records/BACKLOG.md](../records/BACKLOG.md).
 
 > **Što ovaj dokument JEST:** precizan opseg **do verzije 1.0.0** nakon što je Leon instalirao

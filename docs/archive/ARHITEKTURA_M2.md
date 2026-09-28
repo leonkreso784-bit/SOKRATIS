@@ -2,12 +2,12 @@
 
 **Status:** ✅ ISPUNJEN 2026-09-24 — **referenca, ne izvor istine.** Etape 1 „funkcija" i 2 „izgled"
 (§13.1) su u kodu (`main`, `1.0.0-pre.1`); etapa 3 „izdanje" (§13.1, §13.8) preuzeta je u novi
-aktivni spec [plan/ARHITEKTURA_1_0.md](../plan/ARHITEKTURA_1_0.md) nakon Leonovih nalaza
+aktivni spec [plan/ARHITEKTURA_1_0.md](ARHITEKTURA_1_0.md) nakon Leonovih nalaza
 ([product/NALAZI_LEON_2026-09-23.md](../product/NALAZI_LEON_2026-09-23.md)) — on mijenja §1.1
 (grane), §6.1/§6.2 (pogledi → ploča), §6.6 (grafovi) i §5.3 (tray). Što je stvarno izgrađeno:
 [architecture/ARCHITECTURE.md](../architecture/ARCHITECTURE.md). Izvorni status: napisan 2026-09-18 iz
 brainstorminga s Leonom i isti dan odobren; plan cigli
-[superpowers/plans/2026-09-18-m2-desktop.md](../superpowers/plans/2026-09-18-m2-desktop.md);
+[superpowers/plans/2026-09-18-m2-desktop.md](2026-09-18-m2-desktop.md);
 dopunjen 2026-09-21 rezom za 1.0.0 (§13, S-024…S-031).
 
 Što je od M1 stvarno izgrađeno opisuje [architecture/ARCHITECTURE.md](../architecture/ARCHITECTURE.md);

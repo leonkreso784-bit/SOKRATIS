@@ -16,10 +16,9 @@ Model je preuzet iz Sokrat Studyja; uzeto je samo ono što ovom projektu treba.
 | **`architecture/`** | **ŠTO JE IZGRAĐENO** — sustav kakav stoji u `crates/`, bez kronologije | kad kod pomakne granicu |
 | **`workflow/`** | **KAKO RADIMO** — testiranje, Rust-konvencije i pojmovnik | povremeno |
 | **`records/`** | **POVIJEST** — dnevnik, changelog, odluke, backlog | stalno |
-| **`archive/`** | **ISPUNJENO** (specovi, zapisi namjere) — referenca, **nikad izvor istine** | isti dan kad dokument ispuni svrhu (S-031) |
-| **`superpowers/plans/`** | planovi implementacije (cigla po cigla) za aktivni spec | po milestoneu |
+| **`archive/`** | **ISPUNJENO** (specovi, planovi cigli, zapisi namjere) — referenca, **nikad izvor istine** | isti dan kad dokument ispuni svrhu (S-031) |
 
-**Što još NE postoji i kad nastaje:** `records/BUGS.md` s prvim bugom · `records/HISTORY.md` kad
+**Što još NE postoji i kad nastaje:** `superpowers/plans/` s planom cigli sljedećeg aktivnog speca (M3; planovi M1, M2 i 1.0.0 su u `archive/`) · `records/BUGS.md` s prvim bugom · `records/HISTORY.md` kad
 zatvorenih milestonea bude toliko da ih `CHANGELOG.md` više ne drži pregledno (M1 je zasad cijeli u
 0.1.0, pa bi drugi dokument bio duplikat — S-010) · `ideas/` s prvom idejom koja je prevelika za
 redak u backlogu.
@@ -53,20 +52,16 @@ redak u backlogu.
 | Dokument | Svrha |
 |---|---|
 | [PRD.md](./product/PRD.md) | Što gradimo, za koga, opseg po milestoneima, ne-ciljevi, rječnik |
-| [NALAZI_LEON_2026-09-23.md](./product/NALAZI_LEON_2026-09-23.md) | Leonovi nalazi nad instaliranom „1.0.0-pre" s provjerenim uzrocima (metrike vide samo `main`, premalo/nečitki grafovi, X mora zatvoriti + animacija svaki put, konzolni prozor `git`-a, više projekata, kartica → nadzorna ploča) — **pretvoreno 2026-09-24** brainstormingom u S-032…S-037 i spec [ARHITEKTURA_1_0.md](./plan/ARHITEKTURA_1_0.md); ovdje ostaje kao izvorni zapis |
+| [NALAZI_LEON_2026-09-23.md](./product/NALAZI_LEON_2026-09-23.md) | Leonovi nalazi nad instaliranom „1.0.0-pre" s provjerenim uzrocima (metrike vide samo `main`, premalo/nečitki grafovi, X mora zatvoriti + animacija svaki put, konzolni prozor `git`-a, više projekata, kartica → nadzorna ploča) — **pretvoreno 2026-09-24** brainstormingom u S-032…S-037 i spec [ARHITEKTURA_1_0.md](./archive/ARHITEKTURA_1_0.md); ovdje ostaje kao izvorni zapis |
 
 ## `plan/` — što sada
 
-Spec Milestonea 1 je **ispunjen i arhiviran** ([archive/ARHITEKTURA_M1.md](./archive/ARHITEKTURA_M1.md));
-spec M2 (desktop) je **ispunjen i arhiviran** ([archive/ARHITEKTURA_M2.md](./archive/ARHITEKTURA_M2.md),
-2026-09-24) — etape 1–2 su u kodu, etapa 3 „izdanje" seli u novi spec. **Jedini aktivni spec je
-ARHITEKTURA_1_0** (drugi rez do 1.0.0, iz brainstorminga nad Leonovim nalazima, S-032…S-037). Gdje je
-izvedba stala i što je sljedeće kaže `plan/ROADMAP.md` („Gdje smo“) — ovaj indeks to ne ponavlja.
+**Između milestonea** (od izdanja 1.0.0, 2026-09-28): `plan/` nosi samo ROADMAP — nema aktivnog speca;
+sljedeći nastaje kad M3 krene. Gdje smo i što je sljedeće kaže ROADMAP („Gdje smo“), ne ovaj indeks.
 
 | Dokument | Svrha |
 |---|---|
 | [ROADMAP.md](./plan/ROADMAP.md) | 🟩 **živ** — milestonei M0–M4, status, što je sljedeće |
-| [ARHITEKTURA_1_0.md](./plan/ARHITEKTURA_1_0.md) | 🟩 **AKTIVAN SPEC** (2026-09-24, iz brainstorminga nad Leonovim nalazima, S-032…S-037) — do 1.0.0: metrike nad **svim lokalnim granama** s oznakom grane po commitu, dnevnik kao unija stabala, nadzorna ploča projekta s 8 sekcija i 11 grafova (d3-matematika + naš SVG), X = upit → izlaz bez traya, kvar konzolnog prozora; preuzima etapu „izdanje" iz speca M2 |
 
 ## `architecture/` — što je izgrađeno
 
@@ -100,14 +95,8 @@ izvedba stala i što je sljedeće kaže `plan/ROADMAP.md` („Gdje smo“) — o
 |---|---|
 | [ARHITEKTURA_M1.md](./archive/ARHITEKTURA_M1.md) | ✅ ISPUNJEN 2026-09-17 — spec arhitekture i opsega Milestonea 1 (jezgra · io · CLI) |
 | [PLAN_DESIGNE.md](./archive/PLAN_DESIGNE.md) | ✅ ISPUNJEN 2026-09-21 — Leonov zapis namjere (izgled, dodaci, put do 1.0.0); pretvoren u rez S-024…S-031, spec M2 §13 i stavke u `records/BACKLOG.md` |
-| [ARHITEKTURA_M2.md](./archive/ARHITEKTURA_M2.md) | ✅ ISPUNJEN 2026-09-24 (etape 1–2 u kodu; etapa 3 „izdanje" preuzeta u `plan/ARHITEKTURA_1_0.md`) — spec desktopa: granice (`store`, `desktop` bez logike), Tauri ugovor, SQLite shema, watcher, pogledi, teme i znak, splash, ovisnosti, testovi, §13 rez za 1.0.0 |
-
-## `superpowers/plans/` — planovi implementacije
-
-Nastaju iz aktivnog speca, jedan po milestoneu.
-
-| Dokument | Svrha |
-|---|---|
-| [2026-09-17-m1-jezgra-i-cli.md](./superpowers/plans/2026-09-17-m1-jezgra-i-cli.md) | **Plan M1** — ✅ IZVRŠEN 2026-09-17: 22 cigle u 8 tokova (kostur · fixture · parse · metrike · docs+pravila · io · cli · integracija) s testovima i kodom po koraku; vlasništvo datoteka po toku. Zapis plana, ne izvor istine |
-| [2026-09-18-m2-desktop.md](./superpowers/plans/2026-09-18-m2-desktop.md) | **Plan M2** — 📋 AKTIVAN od 2026-09-18, **dopunjen 2026-09-21 ciglama T36–T43** (rez za 1.0.0, spec §13): 35 + 8 cigli u 9 tokova (kostur · jezgra · profil · io · store · cli · sučelje · desktop · integracija) iz speca `archive/ARHITEKTURA_M2.md`; testovi i kod po koraku, vlasništvo datoteka po toku, ovisnosti među tokovima, dva Leonova OK-a (`npm install`, tray-ikona); **od 2026-09-24 nastavlja ga plan 1.0.0** (T44–T64) — T35 i T43 ostaju odavde |
-| [2026-09-24-1-0-0-grane-i-ploca.md](./superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md) | **Plan 1.0.0 (drugi rez)** — 📋 AKTIVAN od 2026-09-24, iz speca `plan/ARHITEKTURA_1_0.md`: cigle **T44–T64** u 7 tokova (DESKTOP-2 · JEZGRA-2 · IO-2 · GRAFOVI · PLOČA · LANCI · IZDANJE; T64 dodan 2026-09-25, S-038), test-prvo, vlasništvo datoteka po toku, pet sesija s instalaterom „1.0.0-pre.N" nakon svake; preuzima T35/T43 iz plana M2 |
+| [ARHITEKTURA_M2.md](./archive/ARHITEKTURA_M2.md) | ✅ ISPUNJEN 2026-09-24 (etape 1–2 u kodu; etapa 3 „izdanje" preuzeta u `ARHITEKTURA_1_0.md`) — spec desktopa: granice (`store`, `desktop` bez logike), Tauri ugovor, SQLite shema, watcher, pogledi, teme i znak, splash, ovisnosti, testovi, §13 rez za 1.0.0 |
+| [ARHITEKTURA_1_0.md](./archive/ARHITEKTURA_1_0.md) | ✅ ISPUNJEN 2026-09-28 — spec drugog reza do 1.0.0 (S-032…S-038): metrike nad svim lokalnim granama, dnevnik kao unija stabala, ploča projekta s grafovima, X = upit → izlaz bez traya, lanci nespojenih grana |
+| [2026-09-17-m1-jezgra-i-cli.md](./archive/2026-09-17-m1-jezgra-i-cli.md) | ✅ IZVRŠEN — plan cigli M1: 22 cigle u 8 tokova, testovi i kod po koraku, vlasništvo datoteka po toku |
+| [2026-09-18-m2-desktop.md](./archive/2026-09-18-m2-desktop.md) | ✅ IZVRŠEN — plan cigli M2 (T1–T43) iz speca `ARHITEKTURA_M2.md`, uključujući rez za 1.0.0 (T36–T43) |
+| [2026-09-24-1-0-0-grane-i-ploca.md](./archive/2026-09-24-1-0-0-grane-i-ploca.md) | ✅ IZVRŠEN — plan cigli drugog reza T44–T64 u 7 tokova (DESKTOP-2 · JEZGRA-2 · IO-2 · GRAFOVI · PLOČA · LANCI · IZDANJE), iz speca `ARHITEKTURA_1_0.md` |

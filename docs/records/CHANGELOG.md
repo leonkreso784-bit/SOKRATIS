@@ -3,17 +3,40 @@
 Format: [Keep a Changelog](https://keepachangelog.com/) · Verzioniranje: [SemVer](https://semver.org/).
 Isporuka = ono što je u `main`-u; sesije su u `PROGRESS.md`.
 
-## [Unreleased] — rad u tijeku
+## [Unreleased]
 
-**Milestone 2 (desktop) je u izvedbi** po odobrenom specu
-[`../archive/ARHITEKTURA_M2.md`](../archive/ARHITEKTURA_M2.md) (odluke S-012…S-022) i planu od 35 cigli;
-**drugi rez do 1.0.0** (S-032…S-037) nastavlja po
-[`../plan/ARHITEKTURA_1_0.md`](../plan/ARHITEKTURA_1_0.md).
-**Ovaj odjeljak izlazi kao 1.0.0, ne 0.2.0** (S-024; rez i dopuna speca §13 od 2026-09-21).
-**Na disku je `main` verzije `1.0.0-pre.4`** (jedan izvor: `[workspace.package]` u korijenskom
-`Cargo.toml`, M2/37, S-037) — netagirano, neobjavljeno; tag traži Leonov izričit OK na kraju etape
-izdanja (S-025). Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek sesije:
-[`PROGRESS.md`](./PROGRESS.md).
+(ništa još — sljedeće isporuke dolaze s M3)
+
+## [1.0.0] — 2026-09-28 — Desktop (Milestone 2)
+
+**Netagirano.** Datum je dan gradnje izdanja (verzija `1.0.0` u `main`-u, `82ad10e`); tag `v1.0.0` i
+izdanje na GitHubu čekaju Leonov izričit OK. Izlazi kao 1.0.0, ne 0.2.0 (S-024). Specovi:
+[`../archive/ARHITEKTURA_M2.md`](../archive/ARHITEKTURA_M2.md) (S-012…S-031) i
+[`../archive/ARHITEKTURA_1_0.md`](../archive/ARHITEKTURA_1_0.md) (drugi rez, S-032…S-038).
+
+### Što korisnik dobiva
+
+- **Desktop aplikacija za Windows** (Tauri 2) koja prati više projekata odjednom; projekt se dodaje
+  izborom mape, a sva radna stabla istog repozitorija su jedan projekt (S-015). Bez oblaka i bez računa.
+- **Pregled** svih projekata na karticama (zadnji commit, broj radnih stabala, signali); klik na
+  karticu otvara **ploču Projekt** s osam sekcija — Sažetak, Tempo, Grane, Vrste rada, Faze, Isporuke,
+  Pokazatelji, Dokumentacija — i grafovima (stupci, linija, toplinska karta, doba dana, Gantt faza).
+- **Mjerenje preko svih lokalnih grana**, s granom uz svaki commit i satima po grani (S-032); dnevnik se
+  čita iz svih radnih stabala (S-033). `--scope default` / `branch_scope: "default"` vraća mjerenje
+  samo nad zadanom granom.
+- **Signal nespojenih grana broji lance**, ne svaku granu (S-038); svaki signal i dalje nosi dokaz.
+- **Osvježavanje bez klika:** promjena u repou ponovno izračuna projekt; obavijest OS-a samo na prijelaz
+  u Alert. Prozor ostaje živ dok se računa.
+- **Dnevnik** (vrsta rada po commitu, ručni ispravak) i **Vizije** (dodavanje i uređivanje u mjestu) —
+  ručni podaci se pišu u `<repo>/.sokratis/`.
+- **Kartica s objašnjenjem** uz svaku brojku i graf (što mjeri, kako se računa, kako čitati).
+- **Postavke:** četiri teme, hrvatski/engleski, pokretanje sa sustavom, animacije uključene/isključene.
+- **Animacija pokretanja** pri svakom pokretanju; X pita „Zatvoriti Sokratis?" pa izlazi (S-036).
+- **Instalater NSIS**, nepotpisan, samo za vlasnika (S-029). Licenca još nije odabrana.
+- **CLI** (`sokratis`) dobiva `report --until` i `report --scope all|default`; tablica imenuje mjereni
+  opseg i ima sekciju GRANE.
+
+### Po ciglama
 
 - **`M2/1a` — kostur M2 (2026-09-18).** Korisnik CLI-ja **ne vidi ništa novo**: nema nove naredbe ni
   promjene ponašanja, sve tri naredbe rade kao u 0.1.0. Što se ispod promijenilo: `Report` u JSON-u
@@ -442,6 +465,34 @@ izdanja (S-025). Status: [`../plan/ROADMAP.md`](../plan/ROADMAP.md) · tijek ses
   artefakata u zajedničkom `target`-u iz dimnog testa T62 (gradnja iz drugog radnog stabla u isti
   `target`, ne kvar u kodu — `PROGRESS.md`, ruling R78); nakon čišćenja artefakata sve zeleno. Verzija
   u kodu ostaje `1.0.0-pre.4`.
+
+- **`M2/35` — verzija 1.0.0, vlastiti profil izuzima fixture, mjerenja (2026-09-28, IZDANJE).**
+  Korisnik dobiva `sokratis --version` = `sokratis 1.0.0` i instalater s istim brojem: jedan izvor je
+  `[workspace.package]` u korijenskom `Cargo.toml`, `apps/desktop/package.json` ga zrcali (test
+  `version.test.ts`). Sokratisov vlastiti profil postavlja `test_path_exclude: ["/fixtures/"]`, pa
+  fixture pariteta više ne napuhuje njegov udio testnih redaka: `test_share` **0,321 → 0,13**.
+  **Mjereno 2026-09-28** (stroj usporedno opterećen — gornja ocjena): CLI `report` nad repoom prvog
+  korisnika, opseg `all` (11 grana, 359 commita) medijan **5,0 s** · opseg `default` (190 commita)
+  medijan **2,4 s** (M1: 3,2 s); desktop „commit → `report_updated`" 2376 · 1638 · 2179 ms, medijan
+  **2179 ms** (uključuje odgodu watchera 600 ms).
+- **`M2/63` — krug popravaka nakon završne recenzije 1.0.0 (2026-09-28, IZDANJE).** Završna recenzija
+  (presuda „S popravcima", bez Critical nalaza) dala je pet Important i jedan Minor nalaz; svih šest je
+  zatvoreno jednim krugom (re-recenzija: spojivo). Korisnik dobiva: (1) **prozor ostaje živ dok se
+  izvještaj računa** — teške naredbe više ne rade na glavnoj niti (laka naredba poslana usred teške
+  čekala je 530–801 ms, sad 3–5 ms; zahtjev za zatvaranje usred niza izračuna otvara upit prije nego
+  ijedan izračun završi); (2) **nov projekt se sam izračuna** odmah nakon dodavanja (prije: 12 s nakon
+  dodavanja bez izračuna, sad izračunat unutar 2 s); (3) **poruka greške nosi uzrok** (npr. koje polje
+  profila je krivo), ne samo putanju; (4) **broj radnih stabala na kartici Pregleda** dolazi iz zadnjeg
+  izračuna, ne iz dana dodavanja (kartica 3 uz izmjerena 4 → 4); (5) tri kartice s objašnjenjem
+  usklađene s kodom drugog reza; (6) „danas" na grafovima je datum ovog računala, ne UTC. Mjerenja su
+  orkestratorova, `tauri dev` nad klonom pravog repoa sa zasebnom bazom, prije i poslije popravka.
+- **Spojeno u `main` `82ad10e` (2026-09-28): IZDANJE (T35, `M2/63`).** Brane na `main`-u: `cargo fmt
+  --check` OK · `cargo clippy --workspace --all-targets -- -D warnings` OK · `cargo test --workspace`
+  **182 passed, 0 failed, 2 ignored** · `npm run check` (svelte-check bez grešaka · i18n **342** ključa
+  hr = en · kontrast sve četiri teme · vitest **141/141** u 15 datoteka) · `npm run build` OK ·
+  `sokratis docs .` 100/100 · `signals .` nema signala · `sokratis --version` = `sokratis 1.0.0`.
+  Seljenje M1 sesija iz `PROGRESS.md` u arhivu je izmjereno i odgođeno (isporuke bi pale 18 → 16,
+  `records/BACKLOG.md`).
 
 ## [0.1.0] — 2026-09-17 — Jezgra i CLI (Milestone 1)
 

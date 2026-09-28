@@ -13,8 +13,8 @@
 | **integracijski (io)** | `crates/sokratis-io/tests/` | git-proces, radna stabla (**od T49/T50, 2026-09-24** `tests/common/mod.rs` += `add_worktree`/`commit_at`, uklj. detached stablo bez retka `branch` u porcelainu), profil, ručni podaci; **od T64 (2026-09-27)** `tests/project.rs` dokazuje da se `branch_graph` puni SAMO kad postoji nespojena grana osim zadane (repo s jednom granom ne plaća proces); `tests/perf.rs` tvrdi GORNJU GRANICU git-procesa po izvještaju (brojka: `../records/CHANGELOG.md`, S-010); **od T52 (2026-09-26)** isti fajl += `measure_real_repo_both_scopes` — `#[ignore]` jer ovisi o pravom repozitoriju na disku, ručno se pokreće `SOKRATIS_MEASURE_REPO=<putanja> cargo test -p sokratis-io --test perf -- --ignored --nocapture` (naredba u doc-komentaru cigle), brojka procesa/trajanja: `../records/CHANGELOG.md` | **privremeni repo** stvoren u testu; `measure_real_repo_both_scopes` čita **pravi** repozitorij s diska |
 | **izlazni kodovi (cli)** | `crates/sokratis-cli/tests/cli.rs` | ugovor prema preflightu: **0** (nema signala) i **2** (Alert) nad repoom s poznatom poviješću, **3** za pogrešnu uporabu i za putanju koja nije repozitorij, **0** za `--help`/`--version`; **od T51 (2026-09-26)** += `--scope`: nepoznata vrijednost je pogrešna uporaba (**3**), `--scope default` daje isto ponašanje kao `1.0.0-pre.1` (`scope_default_matches_pre_1_0_behaviour`) | **privremeni repo** (`tests/common/mod.rs`) |
 | **pohrana (store)** — *od M2* | `crates/sokratis-store/src/**` (`#[cfg(test)]`) | migracije se primijene od prazne baze; registar, postavke, snimke i keš sirovih commita (M2/15–18) rade; od DESKTOP-a (T29–T30) imaju pravog pozivatelja u aplikaciji, ali test i dalje ostaje nad `:memory:` bazom (`docs/architecture/ARCHITECTURE.md` §1) | **`:memory:` baza** (`Store::open_in_memory`) — bez gita i bez datoteka |
-| **sučelje (TS/Svelte)** — *od M2* | `apps/desktop/tests/**`, uz komponente | oblikovanje brojki, i18n ključevi (**342** ključa hr=en), kontrast tokena, grafovi s praznim ulazom, ugovor `TauriApi` prema `commands.rs` (`tests/tauri-api.test.ts`, lažni `invoke`/`listen`, **od 2026-09-24 uklj. `quit`/`onCloseRequested`**), verzija iz jednog izvora (`tests/version.test.ts`), pokret bez DOM-a (`tests/motion.test.ts`, čita `motion.css` kroz `scripts/read-motion.mjs`), pokrivenost kartice s objašnjenjem (`tests/explain.test.ts` — svaki `id` ima sva tri ključa u oba jezika, svaki ključ `explain.*` ima svoj `id`, `EXPLAIN_IDS.length === 44` kao regresijska brana, 18 id-eva pokazatelja iz prave snimke jezgre), matematika osi grafova bez DOM-a (`tests/scales.test.ts`, `tests/bucket.test.ts`, od T53; **od `M2/62`** += `dayLevelTicks` — korak u cijelim danima za dnevni format, raspon od jedne točke daje točno jedan tick bez ponavljanja), **raspored grafova bez DOM-a** (`tests/layout.test.ts`, od T54/T55, **prošireno T56/T57 na 6 rasporeda**: okvir, stupci, linija, toplinska karta, histogram, gantt, vodoravni stupci — **stari `tests/scale.test.ts` je nestao**, njegovi testovi su preseljeni u `scales.test.ts`/`layout.test.ts` uz kod koji sada testiraju, R51/R52; **od `M2/62`** += `fitLabel`/`shortLabel` (natpis retka kraćen na „…", pun naziv u `label`), `XTick.anchor` (zadnja oznaka `'end'` kad bi izašla iz okvira), test da nijedna koordinata nije `NaN` nad rubnim rasporedima), **od T58** `tests/helpers.test.ts` += pokrivenost `SECTIONS`/`signalCounts` (ploča projekta), **od T59** += `kindSeries` (`views/helpers.ts`, pet vrsta rada → `Series[]` za naslagani graf) | `npm run check` u `apps/desktop`: `svelte-check` + `vitest` (**140** testova, **15** datoteka) |
-| **ljuska (desktop)** — *od M2* | `apps/desktop/src-tauri/src/commands.rs` (`#[cfg(test)]`) | S-013: crate nema logike, pa je jedini jedinični test pretvorba birača raspona (`Range::to_dates`) u datume | 2 testa nad fiksnim „danas" |
+| **sučelje (TS/Svelte)** — *od M2* | `apps/desktop/tests/**`, uz komponente | oblikovanje brojki i lokalni „danas" (`tests/format.test.ts`, `localYmd` od `M2/63`), i18n ključevi (hr = en), kontrast tokena, grafovi s praznim ulazom, ugovor `TauriApi` prema `commands.rs` (`tests/tauri-api.test.ts`, lažni `invoke`/`listen`, **od 2026-09-24 uklj. `quit`/`onCloseRequested`**), verzija iz jednog izvora (`tests/version.test.ts`), pokret bez DOM-a (`tests/motion.test.ts`, čita `motion.css` kroz `scripts/read-motion.mjs`), pokrivenost kartice s objašnjenjem (`tests/explain.test.ts` — svaki `id` ima sva tri ključa u oba jezika, svaki ključ `explain.*` ima svoj `id`, `EXPLAIN_IDS.length === 44` kao regresijska brana, 18 id-eva pokazatelja iz prave snimke jezgre), matematika osi grafova bez DOM-a (`tests/scales.test.ts`, `tests/bucket.test.ts`, od T53; **od `M2/62`** += `dayLevelTicks` — korak u cijelim danima za dnevni format, raspon od jedne točke daje točno jedan tick bez ponavljanja), **raspored grafova bez DOM-a** (`tests/layout.test.ts`, od T54/T55, **prošireno T56/T57 na 6 rasporeda**: okvir, stupci, linija, toplinska karta, histogram, gantt, vodoravni stupci — **stari `tests/scale.test.ts` je nestao**, njegovi testovi su preseljeni u `scales.test.ts`/`layout.test.ts` uz kod koji sada testiraju, R51/R52; **od `M2/62`** += `fitLabel`/`shortLabel` (natpis retka kraćen na „…", pun naziv u `label`), `XTick.anchor` (zadnja oznaka `'end'` kad bi izašla iz okvira), test da nijedna koordinata nije `NaN` nad rubnim rasporedima), **od T58** `tests/helpers.test.ts` += pokrivenost `SECTIONS`/`signalCounts` (ploča projekta), **od T59** += `kindSeries` (`views/helpers.ts`, pet vrsta rada → `Series[]` za naslagani graf) | `npm run check` u `apps/desktop`: `svelte-check` + `check:i18n` + `check:contrast` + `vitest` (brojke: `CHANGELOG.md`) |
+| **ljuska (desktop)** — *od M2* | `apps/desktop/src-tauri/src/{commands,state,summary}.rs` (`#[cfg(test)]`) | S-013: crate nema logike koju bi vrijedilo testirati, pa su testovi samo čiste pretvorbe: birač raspona (`Range`, JSON oblik i `to_dates`), ime datoteke baze po gradnji, lanac uzroka greške u tekstu za sučelje (`state::text`, `M2/63`), broj stabala iz izvještaja ili registra (`summary::summarize`, `M2/63`) | fiksni „danas", ručno složene greške i minimalan `Report` iz `build_report` |
 
 **Tekuće brojke brana (fmt/clippy/test/svelte-check/i18n/vitest/build) nikad se ne prepisuju ovamo**
 (S-010) — kanonske su u [`../records/CHANGELOG.md`](../records/CHANGELOG.md), po svakoj spojenoj
@@ -29,7 +29,7 @@ modul kad datoteka nema vlastiti `@import "tailwindcss"`.
 **Snapshot `Report`-a** je ugovor prema sučelju (S-022): `insta` je **dev-ovisnost `core`-a od
 `M2/1a`**, a sam test postoji od cigle M2/2 (2026-09-18) —
 `crates/sokratis-core/tests/snapshot.rs` + `tests/snapshots/snapshot__report-sokratstudy-2026-09-17.snap`
-(467 redaka, 15 ključeva na vrhu). Od sada svaka promjena oblika JSON-a mora biti **namjerna**:
+(po jedan ključ na vrhu za svako polje `Report`-a). Svaka promjena oblika JSON-a mora biti **namjerna**:
 `INSTA_UPDATE=always cargo test -p sokratis-core --test snapshot` prepiše snimku, `git diff` pokaže
 točno što se promijenilo, a rečenica u commitu kaže koje polje i zašto. Provjeri prije `git add` da
 nije ostao `.snap.new` (insta ga ostavi kad snimka još ne postoji ili se pending-diff nije razriješio).
@@ -93,7 +93,7 @@ zelena (svelte-check 0 grešaka + vitest). Rust-tokovi u svojim stablima vrte br
 cratea; razlog i naredba: [`AGENTI.md`](./AGENTI.md) §5.
 
 Crveno ne ide u commit. **Izlazni kod 1 nije dokaz da je pao test koji testiraš** — čita se poruka
-(pouka iz Sokrat Studyja). CI (GitHub Actions) dolazi s M3, kad postoji remote. Koliko testova ima
+(pouka iz Sokrat Studyja). CI (GitHub Actions) još ne postoji — `records/BACKLOG.md`, M4. Koliko testova ima
 danas piše [`../records/CHANGELOG.md`](../records/CHANGELOG.md) — brojka prepisana ovamo bi ostarila.
 
 **Nakon SVAKE gradnje iz drugog radnog stabla u ZAJEDNIČKI `target`** (dimni test s
@@ -109,8 +109,8 @@ sporo se prevode) ostaju netaknute — briše se samo pet naših crateova.
 
 ## 5 · Što se NE testira testom
 
-- **Ljuska i izgled** — `sokratis-desktop` po S-013 gotovo nema logike (jedini test: pretvorba
-  `Range`, §1). Dokaz da se ljuska stvarno pokreće je **dimni test** `npm run tauri dev`, ručno
+- **Ljuska i izgled** — `sokratis-desktop` po S-013 gotovo nema logike (testovi su samo čiste
+  pretvorbe, §1). Dokaz da se ljuska stvarno pokreće je **dimni test** `npm run tauri dev`, ručno
   pokrenut prije spajanja svake DESKTOP/INTEGRACIJA-cigle (spec M2 §9): splash prikazan i zatvoren
   točno jednom, glavni prozor se pojavi tek nakon animacije I prvog izračuna svih projekata, druga
   instanca podigne postojeći prozor umjesto da otvori novi, **X pokazuje upit „Zatvoriti Sokratis?" —
@@ -163,9 +163,21 @@ sporo se prevode) ostaju netaknute — briše se samo pet naših crateova.
   `evaluate`, provjera da nijedan `<text>` ne izlazi iz okvira grafa na dvije širine prozora. Dimni test
   nad pravim podacima (gore) i vizualna provjera nad `MockApi`-jem hvataju RAZLIČITE rubove — obje idu
   prije spajanja cigle koja dira grafove.
+- **Dimni test izdanja 1.0.0 (sesija 6, 2026-09-28, nalazi završne recenzije T63)** — isti postav kao
+  T62 (`tauri dev`, klon pravog repoa, zasebna baza, CDP), mjereno PRIJE i POSLIJE kruga `M2/63`
+  (pravilo #4): **glavna nit** se mjeri lakom naredbom (`get_settings`) poslanom usred teške
+  (`get_report`) — koliko laka čeka kaže drži li teška glavnu nit; **zatvaranje usred izračuna** —
+  poruka za zatvaranje prozora dok niz izračuna traje, dijalog potvrde mora biti u DOM-u prije nego
+  ijedan završi; **prvi izračun novog projekta** — `last_refresh`/`last_commit` kartice nekoliko sekundi
+  nakon dodavanja; **broj stabala** — kartica prema `touched.worktrees` nakon dodanog stabla u klonu.
+  Brojke prije → poslije: `CHANGELOG.md`, unos `M2/63`. Vučenje prozora mišem nije mjereno (nema
+  ulaznog uređaja) — zamjena je mjerenje glavne niti.
 - **Na ručnoj listi za Leona ostaju** (`docs/architecture/ARCHITECTURE.md` §11 — nisu provjereni ni u
   S2 ni u S3 ni u S4): autostart u `HKCU\…\Run`, obavijest na prijelaz u
   Alert, preskok splasha, `prefers-reduced-motion`, osvježenje bez klika (sa štopericom), četiri teme,
   kartica s objašnjenjem vizualno (S4 ju je provjerio samo testovima i strukturom).
-- **Performanse** — danas se ne testiraju; M2/11 prvo **mjeri** (brojač git-procesa po izvještaju) i
-  tek to mjerenje nosi brojku u test; `gix` je odgovor koji i dalje čeka pitanje.
+- **Performanse** — test tvrdi samo GORNJU GRANICU git-procesa po izvještaju (`io/tests/perf.rs`);
+  trajanje se **mjeri**, ne testira: `#[ignore]` testovi nad pravim repozitorijem
+  (`measure_real_repo_both_scopes`, `io/tests/cache.rs::measure_cached_input_over_a_real_repo`) i
+  mjerenja CLI-ja i desktopa na izdanju — brojke su na jednom mjestu, `CHANGELOG.md` (`[1.0.0]`, unos
+  `M2/35`). `gix` je odgovor koji i dalje čeka pitanje.

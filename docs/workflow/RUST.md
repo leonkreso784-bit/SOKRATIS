@@ -11,12 +11,12 @@
 | **edition 2024**, stable toolchain, MSVC target | zadano za nov projekt; MSVC jer Tauri to očekuje na Windowsu |
 | **`core` bez I/O-a** (S-002) | testira se bez gita; ownership bez lifetimeova prema vanjskom svijetu |
 | **greške:** `thiserror` u `core`/`io` (tipizirane), `anyhow` samo u `cli` | biblioteka mora reći *koja* greška; binarna smije samo ispisati |
-| **`unwrap()`/`expect()` samo u testovima**, uz iznimku koju **plan izričito imenuje i obrazloži** — danas jedina: `expect` na `tauri::Builder::run` (`apps/desktop/src-tauri/src/lib.rs`) | u produkcijskom kodu pad je bug, ne tok; iznimka vrijedi tamo gdje nastavak nema smisla (ljuska koja se nije digla) i mora stajati u cigli, ne u glavi |
+| **`unwrap()`/`expect()` samo u testovima**, uz iznimku koju **plan izričito imenuje i obrazloži** — danas dvije, obje u `apps/desktop/src-tauri/src/lib.rs`: `expect` na `Store::open` (bez registra projekata nema što raditi) i na `tauri::Builder::run` | u produkcijskom kodu pad je bug, ne tok; iznimka vrijedi tamo gdje nastavak nema smisla (ljuska koja se nije digla) i mora stajati u cigli, ne u glavi |
 | **`?` umjesto `match` na `Result` gdje samo propagiramo** | manje buke, ista sigurnost |
 | **jedno pravilo = jedna datoteka** u `core/src/rules/` | novo pravilo ne dira stara; test uz kod |
 | **`///` doc-komentar na svakom javnom tipu i funkciji** | `cargo doc` postaje dokumentacija jezgre |
 | **`serde` derive na svemu što izlazi iz jezgre** | JSON je ugovor prema CLI-ju i sučelju |
-| **bez `async` u M1** | nema mreže; `notify` u M2 je jedini kandidat |
+| **bez vlastitog `async` koda** | nema mreže ni async runtimea u našim crateovima; jedino `async` je u desktopu — `#[tauri::command(async)]` i `async fn add_project` samo šalju naredbu na nit izvršitelja da ne smrzne prozor (M2/63), tijela ostaju sinkrona |
 | **lifetime samo gdje štedi kopiju koja bi boljela:** `IndicatorInput<'a>` je jedina iznimka u jezgri; `Context` je u vlasništvu (klonira se jednom po izvještaju) | pravila i parseri ostaju čitljivi bez `'a` |
 | **imenovanje:** tipovi `PascalCase`, funkcije/polja `snake_case`, engleski | S-008; clippy to i traži |
 | **svaki `std::process::Command` u `io`/desktopu ide kroz `git_command`** | M2/44, kvar 4 iz Leonovih nalaza — instalirana GUI aplikacija bljeskala konzolu `git.exe` pri svakom osvježenju; `git.rs::git_command(repo)` je jedino mjesto koje smije zvati `Command::new("git")` i na Windowsu postavlja `CREATE_NO_WINDOW` |
@@ -31,7 +31,7 @@
 | `anyhow` | greške u `cli` | binarnoj je dovoljno „što je pošlo krivo" |
 | `clap` (derive) | argumenti CLI-ja | `--json`, `--since` bez ručnog parsiranja |
 | `chrono` (samo `io`) | današnji lokalni datum za `ReportInput.today` | odlučeno u planu M1 (T17): lokalni datum na Windowsu bez feature-gatea; jezgra datume računa sama (`civil.rs`), bez ovisnosti |
-| `tempfile` (dev) | privremeni repo u io- i cli-testovima | čišćenje bez ručnog `rm` |
+| `tempfile` (dev) | privremeni repo u io- i cli-testovima, privremena baza u store-testovima | čišćenje bez ručnog `rm` |
 
 **Od M2** (pinane u `M2/1a`, `[workspace.dependencies]`; verzije su `max_stable_version` s crates.io
 na 2026-09-18):
@@ -41,7 +41,7 @@ na 2026-09-18):
 | `rusqlite` (`bundled`, samo `store`) | SQLite: registar projekata, postavke, snimke brojki (S-014) | zrelo vezivanje na SQLite bez ORM-a; **`bundled`** kompilira samu knjižnicu u binarnu — tuđi stroj nema `sqlite3.dll`, a instalacija ne smije tražiti ništa izvana |
 | `notify` (samo `io`) | watcher nad `.git`, docs i `.sokratis` (S-016) | jedini održavan prenosiv watcher; koristi ReadDirectoryChangesW na Windowsu. Ovisnost je u manifestu od `M2/1a`; kod (`crates/sokratis-io/src/watch.rs`) je stigao ciglom M2/13 i od 2026-09-20 (tok IO) je u `main`-u; od DESKTOP-a (T30, `engine.rs`, 2026-09-21) ima pravog pozivatelja — nit motora čita njegov `WatchEvent` |
 | `insta` (dev, `core`) | snapshot cijelog `Report`-a nad fixtureom pariteta | **vratio se u `M2/1a` s razlogom** (S-022): M1 ga je izbacio jer bi zamrznuo oblik koji se još mijenja, M2 gradi sučelje nad tim oblikom — pa svaka promjena JSON-a mora biti vidljiva u diffu snimke. Prvi snapshot-test je M2/2 (2026-09-18): `crates/sokratis-core/tests/snapshot.rs`, 467 redaka, 15 ključeva — namjerna promjena oblika: [`TESTING.md`](./TESTING.md) §1 |
-| `tauri` 2.11.5 (+ `tauri-build` 2.6.3) | ljuska: prozori, ugovor prema sučelju (S-012, S-013) | **2.x, ne 3 alpha** — pinamo stabilno; jedina uključena mogućnost je `image-png` (**`tray-icon` maknut M2/45, S-036** — tray ukinut, `Cargo.lock` nepromijenjen jer je lock feature-agnostičan). Od DESKTOP-a (T29–T33, 2026-09-21) ljuska ima jedanaest stvarnih naredbi i dva događaja (`report_updated`, `signal_raised`) — prije toga je pokretala samo prazne prozore; **od M2/45 dvanaest naredbi** (+`quit`) |
+| `tauri` 2.11.5 (+ `tauri-build` 2.6.3) | ljuska: prozori, ugovor prema sučelju (S-012, S-013) | **2.x, ne 3 alpha** — pinamo stabilno; jedina uključena mogućnost je `image-png` (**`tray-icon` maknut M2/45, S-036** — tray ukinut, `Cargo.lock` nepromijenjen jer je lock feature-agnostičan). Ljuska ima dvanaest naredbi i tri događaja prema sučelju (`report_updated`, `signal_raised`, `close_requested`) |
 | `tauri-plugin-dialog` 2.7.3 · `-notification` 2.4.0 · `-autostart` 2.5.1 · `-single-instance` 2.4.4 | odabir mape, obavijest na Alert, pokretanje sa sustavom, jedna instanca (S-020) | službeni plugini istog izdanja; svaki pokriva točno jednu Leonovu odluku, nijedan ne nosi logiku. Kod koji ih stvarno zove stiže DESKTOP-om (T29–T33): `add_project` (dialog), obavijest na prijelaz u Alert (`notification`), `set_setting("autostart")` (`autostart`, plugin PA baza — **od M2/45 prekidač u Postavkama, ne tray-kvačica**), drugi proces podiže postojeći prozor umjesto da se otvori (`single-instance`) |
 
 Nijedan nov crate za nešto što projekt već ima: `serde`/`serde_json` u `store` nisu dev-ovisnost jer
@@ -53,13 +53,16 @@ sam preuzme u `%LOCALAPPDATA%\tauri\` pri prvoj gradnji `npm run tauri build` (a
 ulazi u `Cargo.lock` ni `package-lock.json`, Ruling R18).
 
 Nova ovisnost = namjerna radnja: redak ovdje + obrazloženje u commitu (CLAUDE.md #6).
-`Cargo.lock` se commita. Ovisnost smije čekati svoju ciglu (danas: `notify` i `insta`), ali samo ako
-je pinana u cigli koja je uvela i ovdje objašnjena — stanje koda je u
+`Cargo.lock` se commita. Ovisnost smije čekati svoju ciglu, ali samo ako je pinana u cigli koja je uvela i
+ovdje objašnjena (danas nijedna ne čeka) — stanje koda je u
 [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §11.
 
 **npm-ovisnosti sučelja** (`apps/desktop/package.json`, verzije pinane bez `^`) nisu crateovi i ne
 ulaze u ovu tablicu; što je zašto odabrano stoji u specu
-[`../archive/ARHITEKTURA_M2.md`](../archive/ARHITEKTURA_M2.md) §7. **Od T53 (2026-09-24, S-035,
+[`../archive/ARHITEKTURA_M2.md`](../archive/ARHITEKTURA_M2.md) §7. Za izvođenje: `@tauri-apps/api` +
+tri plugina istih izdanja kao Rust-strana (`-autostart`, `-dialog`, `-notification`) i četiri d3-paketa
+niže; za gradnju i provjeru (dev): Vite + `@sveltejs/vite-plugin-svelte`, Svelte, `svelte-check`,
+TypeScript, Tailwind (`@tailwindcss/vite`), `@tauri-apps/cli`, vitest i `@types/d3-*`. **Od T53 (2026-09-24, S-035,
 Leonov OK) += `d3-scale` 4.0.2 · `d3-shape` 3.2.0 · `d3-array` 3.2.4 · `d3-time-format` 4.1.0 + dev
 `@types/*` za sve četiri** — matematika osi grafova (ticksovi, ljestvice, interpolacija), bez DOM-a
 (rade i u vitestu); sve četiri su **ISC licenca**, isti d3-monorepo, izgled i boje ostaju naši
@@ -223,6 +226,8 @@ Test za pravilo: **Leon može pročitati datoteku i reći što radi.** Ako ne mo
 | paucal kao čista funkcija (`fn branch_word(n: usize) -> &'static str`) | M2/51 (`cli/src/table.rs`) | hrvatska množina (1 grana · 2–4 grane · 5+ grana) izdvojena iz ispisa u funkciju bez nuspojava — testira se sama, bez građenja cijele tablice |
 | `#[ignore]` + `std::env::var_os` za test koji ovisi o stroju | M2/52 (`io/tests/perf.rs::measure_real_repo_both_scopes`) | `#[ignore]` isključuje test iz običnog `cargo test` (repozitorij na disku ne postoji na svakom stroju); `var_os` (ne `var`) jer je putanja s diska `OsString`, bez jamstva UTF-8 — isti razlog kao `String::from_utf8_lossy` (§4 gore), na drugom smjeru pretvorbe |
 | graf kao `HashMap<String, Vec<String>>` (susjedni popis) | M2/64 (`core/src/chains.rs::parse_parents`) | commit → njegovi roditelji je najjednostavniji prikaz grafa nad TEKSTOM (`%H\|%P`) koji `io` preda — jezgra ne zna za git proces (S-002), samo za ovu strukturu |
+| `#[tauri::command(async)]` | M2/63 (`desktop/src-tauri/src/commands.rs`, `get_report`/`set_override`/`save_visions`/`refresh`) | naredba bez `async` u Tauriju 2 radi na GLAVNOJ niti (petlja događaja prozora) i smrzava prozor dok traje; atribut `(async)` je šalje na nit izvršitelja, a tijelo funkcije ostaje obično i sinkrono |
+| šetnja lanca uzroka `std::error::Error::source()` | M2/63 (`desktop/src-tauri/src/state.rs::text`) | `source()` vraća grešku ispod ove (`Option<&dyn Error>`); petlja `while let Some(err) = cause` skupi sve poruke — `{e:#}` to radi samo uz `anyhow`, a `thiserror`-tipovi drže uzrok odvojeno u `#[source]` |
 | iterativni obilazak sa stogom (`Vec::push`/`pop`) umjesto rekurzije | M2/64 (`core/src/chains.rs::assign_containment`) | repo može imati tisuće commita, pa bi rekurzija za dugu granu mogla prepuniti stog poziva; `HashSet` posjećenih uz to sprječava ponovni obilazak istog commita (dvije grane mogu dijeliti dio povijesti) i beskonačnu petlju |
 
 Redak se dodaje **u cigli u kojoj se pojam prvi put pojavi**, s referencom na datoteku.
@@ -249,4 +254,5 @@ uvode idu u ovu tablicu — **ne** u §4, koji je Rust.
 | Svelte `<style>` s `:global(...)` za djecu-komponente | M2/58 (`views/Project.svelte`) | Svelteov CSS-scoping po zadanom pogađa samo markup TE komponente; `:global(h2[id^='sec-'])` namjerno probija tu granicu da jedno pravilo (`scroll-margin-top`) pogodi naslov u BILO KOJOJ podkomponenti sekcije, bez ponavljanja u svih osam |
 | `scroll-margin-top` uz `position: sticky` | M2/58 (`views/Project.svelte`) | ljepljivi izbornik ostaje na vrhu scrollajućeg `<main>`-a i vizualno prekriva sidro odmah nakon skoka; `scroll-margin-top` pomakne točku zaustavljanja pretraživača za visinu izbornika, bez promjene stvarnog rasporeda |
 | `xl:` razred (1280 px) nasuprot `lg:` (1024 px) | M2/58 (`views/project/SummarySection.svelte`, krug popravka 1) | Tailwindov `lg:grid-cols-6` je na 1024–1279 px stiskao šest kartica preusko za najdulji tekst signala; `xl:` odgađa prijelaz na širi prozor gdje kartice imaju dovoljno mjesta |
+| `Date.toISOString()` je UTC; lokalni dan iz `getFullYear`/`getMonth`/`getDate` | M2/63 (`lib/format.ts::localYmd`) | `toISOString().slice(0, 10)` daje datum u UTC-u, pa je u Hrvatskoj između ponoći i 1–2 h „danas" još jučer; lokalne metode `Date`-a čitaju sat ovog računala (`getMonth` broji od 0) |
 | `git mv` + `diff -M` za preseljenja | M2/58 (šest preseljenih pogleda u `views/project/`) | `git mv` čuva povijest datoteke kao PREIMENOVANJE, ne brisanje+dodavanje; recenzija i `git log --follow` time i dalje vide izvornu povijest, a `diff -M` u pregledu prikaže samo STVARNU promjenu (uvoz, `<h1>`→`<h2>`), ne cijeli sadržaj kao nov |

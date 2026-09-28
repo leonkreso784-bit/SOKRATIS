@@ -8,7 +8,7 @@
 | stavka | za | bilješka |
 |---|---|---|
 | Pravila M3: udio debugginga raste 3 dana · cigle/dan ispod prosjeka zatvorenih faza · deploy > 14 dana · udio testnih pada · commiti bez unosa u dnevniku · faza dulja od prosjeka · **(Leon, 2026-09-22)** dokumentacija kasni za kodom po datotekama (npr. `ARCHITECTURE.md` nedirnut N dana dok `src/` ima M commita) · test-omjer po cigli (commit u `src/` bez pripadnog testa, pravilo #7) · faza bez zatvaranja dulje od procjene iz plana · nova `.rs`/`.ts` bez zaglavlja „zašto" (pravilo #5) · obećanje u dnevniku („sljedeća sesija: X") bez commita koji X dotiče u N dana | M3 | popis iz speca §2.5; svako pravilo = svoja datoteka + test |
-| Profil za tuđe projekte: dokumentiran JSON format + primjer za repo bez `docs/`; **(Leon, 2026-09-22)** čarobnjak koji PREDLOŽI `profile.json` iz onoga što vidi u repou umjesto tihog Sokrat Studyjeva zadanog, i Conventional Commits kao drugi ponuđeni zadani profil | M3 | zadano = Sokrat Study (S-005); §13.7 (M2, gotovo) jamči da brojke nad neprepoznatim repoom ne lažu — čarobnjak je sljedeći korak, prijedlog umjesto tišine |
+| Profil za tuđe projekte: dokumentiran JSON format + primjer za repo bez `docs/`; **(Leon, 2026-09-22)** čarobnjak koji PREDLOŽI `profile.json` iz onoga što vidi u repou umjesto tihog Sokrat Studyjeva zadanog, i Conventional Commits kao drugi ponuđeni zadani profil. **Prilagodba korisnikovu načinu rada (kandidat, 2026-09-28):** (1) prepoznavanje konvencija iz repoa s dokazom (koji je naslov dnevnika, koji plan, koje testne putanje — i zašto); (2) izvor etapa i jedinica rada kao izbor u profilu (plan · tagovi · ručni rasponi · ništa); (3) natpisi po korisniku i skrivanje sekcija bez izvora | M3 | zadano = Sokrat Study (S-005); §13.7 (M2, gotovo) jamči da brojke nad neprepoznatim repoom ne lažu — čarobnjak je sljedeći korak, prijedlog umjesto tišine. Sloj (2) mijenja ugovor `Report` — namjerna promjena NAKON 1.0.0 (S-022); Sokrat Study ostaje prva predložak-postavka, paritet netaknut |
 | GitHub adapter: CI status po grani, PR-ovi | M3 (opcionalno) | mreža; `gh` nije na stroju |
 | Vercel adapter: deployi umjesto `🚀` u dnevniku | M3 (opcionalno) | mreža |
 | HR/EN natpisi u **sučelju** | → spec M2 [§6.4](../archive/ARHITEKTURA_M2.md) (S-021) | samo pointer |
@@ -17,13 +17,16 @@
 | Instalater NSIS samo za Leona | → spec M2 [§13.6](../archive/ARHITEKTURA_M2.md) (S-029) | samo pointer |
 | Potpisan i objavljen instalater · MSI · automatsko ažuriranje | M4 (objava) | S-029 |
 | `sokratis docs .` mjeri samo korijen i `docs_dir`; `.md` pod `apps/desktop` (npr. budući README sučelja) nitko ne provjerava | M3 (profil: više `docs_dir`-ova ili `extra_docs_dirs`) | nalaz čuvara 2026-09-18 |
-| „Klasifikacija jednom" (spec §3.2) nije dovršena: `metrics/kinds.rs::commit_rows`/`kind_stats` (M2/5) klasificiraju svaki commit jednom za `Report.commits`, ali `metrics/indicators.rs:31` (`kind_count`) i dalje zove `effective_kind` odvojeno za `debugging_commits`/`docs_share` — commit se klasificira više od jednom | M2, odluka na završnoj recenziji | nalaz recenzije M2/5 (2026-09-18); stanje koda: `ARCHITECTURE.md` §11 |
-| `sokratis report --table` u zaglavlju ispisuje samo „od {since}" — `until` se u tabličnom ispisu ne vidi iako je prozor ograničen (JSON je točan) | M2, završni krug popravaka | nalaz recenzije M2/19 (2026-09-20); `table.rs` nema presedan za uvjetno dodavanje polja u zaglavlje |
-| Keširani put (`cached_log`, M2/14b) ne broji `touched.skipped_lines` iz PRVOG čitanja commita — keš pamti `Commit`-e (strukturu), ne sirovi tekst git loga | M2, desktop (T29) ili odluka da nije bitno | poznato ograničenje ugrađeno u zaglavlje `io/src/cache.rs`; ne utječe na commite/redak-brojke, samo na broj preskočenih redaka pri parsiranju |
-| Ključ keša sirovih commita je kratki SHA (`%h`) — ako git jednog dana produlji zadanu duljinu kratice, keš se jednom puni iznova (jednokratni trošak, ne kvar) | M2, desktop (T29) ili odluka da nije bitno | poznato ograničenje ugrađeno u zaglavlje `io/src/cache.rs`; točnost brojki ne strada |
-| Zajednički graf usporedbe projekata na Pregledu (linija po projektu) | M3 | izvan opsega 1.0.0 — [ARHITEKTURA_1_0.md §9](../plan/ARHITEKTURA_1_0.md); srodno: „usporedba projekata na Pregledu" niže (Leon, 2026-09-22) je redak na kartici, ovo je zajednički graf |
-| `branch_ignore` — isključivanje grana po uzorku iz metrika | M3 ili odluka | izvan opsega 1.0.0 — [ARHITEKTURA_1_0.md §9](../plan/ARHITEKTURA_1_0.md); S-032 zadano mjeri SVE lokalne grane, ovo bi bio izuzetak |
-| Sat autora u formatu loga — doba dana prikazano u zoni autora, ne stroja | M3 ili odluka | izvan opsega 1.0.0 — [ARHITEKTURA_1_0.md §9](../plan/ARHITEKTURA_1_0.md) |
+| „Klasifikacija jednom" (spec §3.2) nije dovršena: `metrics/kinds.rs::commit_rows`/`kind_stats` (M2/5) klasificiraju svaki commit jednom za `Report.commits`, ali `metrics/indicators.rs` (`kind_count`) i dalje zove `effective_kind` odvojeno za `debugging_commits`/`docs_share` — commit se klasificira više od jednom | M3 (završna recenzija 1.0.0 ga nije uzela u krug) | nalaz recenzije M2/5 (2026-09-18); stanje koda: `ARCHITECTURE.md` §11 |
+| `sokratis report --table` u zaglavlju ispisuje samo „od {since}" — `until` se u tabličnom ispisu ne vidi iako je prozor ograničen (JSON je točan) | M3 (završna recenzija 1.0.0: čeka) | nalaz recenzije M2/19 (2026-09-20); `table.rs` nema presedan za uvjetno dodavanje polja u zaglavlje |
+| Keširani put (`cached_log`, M2/14b) ne broji `touched.skipped_lines` iz PRVOG čitanja commita — keš pamti `Commit`-e (strukturu), ne sirovi tekst git loga | M3 ili odluka da nije bitno | poznato ograničenje ugrađeno u zaglavlje `io/src/cache.rs`; ne utječe na commite/redak-brojke, samo na broj preskočenih redaka pri parsiranju |
+| Ključ keša sirovih commita je kratki SHA (`%h`) — ako git jednog dana produlji zadanu duljinu kratice, keš se jednom puni iznova (jednokratni trošak, ne kvar) | M3 ili odluka da nije bitno | poznato ograničenje ugrađeno u zaglavlje `io/src/cache.rs`; točnost brojki ne strada |
+| Zajednički graf usporedbe projekata na Pregledu (linija po projektu) | M3 | izvan opsega 1.0.0 — [ARHITEKTURA_1_0.md §9](../archive/ARHITEKTURA_1_0.md); srodno: „usporedba projekata na Pregledu" niže (Leon, 2026-09-22) je redak na kartici, ovo je zajednički graf |
+| `branch_ignore` — isključivanje grana po uzorku iz metrika | M3 ili odluka | izvan opsega 1.0.0 — [ARHITEKTURA_1_0.md §9](../archive/ARHITEKTURA_1_0.md); S-032 zadano mjeri SVE lokalne grane, ovo bi bio izuzetak |
+| Sat autora u formatu loga — doba dana prikazano u zoni autora, ne stroja | M3 ili odluka | izvan opsega 1.0.0 — [ARHITEKTURA_1_0.md §9](../archive/ARHITEKTURA_1_0.md) |
+| **Agenti i tokeni** (kandidat, 2026-09-28): Sokratis pokazuje koliko je agenata radilo na projektu, koliko je tokena potrošeno i koliko se pametno troše | M3 | nov izvor podataka — lokalni transkripti sesija, IZVAN repoa, format bez jamstva — iza vlastitog traita u `io` (isti obrazac kao `GitSource`, S-003); prikaz u tokenima, ne u novcu; „savjet" samo kao pravilo s dokazom; prvo jednokratno mjerenje skriptom (pravilo #4). Polazna brojka iz sesije 5 drugog reza: 12 pokretanja podagenata ≈ 1,7 M tokena (čuvar 197 k · recenzenti 57–128 k · graditelji 103–227 k) |
+| **Dnevnik iz više datoteka** (kandidat, 2026-09-28): `diary_path` kao popis datoteka, ili arhiva dnevnika koju mjerenje i dalje čita | M3 (nakon 1.0.0 — mijenja ugovor profila) | izmjereno na izdanju 1.0.0: seljenje M1 sesija iz `PROGRESS.md` u `docs/archive/PROGRESS_M1.md` bi mjerenju Sokratisa samog srušilo isporuke **18 → 16** (i `deliveries_per_day`, `owner_driven_deliveries`), jer `Profile::diary_path` je jedan `String` (`core/src/profile.rs`) a `io` čita samo tu datoteku po stablu. Do odluke M1 sesije ostaju u `PROGRESS.md`; odluka (ostaju · sele uz pad · sele uz pomak `since` · ova promjena koda) je Leonova |
+| **Prvi vanjski korisnik nakon 1.0.0** (kandidat, 2026-09-28) | odluka prije M4 | otvoreno: (a) koja **licenca** (red „LICENCA" niže); (b) dobiva li vanjski korisnik instalater (S-029 danas kaže „instalater samo za vlasnika", nepotpisan je) ili samo poveznicu na repo; (c) **zadani `since` u profilu** (S-005: `2026-08-29`) nad tuđim repoom bez profila — „Sve" tada počinje 29. 8. 2026 i starija povijest izgleda kao da je nema (nalaz m7 završne recenzije 1.0.0; srodno: red 2 „Nakon 1.0.0 — vanjska lista") |
 
 ## Druga verzija (M3) — iz Leonova zapisa namjere 2026-09-21
 
@@ -89,7 +92,80 @@ Ovdje ostaju samo dvije stavke koje M2 **ne** uzima:
 | stavka | za | bilješka |
 |---|---|---|
 | Jedinice i natpisi **CLI-tablice**: udjeli u %, prijevod `Closed/Running/Planned`, „nema faza" umjesto praznog naslova, širina stupca | M3 | M3; sučelje to rješava u specu M2 §6.3, tablica u terminalu je pomoć — JSON je ugovor i on je točan |
-| `include_unmerged`: metrike i nad nespojenim granama (danas polje postoji, jezgra ga ne čita) | M3 ili odluka | odgođena 7; nijedan pogled M2 to ne traži |
+| `include_unmerged`: mrtvo polje profila — ulogu ima `branch_scope` (S-032), a ime mu proturječi ponašanju (zadano `false`, a nespojene grane se mjere) | M3 ili odluka | odgođena 7 M1 + nalaz m13 završne recenzije 1.0.0: brisanje lomi profile koji ga navode (`deny_unknown_fields`), pa traži odluku |
+
+## Iz završne recenzije 1.0.0 (T63, 2026-09-28) — presuda „čeka"
+
+Izvor: izvještaj završne recenzije `.superpowers/sdd/2026-09-24-1-0-0-grane-i-ploca/task-63-review.md`
+(radni zapis izvan gita) — Minor nalazi m2–m17 i odjeljak „Trijaža odgođenih" (broj = redak ledgera).
+Svi su **kandidati za M3**, ne odluke; nijedan ne gubi podatke ni ne laže u brojkama jezgre. Što od
+toga danas vidi korisnik: [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §11.
+Stavke koje su već drugdje u ovom dokumentu ovdje se ne ponavljaju (`--table` bez `until`, klik na
+obavijest, tekst grafova raste s prozorom, dani bez commita, `include_unmerged`).
+
+| izvor | stavka | mjesto |
+|---|---|---|
+| m2 | pokazatelj zatvorenih faza u razdoblju gleda samo `since`, ne `until` | `core/src/metrics/indicators.rs` |
+| m4 | „{n} stabala" bez hrvatske množine („1 stabala") | `apps/desktop/src/lib/i18n/hr.json` `overview.worktrees` |
+| m5 · 1744 | jedan commit okida 1–3 `report_updated` (višak izračuna i snimki, nije petlja); uzrok mjeriti ispisom sirove putanje u `debounce_loop` | `io/src/watch.rs` |
+| m6 | greška izračuna ide samo na stderr; kartica projekta s pokvarenim profilom trajno piše „još nije izračunano" | `desktop/src-tauri/src/engine.rs`, `commands.rs::list_projects` |
+| m8 · 988 | `Store::open` kroz `expect`; migracija i `schema_version` nisu u istoj transakciji; druga instanca otvara bazu prije odbijanja, bez `busy_timeout` | `desktop/src-tauri/src/lib.rs`, `store/src/store.rs` |
+| m9 | `MockApi` i cijeli insta snapshot u produkcijskom `main.js` (dinamički `import()` u `createApi`) | `apps/desktop/src/lib/api.ts` |
+| m10 · 1087 | dokaz signala i Rust greške su hrvatski i u EN sučelju | `core/src/rules/*.rs`, `engine.rs` |
+| m11 · 595 | decimalna točka na osima grafova u HR sučelju | `apps/desktop/src/lib/charts/layout.ts` |
+| m12 | zaglavlja datoteka postala su dnevnik cigli (`git.rs`, `report.rs`, `io/error.rs`, `App.svelte`, `scales.ts`, `lib.rs`, `phases.rs`, `Sidebar.svelte`, `settings.rs`, `read-tokens.mjs`) — prijedlog: zaglavlje = konstrukti koji su SADA u datoteci, povijest u `git log` | više datoteka |
+| m14 | keš commita učitava sve keširane commite pri svakom izračunu, i nedostižne — raste bez granice; mjeriti kad naraste | `io/src/cache.rs` |
+| m15 | odjava/gašenje Windowsa uz `prevent_close` — nije izmjereno | `desktop/src-tauri/src/lib.rs` |
+| m16 · 967 | autostart se čita iz baze, ne iz OS-a; rub „plugin uspije, baza padne" (R12) | `desktop/src-tauri/src/autostart.rs`, `commands.rs::get_settings` |
+| m17 | nova radna stabla watcher nadzire tek nakon ponovnog pokretanja | `engine.rs::watch` |
+| — | instalacija preko starije verzije i deinstalacija: mapa instalacije i mapa baze su ista (`%LOCALAPPDATA%\sokratis`); **mjeriti** da nadogradnja čuva registar i što deinstalacija briše | `tauri.conf.json`, `state.rs::db_path` |
+| — | CLI `report` nad 11 grana ≈ 5 s (raste s obujmom; desktop ide kroz keš); mjeriti bez opterećenja stroja | `crates/sokratis-cli` |
+| 79 | `write_atomic` ne čisti `.tmp` kad `rename` padne | `io/src/project.rs` |
+| 80 | `IoError::Encode` bez `path` | `io/src/error.rs` |
+| 81 | nema testa „novi najveći ključ" u pisanju overridea | `io/tests/write.rs` |
+| 86 | `inside_root("docs:hidden")` (NTFS ADS) prolazi — ne izlazi iz korijena | `core/src/profile.rs` |
+| 90 | `PathBuf → TEXT` kroz `to_string_lossy` (ne-UTF-8 putanje) | `store/src/registry.rs` |
+| 140 · 141 | komentari u `tokens.css` („specifičnost" umjesto cascade layera, „≈190°") | `apps/desktop/src/styles/tokens.css` |
+| 154 | `branches_per_ref` (git < 2.41) bez testa | `io/src/git.rs` |
+| 164 | `i18n.test.ts`/`smoke.test.ts` bez zaglavlja | `apps/desktop/tests/` |
+| 165 | `check-i18n` ne uspoređuje `{parametre}` (pokriva vitest) | `apps/desktop/scripts/check-i18n.mjs` |
+| 177 · 178 | `kinds.rs`: testni `row_commit` duplira `c`; lanac od 6 koraka | `core/src/metrics/kinds.rs` |
+| 195 · 196 · 197 | bez testa: `num` s 4 znamenke, `kindLabel`/`subLabel`; `ymd` ne provjerava raspon | `apps/desktop/src/lib/format.ts` |
+| 208 | ne-ASCII test ne ide kroz `Project::docs()` | `io/tests/project.rs` |
+| 226 | nema testa `input.branches` za detached + bez zadane grane | `io/tests/project.rs` |
+| 235 | `ringSegments` mutira `let a` u `map` (stil) | `apps/desktop/src/lib/charts/scales.ts` |
+| 240 · 241 · 242 | snapshot bez testa za: `docs: None`; id u `cur` a ne u `prev`; Info → Alert | `core/src/snapshot.rs` |
+| 256 | `Sparkline` s `NaN` elementom crta točku s `NaN cy` | `apps/desktop/src/lib/charts/Sparkline.svelte` |
+| 258 | `Ring` s praznim natpisima → ime „, " | `apps/desktop/src/lib/charts/Ring.svelte` |
+| 274 | `save_snapshot` ne provjerava vlasnika `profile_seen_id` | `store/src/snapshots.rs` |
+| 275 | put `BadIndicatorKind` bez testa | `store/src/snapshots.rs` |
+| 301 | snimka bez `ON CONFLICT` za dupli/rezervirani `id` | `store/src/snapshots.rs` |
+| 405 | splash bez `onDestroy` | `apps/desktop/src/splash/Splash.svelte` |
+| 417 · 418 · 421 | watcher: `p.starts_with(raw)` potiskuje pretka (2 s, bezopasno); nema pozitivnog testa za `Manual`; let-chain u `debounce_loop` | `io/src/watch.rs` |
+| 512 | `bricksPerDay` računa u sučelju (odstupanje od S-012; kartica to kaže) | `apps/desktop/src/views/helpers.ts` |
+| 516 | `types.test.ts` veže samo najgornju razinu `Report`-a (i ključevi `CommitRow`/`BranchStats`/`Touched`) | `apps/desktop/tests/types.test.ts` |
+| 520 · 521 · 1235 | pristupačnost: `Sidebar` `<nav aria-label>` = natpis prve stavke; `Topbar` `aria-label` na `<div>` bez uloge; `Settings` `aria-label` duplicira natpis | `apps/desktop/src/lib/shell/`, `views/Settings.svelte` |
+| 522 | `MockApi.setSetting` nije generički | `apps/desktop/src/lib/api.ts` |
+| 535 | komentar o rezervi `until+2` u `parse/` nije provjeren | `core/src/parse/` |
+| 564 | `SignalBar` uvozi iz `views/helpers` | `apps/desktop/src/lib/shell/SignalBar.svelte` |
+| 602 · 604 | `perf.rs`: `warm_input = plain.clone()`; nema testa za prazan prozor | `io/tests/perf.rs` |
+| 611 | `IndicatorsSection` `$effect` suvišan krug | `apps/desktop/src/views/project/IndicatorsSection.svelte` |
+| 767 | stupac „model" u Isporukama nosi ostatak zaglavlja dnevnika | `core/src/parse/diary.rs` |
+| 781 · 1086 | `helpers.test.ts` i `MockApi.root_path` nose stvarnu putanju s korisničkim imenom (zamjena `C:\repo`) | `apps/desktop/tests/helpers.test.ts`, `lib/api.ts` |
+| 787 | zaglavlje Isporuka o `truncate` | `apps/desktop/src/views/project/DeliveriesSection.svelte` |
+| 788 | potvrda brisanja vizije prelijeva 13 px na 960 px | `apps/desktop/src/views/Visions.svelte` |
+| 866 | `project_worktree.branch` se puni praznim tekstom (R6) | `desktop/src-tauri/src/commands.rs` |
+| 888 | komentar `today()` citira S-013 | `io/src/project.rs` |
+| 907 · 944 | zaglavlja `src-tauri/cache.rs` (`StoreCache::lock`) i `engine.rs` („Sender ostaje u Watcher-u") | `desktop/src-tauri/src/` |
+| 926 · 927 | `rule_title`/`docs_dirs` bez testa; `docs_dirs` ne deduplicira | `desktop/src-tauri/src/engine.rs` |
+| 1085 | „zadnji pobjeđuje": nema testa „stariji zahtjev padne kasnije" | `apps/desktop/src/lib/state.svelte.ts` |
+| 1102 | test `all(commits == 0)` prazno istinit — jasnije `phases.is_empty()` | `core/src/report.rs` |
+| 1250 · 1251 | `Ring` `stroke-width={18 + 2}`; utrka `unlistenFocus` | `Ring.svelte`, `App.svelte` |
+| 1293 · 1314 | kartice: `ind.test_share.how` („dijeljenje se preskače", stvarno `max(1.0)`); `deliveries.list.how` „diary.rs" bez „parse/" | `apps/desktop/src/lib/i18n/*.json` |
+| 1454b · 1592 | komentar iznad `groupBy`; `DEFAULT_MARGINS` nije izvezen | `lib/charts/bucket.ts`, `Gantt.svelte`, `HBars.svelte` |
+| 1520 | `Bars` `role="button"` bez tipkovne radnje; `Tooltip role="status"` | `lib/charts/Bars.svelte`, `Tooltip.svelte` |
+| 1678 · 1679 | `chains.rs` obrnut komparator bez komentara; `perf.rs` izgubljena rečenica o `var_os` | `core/src/chains.rs`, `io/tests/perf.rs` |
+| 1696 | traka ≈ 1 px iznad ljepljivog izbornika (subpikselni rub) — mjeriti | `apps/desktop/src/views/Project.svelte` |
 
 ## Za Leona (tuđi repo, ne naš posao)
 
@@ -136,7 +212,7 @@ stranih korisnika — oni će promijeniti redoslijed.
 | Pogled s telefona na LAN-u (lokalni servis + PWA) | razmatrano kao ljuska C; nije odabrano, ali jezgra to ne sprječava |
 | Snimke ocjena kroz vrijeme kao graf (trend docs-čistoće) | → spec M2 [§4.2](../archive/ARHITEKTURA_M2.md) (S-014); samo pointer |
 | `gix` umjesto `git` procesa | tek kad mjerenje kaže da je sporo (S-003) |
-| Vektorizacija znaka (danas raster WebP/PNG iz Leonove datoteke) | kad tray na 16 px ili instalater to zatraže; M2 rješava pojednostavljenim rasterom |
+| Vektorizacija znaka (danas raster WebP/PNG iz Leonove datoteke) | kad instalater ili mala ikona to zatraže (tray je uklonjen, S-036) |
 | Otvaranje nalaza dokumentacije u editoru (danas klik kopira putanju) | M3; traži `tauri-plugin-opener` — jedna ovisnost više |
 | Dani bez commita nemaju prazan stupac u grafu stupaca | `Report.days` ih ne sadrži — graf preskače rupu umjesto da je crta praznu |
 | Tekst u grafovima raste sa širinom prozora (`viewBox` 600) | graf se rasteže na širinu prozora zajedno s tekstom u sebi — na 1300 px oznake osi (≈ 17 px) veće su od naslova grafa (14 px) i od teksta tablica |

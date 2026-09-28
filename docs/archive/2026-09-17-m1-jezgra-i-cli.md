@@ -1,10 +1,13 @@
 # Milestone 1 — Jezgra + CLI: plan implementacije
 
+> **✅ IZVRŠEN — referenca, ne izvor istine.** Plan cigli M1; arhiviran 2026-09-28 na izdanju 1.0.0 (S-031).
+> Što je izgrađeno: [architecture/ARCHITECTURE.md](../architecture/ARCHITECTURE.md). Status ispod je izvorni.
+
 **Status:** ✅ IZVRŠEN 2026-09-17 — sve 22 cigle su u `main`-u, uz krug popravaka nakon završne
 recenzije. Ovo je **zapis plana**, ne izvor istine: što je izgrađeno kaže
-[`../../architecture/ARCHITECTURE.md`](../../architecture/ARCHITECTURE.md), što je isporučeno
-[`../../records/CHANGELOG.md`](../../records/CHANGELOG.md), a odstupanja od plana
-[`../../records/PROGRESS.md`](../../records/PROGRESS.md). Dvije razlike prema tekstu ispod:
+[`../../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md), što je isporučeno
+[`../../records/CHANGELOG.md`](../records/CHANGELOG.md), a odstupanja od plana
+[`../../records/PROGRESS.md`](../records/PROGRESS.md). Dvije razlike prema tekstu ispod:
 `insta` je nakon završne recenzije **uklonjen** (neiskorišten — pravilo #6; snapshot `Report`-a je M2),
 a `serde_json` je u jezgri **dev-ovisnost**.
 

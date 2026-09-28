@@ -34,7 +34,7 @@ Nije za timove s ticketing sustavima; nije za ljude bez gita.
 | **Signali smjera** | …vidjeti upozorenje s **dokazom** (koje grane, koliko dana, koji commit), ne samo boju |
 | **Više projekata** | …u jednom pregledu vidjeti sve projekte i njihove signale |
 | **CLI kao brana** | …staviti `sokratis signals` u preflight i dobiti izlazni kod koji zaustavlja push |
-| **Desktop [M2]** | …otvoriti aplikaciju iz traya, dobiti sistemsku obavijest kad signal padne na Alert, i sve to u izgledu Sokrat Studyja |
+| **Desktop [M2]** | …otvoriti aplikaciju (i sa sustavom, pri prijavi), dobiti sistemsku obavijest kad signal padne na Alert, i sve to u izgledu Sokrat Studyja |
 | **Vlastite konvencije [M3]** | …napisati `.sokratis/profile.json` za projekt s drukčijim dnevnikom, planom i pragovima |
 
 ## 4 · Opseg po milestoneima
@@ -42,8 +42,9 @@ Nije za timove s ticketing sustavima; nije za ljude bez gita.
 | milestone | u opsegu | izvan opsega |
 |---|---|---|
 | **M1** | jezgra · CLI · paritet s RAD.xlsx · ispravak sati · docs-ocjena · signali `unmerged-branches` i `docs-lag` | ekran, SQLite, watcher |
-| **M2** | Tauri 2 · Svelte 5 · tokeni · SQLite snimke · watcher · tray · obavijesti | novi signali, adapteri |
-| **M3** | ostala pravila · profil za tuđe projekte · HR/EN · instalater · znak · README EN · objava | oblak, timovi |
+| **M2** (izašao kao 1.0.0) | Tauri 2 · Svelte 5 · tokeni · SQLite snimke · watcher · obavijesti · HR/EN · znak · instalater za vlasnika · README EN · mjerenje svih lokalnih grana · ploča projekta (tray uklonjen, S-036) | novi signali, adapteri |
+| **M3** | ostala pravila · profil za tuđe projekte · kandidati iz `records/BACKLOG.md` | oblak, timovi |
+| **M4** | objava: potpisan instalater · licenca · GitHub Actions | |
 
 ## 5 · Ne-ciljevi
 

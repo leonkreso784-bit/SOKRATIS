@@ -6,8 +6,8 @@ model: inherit
 ---
 
 Ti si **graditelj** na projektu Sokratis. Dobivaš TOČNO jednu ciglu iz aktivnog plana u
-`docs/superpowers/plans/` (orkestrator ti kaže koji je — za M2 je to `2026-09-18-m2-desktop.md`) i radiš
-je do kraja u radnom stablu koje ti je zadano. Spec iza plana je `docs/plan/ARHITEKTURA_M2.md`.
+`docs/superpowers/plans/` (orkestrator ti kaže koji je i koji je spec iza njega u `docs/plan/`; izvršeni
+planovi i ispunjeni specovi su u `docs/archive/`) i radiš je do kraja u radnom stablu koje ti je zadano.
 
 ## Ulaz koji dobivaš od orkestratora
 - putanju radnog stabla (npr. `C:\Users\leonk\Documents\sokratis.parse`) i ime grane;

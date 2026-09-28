@@ -372,7 +372,7 @@ rješava problem.
 **Posljedice:** S-005 dopunjena (zadano više nije „samo zadana grana"); paritet s `RAD.xlsx` ostaje
 isti test (fixture je log `main`-a); `Report` dobiva `scope`, `branches` i `branch` po retku
 (snapshot mijenjan namjerno); signal `unmerged_branches` nepromijenjen; spec
-[plan/ARHITEKTURA_1_0.md](../plan/ARHITEKTURA_1_0.md) §1.
+[archive/ARHITEKTURA_1_0.md](../archive/ARHITEKTURA_1_0.md) §1.
 
 ## S-033 — dnevnik je unija svih radnih stabala; plan i `docs/` iz vodećeg stabla (2026-09-24)
 
@@ -441,7 +441,7 @@ kvarovi + osi, ploča u 1.1.0 · 1.0.0 = samo grane + kvarovi.
 IZDANJE; nakon svake sesije instalater „1.0.0-pre.N" (S-029) da Leon vidi gotovo odmah.
 **Posljedice:** etapa 3 iz M2 §13 (T35, završna recenzija, T43) seli na kraj ovog reza; T35 ostaje
 napola u stablu `sokratis.rel` do tada; spec M2 arhiviran, aktivan je
-[plan/ARHITEKTURA_1_0.md](../plan/ARHITEKTURA_1_0.md).
+[archive/ARHITEKTURA_1_0.md](../archive/ARHITEKTURA_1_0.md).
 
 ## S-038 — nespojene grane su lanci: signal broji vrhove, sadržane grane su dokaz (2026-09-25)
 

@@ -11,21 +11,20 @@ Desktop aplikacija koja se priključi na git-repozitorij projekta, izračuna sta
 danas radi `docs/records/RAD.xlsx` u Sokrat Studyju), ocijeni čistoću dokumentacije i javi smjer
 projekta **s dokazom**. Prati više projekata. Izgled kao Sokrat Study. Repo je javan (S-023); licenca je neodlučena.
 Definicija: `docs/product/PRD.md` · što je izgrađeno: `docs/architecture/ARCHITECTURE.md` ·
-milestonei: `docs/plan/ROADMAP.md` · ispunjeni spec M1: `docs/archive/ARHITEKTURA_M1.md`.
+milestonei: `docs/plan/ROADMAP.md` · ispunjeni specovi: `docs/archive/`.
 
-**Prvi korisnik je Sokrat Study** (`C:\Users\leonk\Documents\sokratstudy.dev` + radna stabla
-`sokratstudy.f21` · `.f22` · `.f25` · `.f3` = **jedan** projekt). Referentna implementacija za paritet:
+**Prvi korisnik je Sokrat Study** (`C:\Users\leonk\Documents\sokratstudy.dev` + sva njegova
+radna stabla `sokratstudy.*` = **jedan** projekt, S-015). Referentna implementacija za paritet:
 `sokratstudy.dev/scripts/rad-xlsx.py` (Python, generira `RAD.xlsx`). Njezin poznati kvar — negativni
 sati zbog cherry-pickova — se u Sokratisu **ispravlja, ne prenosi** (S-007).
 
 ## Stack
 - **Rust** (stable, MSVC target, edition 2024) · Cargo workspace: `crates/sokratis-core` (čisti, bez
   I/O-a) · `crates/sokratis-io` (git, datoteke, profil) · `crates/sokratis-cli` (binarna `sokratis`) ·
-  `crates/sokratis-store` (SQLite) i `apps/desktop/src-tauri` (crate `sokratis-desktop`) — **kostur
-  cijel u `main`-u** (`M2/1a`+`M2/1b`); desktop crate je u `[workspace] members` i builda se.
-- **Desktop [M2]:** Tauri 2 (`apps/desktop`) · sučelje **Svelte 5 + Tailwind v4** + `tokens.css`
+  `crates/sokratis-store` (SQLite) · `apps/desktop/src-tauri` (crate `sokratis-desktop`, Tauri ljuska).
+- **Desktop:** Tauri 2 (`apps/desktop`) · sučelje **Svelte 5 + Tailwind v4** + `tokens.css`
   prenesen iz Sokrat Studyja (4 teme, zadana svijetla „Akademsko plavo"). Znak Sokratisa je **nov**.
-- **Pohrana:** ručni podaci u `<repo>/.sokratis/` (profil · overridei · vizije) · [M2] SQLite u
+- **Pohrana:** ručni podaci u `<repo>/.sokratis/` (profil · overridei · vizije) · SQLite u
   `%LOCALAPPDATA%\sokratis\`. **Bez oblaka, bez računa.**
 
 ## Arhitektura (najvažnije)
@@ -73,18 +72,15 @@ pogrešna uporaba**; `--help`/`--version` = 0) — sve rade nad pravim repozitor
 Sokrat Studyjem).
 Testovi i brane: `docs/workflow/TESTING.md`.
 
-## Stanje — TRENUTNO (2026-09-28 — drugi rez do 1.0.0: sesija 6, T44–T62+T64 gotovi)
-- **M0 gotov, M1 zatvoren** (0.1.0). Aktivan spec `docs/plan/ARHITEKTURA_1_0.md`; aktivan plan
-  `docs/superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md`: T44–T64, sedam tokova.
-- **T44–T62 + T64 u `main`-u** (vrh `b698611`, verzija `1.0.0-pre.4`, nepromijenjena): grane u
-  mjerenju svih lokalnih grana (S-032), dnevnik unija stabala (S-033), **LANCI T64** — nespojene grane
-  su lanci, signal broji vrhove ne svaku granu (S-038); **PLOČA T59–T62 spojena** — prekidač
-  dan/tjedan/mjesec, grafovi u šest od osam sekcija ploče Projekt, stupac grane u Dnevniku,
-  `EXPLAIN_IDS` 37 → 44, krug popravaka `M2/62` nakon dimnog testa.
-- **Dva stabla:** `sokratis` (`main`) · `sokratis.rel` (`feat/release`, T35 napola, necommitano) —
-  ne dirati dok tok IZDANJE ne dođe na red. **Sljedeće:** tok IZDANJE (T35, T63, T43, instalater
-  1.0.0; tag traži Leonov OK).
-- Druga verzija (M3) i kasnije: `docs/records/BACKLOG.md`.
+## Stanje — TRENUTNO (2026-09-28 — verzija 1.0.0 u `main`-u, netagirana)
+- **M0 gotov, M1 zatvoren** (0.1.0), **M2 kod gotov kao 1.0.0** (S-024): oba reza (T1–T43, T44–T64) i
+  krug popravaka završne recenzije (`M2/63`) su u `main`-u; verzija u `Cargo.toml` je `1.0.0`.
+- **Nema aktivnog speca ni plana** — ispunjeni su u `docs/archive/`; sljedeći nastaje kad M3 krene
+  (kandidati: `docs/records/BACKLOG.md`).
+- **Instalater 1.0.0** gradi orkestrator iz `main`-a; sha256 i veličina se zapisuju u ledger (izvan gita).
+- **Čeka Leonov izričit OK:** tag `v1.0.0`, izdanje na GitHubu, licenca; odluka o M1 sesijama u
+  `PROGRESS.md` (seljenje u arhivu izmjereno i odgođeno — mijenja isporuke, v. BACKLOG).
+- **Jedno radno stablo:** `sokratis` (`main`), grana osim `main`-a nema (`git worktree list`).
 - Brane, brojke i tijek sesija: `PROGRESS.md`; isporuke: `CHANGELOG.md`. Ovaj odjeljak to ne ponavlja.
 
 ## Ključne odluke — samo žive
@@ -118,17 +114,13 @@ sesije.
 ## Agenti — više grana, jedan orkestrator
 Uloge i protokol: `docs/workflow/AGENTI.md`. Graditelj radi **jednu ciglu u svom stablu**, recenzent presuđuje
 u dva prolaza, čuvar dokumentacije piše zapise; **samo orkestrator spaja u `main`**. Nakon compacta stanje se
-čita iz gita (`git log --oneline -15` · `git worktree list`), ne iz sjećanja. **Otvorena su dva stabla** (v. „Stanje"):
-`sokratis` (`main`) · `sokratis.rel` (`feat/release`, T35 napola, necommitano) — potpuno spojena se
-brišu (pravilo #1); `sokratis.rel` NIJE spojeno, pa ga nova sesija ne dira ni ne briše dok tok IZDANJE
-ne dođe na red. `sokratis.ploca2` (`feat/ploca-2`, T59–T62) je obrisano nakon spajanja u `main`
-2026-09-28. Popis tokova i vlasništvo datoteka: `docs/superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md`
-(T44–T64; T64 dodan 2026-09-25, S-038, spojen 2026-09-27); T35/T43 su u starijem
-`docs/superpowers/plans/2026-09-18-m2-desktop.md`.
+čita iz gita (`git log --oneline -15` · `git worktree list`), ne iz sjećanja. Potpuno spojena stabla i grane
+se brišu (pravilo #1). Nema aktivnog plana cigli — planovi M1, M2 i 1.0.0 su u `docs/archive/`; plan M3
+nastaje iz speca M3.
 
 ## Dokumentacija — ulaz je SAMO `docs/README.md`
 Složena **po ulozi dokumenta** (kao Sokrat Study): `product/` ŠTO · `plan/` ŠTO SADA (najviše **jedan**
-aktivni spec + ROADMAP; aktivan je `docs/plan/ARHITEKTURA_1_0.md`) · `architecture/` **ŠTO JE IZGRAĐENO**
+aktivni spec + ROADMAP; danas samo ROADMAP — nema aktivnog speca) · `architecture/` **ŠTO JE IZGRAĐENO**
 (`docs/architecture/ARCHITECTURE.md` — granice crateova, tok podataka, sva polja profila, formati
 `.sokratis/*.json`, izlazni kodovi) · `workflow/` KAKO RADIMO · `records/` POVIJEST ·
-`archive/` ispunjeni specovi — oboje **nikad izvor istine**. Ne traži fajlove napamet — otvori indeks.
+`archive/` ispunjeni specovi i planovi — oboje **nikad izvor istine**. Ne traži fajlove napamet — otvori indeks.

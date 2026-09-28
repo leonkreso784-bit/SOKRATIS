@@ -43,7 +43,7 @@ Tada namjerno još nisu postojali: `architecture/`, `BUGS.md`, `HISTORY.md`, `ar
 `LICENSE` — nastaju kad imaju sadržaj (`architecture/` i `archive/` nastali su na kraju M1, šesti dio sesije).
 
 ### Isporučeno (drugi dio sesije, nakon Leonova OK-a na spec)
-- **Plan M1** `docs/superpowers/plans/2026-09-17-m1-jezgra-i-cli.md`: 22 cigle, svaka s testom, kodom i
+- **Plan M1** `docs/archive/2026-09-17-m1-jezgra-i-cli.md`: 22 cigle, svaka s testom, kodom i
   commit-porukom; 8 tokova s vlasništvom datoteka bez preklapanja (KOSTUR · FIXTURE · PARSE · METRIKE ·
   DOCS+PRAVILA · IO · CLI · INTEGRACIJA). Ugovor tipova i cijeli zadani profil (Sokrat Study) su u T1.
 - **Odluke u planu koje spec dopunjuju:** git format dobiva `%ad` i `%cd` (dan = autor kao tablica, `since` =
@@ -283,7 +283,7 @@ prva cigla M2. (Prva polovica na Opusu 5, nastavak na Fableu 5.1.)
   `git log -1` + 31 `rev-list`), ne parsiranje; keš to ne rješava, M11 rješava. Pravilo #4.
 
 - **Leon je spec odobrio** („Imaš moj OK") bez izmjena. **Plan cigli napisan** (`superpowers:writing-plans`):
-  `docs/superpowers/plans/2026-09-18-m2-desktop.md`, 3639 redaka, **35 cigli u 9 tokova** (KOSTUR ·
+  `docs/archive/2026-09-18-m2-desktop.md`, 3639 redaka, **35 cigli u 9 tokova** (KOSTUR ·
   JEZGRA · PROFIL · IO · STORE · CLI · SUČELJE · DESKTOP · INTEGRACIJA), vlasništvo datoteka po toku,
   graf ovisnosti među tokovima, test + kod po koraku. Verzije za pinanje provjerene na crates.io
   (`max_stable_version`, ne Tauri 3 alpha) i npm-u; TypeScript ostaje 5.9.3 jer svelte-check ne prima 7.
@@ -775,7 +775,7 @@ crte, Leonov OK („super je sve možeš krenuti“).
   su tvrdnje koje su ovom sesijom postale netočne („sedam stabala“, „sljedeća sesija je planiranje“,
   „push traži izričit OK“, „kasnije open-source“) i kronologija koju drugi dokument već drži.
   Veliko čišćenje (PROGRESS po milestoneu, ARCHITECTURE tvrdnju po tvrdnju) je cigla §13.8.
-- **Plan cigli dopunjen** (`docs/superpowers/plans/2026-09-18-m2-desktop.md`, T36–T43): repo bez konvencija ·
+- **Plan cigli dopunjen** (`docs/archive/2026-09-18-m2-desktop.md`, T36–T43): repo bez konvencija ·
   instalater · Postavke s prekidačem pokreta · ulaz grafova · prijelaz pogleda · kartica ×2 · dokumentacija; T35 sada
   postavlja verziju 1.0.0. Pri pisanju plana prekidač pokreta je preseljen uz Postavke (spec §13.3 usklađen).
 - Brane: samo dokumentacija — `sokratis docs .` i `signals .` prije pusha.
@@ -1018,7 +1018,7 @@ Brainstorming (jedno pitanje odjednom) dao je šest odluka, pune u `records/DECI
   „1.0.0-pre.N" gradi se nakon svake od pet sesija (S-029 nastavljena).
 
 ### Napisano
-- **Spec `docs/plan/ARHITEKTURA_1_0.md`** (drugi rez do 1.0.0), commit `77953ec`: §1–§9 — grane (S-032),
+- **Spec `docs/archive/ARHITEKTURA_1_0.md`** (drugi rez do 1.0.0), commit `77953ec`: §1–§9 — grane (S-032),
   dnevnik po stablima (S-033), sučelje (S-034, S-035), desktop (§4), testovi test-prvo (§5), ovisnosti
   (§6), redoslijed pet sesija (§7), izlazni uvjet 1.0.0 (§8), izvan opsega u `BACKLOG.md` (§9). Spec M2
   arhiviran s pečatom (`docs/archive/ARHITEKTURA_M2.md`), poveznice u `docs/README.md` i `CLAUDE.md`
@@ -1026,7 +1026,7 @@ Brainstorming (jedno pitanje odjednom) dao je šest odluka, pune u `records/DECI
 - **Samopregled speca**, commit `17c7c41`: unija dnevnika ide redom od vodećeg stabla, karta grana
   koristi isti `ref_name` kao `branches()` (nepromijenjen), sekcija Grane uvijek vidljiva,
   `branch_scope` označava promjenu profila u trendu kao oznaku, ne lom krivulje (S-033 usklađena).
-- **Plan `docs/superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md`**, commit `7462bfd`: cigle T44–T63
+- **Plan `docs/archive/2026-09-24-1-0-0-grane-i-ploca.md`**, commit `7462bfd`: cigle T44–T63
   u šest tokova (DESKTOP-2 konzola+X · JEZGRA-2 grane+dnevnik · IO-2 `--branches`+stabla+CLI · GRAFOVI
   d3-temelji+8 komponenata · PLOČA tok+8 sekcija · IZDANJE), test-prvo s kodom, vlasništvo datoteka po
   toku, pet sesija s instalaterom nakon svake. Tok IZDANJE preuzima T35/T43 iz plana M2 — taj plan
@@ -1241,3 +1241,42 @@ Sljedeća sesija: recenzija i vizualna provjera kruga popravaka `M2/62` → spaj
 
 ### Što slijedi
 Dio B iste sesije: tok IZDANJE (T35 → T63 završna recenzija → jedan krug popravaka → spajanje → T43 čuvar izdanja → instalater 1.0.0; tag/izdanje/licenca traže Leonov izričit OK).
+
+---
+
+## 2026-09-28 (OPUS) — IZVEDBA sesija 6 drugog reza 1.0.0 (dio B): tok IZDANJE (T35, T63) spojen, verzija 1.0.0, čuvar izdanja T43
+
+**Deseta sesija, dio B (IZDANJE).** Tok IZDANJE je izveden do kraja: verzija, završna recenzija, jedan
+krug popravaka, spajanje, čuvar izdanja. Kod M2 je time isporučen kao **1.0.0** (S-024); tag, izdanje
+na GitHubu i licenca čekaju Leonov izričit OK.
+
+- **T35 `fb716eb`** (stablo `sokratis.rel`): verzija `1.0.0` (jedan izvor `[workspace.package]` u
+  `Cargo.toml`, `package.json` zrcalo, lockovi — samo redci verzije); vlastiti profil
+  `test_path_exclude: ["/fixtures/"]` → `test_share` 0,321 → 0,13. Mjerenja CLI-ja i desktopa:
+  [`CHANGELOG.md`](./CHANGELOG.md) `[1.0.0]`, unos `M2/35`. Cigla nije imala zasebnog recenzenta — ušla je
+  u završnu recenziju kao zaseban paket (ruling R80) i prošla oba prolaza.
+- **Završna recenzija T63** (najsposobniji model, samo čitanje nad `fb716eb`): **„S POPRAVCIMA", bez
+  Critical nalaza**; granice slojeva potvrđene kodom (jezgra bez I/O-a, `Report` ↔ `types.ts`, paritet
+  netaknut od M1, `Command::new` samo u `git_command`). Pet Important + jedan Minor ušli su u JEDAN krug
+  (ruling R82); ostali Minor nalazi i trijaža svih odgođenih → `BACKLOG.md` („Iz završne recenzije 1.0.0").
+- **Mjerenje prije popravka** (pravilo #4; `tauri dev` nad klonom pravog repoa, zasebna baza): nalazi
+  glavne niti, prvog izračuna novog projekta i broja stabala izmjereni kao stvarni kvarovi, ne samo
+  pročitani.
+- **`M2/63` `86d32f5`**: svih šest stavki zatvoreno, test-prvo za grešku s uzrokom, broj stabala i
+  lokalni „danas"; re-recenzija **SPOJIVO**. Dimni test poslije popravka potvrdio sva tri mjerenja
+  (brojke prije → poslije: `CHANGELOG.md`, unos `M2/63`).
+- **SPOJENO: IZDANJE → `main` `82ad10e`** (`merge --no-ff feat/release`, 15 datoteka, +164/−35). Brane
+  zelene (`CHANGELOG.md`, unos spajanja) → **pushano `origin/main` = `82ad10e`**. Stablo `sokratis.rel` i
+  grana `feat/release` obrisani nakon provjere; na disku je jedno stablo, `sokratis` (`main`).
+- **Čuvar izdanja T43**: ARCHITECTURE provjeren prema kodu, spec 1.0.0 i planovi cigli M1/M2/1.0.0
+  arhivirani u `docs/archive/`, CLAUDE/ROADMAP/AGENTI bez pokazivača na aktivni spec, CHANGELOG
+  `[1.0.0]`, README (EN) za 1.0.0, BACKLOG dopunjen. **Seljenje M1 sesija iz ovog dnevnika u arhivu je
+  izmjereno i odgođeno:** isporuke u mjerenju Sokratisa samog pale bi s 18 na 16 (`diary_path` čita
+  jednu datoteku) — odluka čeka Leona (ruling R84; kandidat „dnevnik iz više datoteka" u `BACKLOG.md`).
+- Instalater 1.0.0 gradi orkestrator iz `main`-a; sha256 i veličina su u ledgeru
+  `.superpowers/sdd/2026-09-18-m2-desktop/progress.md` (izvan gita).
+
+### Što slijedi
+**STANI i javi Leonu.** Čeka njegov izričit OK: tag `v1.0.0` i izdanje na GitHubu, licenca, odluka o
+M1 sesijama u dnevniku, instalacija 1.0.0 preko `1.0.0-pre.4`. Zatim M3: spec iz kandidata u
+`BACKLOG.md`, kad 1.0.0 bude u uporabi.

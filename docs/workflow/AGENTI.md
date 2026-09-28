@@ -3,8 +3,8 @@
 > Leon (2026-09-17): *„kreirat nekoliko agenata da se sustavno radi na cijelom projektu… više agenata
 > na više branča a ti ih kontroliraš i nadzireš."* Ovo je protokol. Definicije agenata su u
 > `.claude/agents/*.md`, praćene u repou od 2026-09-18 (prije toga globalno git-ignorirane). Plan koji
-> izvode je **aktivni plan u `docs/superpowers/plans/`** — od 2026-09-18 to je
-> `2026-09-18-m2-desktop.md` (M1 plan `2026-09-17-m1-jezgra-i-cli.md` je izvršen i ostaje kao zapis).
+> izvode je aktivni plan cigli u `docs/archive/` — **danas ga nema**: planovi M1, M2 i 1.0.0
+> su izvršeni i arhivirani u `docs/archive/`; plan M3 nastaje iz speca M3.
 
 ## 1 · Uloge
 
@@ -39,21 +39,15 @@ zato T1 ide prvi i sam, pa se spoji u `main` prije nego se otvore ostala stabla.
 **Ova tablica je povijest M1.** Sve grane `feat/*` i stabla `sokratis.<tok>` iz nje su 2026-09-18
 obrisana uz Leonov OK (sve su bile spojene) — objašnjava merge-povijest, ne trenutno stanje.
 
-**Tokovi M2** (9: KOSTUR · JEZGRA · PROFIL · IO · STORE · CLI · SUČELJE · DESKTOP · INTEGRACIJA), njihove
-grane, stabla, cigle, vlasništvo datoteka i **ovisnosti među tokovima** (koji se spaja prije kojeg) stoje
-na **jednom mjestu**: `docs/superpowers/plans/2026-09-18-m2-desktop.md`, odjeljak „Struktura datoteka i
-vlasništvo po tokovima" (S-010 — ovdje se ne prepisuju). Novo u M2: tok SUČELJE gradi TypeScript/Svelte,
-pa su mu brane `npm run check` umjesto `cargo`; tokovi SUČELJE i DESKTOP nakon `git worktree add` pokreću
-`npm ci` u svom stablu (`node_modules` je git-ignoriran). **T1 je cijel u `main`-u:** koraci 1–12 kao
-`M2/1a`, korak 13 (`npm install` uz Leonov OK → ikone iz Leonova loga → desktop crate natrag u `members`)
-kao `M2/1b`. **Koja su stabla otvorena kaže `git worktree list`, a koji je tok dokle stigao
-`plan/ROADMAP.md`** — ovdje se to ne prepisuje (S-010). Stabla i grane tokova koji su **potpuno spojeni u
-pushani `main`** orkestrator briše sam (Leonovo dopuštenje 2026-09-21, `CLAUDE.md` pravilo #1); tako su
-2026-09-21 obrisana stabla JEZGRE, PROFILA, STOREA, IO-a, CLI-ja i (nakon merga T20–T28) SUČELJA — na
-disku ostaje jedno stablo, `main`. Isto je 2026-09-21 (druga sesija izvedbe) obrisano stablo i grana
-DESKTOP-a (`sokratis.desktop`/`feat/desktop`) čim je T29–T33 potvrđeno spojen i pushan. Cigle iz
-dopune reza za 1.0.0 (spec M2 §13) idu istim protokolom; stanje po cigli je u ledgeru
-`.superpowers/sdd/2026-09-18-m2-desktop/progress.md` (izvan gita).
+**Tokovi M2 i drugog reza do 1.0.0** (KOSTUR · JEZGRA · PROFIL · IO · STORE · CLI · SUČELJE · DESKTOP ·
+INTEGRACIJA, pa DESKTOP-2 · JEZGRA-2 · IO-2 · GRAFOVI · PLOČA · LANCI · IZDANJE), njihove grane, stabla,
+cigle, vlasništvo datoteka i ovisnosti među tokovima stoje u arhiviranim planovima
+(`docs/archive/2026-09-18-m2-desktop.md`, `docs/archive/2026-09-24-1-0-0-grane-i-ploca.md`) — ovdje se ne
+prepisuju (S-010). Tok koji gradi TypeScript/Svelte ima brane `npm run check` umjesto `cargo`, a nakon
+`git worktree add` pokreće `npm ci` u svom stablu (`node_modules` je git-ignoriran). **Koja su stabla
+otvorena kaže `git worktree list`** — ovdje se to ne prepisuje. Stabla i grane tokova koji su **potpuno
+spojeni u pushani `main`** orkestrator briše sam (Leonovo dopuštenje 2026-09-21, `CLAUDE.md` pravilo #1).
+Stanje po cigli je u ledgeru `.superpowers/sdd/<plan>/progress.md` (izvan gita).
 
 ## 3 · Protokol po cigli
 
