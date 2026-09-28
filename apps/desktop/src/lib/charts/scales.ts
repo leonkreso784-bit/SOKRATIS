@@ -4,8 +4,19 @@
 // `scaleTime`): datumi u `Report` su civilni (`YYYY-MM-DD`), bez zone; UTC ponoć drži ticksove na
 // istom mjestu bez obzira na ljetno vrijeme računala. `timeFormatLocale` nosi HR nazive mjeseci i
 // dana; `d3-time` se NE uvozi izravno (tranzitivan, nije pinan) — ticksove daje sama skala.
+// Dopunjeno M2/61 (Ruling R45/R68) — prefiks „tj."/"wk" pred brojem tjedna je bio natpis izvan
+// rječnika (S-021 kršenje); sad ga čita ČISTA `translate()` (`i18n/t.ts`) nad rječnicima uvezenim
+// izravno (`hr.json`/`en.json`), bez Svelte stanja — modul ostaje testiv vitestom bez runa. Nazivi
+// mjeseci/dana (HR/EN objekti gore) OSTAJU ovdje: to je locale-podatak za d3, ne natpis sučelja.
+// Dopunjeno M2/62 (nalaz G3, dimni test ploče) — `scale.ticks(count)` dijeli VRIJEME jednako gusto;
+// za raspon od jednog-dva dana to znači ticksove ISPOD dana (svaka 3 sata) dok je format i dalje
+// dnevni, pa se ista oznaka ponavlja i do osam puta. `dayLevelTicks` ne pita d3 ništa ispod razine
+// dana kad je format dnevni (`days <= 62`) — sam odabire korak u DANIMA i uvijek uključi oba ruba.
 import { scaleLinear, scaleUtc, type ScaleTime } from 'd3-scale';
 import { timeFormatLocale, type TimeLocaleDefinition } from 'd3-time-format';
+import { translate } from '../i18n/t';
+import hrDict from '../i18n/hr.json';
+import enDict from '../i18n/en.json';
 import type { Lang } from '../types';
 
 const HR: TimeLocaleDefinition = {
@@ -44,19 +55,40 @@ export function yTicks(max: number, count = 4): number[] {
   // dopuna T53) — `scaleLinear().domain([0, 1]).ticks(4)` bi inače vratio razlomke.
   return scaleLinear().domain([0, top]).ticks(Math.min(count, top));
 }
-// Dan-razina kad je raspon kraći od ≈ 2 mjeseca, inače mjesec-razina; d3 sam bira gustoću po `count`.
+// T62 (G3) — korak u CIJELIM danima, ne u proizvoljnom d3-intervalu: `requestedCount` je ista gustoća
+// koju je `dateTicks` oduvijek tražio (`floor(širina / 80)`), ali ovdje BIRAMO korak sami umjesto da
+// pitamo d3 za "count" ticksova (d3 bi za kratak raspon spustio interval ispod dana). Oba ruba
+// raspona uvijek dobiju tick (G2 treba znati gdje je zadnji), pa je zadnji korak katkad kraći od
+// ostalih — to ne stvara duplikat jer je uvijek ≥ 1 dan od prethodnog.
+function dayLevelTicks(domain: [Date, Date], requestedCount: number): Date[] {
+  const startMs = domain[0].getTime();
+  const endMs = domain[1].getTime();
+  const spanDays = Math.round((endMs - startMs) / 86_400_000);
+  if (spanDays <= 0) return [domain[0]]; // početak = kraj → točno jedna oznaka
+  const stepDays = Math.max(1, Math.ceil(spanDays / requestedCount));
+  const stepMs = stepDays * 86_400_000;
+  const ticks: Date[] = [];
+  for (let ms = startMs; ms < endMs; ms += stepMs) ticks.push(new Date(ms));
+  ticks.push(domain[1]);
+  return ticks;
+}
+
+// Dan-razina kad je raspon kraći od ≈ 2 mjeseca, inače mjesec-razina; d3 sam bira gustoću po `count`
+// SAMO za mjesec-razinu — dan-razina ide kroz `dayLevelTicks` gore (T62/G3).
 export function dateTicks(domain: [Date, Date], widthPx: number, lang: Lang): { at: Date; x: number; label: string }[] {
   const scale = timeScale(domain, [0, widthPx]);
   const count = Math.max(2, Math.floor(widthPx / 80));
   const days = (domain[1].getTime() - domain[0].getTime()) / 86_400_000;
-  const fmt = locale(lang).utcFormat(days <= 62 ? (lang === 'hr' ? '%d.%m.' : '%b %d') : '%b %Y');
-  return scale.ticks(count).map((at) => ({ at, x: scale(at), label: fmt(at) }));
+  const daily = days <= 62;
+  const fmt = locale(lang).utcFormat(daily ? (lang === 'hr' ? '%d.%m.' : '%b %d') : '%b %Y');
+  const ats = daily ? dayLevelTicks(domain, count) : scale.ticks(count);
+  return ats.map((at) => ({ at, x: scale(at), label: fmt(at) }));
 }
 export function formatDate(ymd: string, lang: Lang, g: 'day' | 'week' | 'month'): string {
   const d = parseYmd(ymd);
   const l = locale(lang);
   if (g === 'day') return l.utcFormat(lang === 'hr' ? '%d.%m.' : '%b %d')(d);
-  if (g === 'week') return (lang === 'hr' ? 'tj. ' : 'wk ') + l.utcFormat('%V')(d);
+  if (g === 'week') return translate(lang === 'hr' ? hrDict : enDict, 'chart.week', { n: l.utcFormat('%V')(d) });
   return l.utcFormat('%b %Y')(d);
 }
 

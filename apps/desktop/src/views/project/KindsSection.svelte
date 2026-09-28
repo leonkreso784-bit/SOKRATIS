@@ -12,11 +12,17 @@
   // `<Explainable>` (dopuna T42): ostala zaglavlja (vrsta, commita, redaka) nemaju vlastiti id.
   // Preseljeno M2/58 iz views/Kinds.svelte — sadržaj nepromijenjen, samo <h1> → <h2 id> i putanje
   // uvoza (S-034).
+  // Dopunjeno M2/59 — naslagani graf „Vrste rada kroz vrijeme" (S-035, T55) uz prsten: `bucketKinds`
+  // preslaže VEĆ klasificirane commite po tjednu (ISO, ponedjeljak) — nije novo mjerenje, samo drugi
+  // raspored istog broja (`CommitRow.kind`, S-012). `kindSeries` (`views/helpers.ts`) daje boju i
+  // natpis svakog niza iz JEDNE mape/rječnika koje prsten i tablica gore već koriste (S-010).
   import { app } from '../../lib/state.svelte';
   import { getDict, getLang, t } from '../../lib/i18n/index.svelte';
   import { kindLabel, num, percent } from '../../lib/format';
-  import { kindColor } from '../helpers';
+  import { kindColor, kindSeries } from '../helpers';
+  import { bucketKinds } from '../../lib/charts/bucket';
   import Ring from '../../lib/charts/Ring.svelte';
+  import Bars from '../../lib/charts/Bars.svelte';
   import Explainable from '../../lib/explain/Explainable.svelte';
   import { sectionId, sectionKey } from './sections';
 
@@ -27,6 +33,9 @@
       label: `${kindLabel(k.kind, getDict())} — ${percent(k.share, getLang())}`,
       color: kindColor(k.kind),
     })),
+  );
+  const overTimeBuckets = $derived(
+    bucketKinds(app.report?.commits ?? [], 'week').map((b) => ({ start: b.start, values: b.counts })),
   );
 </script>
 
@@ -41,7 +50,10 @@
     <!-- Prsten uz tablicu na širokom prozoru (`lg:`), jedno ispod drugog na uskom — tablica mora
          ostati vidljiva bez pomicanja pri 1280×900 (vizualna provjera, krug popravka 1). -->
     <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
-      <div class="w-[260px] shrink-0">
+      <div class="flex w-[260px] shrink-0 flex-col gap-2">
+        <!-- Popravak 1 (V1, Ruling R70): vidljiv naslov iznad prstena — bez njega legenda vrsta rada
+             (tablica desno) izgleda kao da pripada prstenu bez ijednog imena. -->
+        <h3 class="text-sm font-semibold text-ink-1">{t('kinds.title')}</h3>
         <Explainable id="kinds.ring" block><Ring {segments} label={t('kinds.title')} /></Explainable>
       </div>
 
@@ -75,6 +87,13 @@
           {/each}
         </tbody>
       </table>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <h3 class="text-sm font-semibold text-ink-1">{t('kinds.overTime')}</h3>
+      <Explainable id="kinds.over_time" block>
+        <Bars buckets={overTimeBuckets} series={kindSeries(getDict())} granularity="week" stacked label={t('kinds.overTime')} />
+      </Explainable>
     </div>
   {/if}
 </div>

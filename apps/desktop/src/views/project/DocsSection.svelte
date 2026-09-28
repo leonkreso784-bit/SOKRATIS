@@ -13,12 +13,19 @@
   // (tekst/brojka omotana, ne `<p>`/`<h2>` sam — dopuna T42).
   // Preseljeno M2/58 iz views/Docs.svelte — sadržaj nepromijenjen, samo <h1> → <h2 id> i putanje
   // uvoza (S-034).
-  import { app } from '../../lib/state.svelte';
+  // Dopunjeno M2/60 — trend ocjene i signala (spec §3.2, §13, `api.getTrend`) iznad nalaza. Isti
+  // obrazac `$effect`+`requestToken` kao `IndicatorsSection`, ali za TRI fiksne metrike u jednom
+  // `Promise.all` umjesto po pokazatelju: `docs_score` (`docs.rs`), `signals_warn`/`signals_alert`
+  // (broj signala te težine, `snapshots.rs`). Snimke postoje tek OTKAD `engine.rs::try_snapshot`
+  // upisuje dan — prazno prije prvog mjerenja, ne greška (kartica ispod to kaže).
+  import { app, setError } from '../../lib/state.svelte';
+  import { api } from '../../lib/api';
   import { getLang, t } from '../../lib/i18n/index.svelte';
   import { num } from '../../lib/format';
   import { copyText, joinRepoPath } from '../helpers';
+  import Line from '../../lib/charts/Line.svelte';
   import Explainable from '../../lib/explain/Explainable.svelte';
-  import type { Finding, ProjectSummary } from '../../lib/types';
+  import type { Finding, ProjectSummary, Range, TrendPoint } from '../../lib/types';
   import { sectionId, sectionKey } from './sections';
 
   let copiedPath = $state<string | null>(null);
@@ -28,6 +35,66 @@
   const currentProject = $derived<ProjectSummary | null>(
     app.projects.find((p) => p.id === app.currentId) ?? null,
   );
+
+  const TREND_METRICS = ['docs_score', 'signals_warn', 'signals_alert'] as const;
+  let trends = $state<Record<(typeof TREND_METRICS)[number], TrendPoint[]>>({
+    docs_score: [],
+    signals_warn: [],
+    signals_alert: [],
+  });
+  let trendRequestToken = 0;
+
+  $effect(() => {
+    const report = app.report;
+    const projectId = app.currentId;
+    const range = app.range;
+    if (!report || projectId === null) {
+      trends = { docs_score: [], signals_warn: [], signals_alert: [] };
+      return;
+    }
+    void loadTrends(projectId, range);
+  });
+
+  async function loadTrends(projectId: number, range: Range): Promise<void> {
+    const token = ++trendRequestToken;
+    try {
+      const [docsScore, signalsWarn, signalsAlert] = await Promise.all(
+        TREND_METRICS.map((m) => api.getTrend(projectId, m, range)),
+      );
+      if (token !== trendRequestToken) return; // stigao je noviji zahtjev u međuvremenu — ovaj odgovor je star
+      trends = {
+        docs_score: docsScore ?? [],
+        signals_warn: signalsWarn ?? [],
+        signals_alert: signalsAlert ?? [],
+      };
+    } catch (e) {
+      if (token === trendRequestToken) setError(e);
+    }
+  }
+
+  const trendEmpty = $derived(
+    trends.docs_score.length === 0 && trends.signals_warn.length === 0 && trends.signals_alert.length === 0,
+  );
+  const trendSeries = $derived([
+    {
+      id: 'docs_score',
+      label: t('docs.trend.score'),
+      color: 'var(--color-brand-500)',
+      points: trends.docs_score.map((p) => ({ date: p.taken_on, value: p.value })),
+    },
+    {
+      id: 'signals_warn',
+      label: t('docs.trend.warn'),
+      color: 'var(--color-warn)',
+      points: trends.signals_warn.map((p) => ({ date: p.taken_on, value: p.value })),
+    },
+    {
+      id: 'signals_alert',
+      label: t('docs.trend.alert'),
+      color: 'var(--color-danger)',
+      points: trends.signals_alert.map((p) => ({ date: p.taken_on, value: p.value })),
+    },
+  ]);
 
   // "path:line" kad nalaz ima redak, inače samo "path" — jedina definicija tog oblika u datoteci.
   function findingLabel(finding: Finding): string {
@@ -70,6 +137,17 @@
         </p>
       {/if}
     </div>
+
+    {#if trendEmpty}
+      <p class="text-xs text-ink-2">{t('docs.trend.empty')}</p>
+    {:else}
+      <div class="flex flex-col gap-2">
+        <h3 class="text-sm font-semibold text-ink-1">{t('docs.trend')}</h3>
+        <Explainable id="docs.trend" block>
+          <Line series={trendSeries} label={t('docs.trend')} />
+        </Explainable>
+      </div>
+    {/if}
 
     <section class="flex flex-col gap-2">
       <h2 class="text-lg font-semibold text-ink-0">

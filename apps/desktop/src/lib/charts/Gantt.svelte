@@ -4,9 +4,14 @@
   // stanju faze i crta okomicu „danas". Odluka (R60 traži zapisanu): BEZ `Grid` — mreža bi ovdje bila
   // po datumima na X-osi (već ih nosi `Axis`), ne po vrijednosti na Y-osi kao kod stupaca/linija, pa
   // druga okomita mreža ne bi dodala ništa što crta „danas" već ne pokazuje.
+  // Dopunjeno M2/62 (popravak 2, ruling R77) — natpis u margini je UVIJEK `row.shortLabel` (skraćen za
+  // marginu, `layout.ts`), PUNI naziv ostaje u `<title>` (hover, čitač ekrana). Stanje faze BEZ trake
+  // (`!row.from`, npr. „planirana") se VIŠE NE dodaje tom natpisu (izlazilo je iz margine za duga imena
+  // faze, nalaz V5) nego se crta kao DRUGI `<text>` u području crtanja retka, prevedeno iz POSTOJEĆEG
+  // rječnika (`phaseState`).
   import Chart from './Chart.svelte';
   import Axis from './Axis.svelte';
-  import { frame, ganttLayout, type GanttRow, type Margins } from './layout';
+  import { frame, ganttLayout, type Margins } from './layout';
   import { getDict, getLang } from '../i18n/index.svelte';
   import { phaseState, ymd } from '../format';
   import type { Phase, PhaseState } from '../types';
@@ -25,22 +30,24 @@
     if (s === 'running') return 'var(--color-brand-500)';
     return 'var(--color-ink-2)';
   }
-  // Faza bez `from` nema traku (samo natpis) — natpis tada nosi i prevedeno stanje, iz POSTOJEĆEG
-  // rječnika (R60: nema novog teksta „(planirana)" izvan i18n-a).
-  function rowLabel(r: GanttRow): string {
-    return r.from ? r.label : `${r.label} (${phaseState(r.state, getDict())})`;
-  }
 </script>
 
 <Chart width={W} {height} m={M_GANTT} {label}>
   {#snippet children(f)}
     <Axis {f} xTicks={layout.xTicks} yTicks={[]} />
     {#each layout.rows as row, i (i)}
-      <text x={f.m.left - 6} y={row.y + row.h / 2} text-anchor="end" dominant-baseline="middle" font-size="10" fill="var(--color-ink-1)">{rowLabel(row)}</text>
+      <text x={f.m.left - 6} y={row.y + row.h / 2} text-anchor="end" dominant-baseline="middle" font-size="10" fill="var(--color-ink-1)">
+        {row.shortLabel}
+        <title>{row.label}</title>
+      </text>
       {#if row.from}
         <rect class="chart-bar" x={row.x0} y={row.y} width={Math.max(1, row.x1 - row.x0)} height={row.h} rx="2" fill={stateColor(row.state)}>
           <title>{row.label}: {ymd(row.from, getLang())} – {ymd(row.to, getLang())}</title>
         </rect>
+      {:else}
+        <text x={f.m.left + 6} y={row.y + row.h / 2} text-anchor="start" dominant-baseline="middle" font-size="10" fill="var(--color-ink-2)">
+          {phaseState(row.state, getDict())}
+        </text>
       {/if}
     {/each}
     {#if layout.todayX !== null}

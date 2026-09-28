@@ -42,6 +42,7 @@ describe('kartica s objašnjenjem', () => {
     for (const prefix of [
       'overview.',
       'tempo.',
+      'branches.',
       'kinds.',
       'phases.',
       'diary.',
@@ -53,5 +54,10 @@ describe('kartica s objašnjenjem', () => {
     ]) {
       expect(EXPLAIN_IDS.some((id) => id.startsWith(prefix)), prefix).toBe(true);
     }
+  });
+  // Dopunjeno M2/61 — sedam novih grafova ploče projekta (T59/T60) su svoj id već dodali; ova
+  // tvrdnja je regresijska brana koja čuva 44 (37 + 7), ne uvodi novi id.
+  it('popis ima točno 44 objašnjiva id-a (7 novih grafova ploče, spec §3.2)', () => {
+    expect(EXPLAIN_IDS).toHaveLength(44);
   });
 });
