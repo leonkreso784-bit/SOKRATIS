@@ -3,7 +3,7 @@
 // ima drugačiji ICU od Node-a, pa ASCII razmak i crtica moraju biti dio implementacije, ne ishoda.
 import { describe, expect, it } from 'vitest';
 import hr from '../src/lib/i18n/hr.json';
-import { hours, num, percent, phaseState, relative, ymd } from '../src/lib/format';
+import { hours, localYmd, num, percent, phaseState, relative, ymd } from '../src/lib/format';
 
 describe('format', () => {
   it('postoci iz razlomka, decimalni zarez u HR', () => {
@@ -35,5 +35,10 @@ describe('format', () => {
   });
   it('stanje faze prevedeno', () => {
     expect(phaseState('running', hr)).toBe('u tijeku');
+  });
+  // m1 (M2/63): `new Date(2026, 0, 5, 0, 30)` je 5. siječnja 00:30 PO LOKALNOM konstruktoru — isti
+  // datum na svakom stroju, bez obzira na vremensku zonu koja pokreće vitest.
+  it('lokalni datum ne prelazi u UTC dan', () => {
+    expect(localYmd(new Date(2026, 0, 5, 0, 30))).toBe('2026-01-05');
   });
 });

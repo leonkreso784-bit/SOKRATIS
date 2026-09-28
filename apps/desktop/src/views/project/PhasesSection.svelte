@@ -11,9 +11,11 @@
   // fazi od-do, „danas" kao crta. `Report` nema polje „danas" (Ruling R72: `Report.until` ostaje
   // `null` kad je raspon „sve", jezgra ga NE upisuje) — `today` je pomoćna vrijednost SUČELJA, samo
   // za prikaz, izračunata jednom ovdje iz sata ovog računala.
+  // Dopunjeno M2/63 — m1: `today` sad zove `localYmd(new Date())` (lokalni dan stroja) umjesto
+  // `toISOString()` (UTC dan) — crta „danas" u Ganttu je noću do 1-2 h znala biti jedan dan unatrag.
   import { app } from '../../lib/state.svelte';
   import { getDict, getLang, t } from '../../lib/i18n/index.svelte';
-  import { num, phaseState, ymd } from '../../lib/format';
+  import { localYmd, num, phaseState, ymd } from '../../lib/format';
   import { bricksPerDay, phaseRows } from '../helpers';
   import Gantt from '../../lib/charts/Gantt.svelte';
   import Explainable from '../../lib/explain/Explainable.svelte';
@@ -26,7 +28,7 @@
 
   const rows = $derived(phaseRows(app.report?.phases ?? []));
   const phases = $derived(app.report?.phases ?? []);
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localYmd(new Date());
 
   function sectionRows(state: PhaseState): Phase[] {
     return rows[state];

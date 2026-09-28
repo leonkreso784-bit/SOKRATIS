@@ -16,9 +16,11 @@
   // OSTAJE po danu (točan popis, S-012). Toplinska karta (`Heatmap`) i doba dana (`Histogram`) su nova
   // dva grafa iz spec-a §3.2 — oba samo CRTAJU već izmjerene `DayStats`/`CommitRow` (jezgra ne zna za
   // "toplinsku kartu", to je samo drugi raspored istih brojeva).
+  // Dopunjeno M2/63 — m1: gornja granica toplinske karte je `localYmd(new Date())` (lokalni dan
+  // stroja), ne `toISOString()` (UTC dan) — u Hrvatskoj su to različiti dani između ponoći i 1-2 h.
   import { app } from '../../lib/state.svelte';
   import { getLang, t } from '../../lib/i18n/index.svelte';
-  import { hours, num, ymd } from '../../lib/format';
+  import { hours, localYmd, num, ymd } from '../../lib/format';
   import { bucketDays, hourHistogram, type Granularity } from '../../lib/charts/bucket';
   import Bars from '../../lib/charts/Bars.svelte';
   import Line from '../../lib/charts/Line.svelte';
@@ -39,7 +41,7 @@
   // Ruling R72 (popravak 1) — ispravlja pogrešnu tvrdnju iz teksta plana: jezgra (`Report.until`,
   // `report.rs`) NE upisuje današnji datum kad je raspon „sve", ostaje `null`. `today` je pomoćna
   // vrijednost SUČELJA za gornju granicu toplinske karte u tom slučaju (prikaz, ne mjerenje).
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localYmd(new Date());
 </script>
 
 <div class="flex flex-col gap-4">

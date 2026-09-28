@@ -47,8 +47,20 @@ pub fn db_path() -> PathBuf {
 /// Pretvara BILO KOJU grešku (`IoError`, `StoreError`, otrovan `Mutex`…) u tekst — Tauri naredbe
 /// vraćaju `Result<T, String>` jer greška putuje sučelju preko granice procesa kao JSON tekst, ne
 /// kao Rustov `Error`-trait. Jedina funkcija u cijeloj ljusci koja zna za taj ugovor.
-pub fn text<E: std::fmt::Display>(e: E) -> String {
-    format!("{e:#}")
+///
+/// Dopunjeno M2/63 — I3: `{e:#}` (uz `anyhow`) ispisuje CIJELI lanac uzroka, ali `thiserror`-tipovi
+/// (`IoError`, `StoreError`…) `#` ne mijenja ništa (poruka je SAMO varijanta, uzrok stoji odvojeno u
+/// `#[source]`, obrazac I5 u `crates/sokratis-io/src/error.rs`). Zato `text` sad zahtijeva
+/// `std::error::Error` i sam šeta `source()` lancem, spajajući svaku poruku s „: ".
+pub fn text<E: std::error::Error>(e: E) -> String {
+    let mut out = e.to_string();
+    let mut cause: Option<&dyn std::error::Error> = e.source();
+    while let Some(err) = cause {
+        out.push_str(": ");
+        out.push_str(&err.to_string());
+        cause = err.source();
+    }
+    out
 }
 
 #[cfg(test)]
@@ -59,5 +71,21 @@ mod tests {
     fn debug_build_uses_its_own_database_file() {
         assert_eq!(db_file_name(false), "sokratis.db");
         assert_eq!(db_file_name(true), "sokratis-dev.db");
+    }
+
+    /// I3: prije popravka `text` je pokazivao SAMO „profil {path}" — ime polja iz `ParseError`
+    /// ostajalo je zaključano u `#[source]` lancu koji `{e:#}` (varijanta bez `anyhow`) ne otvara.
+    #[test]
+    fn text_walks_the_source_chain_into_the_field_name() {
+        let err = sokratis_io::IoError::ProfileInvalid {
+            path: PathBuf::from("C:/repo/.sokratis/profile.json"),
+            source: sokratis_core::ParseError::PathOutsideRoot {
+                field: "docs_dir".into(),
+                value: "../x".into(),
+            },
+        };
+        let msg = text(err);
+        assert!(msg.contains("profil"), "poruka bez top-razine: {msg}");
+        assert!(msg.contains("docs_dir"), "poruka bez imena polja: {msg}");
     }
 }

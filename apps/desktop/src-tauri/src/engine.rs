@@ -195,9 +195,12 @@ fn refresh_project(app: &AppHandle, id: i64) -> Result<(), String> {
     Ok(())
 }
 
-/// Zapisuje dnevnu snimku (profil pa metrike, S-014) pri SVAKOM izračunu (dopuna T30 #2 —
-/// `save_snapshot` je cjelovita zamjena dana). Greška se NE širi dalje: izvještaj je važniji od
-/// trenda, `report_updated` ide svejedno.
+/// Zapisuje dnevnu snimku (profil pa metrike, S-014) pri SVAKOM OSVJEŽAVANJU MOTORA — pokretanje,
+/// promjena u repou, ručni upis, gumb „Osvježi" (dopuna T30 #2 — `save_snapshot` je cjelovita
+/// zamjena dana); promjena RASPONA u sučelju ide kroz `get_report`/`compute`, ne kroz ovu funkciju,
+/// pa snimku ne piše (popravak I5, M2/63 — komentar je prije tvrdio „pri svakom izračunu izvještaja",
+/// što uključuje i `get_report`). Greška se NE širi dalje: izvještaj je važniji od trenda,
+/// `report_updated` ide svejedno.
 fn snapshot_today(state: &AppState, id: i64, report: &Report) {
     if let Err(e) = try_snapshot(state, id, report) {
         eprintln!("motor: dnevna snimka za projekt {id} nije uspjela: {e}");
