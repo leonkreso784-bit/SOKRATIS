@@ -12,12 +12,10 @@
 // `scaleBand` jer redovi nisu jednako razmaknuti kategorije nego već poredan popis (grane su
 // poredane u `Report`, ovdje se samo crta); `bucketTotal` (R55) izdvaja zbroj/najveću vrijednost
 // jednog dana iz `barsLayout`, da `map`+`reduce` ne žive naslagani u jednom izrazu.
-// Dopunjeno M2/62 — tri nalaza dimnog testa ploče: (G1) `fitLabel` krati predug natpis retka (≈20
-// znakova stane u lijevu marginu 140px uz font-size 10) s „…" na kraju, PUNI naziv ostaje u
-// `label`/`<title>`; (G2) `withEdgeAnchor` prebacuje `text-anchor` zadnjeg X-ticka na 'end' kad bi mu
-// centriran natpis izašao izvan `viewBox`-a; (G3) `dayLevelTicks` (poziva ga `dateTicks` u
-// `scales.ts`) ne pušta d3 ispod razine dana kad je format dnevni, pa se oznaka ne ponavlja na
-// jednodnevnom/dvodnevnom rasponu. Sve tri su ČISTE funkcije s testom (R37) — isto pravilo kao gore.
+// Dopunjeno M2/62 — `fitLabel` krati predug natpis retka za lijevu marginu, PUNI naziv ostaje u
+// `label`/`<title>` (G1); `withEdgeAnchor` postavlja `anchor: 'end'` zadnjem X-ticku kad bi centriran
+// izašao iz `viewBox`-a (G2); `dateTicks`/`dayLevelTicks` (`scales.ts`) drži oznake na razini dana i
+// domena više ne širi jednu točku na idući dan (G3). Sve tri su ČISTE funkcije s testom (R37).
 import { scaleBand } from 'd3-scale';
 import { dateTicks, finiteMax, formatDate, formatMonth, formatWeekday, linear, niceMax, parseYmd, timeScale, toYmd, yTicks } from './scales';
 import { bucketStart, type Granularity } from './bucket';

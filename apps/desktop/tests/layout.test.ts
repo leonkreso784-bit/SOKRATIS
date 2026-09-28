@@ -84,6 +84,9 @@ describe('lineLayout', () => {
     expect(l.xTicks.length).toBeGreaterThan(1);
     expect(l.xTicks.at(-1)?.anchor).toBe('end');
     for (const t of l.xTicks.slice(0, -1)) expect(t.anchor).not.toBe('end');
+    // N2 (popravak 2, T62) — dopuna tvrdnje: `anchor: 'end'` ne smije doći uz NaN koordinatu.
+    for (const t of l.xTicks) expect(Number.isFinite(t.x)).toBe(true);
+    for (const p of l.paths[0]!.points) expect([p.x, p.y].every(Number.isFinite)).toBe(true);
   });
 });
 
@@ -199,6 +202,8 @@ describe('ganttLayout', () => {
     expect(l.xTicks.length).toBeGreaterThan(1);
     expect(l.xTicks.at(-1)?.anchor).toBe('end');
     for (const t of l.xTicks.slice(0, -1)) expect(t.anchor).not.toBe('end');
+    // N2 (popravak 2, T62) — dopuna tvrdnje: `anchor: 'end'` ne smije doći uz NaN koordinatu.
+    for (const t of l.xTicks) expect(Number.isFinite(t.x)).toBe(true);
   });
   // Nalaz G1 (T62) — dugi naziv faze se ne smije odrezati slijeva; `shortLabel` je skraćen natpis za
   // uski margin ulijevo (140), `label` ostaje PUN naziv (koristi ga `<title>` reda u komponenti).
