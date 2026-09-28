@@ -73,17 +73,17 @@ pogrešna uporaba**; `--help`/`--version` = 0) — sve rade nad pravim repozitor
 Sokrat Studyjem).
 Testovi i brane: `docs/workflow/TESTING.md`.
 
-## Stanje — TRENUTNO (2026-09-27 — drugi rez do 1.0.0: sesija 5 zatvorena ranije, T44–T58+T64 gotovi)
+## Stanje — TRENUTNO (2026-09-28 — drugi rez do 1.0.0: sesija 6, T44–T62+T64 gotovi)
 - **M0 gotov, M1 zatvoren** (0.1.0). Aktivan spec `docs/plan/ARHITEKTURA_1_0.md`; aktivan plan
   `docs/superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md`: T44–T64, sedam tokova.
-- **T44–T58 + T64 u `main`-u** (vrh `fd3b452`, verzija `1.0.0-pre.4`, nepromijenjena): grane u
-  mjerenju svih lokalnih grana (S-032), dnevnik unija stabala (S-033), PLOČA T58, **LANCI T64** —
-  nespojene grane su lanci, signal broji vrhove ne svaku granu (S-038).
-- **PLOČA T59–T61 izgrađena na `feat/ploca-2`, NIJE spojena** — dimni test T62 otkrio krug popravaka
-  `M2/62` koji čeka recenziju; sesija 5 zatvorena ranije na Leonov zahtjev. **Sljedeće:** recenzija
-  `M2/62` → spajanje PLOČE → tok IZDANJE (T35, T63, T43).
-- **Tri stabla:** `sokratis` (`main`) · `sokratis.ploca2` (`feat/ploca-2`, NESPOJENO) · `sokratis.rel`
-  (`feat/release`, T35 napola, necommitano) — oba nespojena parkirana, ne dirati. Tag traži Leonov OK.
+- **T44–T62 + T64 u `main`-u** (vrh `b698611`, verzija `1.0.0-pre.4`, nepromijenjena): grane u
+  mjerenju svih lokalnih grana (S-032), dnevnik unija stabala (S-033), **LANCI T64** — nespojene grane
+  su lanci, signal broji vrhove ne svaku granu (S-038); **PLOČA T59–T62 spojena** — prekidač
+  dan/tjedan/mjesec, grafovi u svih osam sekcija ploče Projekt, stupac grane u Dnevniku,
+  `EXPLAIN_IDS` 37 → 44, krug popravaka `M2/62` nakon dimnog testa.
+- **Dva stabla:** `sokratis` (`main`) · `sokratis.rel` (`feat/release`, T35 napola, necommitano) —
+  ne dirati dok tok IZDANJE ne dođe na red. **Sljedeće:** tok IZDANJE (T35, T63, T43, instalater
+  1.0.0; tag traži Leonov OK).
 - Druga verzija (M3) i kasnije: `docs/records/BACKLOG.md`.
 - Brane, brojke i tijek sesija: `PROGRESS.md`; isporuke: `CHANGELOG.md`. Ovaj odjeljak to ne ponavlja.
 
@@ -118,13 +118,12 @@ sesije.
 ## Agenti — više grana, jedan orkestrator
 Uloge i protokol: `docs/workflow/AGENTI.md`. Graditelj radi **jednu ciglu u svom stablu**, recenzent presuđuje
 u dva prolaza, čuvar dokumentacije piše zapise; **samo orkestrator spaja u `main`**. Nakon compacta stanje se
-čita iz gita (`git log --oneline -15` · `git worktree list`), ne iz sjećanja. **Otvorena su tri stabla** (v. „Stanje"):
-`sokratis` (`main`) · `sokratis.ploca2` (`feat/ploca-2`, T59–T61, NESPOJENO) · `sokratis.rel`
-(`feat/release`, T35 napola, necommitano) — potpuno spojena se brišu (pravilo #1), ali ni jedno od ova
-dva NIJE spojeno, pa ih nova sesija ne dira ni ne briše: `sokratis.ploca2` nastavlja recenziju kruga
-popravaka `M2/62` pa spajanje PLOČE, `sokratis.rel` nastavlja T35 kad tok IZDANJE dođe na red. Popis
-tokova i vlasništvo datoteka: `docs/superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md` (T44–T64; T64
-dodan 2026-09-25, S-038, spojen 2026-09-27); T35/T43 su u starijem
+čita iz gita (`git log --oneline -15` · `git worktree list`), ne iz sjećanja. **Otvorena su dva stabla** (v. „Stanje"):
+`sokratis` (`main`) · `sokratis.rel` (`feat/release`, T35 napola, necommitano) — potpuno spojena se
+brišu (pravilo #1); `sokratis.rel` NIJE spojeno, pa ga nova sesija ne dira ni ne briše dok tok IZDANJE
+ne dođe na red. `sokratis.ploca2` (`feat/ploca-2`, T59–T62) je obrisano nakon spajanja u `main`
+2026-09-28. Popis tokova i vlasništvo datoteka: `docs/superpowers/plans/2026-09-24-1-0-0-grane-i-ploca.md`
+(T44–T64; T64 dodan 2026-09-25, S-038, spojen 2026-09-27); T35/T43 su u starijem
 `docs/superpowers/plans/2026-09-18-m2-desktop.md`.
 
 ## Dokumentacija — ulaz je SAMO `docs/README.md`
