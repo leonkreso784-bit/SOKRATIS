@@ -15,6 +15,7 @@
 | HR/EN natpisi u **CLI tablici** | M3 | jezgra je već engleska (S-008); tablica je pomoć za terminal |
 | GitHub Actions | M4 (objava) | README na engleskom je gotov 2026-09-21 (S-030); licenca je odlučena 2026-09-29 (S-039) |
 | Obavijesti o licencama ugrađenih komponenti uz instalater (npr. `THIRD-PARTY-NOTICES`) | zakrpa 1.0.1 ili M4 — odluka | MIT · Apache-2.0 · BSD · MPL-2.0 traže da tekst licence i autorska obavijest putuju uz binarnu distribuciju; instalater ih danas ne nosi (popis je samo u `Cargo.lock` i `package-lock.json`). Alat koji to generira je nova razvojna ovisnost — namjerna radnja (pravilo #6) |
+| Verzija se nigdje ne vidi u aplikaciji (nalaz Leonove provjere instalatera 1.0.0, 2026-09-29) | zakrpa 1.0.1 ili M3 — odluka | u `apps/desktop/src` i `src-tauri/src` nema nijednog prikaza verzije; broj se vidi samo u Windowsovu popisu instaliranih aplikacija i u svojstvima izvršne datoteke. Prijedlog: redak „O aplikaciji" u Postavkama (verzija iz `[workspace.package]`, licenca) — prirodno mjesto i za obavijesti o licencama ugrađenih komponenti (red iznad) |
 | Instalater NSIS | → spec M2 [§13.6](../archive/ARHITEKTURA_M2.md) (S-029) | samo pointer; od 2026-09-29 je priložen izdanju na GitHubu (S-040) |
 | Potpisan instalater · MSI · automatsko ažuriranje | M4 (objava) | S-029; nepotpisani je objavljen uz 1.0.0 (S-040) |
 | `sokratis docs .` mjeri samo korijen i `docs_dir`; `.md` pod `apps/desktop` (npr. budući README sučelja) nitko ne provjerava | M3 (profil: više `docs_dir`-ova ili `extra_docs_dirs`) | nalaz čuvara 2026-09-18 |
