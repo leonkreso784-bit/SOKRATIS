@@ -3,6 +3,7 @@ name = "sokratis-core"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
+license-file.workspace = true
 publish.workspace = true
 
 [dependencies]

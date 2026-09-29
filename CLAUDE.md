@@ -9,7 +9,7 @@
 ## Što je projekt
 Desktop aplikacija koja se priključi na git-repozitorij projekta, izračuna statistiku rada (ono što
 danas radi `docs/records/RAD.xlsx` u Sokrat Studyju), ocijeni čistoću dokumentacije i javi smjer
-projekta **s dokazom**. Prati više projekata. Izgled kao Sokrat Study. Repo je javan (S-023); licenca je neodlučena.
+projekta **s dokazom**. Prati više projekata. Izgled kao Sokrat Study. Repo je javan (S-023); besplatan za korištenje, **nije open source** (S-039, `LICENSE`).
 Definicija: `docs/product/PRD.md` · što je izgrađeno: `docs/architecture/ARCHITECTURE.md` ·
 milestonei: `docs/plan/ROADMAP.md` · ispunjeni specovi: `docs/archive/`.
 
@@ -109,7 +109,7 @@ hrvatski · **S-031** dokumentacija: točnost se čuva smanjivanjem, ispunjeno i
 nadzorna ploča projekta · **S-035** grafovi: d3-matematika + naš SVG · **S-036** X = upit → izlaz, tray
 uklonjen, autostart otvara prozor · **S-038** nespojene grane su lanci: signal broji vrhove, sadržane su
 dokaz (T64 u `main`-u 2026-09-27; vanjska lista od 14 prijedloga → BACKLOG) · **S-037** sve prije 1.0.0, instalater „1.0.0-pre.N" nakon svake
-sesije.
+sesije. **[objava 1.0.0]** **S-039** licenca: besplatno korištenje, bez izmjena, dijeljenja i doprinosa (vlastiti tekst).
 
 ## Agenti — više grana, jedan orkestrator
 Uloge i protokol: `docs/workflow/AGENTI.md`. Graditelj radi **jednu ciglu u svom stablu**, recenzent presuđuje

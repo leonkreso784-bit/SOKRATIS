@@ -1,0 +1,67 @@
+Sokratis Freeware License, version 1.0
+
+Copyright (c) 2026 Leon Kreso. All rights reserved.
+
+This is not an open-source license. It lets you use Sokratis free of charge.
+It does not let you change it or pass it on.
+
+Definitions
+
+"Software" means Sokratis: the source code in the official repository and the
+installers and binaries published there by the copyright holder.
+
+"Official repository" means https://github.com/leonkreso784-bit/SOKRATIS.
+
+1. What you may do
+
+Free of charge, you may:
+
+  a) download the Software from the official repository and its releases;
+  b) install and run the Software on computers you use, for any purpose,
+     including commercial work;
+  c) read the source code, and build the Software from unmodified source for
+     your own use.
+
+2. What you may not do
+
+Without prior written permission from the copyright holder, you may not:
+
+  a) modify the Software or create derivative works based on it;
+  b) distribute, publish, sublicense, rent, lease or sell the Software or any
+     copy of it, in whole or in part, modified or not;
+  c) remove or alter this license or any copyright notice in the Software.
+
+Viewing and forking the official repository on GitHub, to the extent that
+GitHub's Terms of Service give every GitHub user that right, is not a breach
+of this license. Changing the code in a fork is.
+
+3. Contributions
+
+The project does not accept contributions. Pull requests and patches are not
+reviewed or merged.
+
+4. Name, logo and design
+
+This license gives you no right to use the name "Sokratis", its logo or its
+visual design, except to refer to the Software.
+
+5. Third-party components
+
+The Software contains third-party components that are licensed under their own
+terms. Those terms continue to apply to those components, and nothing in this
+license limits the rights they give you. The components are listed in
+Cargo.lock and apps/desktop/package-lock.json in the official repository.
+
+6. Termination
+
+Your rights under this license end automatically if you break its terms. When
+they end, you must stop using the Software and delete your copies of it.
+
+7. No warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

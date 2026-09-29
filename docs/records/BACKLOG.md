@@ -13,7 +13,8 @@
 | Vercel adapter: deployi umjesto `🚀` u dnevniku | M3 (opcionalno) | mreža |
 | HR/EN natpisi u **sučelju** | → spec M2 [§6.4](../archive/ARHITEKTURA_M2.md) (S-021) | samo pointer |
 | HR/EN natpisi u **CLI tablici** | M3 | jezgra je već engleska (S-008); tablica je pomoć za terminal |
-| LICENCA · GitHub Actions | M4 (objava) | README na engleskom je gotov 2026-09-21 (S-030). Licenca je **neodlučena**: Leon ne isključuje prodaju (2026-09-21), pa „MIT kao Sokrat Study“ više nije pretpostavka; do odluke sva prava pridržana |
+| GitHub Actions | M4 (objava) | README na engleskom je gotov 2026-09-21 (S-030); licenca je odlučena 2026-09-29 (S-039) |
+| Obavijesti o licencama ugrađenih komponenti uz instalater (npr. `THIRD-PARTY-NOTICES`) | zakrpa 1.0.1 ili M4 — odluka | MIT · Apache-2.0 · BSD · MPL-2.0 traže da tekst licence i autorska obavijest putuju uz binarnu distribuciju; instalater ih danas ne nosi (popis je samo u `Cargo.lock` i `package-lock.json`). Alat koji to generira je nova razvojna ovisnost — namjerna radnja (pravilo #6) |
 | Instalater NSIS samo za Leona | → spec M2 [§13.6](../archive/ARHITEKTURA_M2.md) (S-029) | samo pointer |
 | Potpisan i objavljen instalater · MSI · automatsko ažuriranje | M4 (objava) | S-029 |
 | `sokratis docs .` mjeri samo korijen i `docs_dir`; `.md` pod `apps/desktop` (npr. budući README sučelja) nitko ne provjerava | M3 (profil: više `docs_dir`-ova ili `extra_docs_dirs`) | nalaz čuvara 2026-09-18 |
@@ -56,7 +57,7 @@ verzija nadgleda gradnju druge, pa se redoslijed ispod još može promijeniti iz
 |---|---|
 | **Timovi:** razrada po autoru u jednom repou · dijeljeni rad preko korisnikova **vlastitog** Supabasea, servera ili čega drugog | sudara se s PRD §5 „sve lokalno“ i s retkom „Oblak / računi / Supabase“ u „Odbijeno“ niže — to odbijanje vrijedi za 1.0.0 i drugu verziju; timovi ga ponovno otvaraju tek vlastitom odlukom i specom |
 | **Ne samo git:** mape bez gita · Issues/Linear · time-tracker kao izvor | `GitSource` je već trait (S-003) — drugi izvor je nova implementacija, ali `Report` danas pretpostavlja commite |
-| Prodaja kao proizvod | Leon: „moguće kasnije, sad ne ulazi u priču“; veže se na licencu (gore) |
+| Prodaja kao proizvod | Leon: „moguće kasnije, sad ne ulazi u priču“; licenca 1.0.0 (S-039) dopušta besplatnu uporabu i ne može se stegnuti za već objavljenu verziju |
 | Treći i četvrti projekt pod nadzorom (dva Leonova projekta izvan ovog repoa; imena se ne zapisuju u javni repo) | ne zna se drže li se konvencija Sokrat Studyja → spec M2 §13.7 jamči da brojke ne lažu; profil za tuđe projekte je redak u „Čeka milestone“ |
 
 ## Iz završne recenzije M1 (nalazi koji nisu popravljeni u M1)
@@ -74,8 +75,7 @@ zatvorena u cijelosti** (2026-09-20, tok IO): jezgra (`Profile::validate_paths`/
 odbija putanju izvan repoa; io-dio — `io::Project::open` zove `validate_paths()` odmah nakon
 učitavanja profila, prije nego se ijedna putanja pročita s diska (M2/14, merge `3ca068c`) — je ušao.
 Repo je od 2026-09-20 javan (S-023); ova ograda je bila dug prema javnom kodu, sad zatvoren u
-cijelosti. Preostaje samo LICENCA, koja ne postoji (kod je vidljiv, ali nije licenciran za tuđu
-uporabu) — stavka „README EN · LICENCA" gore time ostaje jedina otvorena iz te odluke. Testni redak
+cijelosti. Licenca postoji od 2026-09-29 (S-039), pa iz te odluke više ništa nije otvoreno. Testni redak
 koji fixture prevlada (odgođena 8) je riješen ciglom M2/9 (`test_path_exclude`).
 **I6 je riješena ciglom M2/4**: `Report.vision_totals` zbraja vizije po stanju. **`phase_tag` (I3 +
 M14) je riješen ciglom M2/6**: aktivne faze se na commit vežu regexom iz profila, ne tvrdim
@@ -183,7 +183,7 @@ stranih korisnika — oni će promijeniti redoslijed.
 |---|---|---|---|
 | 1 | više signala s dokazom, prazna stanja koja uče | dva pravila (`unmerged_branches`, `docs_lag`); prazna stanja su goli natpisi (`tempo.empty`) | najjeftinije, pogađa jezgru vrijednosti; pravila iz „Čeka milestone" gore; prazno stanje = „Sokratis čita X iz Y; primjer retka" (obrazac S-027) |
 | 2 | profil za tuđe projekte kao **preset**, ne čarobnjak | klasifikator VEĆ hvata `^fix`, `^docs`, `^ci:`, `^test:`, `refactor`; ali zadani `since` je **`2026-08-29`** (početak pariteta) → stranac s dvogodišnjim projektom vidi tri tjedna | `since` = pametna zadana vrijednost (prvi commit ili 90 dana) · `"preset": "conventional"` · detekcija dnevnika po obliku naslova; čarobnjak s UI-jem tek ako preset ne bude dovoljan (srodno: red „Profil za tuđe projekte" gore) |
-| 3 | licenca | neodlučena, sva prava pridržana | odlučuje se kod taga 1.0.0 (red „LICENCA" gore); MIT/Apache-2.0 za korisnike, AGPL-3.0 protiv SaaS-klonova |
+| 3 | licenca | **odlučeno 2026-09-29 (S-039):** besplatno korištenje, bez izmjena i dijeljenja | prijedlog liste (MIT/Apache-2.0 ili AGPL-3.0) nije uzet |
 | 4 | prvi strani korisnik | — | Leonov prijatelj s 1.0.0; jeftinije od bilo koje cigle |
 | 5 | sati koji ne lažu | pragovi `session_gap_hours`/`session_start_hours` SU polja profila, nema sučelja; proxy označen (S-007) | prvo ručna korekcija po danu (mehanika kao `overrides.json`), pa senzor mtime-a |
 | 6 | izvoz | CLI već daje JSON | JSON/CSV = gumb + dijalog; PNG grafa kasnije |
