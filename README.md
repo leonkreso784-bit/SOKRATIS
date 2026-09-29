@@ -4,8 +4,8 @@
 computes work statistics, scores how clean the documentation is, and reports where the project is
 heading — always with evidence. It watches several projects at once.
 
-> **Version 1.0.0** (September 2026, Windows only, untagged). The installer is unsigned and, for now,
-> meant for the author. **No license has been chosen yet** — see [License](#license). What has shipped:
+> **Version 1.0.0** (September 2026, Windows only). The installer is unsigned, so Windows SmartScreen
+> warns before it runs. **Free to use, not open source** — see [License](#license). What has shipped:
 > [docs/records/CHANGELOG.md](./docs/records/CHANGELOG.md).
 
 ## Why it exists
@@ -107,4 +107,10 @@ entry point is [docs/README.md](./docs/README.md).
 
 ## License
 
-No license has been chosen yet. Until one is, all rights are reserved. Author: Leon Kreso.
+Sokratis is **free to use, but it is not open source**. Under the
+[Sokratis Freeware License 1.0](./LICENSE) you may download it from this repository, install it and
+use it for any purpose, including commercial work. You may not modify it, redistribute it or sell it.
+The project does not accept contributions — pull requests are not reviewed. The name, the logo and the
+visual design are not licensed. Third-party components keep their own licenses.
+
+Copyright © 2026 Leon Kreso. All rights reserved.

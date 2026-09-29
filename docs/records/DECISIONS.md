@@ -461,3 +461,19 @@ Ujedno potvrđeno: **ništa s vanjske liste od 14 prijedloga ne ulazi u 1.0.0** 
 proces, samo kad postoji nespojena grana; granica 8 ostaje); nov `core/src/chains.rs`; spec §1.4; plan
 tok LANCI. Nusprodukti u BACKLOG: signal „živa grana predugo izvan zadane" · pravilo docs-a „citirana
 brojka/verzija = izvor istine". `include_unmerged` (mrtvo polje) ostaje odluka T63.
+
+## S-039 — licenca: besplatno korištenje, bez izmjena, dijeljenja i doprinosa; vlastiti tekst (2026-09-29)
+
+**Kontekst:** repo je javan od 2026-09-20 (S-023) bez licence — kod se smio gledati, ne i koristiti.
+Prije izdanja i prvog vanjskog korisnika treba dozvola. Ovisnosti izbor ne ograničavaju (izmjereno
+2026-09-28: nijedan GPL; pet Rust paketa MPL-2.0 kroz Tauri; npm u produkciji ISC · MIT · Apache-2.0).
+Leon ne isključuje kasniju prodaju.
+**Odluka (Leon, 2026-09-29):** ljudi smiju preuzeti i koristiti, ne smiju mijenjati kod ni doprinositi;
+između tri ponuđene inačice izabrana je „svaka svrha, bez dijeljenja". Nijedna standardna licenca
+(SPDX) to ne pokriva, pa je tekst vlastit — [`LICENSE`](../../LICENSE) u korijenu, „Sokratis Freeware
+License 1.0". Što točno dopušta i zabranjuje piše SAMO ondje (S-010).
+**Posljedice:** Sokratis **nije open source** i README to kaže. `Cargo.toml` nosi `license-file` (polje
+`license` prima samo SPDX oznake), `package.json` `SEE LICENSE IN`. Za već objavljenu verziju licenca se
+kasnije može olabaviti, ne stegnuti. GitHubovi uvjeti svakom korisniku GitHuba daju pravo gledati i
+forkati javni repo — licenca to ne oduzima, zabranjuje izmjenu. Tekst nije pregledao pravnik.
+Otvoreno: obavijesti o licencama ugrađenih komponenti uz instalater (`BACKLOG.md`).

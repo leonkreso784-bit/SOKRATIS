@@ -12,6 +12,9 @@ members = [
 version = "1.0.0"
 edition = "2024"
 authors = ["Leon Kreso"]
+# Vlastita licenca (S-039) nema SPDX oznaku, pa ide `license-file`, ne `license`; putanja je od korijena
+# radnog prostora i crateovi je nasljeđuju kao i verziju.
+license-file = "LICENSE"
 publish = false
 
 [workspace.dependencies]

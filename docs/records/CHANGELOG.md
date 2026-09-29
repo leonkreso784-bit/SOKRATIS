@@ -32,7 +32,9 @@ izdanje na GitHubu čekaju Leonov izričit OK. Izlazi kao 1.0.0, ne 0.2.0 (S-024
 - **Kartica s objašnjenjem** uz svaku brojku i graf (što mjeri, kako se računa, kako čitati).
 - **Postavke:** četiri teme, hrvatski/engleski, pokretanje sa sustavom, animacije uključene/isključene.
 - **Animacija pokretanja** pri svakom pokretanju; X pita „Zatvoriti Sokratis?" pa izlazi (S-036).
-- **Instalater NSIS**, nepotpisan, samo za vlasnika (S-029). Licenca još nije odabrana.
+- **Instalater NSIS**, nepotpisan, samo za vlasnika (S-029).
+- **Licenca:** besplatno za korištenje, nije open source — smije se preuzeti i koristiti, ne smije se
+  mijenjati ni dijeliti dalje (S-039); tekst je [`LICENSE`](../../LICENSE).
 - **CLI** (`sokratis`) dobiva `report --until` i `report --scope all|default`; tablica imenuje mjereni
   opseg i ima sekciju GRANE.
 
@@ -493,6 +495,11 @@ izdanje na GitHubu čekaju Leonov izričit OK. Izlazi kao 1.0.0, ne 0.2.0 (S-024
   `sokratis docs .` 100/100 · `signals .` nema signala · `sokratis --version` = `sokratis 1.0.0`.
   Seljenje M1 sesija iz `PROGRESS.md` u arhivu je izmjereno i odgođeno (isporuke bi pale 18 → 16,
   `records/BACKLOG.md`).
+- **`M2/65` — licenca (2026-09-29, IZDANJE).** Korisnik dobiva **dozvolu za uporabu**: do sada je kod
+  bio javan, ali bez licence, pa ga nitko osim autora nije smio koristiti. Nova datoteka `LICENSE`
+  („Sokratis Freeware License 1.0", vlastiti tekst, S-039); README dobiva odjeljak o licenci i više ne
+  kaže da licenca nije odabrana; manifesti nose pokazivač na datoteku (`license-file` u `Cargo.toml`,
+  `license` u `package.json`). Ponašanje aplikacije i CLI-ja se ne mijenja.
 
 ## [0.1.0] — 2026-09-17 — Jezgra i CLI (Milestone 1)
 
