@@ -477,3 +477,33 @@ License 1.0". Što točno dopušta i zabranjuje piše SAMO ondje (S-010).
 kasnije može olabaviti, ne stegnuti. GitHubovi uvjeti svakom korisniku GitHuba daju pravo gledati i
 forkati javni repo — licenca to ne oduzima, zabranjuje izmjenu. Tekst nije pregledao pravnik.
 Otvoreno: obavijesti o licencama ugrađenih komponenti uz instalater (`BACKLOG.md`).
+
+## S-040 — izdanje 1.0.0 je javno: tag `v1.0.0`, izdanje na GitHubu, nepotpisani instalater priložen (2026-09-29)
+
+**Kontekst:** S-029 je instalater držao „samo za Leona: nepotpisan i neobjavljen", a objavu ostavio za
+M4. Leon je 1.0.0 instalirao preko „1.0.0-pre.4" i prošao ručnu listu („dobro je za 1.0.0"); prvi vanjski
+korisnik čeka.
+**Odluka (Leon, 2026-09-29):** tag `v1.0.0` i izdanje na GitHubu idu sada, instalater se prilaže
+izdanju, a prvi vanjski korisnik dobiva instalater, ne samo poveznicu na repo. Tag ide na commit koji
+nosi licencu (S-039); instalater se gradi iz tagiranog commita.
+**Posljedice:** S-029 vrijedi i dalje u dijelu „NSIS, nepotpisan, bez automatskog ažuriranja" —
+ukinut je dio „neobjavljen". SmartScreen upozorenje sad vidi svatko tko instalater pokrene i README to
+kaže. Potpisivanje, MSI i automatsko ažuriranje ostaju M4. Izdanje se stvara alatom `gh` (GitHub CLI),
+koji je razvojni alat na stroju, ne ovisnost projekta.
+
+## S-041 — nakon gradnje 1.0.0: što ostaje kako jest (2026-09-29)
+
+**Kontekst:** sesija odluka nakon gradnje 1.0.0; svaka stavka je imala izmjerene mogućnosti.
+**Odluka (Leon, 2026-09-29):**
+- **Dnevnik M1 ostaje u `PROGRESS.md`** — seljenje u arhivu bi mjerenju srušilo isporuke 18 → 16;
+  `diary_path` kao popis datoteka je kandidat M3.
+- **Zadani `since` (S-005) ostaje** — Leon je odluku prepustio („sve jedno mi je"), pa vrijedi stanje
+  koje ne mijenja kod: README upozorava, vanjski korisnik dobiva primjer profila; trajno rješenje
+  (preset ili čarobnjak) je kandidat M3.
+- **Ploča Projekt ostaje** kakva je, uključujući tekst grafova koji raste sa širinom prozora.
+- **„11 grafova" iz speca = 10 grafova + sparkline kao vrsta** — prihvaćeno.
+- **Putanja do Sokrat Studyja u `CLAUDE.md` i zaglavlja datoteka** ostaju; čišćenje zaglavlja je
+  kandidat M3.
+- **Brojci sati Leon NE vjeruje.** Ne popravlja se zakrpom: njegov prijedlog (sati iz sesija s
+  AI-jem) mijenja izvor podataka i ide u M3 kroz brainstorming i spec.
+**Posljedice:** nijedna izmjena koda; kandidati su u `BACKLOG.md`. M3 ne počinje bez Leonova izričitog OK-a.

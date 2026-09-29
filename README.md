@@ -48,6 +48,13 @@ The same numbers are available from a command line tool, so they can also run in
   first `cargo` run), Visual Studio Build Tools with the C++ workload (MSVC target), and Node.js with
   npm for the interface.
 
+## Installing
+
+Download `Sokratis_1.0.0_x64-setup.exe` from the
+[Releases](https://github.com/leonkreso784-bit/SOKRATIS/releases) page and run it. It installs for the
+current user and needs no administrator rights. The installer is not signed, so Windows SmartScreen
+shows a warning before it runs.
+
 ## Running from source
 
 Command line (JSON by default, `--table` for a terminal table):

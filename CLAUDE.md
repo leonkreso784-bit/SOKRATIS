@@ -102,14 +102,16 @@ preskočiva · **S-020** tray minimizira, autostart, jedna instanca, obavijest s
 **[rez za 1.0.0]** **S-024** izlaz iz M2 = 1.0.0, 0.2.0 se preskače · **S-025** crta reza i tri etape (funkcija →
 izgled → izdanje, „1.0.0-pre“ nakon prve) · **S-026** animacije ≤ 250 ms, bez biblioteke, `data-motion="off"` ·
 **S-027** kartica s objašnjenjem je statična (`explain.<id>.what|how|read`) · **S-028** tema · jezik · autostart ·
-animacije u pogledu Postavke · **S-029** instalater NSIS samo za Leona · **S-030** README engleski, `docs/`
+animacije u pogledu Postavke · **S-029** instalater NSIS, nepotpisan (dio „samo za Leona, neobjavljen" ukinut S-040) · **S-030** README engleski, `docs/`
 hrvatski · **S-031** dokumentacija: točnost se čuva smanjivanjem, ispunjeno ide u `archive/`.
 **[drugi rez do 1.0.0]** **S-032** metrike nad svim lokalnim granama, oznaka grane po commitu ·
 **S-033** dnevnik = unija radnih stabala, plan/`docs/` iz vodećeg stabla · **S-034** klik na karticu →
 nadzorna ploča projekta · **S-035** grafovi: d3-matematika + naš SVG · **S-036** X = upit → izlaz, tray
 uklonjen, autostart otvara prozor · **S-038** nespojene grane su lanci: signal broji vrhove, sadržane su
 dokaz (T64 u `main`-u 2026-09-27; vanjska lista od 14 prijedloga → BACKLOG) · **S-037** sve prije 1.0.0, instalater „1.0.0-pre.N" nakon svake
-sesije. **[objava 1.0.0]** **S-039** licenca: besplatno korištenje, bez izmjena, dijeljenja i doprinosa (vlastiti tekst).
+sesije. **[objava 1.0.0]** **S-039** licenca: besplatno korištenje, bez izmjena, dijeljenja i doprinosa (vlastiti tekst) ·
+**S-040** izdanje je javno: tag `v1.0.0`, GitHub, instalater priložen · **S-041** nakon gradnje 1.0.0 ostaje kako jest:
+dnevnik M1 u `PROGRESS.md`, zadani `since`, ploča, zaglavlja; brojci sati Leon ne vjeruje → kandidat M3.
 
 ## Agenti — više grana, jedan orkestrator
 Uloge i protokol: `docs/workflow/AGENTI.md`. Graditelj radi **jednu ciglu u svom stablu**, recenzent presuđuje

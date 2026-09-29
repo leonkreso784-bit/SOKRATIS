@@ -44,7 +44,7 @@ Nije za timove s ticketing sustavima; nije za ljude bez gita.
 | **M1** | jezgra · CLI · paritet s RAD.xlsx · ispravak sati · docs-ocjena · signali `unmerged-branches` i `docs-lag` | ekran, SQLite, watcher |
 | **M2** (izašao kao 1.0.0) | Tauri 2 · Svelte 5 · tokeni · SQLite snimke · watcher · obavijesti · HR/EN · znak · instalater za vlasnika · README EN · mjerenje svih lokalnih grana · ploča projekta (tray uklonjen, S-036) | novi signali, adapteri |
 | **M3** | ostala pravila · profil za tuđe projekte · kandidati iz `records/BACKLOG.md` | oblak, timovi |
-| **M4** | objava: potpisan instalater · licenca · GitHub Actions | |
+| **M4** | objava: potpisan instalater · GitHub Actions (licenca je odlučena uz 1.0.0, S-039) | |
 
 ## 5 · Ne-ciljevi
 

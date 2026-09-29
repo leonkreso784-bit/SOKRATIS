@@ -7,10 +7,11 @@ Isporuka = ono što je u `main`-u; sesije su u `PROGRESS.md`.
 
 (ništa još — sljedeće isporuke dolaze s M3)
 
-## [1.0.0] — 2026-09-28 — Desktop (Milestone 2)
+## [1.0.0] — 2026-09-29 — Desktop (Milestone 2)
 
-**Netagirano.** Datum je dan gradnje izdanja (verzija `1.0.0` u `main`-u, `82ad10e`); tag `v1.0.0` i
-izdanje na GitHubu čekaju Leonov izričit OK. Izlazi kao 1.0.0, ne 0.2.0 (S-024). Specovi:
+**Tag `v1.0.0`**, izdanje na GitHubu s priloženim instalaterom (S-040). Kod je izgrađen 2026-09-28
+(`82ad10e`); nakon toga su ušle samo licenca (S-039) i dokumentacija. Izlazi kao 1.0.0, ne 0.2.0
+(S-024). Specovi:
 [`../archive/ARHITEKTURA_M2.md`](../archive/ARHITEKTURA_M2.md) (S-012…S-031) i
 [`../archive/ARHITEKTURA_1_0.md`](../archive/ARHITEKTURA_1_0.md) (drugi rez, S-032…S-038).
 
@@ -32,7 +33,8 @@ izdanje na GitHubu čekaju Leonov izričit OK. Izlazi kao 1.0.0, ne 0.2.0 (S-024
 - **Kartica s objašnjenjem** uz svaku brojku i graf (što mjeri, kako se računa, kako čitati).
 - **Postavke:** četiri teme, hrvatski/engleski, pokretanje sa sustavom, animacije uključene/isključene.
 - **Animacija pokretanja** pri svakom pokretanju; X pita „Zatvoriti Sokratis?" pa izlazi (S-036).
-- **Instalater NSIS**, nepotpisan, samo za vlasnika (S-029).
+- **Instalater NSIS**, nepotpisan (Windows SmartScreen upozorava prije pokretanja), priložen izdanju
+  na GitHubu (S-029, S-040).
 - **Licenca:** besplatno za korištenje, nije open source — smije se preuzeti i koristiti, ne smije se
   mijenjati ni dijeliti dalje (S-039); tekst je [`LICENSE`](../../LICENSE).
 - **CLI** (`sokratis`) dobiva `report --until` i `report --scope all|default`; tablica imenuje mjereni
