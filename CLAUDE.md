@@ -72,14 +72,15 @@ pogrešna uporaba**; `--help`/`--version` = 0) — sve rade nad pravim repozitor
 Sokrat Studyjem).
 Testovi i brane: `docs/workflow/TESTING.md`.
 
-## Stanje — TRENUTNO (2026-09-28 — verzija 1.0.0 u `main`-u, netagirana)
-- **M0 gotov, M1 zatvoren** (0.1.0), **M2 kod gotov kao 1.0.0** (S-024): oba reza (T1–T43, T44–T64) i
-  krug popravaka završne recenzije (`M2/63`) su u `main`-u; verzija u `Cargo.toml` je `1.0.0`.
+## Stanje — TRENUTNO (2026-09-29 — verzija 1.0.0 izdana, tag `v1.0.0`)
+- **M0 gotov, M1 zatvoren** (0.1.0), **M2 izdan kao 1.0.0** (S-024): tag `v1.0.0`, izdanje na GitHubu s
+  nepotpisanim instalaterom (S-040), licenca u `LICENSE` (S-039).
 - **Nema aktivnog speca ni plana** — ispunjeni su u `docs/archive/`; sljedeći nastaje kad M3 krene
-  (kandidati: `docs/records/BACKLOG.md`).
-- **Instalater 1.0.0 je sagrađen** 2026-09-28 iz `82ad10e` (`target/release/bundle/nsis/`; veličina i sha256: `PROGRESS.md`, unos sesije 6 dio B); instalira ga Leon.
-- **Čeka Leonov izričit OK:** tag `v1.0.0`, izdanje na GitHubu, licenca; odluka o M1 sesijama u
-  `PROGRESS.md` (seljenje u arhivu izmjereno i odgođeno — mijenja isporuke, v. BACKLOG).
+  (kandidati: `docs/records/BACKLOG.md`). **M3 ne počinje bez Leonova izričitog OK-a** — redom
+  brainstorming, spec, plan.
+- **Čeka Leonovu riječ:** fork javnog repoa na GitHubu (licenca ga ne može zabraniti) · obavijesti o
+  licencama ugrađenih komponenti uz instalater (BACKLOG) — v. `PROGRESS.md`, unos 2026-09-29.
+- **Leon čita kod i uči Rust:** objašnjenja idu na primjerima iz NJEGOVA koda (`datoteka:redak`).
 - **Jedno radno stablo:** `sokratis` (`main`), grana osim `main`-a nema (`git worktree list`).
 - Brane, brojke i tijek sesija: `PROGRESS.md`; isporuke: `CHANGELOG.md`. Ovaj odjeljak to ne ponavlja.
 

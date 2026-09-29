@@ -1279,3 +1279,34 @@ na GitHubu i licenca čekaju Leonov izričit OK.
 **STANI i javi Leonu.** Čeka njegov izričit OK: tag `v1.0.0` i izdanje na GitHubu, licenca, odluka o
 M1 sesijama u dnevniku, instalacija 1.0.0 preko `1.0.0-pre.4`. Zatim M3: spec iz kandidata u
 `BACKLOG.md`, kad 1.0.0 bude u uporabi.
+
+## 2026-09-29 (FABLE) — Sesija odluka: licenca (`M2/65`), tag `v1.0.0`, izdanje 1.0.0 na GitHubu
+
+**Jedanaesta sesija.** Leon je 1.0.0 instalirao preko „1.0.0-pre.4" (baza je preživjela), prošao ručnu
+listu i donio odluke koje su čekale od gradnje izdanja. Kod aplikacije nije diran.
+
+- **Odluke** (puni tekst: [`DECISIONS.md`](./DECISIONS.md)): **S-039** licenca · **S-040** izdanje je
+  javno, instalater priložen (ukida dio S-029 „neobjavljen") · **S-041** što ostaje kako jest (dnevnik
+  M1, zadani `since`, ploča, zaglavlja). **Brojci sati Leon ne vjeruje** — njegov prijedlog „sati iz
+  sesija s AI-jem" je kandidat M3 u [`BACKLOG.md`](./BACKLOG.md), ne zakrpa.
+- **`M2/65` — licenca** (`6ad23fd` + popravak `a9c76ca`, grana `feat/license` u glavnom stablu):
+  datoteka `LICENSE`, README, pokazivači u manifestima. Recenzija: **SPOJIVO**; prijedlog recenzenta
+  (definicija „Software" pokriva i binarnu datoteku koju korisnik sam izgradi) proveden. Spojeno u
+  `main` `25b97f1`; odluke i stanje izdanja u dokumentaciji `7a129b2`.
+- **Brane na `main`-u `7a129b2` zelene** (brojke: [`CHANGELOG.md`](./CHANGELOG.md), unos spajanja
+  IZDANJA — nepromijenjene, cigla ne dira kod) → pushano; grana `feat/license` obrisana.
+- **Instalater sagrađen iznova iz `7a129b2`**, commita koji nosi tag: `Sokratis_1.0.0_x64-setup.exe`,
+  3 737 476 B, sha256 `4d14dae9614bac7d16b5c53bfa4572529bc0f8745622ab2e83b44f3a87dd9fbd`; nepotpisan.
+  Od instalatera iz `82ad10e`, koji je Leon instalirao, razlikuje se samo po recima licence u
+  manifestima. **Novi instalater nije ručno instaliran ni isproban.**
+- **Tag `v1.0.0` → `7a129b2`**, pushan. **Izdanje objavljeno** alatom `gh` (instaliran ovu sesiju,
+  prijavio se Leon): <https://github.com/leonkreso784-bit/SOKRATIS/releases/tag/v1.0.0>, instalater
+  priložen — GitHub za priloženu datoteku javlja isti sha256 i veličinu.
+- **Nalaz recenzije koji čeka Leonovu riječ:** javni repo na GitHubu svatko smije forkati (GitHubovi
+  uvjeti), a fork je javna kopija pod tuđim računom; licenca to ne može oduzeti, zabranjuje izmjenu i
+  dijeljenje izvan toga. Jedini način da forka nema je privatan repo.
+
+### Što slijedi
+**STANI.** Otvoreno za Leona: fork na GitHubu (gore) · obavijesti o licencama ugrađenih komponenti uz
+instalater (`BACKLOG.md`) · hoće li novi instalater isprobati prije nego ga pošalje prvom vanjskom
+korisniku. Zatim, tek uz njegov OK: M3 — brainstorming, pa spec, pa plan.
