@@ -119,7 +119,7 @@ obavijest, tekst grafova raste s prozorom, dani bez commita, `include_unmerged`)
 | m15 | odjava/gašenje Windowsa uz `prevent_close` — nije izmjereno | `desktop/src-tauri/src/lib.rs` |
 | m16 · 967 | autostart se čita iz baze, ne iz OS-a; rub „plugin uspije, baza padne" (R12) | `desktop/src-tauri/src/autostart.rs`, `commands.rs::get_settings` |
 | m17 | nova radna stabla watcher nadzire tek nakon ponovnog pokretanja | `engine.rs::watch` |
-| — | instalacija preko starije verzije i deinstalacija: mapa instalacije i mapa baze su ista (`%LOCALAPPDATA%\sokratis`); **mjeriti** da nadogradnja čuva registar i što deinstalacija briše | `tauri.conf.json`, `state.rs::db_path` |
+| — | instalacija preko starije verzije i deinstalacija: mapa instalacije i mapa baze su ista (`%LOCALAPPDATA%\sokratis`). **Izmjereno 2026-09-28/29:** instalacija 1.0.0 preko „1.0.0-pre.4" čuva bazu; tiha deinstalacija (`uninstall.exe /S`) uklanja izvršnu datoteku, prečace i ključ registra, a OSTAVLJA obje baze i mapu `dev.sokratis.app` (podaci WebView2). Nije mjereno: deinstalacija kroz prozor s uključenim brisanjem podataka | `tauri.conf.json`, `state.rs::db_path` |
 | — | CLI `report` nad 11 grana ≈ 5 s (raste s obujmom; desktop ide kroz keš); mjeriti bez opterećenja stroja | `crates/sokratis-cli` |
 | 79 | `write_atomic` ne čisti `.tmp` kad `rename` padne | `io/src/project.rs` |
 | 80 | `IoError::Encode` bez `path` | `io/src/error.rs` |
