@@ -1,0 +1,17 @@
+name: Notify sokrat.dev
+on:
+  release:
+    types: [published]
+jobs:
+  redeploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger sokrat.dev rebuild
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::warning::SOKRAT_DEV_DEPLOY_HOOK is not set; skipping sokrat.dev rebuild"
+            exit 0
+          fi
+          curl --fail --silent --show-error -X POST "$HOOK"
+        env:
+          HOOK: ${{ secrets.SOKRAT_DEV_DEPLOY_HOOK }}
