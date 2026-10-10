@@ -1323,7 +1323,7 @@ na GitHubu (opis: [`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §12), do
   1.0.1** (verzija u Postavkama · obavijesti o licencama ugrađenih komponenti · množina „stabala").
 - **Pospremanje dokumentacije:** ROADMAP više ne kaže da tag i izdanje čekaju; BACKLOG više ne kaže da
   `gh` nije na stroju.
-- **Plan zakrpe** [`ZAKRPA_1_0_1.md`](../plan/ZAKRPA_1_0_1.md) (`363f571`, bez speca — ugovor `Report`,
+- **Plan zakrpe** [`2026-10-10-zakrpa-1-0-1.md`](../archive/2026-10-10-zakrpa-1-0-1.md) (`363f571`, bez speca — ugovor `Report`,
   profil i jezgra se ne diraju): T65–T67 u dva paralelna toka, svaki u svom stablu; T68 orkestrator u `main`-u.
 - **SUČELJE-3** (`feat/zakrpa-ui`): T65 množina broja stabala (`b841932`) · T66 „O aplikaciji" u
   Postavkama (`3dbfb01`). Recenzija **SPOJIVO** (tri Minor) → spojeno `e5a1936`.
@@ -1347,13 +1347,21 @@ na GitHubu (opis: [`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §12), do
   `bundle.resources`; množina maknuta iz §11) · `TESTING.md` §4 (`notices:check` u `npm run check` i pravilo
   „nov paket ili crate → `npm run notices`") · `RUST.md` §5 (šest TS/JS pojmova) · BACKLOG bez riješenih redaka.
 
+- **Izdanje 1.0.1 (Leonov OK u sesiji: „imaš moj OK", nakon čitanja koda; instalater još nije skinuo).**
+  Između `f7e4a7d` (prva gradnja instalatera) i `e0c3663` razlika je samo `docs/`; instalater je ipak sagrađen
+  iznova iz čistog `e0c3663`, commita koji nosi tag (obrazac 1.0.0): `Sokratis_1.0.1_x64-setup.exe`,
+  3 767 332 B, sha256 `b011c6c731ad4d6989eaea16a9bcb8932676096de5255d15f1a72e2d98ef3d57`; nepotpisan. Prva
+  gradnja iz `f7e4a7d` (3 773 466 B, `719265dc…a717`) nije objavljena — release build na Windowsu nije
+  bajt-za-bajt ponovljiv. Generirana NSIS skripta stavlja `LICENSE.txt` i `THIRD-PARTY-NOTICES.txt` u
+  `$INSTDIR` i briše ih pri deinstalaciji. **Instalater nije instaliran ni isproban** (instalacija bi
+  pregazila Leonovu 1.0.0).
+- **Tag `v1.0.1` → `e0c3663`**, pushan. **Izdanje objavljeno:**
+  <https://github.com/leonkreso784-bit/SOKRATIS/releases/tag/v1.0.1> (Latest), instalater priložen — GitHub
+  za prilog javlja isti sha256 i veličinu. Workflow „Notify sokrat.dev" se pokrenuo na objavu i završio
+  uspješno — bez tajne samo upozorenje, sokrat.dev nije osvježen. Plan zakrpe arhiviran (S-031).
+
 ### Što slijedi
-- **Instalater 1.0.1 je sagrađen** iz `f7e4a7d`: `Sokratis_1.0.1_x64-setup.exe`, 3 773 466 B, sha256
-  `719265dc09caf267b7a54200061f6a53eee55b8b3d603e2ee4f621417260a717`; nepotpisan. Generirana NSIS skripta
-  (`target/release/nsis/x64/installer.nsi`) stavlja `LICENSE.txt` i `THIRD-PARTY-NOTICES.txt` u `$INSTDIR` i
-  briše ih pri deinstalaciji. **Nije instaliran ni isproban** (instalacija bi pregazila Leonovu 1.0.0) — da
-  Postavke pokazuju `1.0.1`, vidi se tek kad ga Leon instalira.
-- **Tag `v1.0.1` i izdanje na GitHubu čekaju Leonov izričit OK** (pravilo #1).
-- **Čeka Leona:** tajna `SOKRAT_DEV_DEPLOY_HOOK` za workflow `notify-sokrat-dev.yml`
-  ([`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §12).
-- Zatim, tek uz Leonov OK: M3 — brainstorming, pa spec, pa plan.
+**STANI.** Za Leona: instalirati 1.0.1 i pogledati Postavke → „O aplikaciji" i mapu instalacije
+(`THIRD-PARTY-NOTICES.txt`, `LICENSE.txt`) · tajna `SOKRAT_DEV_DEPLOY_HOOK`
+([`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §12). Zatim, tek uz njegov OK: M3 — brainstorming
+(glavna tema: sati kojima vjeruje), pa spec, pa plan.

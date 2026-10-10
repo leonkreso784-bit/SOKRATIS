@@ -7,9 +7,10 @@ Isporuka = ono što je u `main`-u; sesije su u `PROGRESS.md`.
 
 (ništa još — sljedeće isporuke dolaze s M3)
 
-## [1.0.1] — 2026-10-10 — zakrpa (netagirano — tag `v1.0.1` čeka Leonov OK)
+## [1.0.1] — 2026-10-10 — zakrpa
 
-Plan: [`../plan/ZAKRPA_1_0_1.md`](../plan/ZAKRPA_1_0_1.md) (T65–T68). Ugovor `Report`, profil i
+**Tag `v1.0.1`** (→ `e0c3663`), izdanje na GitHubu s priloženim instalaterom. Plan:
+[`../archive/2026-10-10-zakrpa-1-0-1.md`](../archive/2026-10-10-zakrpa-1-0-1.md) (T65–T68). Ugovor `Report`, profil i
 jezgra nisu dirani.
 
 ### Što korisnik dobiva
