@@ -7,6 +7,27 @@ Isporuka = ono što je u `main`-u; sesije su u `PROGRESS.md`.
 
 (ništa još — sljedeće isporuke dolaze s M3)
 
+## [1.0.1] — 2026-10-10 — zakrpa (netagirano — tag `v1.0.1` čeka Leonov OK)
+
+Plan: [`../plan/ZAKRPA_1_0_1.md`](../plan/ZAKRPA_1_0_1.md) (T65–T68). Ugovor `Report`, profil i
+jezgra nisu dirani.
+
+### Što korisnik dobiva
+
+- **Postavke → „O aplikaciji"**: verzija aplikacije (Tauri je čita iz `Cargo.toml`), licenca i uputa
+  na obavijesti o licencama (T66).
+- **Instalater nosi `THIRD-PARTY-NOTICES.txt` i `LICENSE.txt`** u mapi instalacije — popis svih
+  ugrađenih komponenti (crateovi izvršne datoteke i npm paketi čiji je kod u sučelju) s tekstovima
+  njihovih licenci (T67).
+- **Kartica Pregleda piše „1 stablo · 3 stabla · 5 stabala"** umjesto uvijek „stabala" (T65).
+
+### Za razvoj
+
+- `npm run notices` piše `THIRD-PARTY-NOTICES.txt`; `npm run notices:check` (dio `npm run check`)
+  pada kad datoteka ne odgovara lockovima i buildu sučelja — nov npm paket u sučelju ili nov crate
+  traži ponovni `npm run notices` (T67).
+- Brane: Rust 182 prošlo (2 ignorirana) · vitest 141 → 162 · i18n 342 → 349 ključeva.
+
 ## [1.0.0] — 2026-09-29 — Desktop (Milestone 2)
 
 **Tag `v1.0.0`**, izdanje na GitHubu s priloženim instalaterom (S-040). Kod je izgrađen 2026-09-28
