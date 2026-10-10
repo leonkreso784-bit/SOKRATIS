@@ -46,6 +46,10 @@ describe('obavijesti o licencama — čiste funkcije', () => {
     expect(normalizeText('\r\nA  \r\nB\r\n\r\n')).toBe('A\nB');
   });
 
+  it('tekst: BOM na početku se skida', () => {
+    expect(normalizeText('﻿MIT License')).toBe('MIT License');
+  });
+
   it('isti tekst licence ide jednom, s popisom svih komponenti koje ga nose', () => {
     const out = renderNotices([
       crate('beta', 'MIT', [{ name: 'LICENSE', text: MIT_A }]),
