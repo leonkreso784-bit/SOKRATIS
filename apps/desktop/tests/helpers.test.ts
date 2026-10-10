@@ -36,6 +36,7 @@ import {
   sortDeliveries,
   sortDiary,
   sortProjects,
+  worktreesLabel,
 } from '../src/views/helpers';
 
 const project = (name: string, worst: ProjectSummary['worst']): ProjectSummary => ({
@@ -95,6 +96,24 @@ describe('signalSummary', () => {
   });
   it('pet i više ide na "many" oblik hrvatske množine', () => {
     expect(signalSummary({ info: 0, warn: 0, alert: 5 }, hr)).toBe('5 uzbuna');
+  });
+});
+
+// Kartica Pregleda pisala je „1 stabala" za svaki broj (BACKLOG m4) — oblik bira `pluralCategory`,
+// tekst daje rječnik (`overview.worktrees.one|few|many`).
+describe('worktreesLabel', () => {
+  it('hrvatski: 1 i 21 su "stablo", 2-4 i 22 "stabla"', () => {
+    expect(worktreesLabel(hr, 1)).toBe('1 stablo');
+    for (const n of [2, 3, 4]) expect(worktreesLabel(hr, n)).toBe(`${n} stabla`);
+    expect(worktreesLabel(hr, 21)).toBe('21 stablo');
+    expect(worktreesLabel(hr, 22)).toBe('22 stabla');
+  });
+  it('hrvatski: 0, 5 i 11-14 su "stabala"', () => {
+    for (const n of [0, 5, 11, 12, 14]) expect(worktreesLabel(hr, n)).toBe(`${n} stabala`);
+  });
+  it('engleski: jednina samo za 1', () => {
+    expect(worktreesLabel(en, 1)).toBe('1 worktree');
+    expect(worktreesLabel(en, 2)).toBe('2 worktrees');
   });
 });
 
