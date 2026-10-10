@@ -78,8 +78,7 @@ Testovi i brane: `docs/workflow/TESTING.md`.
 - **Nema aktivnog speca ni plana** — ispunjeni su u `docs/archive/`; sljedeći nastaje kad M3 krene
   (kandidati: `docs/records/BACKLOG.md`). **M3 ne počinje bez Leonova izričitog OK-a** — redom
   brainstorming, spec, plan.
-- **Čeka Leonovu riječ:** fork javnog repoa na GitHubu (licenca ga ne može zabraniti) · obavijesti o
-  licencama ugrađenih komponenti uz instalater (BACKLOG) — v. `PROGRESS.md`, unos 2026-09-29.
+- **Čeka Leona:** tajna `SOKRAT_DEV_DEPLOY_HOOK` za jedini workflow (`ARCHITECTURE.md` §12).
 - **Leon čita kod i uči Rust:** objašnjenja idu na primjerima iz NJEGOVA koda (`datoteka:redak`).
 - **Jedno radno stablo:** `sokratis` (`main`), grana osim `main`-a nema (`git worktree list`).
 - Brane, brojke i tijek sesija: `PROGRESS.md`; isporuke: `CHANGELOG.md`. Ovaj odjeljak to ne ponavlja.
@@ -112,7 +111,7 @@ uklonjen, autostart otvara prozor · **S-038** nespojene grane su lanci: signal 
 dokaz (T64 u `main`-u 2026-09-27; vanjska lista od 14 prijedloga → BACKLOG) · **S-037** sve prije 1.0.0, instalater „1.0.0-pre.N" nakon svake
 sesije. **[objava 1.0.0]** **S-039** licenca: besplatno korištenje, bez izmjena, dijeljenja i doprinosa (vlastiti tekst) ·
 **S-040** izdanje je javno: tag `v1.0.0`, GitHub, instalater priložen · **S-041** nakon gradnje 1.0.0 ostaje kako jest:
-dnevnik M1 u `PROGRESS.md`, zadani `since`, ploča, zaglavlja; brojci sati Leon ne vjeruje → kandidat M3.
+dnevnik M1 u `PROGRESS.md`, zadani `since`, ploča, zaglavlja; brojci sati Leon ne vjeruje → kandidat M3 · **S-042** repo ostaje javan, fork se prihvaća.
 
 ## Agenti — više grana, jedan orkestrator
 Uloge i protokol: `docs/workflow/AGENTI.md`. Graditelj radi **jednu ciglu u svom stablu**, recenzent presuđuje

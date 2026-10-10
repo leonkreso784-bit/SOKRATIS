@@ -10,7 +10,7 @@ izlaz bez traya, lanci nespojenih grana). Što od koda stoji bez pokrića ili s 
 > podataka, formati koje čita i ugovori prema korisniku CLI-ja i sučelja. **Što NIJE:** kronologija (to su
 > [records/CHANGELOG.md](../records/CHANGELOG.md) i [records/PROGRESS.md](../records/PROGRESS.md)),
 > plan ([plan/ROADMAP.md](../plan/ROADMAP.md)) ni dom odluka
-> ([records/DECISIONS.md](../records/DECISIONS.md), S-001…S-038). Specovi po kojima je građeno su
+> ([records/DECISIONS.md](../records/DECISIONS.md)). Specovi po kojima je građeno su
 > arhivirani: [archive/ARHITEKTURA_M1.md](../archive/ARHITEKTURA_M1.md),
 > [archive/ARHITEKTURA_M2.md](../archive/ARHITEKTURA_M2.md) i
 > [archive/ARHITEKTURA_1_0.md](../archive/ARHITEKTURA_1_0.md); aktivnog speca nema.
@@ -656,3 +656,16 @@ Ovo je **stanje koda**; što se od toga planira i kada je u [`../records/BACKLOG
 
 **Provjera koju test ne pokriva** — ručna lista (autostart ↔ `HKCU\…\Run`, obavijest na prijelaz u Alert,
 preskok splasha, `prefers-reduced-motion`, četiri teme): [`TESTING.md`](../workflow/TESTING.md) §5.
+
+---
+
+## 12 · Izvan crateova: GitHub Actions
+
+Jedini workflow je **`.github/workflows/notify-sokrat-dev.yml`** (`7f19883`, 2026-10-10). Okida se kad se
+na GitHubu **objavi izdanje** (`release: published`) i radi samo jedno: `POST` na adresu iz tajne
+repozitorija `SOKRAT_DEV_DEPLOY_HOOK` (deploy hook stranice sokrat.dev), da stranica nanovo izgradi popis
+izdanja. **Bez postavljene tajne** workflow ispiše upozorenje i završi uspješno — izdanje ne pada.
+Stanje 2026-10-10: tajna **nije postavljena** (`gh secret list` prazan); postavlja je Leon.
+
+Workflow **ne gradi i ne testira** Sokratis — brane se vrte lokalno ([`TESTING.md`](../workflow/TESTING.md));
+CI s branama je kandidat M4 ([`BACKLOG.md`](../records/BACKLOG.md)).

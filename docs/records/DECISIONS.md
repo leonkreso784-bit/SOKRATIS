@@ -507,3 +507,12 @@ koji je razvojni alat na stroju, ne ovisnost projekta.
 - **Brojci sati Leon NE vjeruje.** Ne popravlja se zakrpom: njegov prijedlog (sati iz sesija s
   AI-jem) mijenja izvor podataka i ide u M3 kroz brainstorming i spec.
 **Posljedice:** nijedna izmjena koda; kandidati su u `BACKLOG.md`. M3 ne počinje bez Leonova izričitog OK-a.
+
+## S-042 — repo ostaje javan; fork se prihvaća (2026-10-10)
+
+**Kontekst:** nalaz recenzije licence (`M2/65`, 2026-09-29): GitHubovi uvjeti dopuštaju svakome forkati
+javni repo, a fork je javna kopija pod tuđim računom — licenca S-039 to ne može zabraniti. Jedini način da
+forka nema je privatan repo, a onda izdanje i instalater trebaju drugo javno mjesto.
+**Odluka (Leon, 2026-10-10):** repo **ostaje javan** (S-023); fork na GitHubu se prihvaća kao posljedica
+javnog repoa. Licenca i dalje zabranjuje izmjenu i dijeljenje izvan onoga što GitHub sam radi.
+**Posljedice:** nijedna izmjena koda ni licence; otvoreno pitanje iz sesije 2026-09-29 je zatvoreno.

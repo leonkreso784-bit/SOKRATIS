@@ -11,6 +11,7 @@
 
 # lokalno
 .playwright-mcp/
+.vscode/
 .env
 .jank/
 *.log

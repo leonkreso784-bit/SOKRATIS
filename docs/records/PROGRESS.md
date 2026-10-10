@@ -1310,3 +1310,16 @@ listu i donio odluke koje su čekale od gradnje izdanja. Kod aplikacije nije dir
 **STANI.** Otvoreno za Leona: fork na GitHubu (gore) · obavijesti o licencama ugrađenih komponenti uz
 instalater (`BACKLOG.md`) · hoće li novi instalater isprobati prije nego ga pošalje prvom vanjskom
 korisniku. Zatim, tek uz njegov OK: M3 — brainstorming, pa spec, pa plan.
+
+## 2026-10-10 (OPUS) — Pregled nakon izdanja 1.0.0, odluke, zakrpa 1.0.1
+
+**Dvanaesta sesija.** Pregled stanja nakon izdanja: `main` = `origin/main` = `7f19883`, jedno radno
+stablo, grana osim `main`-a nema. Brane na `7f19883` zelene (fmt · clippy · `cargo test` 182/182 ·
+vitest). Od prošle sesije u `main` su ušla dva commita s nalazima u BACKLOG-u i `7f19883` — prvi workflow
+na GitHubu (opis: [`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §12), dotad nezapisan u `docs/`.
+
+- **Odluke:** **S-042** repo ostaje javan, fork se prihvaća · workflow `notify-sokrat-dev.yml` ostaje
+  (tajnu `SOKRAT_DEV_DEPLOY_HOOK` postavlja Leon) · `.vscode/` u `.gitignore` · sesija radi **zakrpu
+  1.0.1** (verzija u Postavkama · obavijesti o licencama ugrađenih komponenti · množina „stabala").
+- **Pospremanje dokumentacije:** ROADMAP više ne kaže da tag i izdanje čekaju; BACKLOG više ne kaže da
+  `gh` nije na stroju.
