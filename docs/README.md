@@ -100,3 +100,4 @@ Plan zakrpe 1.0.1 je izvršen i arhiviran. Gdje smo i što je sljedeće kaže RO
 | [2026-09-17-m1-jezgra-i-cli.md](./archive/2026-09-17-m1-jezgra-i-cli.md) | ✅ IZVRŠEN — plan cigli M1: 22 cigle u 8 tokova, testovi i kod po koraku, vlasništvo datoteka po toku |
 | [2026-09-18-m2-desktop.md](./archive/2026-09-18-m2-desktop.md) | ✅ IZVRŠEN — plan cigli M2 (T1–T43) iz speca `ARHITEKTURA_M2.md`, uključujući rez za 1.0.0 (T36–T43) |
 | [2026-09-24-1-0-0-grane-i-ploca.md](./archive/2026-09-24-1-0-0-grane-i-ploca.md) | ✅ IZVRŠEN — plan cigli drugog reza T44–T64 u 7 tokova (DESKTOP-2 · JEZGRA-2 · IO-2 · GRAFOVI · PLOČA · LANCI · IZDANJE), iz speca `ARHITEKTURA_1_0.md` |
+| [2026-10-10-zakrpa-1-0-1.md](./archive/2026-10-10-zakrpa-1-0-1.md) | ✅ IZVRŠEN — plan cigli zakrpe 1.0.1, T65–T68 u 2 toka (SUČELJE-3 · OBAVIJESTI) + izdanje, bez speca |
