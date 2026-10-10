@@ -108,7 +108,7 @@ je riješen zakrpom 1.0.1 — [`CHANGELOG.md`](./CHANGELOG.md) `[1.0.1]`.
 | izvor | stavka | mjesto |
 |---|---|---|
 | m2 | pokazatelj zatvorenih faza u razdoblju gleda samo `since`, ne `until` | `core/src/metrics/indicators.rs` |
-| m5 · 1744 | jedan commit okida 1–3 `report_updated` (višak izračuna i snimki, nije petlja); uzrok mjeriti ispisom sirove putanje u `debounce_loop` | `io/src/watch.rs` |
+| m5 · 1744 | jedan commit okida 1–3 `report_updated` (višak izračuna i snimki, nije petlja); uzrok mjeriti ispisom sirove putanje u `debounce_loop`. **Posljedica u branama (izmjereno 2026-10-11):** test `a_commit_yields_exactly_one_git_event_within_two_seconds` pada kad je stroj opterećen (paralelni build drugog stabla) — 2 pada u punoj brani; sam 8/8, cijela datoteka 3/3, puna brana na mirnom stroju zelena. Brana je tada lažno crvena | `io/src/watch.rs`, `io/tests/watch.rs:68` |
 | m6 | greška izračuna ide samo na stderr; kartica projekta s pokvarenim profilom trajno piše „još nije izračunano" | `desktop/src-tauri/src/engine.rs`, `commands.rs::list_projects` |
 | m8 · 988 | `Store::open` kroz `expect`; migracija i `schema_version` nisu u istoj transakciji; druga instanca otvara bazu prije odbijanja, bez `busy_timeout` | `desktop/src-tauri/src/lib.rs`, `store/src/store.rs` |
 | m9 | `MockApi` i cijeli insta snapshot u produkcijskom `main.js` (dinamički `import()` u `createApi`) | `apps/desktop/src/lib/api.ts` |
