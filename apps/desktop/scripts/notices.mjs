@@ -34,7 +34,7 @@ export function normalizeSpdx(expr) {
 /** Tekst licence bez BOM-a, s LF krajevima redaka, bez razmaka na kraju retka i praznih rubova. */
 export function normalizeText(text) {
   return String(text)
-    .replace(/^﻿/, '')
+    .replace(/^\uFEFF/, '')
     .replace(/\r\n?/g, '\n')
     .split('\n')
     .map((line) => line.trimEnd())
