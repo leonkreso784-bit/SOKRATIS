@@ -9,8 +9,15 @@
 //! `String`, nema alokacije. Rust iz potpisa sam zaključi (lifetime elision) da rez živi točno
 //! koliko i ulaz, pa ga ne može nadživjeti. `end` dolazi iz `find("\n## ")`, a `\n` je jedan bajt,
 //! zato je rez uvijek na granici znaka i ne može panicirati usred `⏸`.
+//!
+//! ZAŠTO RUST OVAKO (cigla 1.0.2/T70 — kod nije poveznica)
+//! Stanje „jesmo li u bloku koda" je `Option<(char, usize)>`: `None` = izvan bloka, `Some(('~', 4))`
+//! = unutra, a blok zatvara samo ograda istog znaka i barem te duljine — jedan tip nosi i „jesmo li"
+//! i „čime se zatvara", pa ta dva ne mogu otići u raskorak. Inline kod su `Range<usize>` (bajtni
+//! rasponi, kraj isključen); `span.contains(&start)` kaže je li poveznica počela u kodu.
 use crate::{DocFile, DocsHealth, Finding, Patterns, Profile};
 use std::collections::HashSet;
+use std::ops::Range;
 
 fn finding(check: &str, path: &str, line: Option<usize>, message: String) -> Finding {
     Finding {
@@ -42,19 +49,103 @@ fn resolve(from_file: &str, link: &str) -> Option<String> {
     Some(parts.join("/"))
 }
 
+/// Ako redak izgleda kao ograda bloka koda (CommonMark): do 3 razmaka uvlake, pa niz od barem 3
+/// ista znaka `` ` `` ili `~`. Vraća (znak, duljinu niza, ostatak retka iza niza).
+fn fence_run(line: &str) -> Option<(char, usize, &str)> {
+    let rest = line.trim_start_matches(' ');
+    let indent = line.len() - rest.len();
+    if indent > 3 {
+        return None;
+    }
+    let mark = rest.chars().next()?;
+    if mark != '`' && mark != '~' {
+        return None;
+    }
+    // Oba znaka su ASCII (1 bajt), pa je broj znakova ujedno broj bajtova za rez ispod.
+    let len = rest.chars().take_while(|&c| c == mark).count();
+    if len < 3 {
+        return None;
+    }
+    Some((mark, len, &rest[len..]))
+}
+
+/// Redak koji OTVARA blok koda. Iza ``` ne smije biti backticka: ``` `` x `` ``` je inline kod.
+fn fence_open(line: &str) -> Option<(char, usize)> {
+    let (mark, len, info) = fence_run(line)?;
+    if mark == '`' && info.contains('`') {
+        return None;
+    }
+    Some((mark, len))
+}
+
+/// Redak koji ZATVARA blok otvoren s `open`: isti znak, barem ista duljina, iza samo razmaci.
+fn fence_closes(line: &str, open: (char, usize)) -> bool {
+    match fence_run(line) {
+        Some((mark, len, rest)) => mark == open.0 && len >= open.1 && rest.trim().is_empty(),
+        None => false,
+    }
+}
+
+/// Rasponi inline koda u retku (bajtni indeksi, kraj isključen): niz od N backtickova otvara,
+/// sljedeći niz od TOČNO N backtickova zatvara. Niz bez para je obični znak i ne otvara ništa.
+fn inline_code_spans(line: &str) -> Vec<Range<usize>> {
+    // Prvo svi nizovi backtickova kao (početak, duljina). `as_bytes` je siguran: backtick je ASCII.
+    let bytes = line.as_bytes();
+    let mut runs: Vec<(usize, usize)> = Vec::new();
+    let mut i = 0;
+    while i < bytes.len() {
+        if bytes[i] == b'`' {
+            let start = i;
+            while i < bytes.len() && bytes[i] == b'`' {
+                i += 1;
+            }
+            runs.push((start, i - start));
+        } else {
+            i += 1;
+        }
+    }
+    let mut spans = Vec::new();
+    let mut k = 0;
+    while k < runs.len() {
+        let (open_at, n) = runs[k];
+        let partner = runs[k + 1..].iter().position(|&(_, len)| len == n);
+        match partner {
+            Some(offset) => {
+                let (close_at, _) = runs[k + 1 + offset];
+                spans.push(open_at..close_at + n);
+                k += offset + 2; // iza zatvarajućeg niza
+            }
+            None => k += 1,
+        }
+    }
+    spans
+}
+
 fn dead_links(files: &[DocFile], known: &HashSet<&str>, p: &Patterns, out: &mut Vec<Finding>) {
     let re = &p.md_link;
     for f in files {
-        let mut in_fence = false; // poveznica unutar ``` bloka je primjer, ne poveznica
+        // Otvoreni blok koda: (znak ograde, duljina). Poveznica u bloku je primjer, ne poveznica.
+        let mut open_fence: Option<(char, usize)> = None;
         for (i, line) in f.content.lines().enumerate() {
-            if line.trim_start().starts_with("```") {
-                in_fence = !in_fence;
+            if let Some(open) = open_fence {
+                if fence_closes(line, open) {
+                    open_fence = None;
+                }
                 continue;
             }
-            if in_fence {
+            if let Some(open) = fence_open(line) {
+                open_fence = Some(open);
                 continue;
             }
+            let code = inline_code_spans(line);
             for c in re.captures_iter(line) {
+                // Grupa 0 (cijeli pogodak) uvijek postoji; počinje li u inline kodu, to je primjer.
+                let starts_in_code = c
+                    .get(0)
+                    .is_some_and(|m| code.iter().any(|span| span.contains(&m.start())));
+                if starts_in_code {
+                    continue;
+                }
                 // Grupa 1 je zajamčena: regex je konstanta iz `Patterns`, a ne iz profila.
                 let Some(link) = c.get(1).map(|m| m.as_str()) else {
                     continue;
@@ -419,6 +510,69 @@ mod tests {
             "{:?}",
             h.findings
         );
+    }
+
+    /// Pomoćnik za T70: brojevi redaka `dead-link` nalaza u jednoj datoteci (`docs/README.md`).
+    fn dead_link_lines(content: &str) -> Vec<usize> {
+        let p = Profile::default();
+        let pat = Patterns::compile(&p).unwrap();
+        let files = vec![f("docs/README.md", content, None)];
+        let h = docs_health(&files, None, &p, &pat).unwrap();
+        h.findings
+            .iter()
+            .filter(|x| x.check == "dead-link")
+            .filter_map(|x| x.line)
+            .collect()
+    }
+
+    #[test]
+    fn link_inside_tilde_fence_is_an_example() {
+        let text = "uvod\n~~~\n[x](nema.md)\n```\n[x](nema.md)\n~~~ ne zatvara\n~~~\n[y](nema.md)";
+        // ``` unutar ~~~ bloka ne zatvara blok (drugi znak); `~~~ ne zatvara` ima tekst iza ograde.
+        assert_eq!(dead_link_lines(text), vec![8]);
+    }
+
+    #[test]
+    fn longer_backtick_fence_is_closed_only_by_fence_at_least_as_long() {
+        let text = "````md\n```\n[x](nema.md)\n```\n[x](nema.md)\n````\n[y](nema.md)";
+        assert_eq!(dead_link_lines(text), vec![7]);
+    }
+
+    #[test]
+    fn unclosed_fence_lasts_to_end_of_file() {
+        assert!(dead_link_lines("```\n[x](nema.md)\n\n[x](nema.md)").is_empty());
+    }
+
+    #[test]
+    fn fence_needs_at_most_three_spaces_and_no_backtick_in_info() {
+        // 4 razmaka = nije ograda; ``` s backtickom u info-nizu = inline kod, nije ograda.
+        let text = "    ```\n[a](nema.md)\n  ``` `` x `` ```\n[b](nema.md)\n   ~~~\n[c](nema.md)";
+        assert_eq!(dead_link_lines(text), vec![2, 4]);
+    }
+
+    #[test]
+    fn link_inside_inline_code_is_an_example() {
+        let text = "primjer `[x](nema.md)` i ``[x](nema.md) ` unutra``\nnapola ``[x](nema.md)` nije zatvoren\n[`OK.md`](OK.md)";
+        // Red 2: `` se ne zatvara jednim ` → nema raspona, poveznica se provjerava.
+        // Red 3: kod u TEKSTU poveznice ne skriva cilj; README nema OK.md pa je i to nalaz.
+        assert_eq!(dead_link_lines(text), vec![2, 3]);
+    }
+
+    #[test]
+    fn real_dead_link_next_to_inline_code_is_still_reported() {
+        let text = "prazno\n`[x](nema.md)` ali [y](nema.md) pa `kod`";
+        assert_eq!(dead_link_lines(text), vec![2]);
+        let p = Profile::default();
+        let pat = Patterns::compile(&p).unwrap();
+        let files = vec![f("docs/README.md", text, None)];
+        let h = docs_health(&files, None, &p, &pat).unwrap();
+        let dead: Vec<&str> = h
+            .findings
+            .iter()
+            .filter(|x| x.check == "dead-link")
+            .map(|x| x.message.as_str())
+            .collect();
+        assert_eq!(dead.len(), 1, "samo jedan nalaz u retku: {dead:?}");
     }
 
     #[test]
