@@ -727,3 +727,92 @@ fn chain_of_branches_collapses_to_its_top_in_input_and_signals() {
         "{top_c}"
     );
 }
+
+/// Zakrpa 1.0.2/T71: `ReportInput.docs_source` imenuje stablo iz kojeg su `docs` stvarno pročitani —
+/// VODEĆE (noviji commit, S-033), s NJEGOVOM granom i punim SHA-om — i jezgra ga prenosi u `Report`.
+#[test]
+fn docs_source_is_the_lead_worktree_with_its_branch_and_full_sha() {
+    let r = Repo::init();
+    r.commit(
+        "docs/a.md",
+        "# a
+",
+        "docs: a",
+        "2026-09-10T10:00:00+02:00",
+        "2026-09-10T10:00:00+02:00",
+    );
+    let wt = r.add_worktree("feat/x");
+    let wt_root = wt.path().join("wt");
+    r.commit_at(
+        &wt_root,
+        "docs/b.md",
+        "# b
+",
+        "docs: b u grani",
+        "2026-09-12T10:00:00+02:00",
+        "2026-09-12T10:00:00+02:00",
+    );
+    let full_sha = r.git(&["rev-parse", "feat/x"]);
+
+    let p = Project::open(r.path()).unwrap();
+    let input = p.input(Some("2026-09-01")).unwrap();
+    let source = input.docs_source.clone().expect("io zna vodeće stablo");
+    assert_eq!(source.branch.as_deref(), Some("feat/x"));
+    assert_eq!(source.commit, full_sha);
+    assert_eq!(source.commit.len(), 40, "puni SHA");
+    assert_eq!(std::path::Path::new(&source.worktree), wt_root);
+    assert!(
+        input.docs.iter().any(|d| d.path == "docs/b.md"),
+        "docs su iz istog stabla koje izvor imenuje"
+    );
+    let report = sokratis_core::build_report(&input, &p.profile).unwrap();
+    assert_eq!(report.docs_source, Some(source));
+}
+
+/// Zakrpa 1.0.2/T71: vodeće stablo u detached HEAD-u nema granu — izvor to kaže s `branch = None`,
+/// a SHA je i dalje njegov.
+#[test]
+fn detached_lead_worktree_gives_docs_source_without_branch() {
+    let r = Repo::init();
+    r.commit(
+        "docs/a.md",
+        "# a
+",
+        "docs: a",
+        "2026-09-10T10:00:00+02:00",
+        "2026-09-10T10:00:00+02:00",
+    );
+    let detached = tempfile::tempdir().unwrap();
+    let dpath = detached.path().join("d");
+    r.git(&[
+        "worktree",
+        "add",
+        "-q",
+        "--detach",
+        &dpath.to_string_lossy(),
+    ]);
+    let short = r.commit_at(
+        &dpath,
+        "docs/b.md",
+        "# b
+",
+        "docs: b bez grane",
+        "2026-09-12T10:00:00+02:00",
+        "2026-09-12T10:00:00+02:00",
+    );
+
+    let p = Project::open(r.path()).unwrap();
+    let source = p
+        .input(Some("2026-09-01"))
+        .unwrap()
+        .docs_source
+        .expect("io zna vodeće stablo");
+    assert_eq!(source.branch, None, "detached stablo nema granu");
+    assert!(
+        source.commit.starts_with(&short),
+        "{} / {short}",
+        source.commit
+    );
+    assert_eq!(source.commit.len(), 40);
+    assert_eq!(std::path::Path::new(&source.worktree), dpath);
+}

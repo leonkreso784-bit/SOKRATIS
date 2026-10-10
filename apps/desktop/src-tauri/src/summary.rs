@@ -92,6 +92,7 @@ mod tests {
             commit_branches: HashMap::new(),
             worktrees,
             branch_graph: String::new(),
+            docs_source: None,
         };
         build_report(&input, &Profile::default()).expect("minimalni ulaz mora proći kroz jezgru")
     }

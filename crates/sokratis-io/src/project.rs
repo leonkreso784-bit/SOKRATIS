@@ -48,8 +48,12 @@
 //! Dopunjeno M2/64 (S-038): `branches` je izvučen u `let` PRIJE konstrukcije `ReportInput` (bio je
 //! unutra) da `branch_graph` može pitati ISTI popis „ima li koja nespojena grana osim zadane" —
 //! repo s jednom granom (paritet, Review Focus #1) tako i dalje ne plaća `commit_parents`.
+//!
+//! Dopuna (zakrpa 1.0.2, T71): `docs_source` nastaje iz ISTOG `ordered.first()` kao `lead` —
+//! `Option::map` pretvori „možda prvo stablo" u „možda izvor" bez `if`-a, a put, grana i SHA
+//! dolaze iz `worktree list` koji je već plaćen (nijedan git-proces više, `tests/perf.rs`).
 use crate::{CommitCache, GitCli, GitSource, IoError, Scope, WorktreeHead, cached_log};
-use sokratis_core::{BranchScope, DocFile, Profile, ReportInput, Vision, WorkKind};
+use sokratis_core::{BranchScope, DocFile, DocsSource, Profile, ReportInput, Vision, WorkKind};
 use std::collections::{BTreeMap, HashMap};
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -375,6 +379,14 @@ impl Project {
                 root: self.root.clone(),
                 head: "HEAD".to_string(),
             });
+        // Zakrpa 1.0.2: izvor dokumentacije je ISTO stablo kao `lead` (docs se čitaju iz njega,
+        // niže). Nema li popisa stabala, `lead` pada na `root`/`"HEAD"` — to nije SHA ni poznata
+        // grana, pa je izvor tada `None` (ne izmišlja se).
+        let docs_source = ordered.first().map(|h| DocsSource {
+            worktree: lead.root.to_string_lossy().into_owned(),
+            branch: h.branch.clone(),
+            commit: h.head.clone(),
+        });
         let read_lead = |rel: &str| std::fs::read_to_string(lead.root.join(rel)).ok();
         let since = since
             .map(str::to_string)
@@ -431,6 +443,7 @@ impl Project {
             commit_branches,
             worktrees: ordered.len().max(1) as u32,
             branch_graph,
+            docs_source,
         })
     }
 

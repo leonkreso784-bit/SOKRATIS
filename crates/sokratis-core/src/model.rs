@@ -20,6 +20,11 @@
 //! Dopunjeno M2/64 (S-038): `BranchInfo` dobiva `tip` (puni SHA) i `contained_in` — ključ i rezultat
 //! sadržanosti grana u lancu (`chains::assign_containment`). `ReportInput.branch_graph` je ZADNJE
 //! polje iz istog razloga kao `CommitRow.branch` gore: dodatak na kraju je diff jednog retka.
+//!
+//! Dopuna (zakrpa 1.0.2, T71): `DocsSource.branch` je `Option<String>`, ne prazan tekst — detached
+//! HEAD NEMA granu, a `None` to kaže tipom, pa svaki čitatelj (`match`/`if let`) mora odlučiti što
+//! tada ispisati. `docs_source` je `Option` i ZADNJE polje i u `Report` i u `ReportInput`: JSON bez
+//! tog polja (zapis prije 1.0.2) serde čita kao `None`, bez `#[serde(default)]`.
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -243,6 +248,18 @@ pub struct DocsHealth {
     pub lag_days: Option<i64>,
 }
 
+/// Odakle je dokumentacija pročitana (zakrpa 1.0.2): vodeće radno stablo (S-033). Puni ga `io`
+/// (jedini zna git i disk), jezgra ga samo prepiše u `Report.docs_source` (S-002).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct DocsSource {
+    /// putanja vodećeg radnog stabla, kako je `io` normalizira
+    pub worktree: String,
+    /// grana tog stabla; `None` = detached HEAD (stablo nije ni na jednoj grani)
+    pub branch: Option<String>,
+    /// puni SHA (40 znakova) HEAD-a tog stabla
+    pub commit: String,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Severity {
@@ -328,6 +345,9 @@ pub struct Report {
     pub vision_totals: Vec<VisionTotal>,
     pub docs: Option<DocsHealth>,
     pub signals: Vec<Signal>,
+    /// iz kojeg stabla, grane i commita je `docs` mjerena (zakrpa 1.0.2); `None` = `io` nije
+    /// znao (nema popisa radnih stabala) ili ulaz nije došao iz `io` (testovi)
+    pub docs_source: Option<DocsSource>,
 }
 
 /// Sve što jezgra dobiva izvana. Puni ga `sokratis-io`, testovi ga pune ručno.
@@ -361,6 +381,8 @@ pub struct ReportInput {
     /// vremena — sadržanost traži cijelu nespojenu povijest) — `chains::parse_parents` ga čita u
     /// kartu `commit → roditelji`. Prazan tekst = nema nespojenih grana (ili samo jedna).
     pub branch_graph: String,
+    /// Zakrpa 1.0.2: vodeće stablo iz kojeg je `io` pročitao `docs` — jezgra ga samo prepiše.
+    pub docs_source: Option<DocsSource>,
 }
 
 /// Sve što pravilo smije vidjeti — u vlasništvu, bez lifetimeova (gradi se jednom u `build_report`).

@@ -362,3 +362,45 @@ fn commit_sources_is_empty_when_only_default_branch_exists() {
         1
     );
 }
+
+/// Zakrpa 1.0.2/T71: porcelain uz HEAD daje i redak `branch refs/heads/<ime>` — `worktree_heads`
+/// ga čita u kratko ime grane; detached stablo taj redak NEMA, pa je grana `None`. Isti proces kao
+/// prije (nijedan git-poziv više), samo jedan redak izlaza koji se do sada preskakao.
+#[test]
+fn worktree_heads_carry_branch_name_and_none_when_detached() {
+    let r = Repo::init();
+    r.commit(
+        "a.txt",
+        "1",
+        "prvi",
+        "2026-09-10T10:00:00+02:00",
+        "2026-09-10T10:00:00+02:00",
+    );
+    let wt = r.add_worktree("feat/x");
+    let detached = tempfile::tempdir().unwrap();
+    let dpath = detached.path().join("d");
+    r.git(&[
+        "worktree",
+        "add",
+        "-q",
+        "--detach",
+        &dpath.to_string_lossy(),
+    ]);
+    let g = GitCli::new(r.path());
+    let before = g.calls();
+    let heads = g.worktree_heads().unwrap();
+    assert_eq!(g.calls() - before, 1, "jedan proces, kao prije");
+    assert_eq!(heads.len(), 3);
+    // Glavno stablo git ispisuje PRVO; redoslijed sporednih ovisi o (nasumičnim) imenima privremenih
+    // mapa, pa ih test traži po zadnjoj komponenti putanje (`wt`, `d`), ne po mjestu u popisu.
+    assert_eq!(heads[0].branch.as_deref(), Some("main"));
+    let branch_of = |last: &str| {
+        heads
+            .iter()
+            .find(|h| h.path.ends_with(last))
+            .map(|h| h.branch.clone())
+    };
+    assert_eq!(branch_of("wt"), Some(Some("feat/x".to_string())));
+    assert_eq!(branch_of("d"), Some(None), "detached stablo nema granu");
+    drop(wt);
+}

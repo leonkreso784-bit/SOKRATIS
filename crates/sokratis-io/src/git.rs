@@ -60,6 +60,10 @@
 //! vremena mjerenja. Ruling R63: ime grane SMIJE sadržavati `|`, pa oba parsera (`parse_ahead_behind`,
 //! `branches_per_ref`) čitaju redak ZDESNA (`rsplitn`) — polja s FIKSNIM oblikom (broj, SHA) su
 //! zadnja, ime je „sve što ostane", isti obrazac kao `parse_commit_sources` gore (Review Focus #3).
+//!
+//! Dopuna (zakrpa 1.0.2, T71): `worktree_heads` čita i redak `branch` u `WorktreeHead.branch:
+//! Option<String>` — `heads.last_mut()` daje `Option<&mut WorktreeHead>` (promjenjivu posudbu
+//! zadnjeg upisanog stabla), pa se grana upiše u ISTI blok bez indeksa i bez pada na praznom popisu.
 use crate::IoError;
 use sokratis_core::BranchInfo;
 use std::collections::HashMap;
@@ -181,12 +185,14 @@ fn parse_commit_sources(text: &str) -> HashMap<String, String> {
         .collect()
 }
 
-/// Jedno radno stablo iz `git worktree list --porcelain`: putanja + PUNI SHA HEAD-a (grana može
-/// nedostajati — detached).
+/// Jedno radno stablo iz `git worktree list --porcelain`: putanja + PUNI SHA HEAD-a + kratko ime
+/// grane (`None` = detached: porcelain tada nema redak `branch`).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WorktreeHead {
     pub path: PathBuf,
     pub head: String,
+    /// Zakrpa 1.0.2: grana stabla iz istog izlaza `worktree list` — bez ijednog procesa više.
+    pub branch: Option<String>,
 }
 
 pub trait GitSource {
@@ -534,10 +540,12 @@ impl GitSource for GitCli {
             .collect())
     }
     fn worktree_heads(&self) -> Result<Vec<WorktreeHead>, IoError> {
-        // Porcelain: blokovi `worktree <put>` / `HEAD <sha>` / (`branch …` | `detached`), prazan
-        // redak između. Detached stablo NEMA redak `branch` — parser gleda samo prva dva.
+        // Porcelain: blokovi `worktree <put>` / `HEAD <sha>` / (`branch refs/heads/<ime>` |
+        // `detached`), prazan redak između. Stablo se upiše na retku `HEAD` (grana zasad `None`);
+        // redak `branch` dolazi ODMAH iza `HEAD` istog bloka, pa pripada ZADNJEM upisanom stablu.
+        // Detached stablo taj redak nema i ostaje s `None`.
         let out = self.run(&["worktree", "list", "--porcelain"])?;
-        let mut heads = Vec::new();
+        let mut heads: Vec<WorktreeHead> = Vec::new();
         let mut path: Option<PathBuf> = None;
         for line in out.lines() {
             if let Some(p) = line.strip_prefix("worktree ") {
@@ -548,7 +556,14 @@ impl GitSource for GitCli {
                 heads.push(WorktreeHead {
                     path: p,
                     head: sha.trim().to_string(),
+                    branch: None,
                 });
+            } else if let Some(full_ref) = line.strip_prefix("branch ")
+                && let Some(last) = heads.last_mut()
+            {
+                let full_ref = full_ref.trim();
+                let short = full_ref.strip_prefix("refs/heads/").unwrap_or(full_ref);
+                last.branch = Some(short.to_string());
             }
         }
         Ok(heads)
