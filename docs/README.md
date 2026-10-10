@@ -57,11 +57,12 @@ redak u backlogu.
 ## `plan/` — što sada
 
 **Između milestonea** (od izdanja 1.0.0, 2026-09-28): nema aktivnog speca; spec M3 nastaje kad M3 krene.
-Plan zakrpe 1.0.1 je izvršen i arhiviran. Gdje smo i što je sljedeće kaže ROADMAP („Gdje smo“), ne ovaj indeks.
+Aktivan je plan zakrpe 1.0.2 (bez speca). Gdje smo i što je sljedeće kaže ROADMAP („Gdje smo“), ne ovaj indeks.
 
 | Dokument | Svrha |
 |---|---|
 | [ROADMAP.md](./plan/ROADMAP.md) | 🟩 **živ** — milestonei M0–M4, status, što je sljedeće |
+| [ZAKRPA_1_0_2.md](./plan/ZAKRPA_1_0_2.md) | 📋 **aktivan** — plan cigli T69–T73 (pauzirani plan, primjeri poveznica u kodu, izvor mjerenja dokumentacije) |
 
 ## `architecture/` — što je izgrađeno
 

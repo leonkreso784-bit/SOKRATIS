@@ -14,7 +14,8 @@ nalaza nad instaliranom „1.0.0-pre" (T44–T64, S-032…S-038) — te krug pop
 GitHubu s nepotpisanim instalaterom (S-040), licenca S-039. **Zakrpa 1.0.1 izdana 2026-10-10**
 (tag `v1.0.1`, izdanje na GitHubu; plan [archive/2026-10-10-zakrpa-1-0-1.md](../archive/2026-10-10-zakrpa-1-0-1.md):
 verzija u Postavkama, obavijesti o licencama ugrađenih komponenti, množina; isporuka:
-[CHANGELOG.md](../records/CHANGELOG.md) `[1.0.1]`). Nema aktivnog speca; **M3 nema spec** — piše se kad 1.0.0 bude u
+[CHANGELOG.md](../records/CHANGELOG.md) `[1.0.1]`). **Zakrpa 1.0.2 je u izvedbi** (plan
+[ZAKRPA_1_0_2.md](./ZAKRPA_1_0_2.md): ocjena dokumentacije — pauzirani plan, primjeri poveznica u kodu, izvor mjerenja). Nema aktivnog speca; **M3 nema spec** — piše se kad 1.0.0 bude u
 uporabi, iz kandidata u [records/BACKLOG.md](../records/BACKLOG.md). Zapis namjere iz kojeg je prvi rez
 nastao: [archive/PLAN_DESIGNE.md](../archive/PLAN_DESIGNE.md).
 

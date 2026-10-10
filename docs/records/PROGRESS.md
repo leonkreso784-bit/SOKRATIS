@@ -1364,6 +1364,14 @@ na GitHubu (opis: [`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §12), do
   u [`BACKLOG.md`](./BACKLOG.md) („Potpisan instalater — putovi"); preporuka je Microsoft Store s MSIX-om (M4),
   a odluka je Leonova.
 
+- **Vanjska analiza ocjene dokumentacije** (druga sesija nad Leonovim drugim projektom, pet točaka). Izmjereno
+  nad privremenim repoom kroz pravi CLI: plan „naslov → status ⏸️ PAUZIRAN" broji se kao aktivan, status u
+  prvom retku se prepozna; poveznica u inline kodu i u `~~~` bloku daje `dead-link`; mrtva slika `.png`
+  se ne javlja; kazne se zbrajaju bez granice; izvor mjerenja (vodeće stablo, S-033) se nigdje ne vidi.
+  **Leonova odluka:** zakrpa 1.0.2 = pauzirani plan + primjeri u kodu + izvor mjerenja
+  ([`../plan/ZAKRPA_1_0_2.md`](../plan/ZAKRPA_1_0_2.md)); ostalo, uključujući branu repoa kao izvor
+  (`docs_gate`, kandidat otvoren), u [`BACKLOG.md`](./BACKLOG.md) za M3.
+
 ### Što slijedi
 **STANI.** Za Leona: instalirati 1.0.1 i pogledati Postavke → „O aplikaciji" i mapu instalacije
 (`THIRD-PARTY-NOTICES.txt`, `LICENSE.txt`) · tajna `SOKRAT_DEV_DEPLOY_HOOK`

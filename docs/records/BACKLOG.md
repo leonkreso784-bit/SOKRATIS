@@ -181,6 +181,21 @@ nalazi koje zakrpa nije uzela. Kandidati za M3, nijedan ne mijenja brojke ni sad
 | test množine nema 111/112 (hrvatski: „stabala", ne „stablo"/„stabla") | `apps/desktop/tests/helpers.test.ts` (`worktreesLabel`) |
 | posuđeni MIT tekst (komponenta bez vlastite datoteke licence) nosi redak „Copyright" davatelja; uz posuđivača stoje i njegovi nositelji prava iz metapodataka paketa | `scripts/notices.mjs::renderNotices`, `THIRD-PARTY-NOTICES.txt` |
 
+## Ocjena dokumentacije — vanjska analiza 2026-10-10 (kandidati M3)
+
+Druga sesija nad Leonovim drugim projektom (ime se ne piše u javni repo) pročitala je `core/src/docs.rs` i
+`core/src/profile.rs`; tvrdnje su izmjerene (`PROGRESS.md`, unos 2026-10-10). Kvarovi koji ne mijenjaju
+značenje ocjene idu u zakrpu 1.0.2 ([`../plan/ZAKRPA_1_0_2.md`](../plan/ZAKRPA_1_0_2.md)); ovdje je ostatak.
+
+| stavka | bilješka |
+|---|---|
+| **Brana samog repoa kao izvor nalaza** (`docs_gate`, npr. `node scripts/check-docs.mjs --json` u profilu); ugrađena pravila ostaju rezerva za repo bez brane | Leon 2026-10-10: kandidat, otvoreno. Sokratis tada pokazuje isto što i CI repoa. **Rizik:** izvršava kod iz repoa → odobrenje jednom po projektu, spremljeno u lokalnu bazu (`sokratis-store`), NE u repo (repo si ne smije sam dati dopuštenje). Pokreće `io`, ne `core` (S-002). Procjena druge sesije: ≈ pola dana uz `--json` izlaz brane |
+| Gornja granica kazne po vrsti nalaza + prikaz grupiran po vrsti („99 × nije u indeksu — isti uzrok") | danas se kazne samo zbrajaju (`docs.rs::docs_health`): `not_indexed` = 3 boda, 34 nalaza iste vrste = 0/100. Mijenja značenje broja → odluka u M3 |
+| Odvojena ocjena za `main` i za radne grane | 1.0.2 samo kaže iz kojeg je stabla mjereno (T71); dvije ocjene traže drugo čitanje docs-a (`io`) |
+| Mrtve poveznice na ciljeve koji nisu `.md` (slike, skripte) | `md_link` hvata samo `.md` (`profile.rs`); `io` bi morao predati popis svih datoteka repoa (`git ls-files`), ne samo `.md` |
+| Provjera duljine dokumenata (npr. dnevnik > N redaka) | danas samo budžet `key_file`; s `docs_gate` dolazi iz brane repoa |
+| Konvencije drugih repoa („indeks + mapa", područja planova) | nije kvar nego profil — red „Profil za tuđe projekte" u „Čeka milestone" |
+
 ## Potpisan instalater — putovi (2026-10-10, Leon odlučuje u M4)
 
 Leon je pri instalaciji 1.0.1 dobio upozorenje Windows SmartScreena („nepoznat izdavač") i pitao kako ga
