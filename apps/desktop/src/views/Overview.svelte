@@ -15,7 +15,7 @@
   import { app, enterProject, loadProjects, setError } from '../lib/state.svelte';
   import { getDict, t } from '../lib/i18n/index.svelte';
   import { relative } from '../lib/format';
-  import { severityClass, signalSummary, sortProjects } from './helpers';
+  import { severityClass, signalSummary, sortProjects, worktreesLabel } from './helpers';
   import Explainable from '../lib/explain/Explainable.svelte';
   import type { ProjectSummary } from '../lib/types';
 
@@ -83,7 +83,7 @@
             <h2 class="text-lg font-semibold text-ink-0">{project.name}</h2>
           </button>
           <p class="text-sm text-ink-1">
-            <Explainable id="overview.worktrees">{t('overview.worktrees', { n: project.worktrees })}</Explainable>
+            <Explainable id="overview.worktrees">{worktreesLabel(getDict(), project.worktrees)}</Explainable>
           </p>
           <p class="text-sm text-ink-2">
             <Explainable id="overview.last_commit">{lastCommitText(project)}</Explainable>

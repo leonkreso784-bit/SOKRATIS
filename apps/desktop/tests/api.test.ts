@@ -4,6 +4,7 @@
 // i Dnevnik u pregledniku: popis projekata, pa `Report`, pa promjena vrste jednom commitu.
 import { describe, expect, it } from 'vitest';
 import { MockApi } from '../src/lib/api';
+import pkg from '../package.json';
 
 describe('MockApi', () => {
   it('daje jedan projekt i izvještaj iz snapshota; override se pamti', async () => {
@@ -25,5 +26,10 @@ describe('MockApi', () => {
     const r = await api.getReport(ps[0]!.id, { preset: 'all' });
     expect(r.docs).not.toBeNull();
     expect(r.docs?.findings.every((f) => f.message.startsWith('MOCK'))).toBe(true);
+  });
+
+  it('appVersion vraća verziju iz package.json (zrcalo Cargo.toml, tests/version.test.ts)', async () => {
+    const api = new MockApi();
+    expect(await api.appVersion()).toBe(pkg.version);
   });
 });

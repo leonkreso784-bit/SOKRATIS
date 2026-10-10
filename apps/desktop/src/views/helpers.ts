@@ -63,6 +63,13 @@ export function signalSummary(c: { info: number; warn: number; alert: number }, 
   return parts.length > 0 ? parts.join(' · ') : translate(dict, 'signals.none');
 }
 
+// "1 stablo" · "3 stabla" · "5 stabala" — isti izbor oblika kao `signalSummary`, za broj radnih
+// stabala na kartici Pregleda. Ključ `overview.worktrees.<oblik>`; id objašnjenja `overview.worktrees`
+// je zaseban ključ i ostaje isti.
+export function worktreesLabel(dict: Dict, n: number): string {
+  return translate(dict, `overview.worktrees.${pluralCategory(n)}`, { n });
+}
+
 // Pogled Faze (cigla M2/27) razvrstava `Report.phases` po `state` u tri odjeljka; jezgra već zna
 // stanje svake faze (`model.rs`), ovo je samo razvrstavanje — nijedan izračun (S-012).
 export function phaseRows(phases: Phase[]): { closed: Phase[]; running: Phase[]; planned: Phase[] } {
