@@ -16,7 +16,7 @@
 | GitHub Actions — brane (fmt · clippy · test) na svakom pushu | M4 (objava) | README na engleskom je gotov 2026-09-21 (S-030); licenca je odlučena 2026-09-29 (S-039). Jedini workflow u repou danas ne vrti brane — opis: [`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §12 |
 | Obavijesti o licencama ugrađenih komponenti · verzija vidljiva u aplikaciji | → zakrpa 1.0.1 ([`CHANGELOG.md`](./CHANGELOG.md) `[1.0.1]`) | samo pointer |
 | Instalater NSIS | → spec M2 [§13.6](../archive/ARHITEKTURA_M2.md) (S-029) | samo pointer; od 2026-09-29 je priložen izdanju na GitHubu (S-040) |
-| Potpisan instalater · MSI · automatsko ažuriranje | M4 (objava) | S-029; nepotpisani je objavljen uz 1.0.0 (S-040) |
+| Potpisan instalater · MSI · automatsko ažuriranje | M4 (objava) | S-029; nepotpisani je objavljen uz 1.0.0 (S-040). Tri puta protiv upozorenja SmartScreena, s cijenom i zamkom: odjeljak „Potpisan instalater — putovi (2026-10-10)" niže |
 | `sokratis docs .` mjeri samo korijen i `docs_dir`; `.md` pod `apps/desktop` (npr. budući README sučelja) nitko ne provjerava | M3 (profil: više `docs_dir`-ova ili `extra_docs_dirs`) | nalaz čuvara 2026-09-18 |
 | „Klasifikacija jednom" (spec §3.2) nije dovršena: `metrics/kinds.rs::commit_rows`/`kind_stats` (M2/5) klasificiraju svaki commit jednom za `Report.commits`, ali `metrics/indicators.rs` (`kind_count`) i dalje zove `effective_kind` odvojeno za `debugging_commits`/`docs_share` — commit se klasificira više od jednom | M3 (završna recenzija 1.0.0 ga nije uzela u krug) | nalaz recenzije M2/5 (2026-09-18); stanje koda: `ARCHITECTURE.md` §11 |
 | `sokratis report --table` u zaglavlju ispisuje samo „od {since}" — `until` se u tabličnom ispisu ne vidi iako je prozor ograničen (JSON je točan) | M3 (završna recenzija 1.0.0: čeka) | nalaz recenzije M2/19 (2026-09-20); `table.rs` nema presedan za uvjetno dodavanje polja u zaglavlje |
@@ -180,6 +180,21 @@ nalazi koje zakrpa nije uzela. Kandidati za M3, nijedan ne mijenja brojke ni sad
 | crtica `'—'` upisana izravno, a `format.ts` ima isti znak kao neizvezenu konstantu `DASH` | `views/Settings.svelte`, `lib/format.ts` |
 | test množine nema 111/112 (hrvatski: „stabala", ne „stablo"/„stabla") | `apps/desktop/tests/helpers.test.ts` (`worktreesLabel`) |
 | posuđeni MIT tekst (komponenta bez vlastite datoteke licence) nosi redak „Copyright" davatelja; uz posuđivača stoje i njegovi nositelji prava iz metapodataka paketa | `scripts/notices.mjs::renderNotices`, `THIRD-PARTY-NOTICES.txt` |
+
+## Potpisan instalater — putovi (2026-10-10, Leon odlučuje u M4)
+
+Leon je pri instalaciji 1.0.1 dobio upozorenje Windows SmartScreena („nepoznat izdavač") i pitao kako ga
+maknuti. Podloga je provjerena na webu 2026-10-10 (izvori: Microsoft Learn, „Code signing options for
+Windows app developers", „SmartScreen reputation", „Artifact Signing quickstart"). **Odluka nije donesena;
+orkestratorova preporuka je put 1.**
+
+| put | cijena | nestaje li upozorenje | zamka |
+|---|---|---|---|
+| **1. Microsoft Store, MSIX paket** | račun za pojedince besplatan; Microsoft sam potpisuje MSIX | da — aplikacija iz Storea nema upozorenje | Tauri ne gradi MSIX (bundle-cilj je samo NSIS, S-029) → nova cigla pakiranja; MSIX virtualizira pisanje po disku i registru → autostart (danas ključ `HKCU\…\Run` kroz `tauri-plugin-autostart`) i mjesto baze (`state.rs::db_path`) treba prilagoditi; traži spec |
+| **2. OV certifikat** (DigiCert, Sectigo, Certum …) | ≈ 150–300 $ godišnje; ključ na USB tokenu ili u oblaku | **ne odmah** — od 2024. ni EV ne preskače SmartScreen, ugled se gradi preuzimanjima, nova verzija kreće iznova | pri malom broju preuzimanja upozorenje može ostati mjesecima; Store za EXE/MSI svejedno traži takav certifikat |
+| **3. Azure Artifact Signing** (bivši Trusted Signing) | ≈ 10 $ mjesečno | kao put 2 — ugled se gradi | pojedinci samo iz SAD-a i Kanade; organizacije iz EU smiju, a vrijedi li to za obrt nije potvrđeno — pitati Microsoft prije plaćanja |
+
+Do odluke: korisnik klikne „Više informacija" → „Ipak pokreni"; upozorenje stoji u bilješkama izdanja.
 
 ## Za Leona (tuđi repo, ne naš posao)
 

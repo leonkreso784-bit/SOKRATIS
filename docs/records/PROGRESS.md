@@ -1360,6 +1360,10 @@ na GitHubu (opis: [`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §12), do
   za prilog javlja isti sha256 i veličinu. Workflow „Notify sokrat.dev" se pokrenuo na objavu i završio
   uspješno — bez tajne samo upozorenje, sokrat.dev nije osvježen. Plan zakrpe arhiviran (S-031).
 
+- **SmartScreen pri instalaciji 1.0.1** (Leonovo pitanje): tri puta potpisivanja, s cijenom i zamkom, upisana su
+  u [`BACKLOG.md`](./BACKLOG.md) („Potpisan instalater — putovi"); preporuka je Microsoft Store s MSIX-om (M4),
+  a odluka je Leonova.
+
 ### Što slijedi
 **STANI.** Za Leona: instalirati 1.0.1 i pogledati Postavke → „O aplikaciji" i mapu instalacije
 (`THIRD-PARTY-NOTICES.txt`, `LICENSE.txt`) · tajna `SOKRAT_DEV_DEPLOY_HOOK`
