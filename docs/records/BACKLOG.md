@@ -14,8 +14,7 @@
 | HR/EN natpisi u **sučelju** | → spec M2 [§6.4](../archive/ARHITEKTURA_M2.md) (S-021) | samo pointer |
 | HR/EN natpisi u **CLI tablici** | M3 | jezgra je već engleska (S-008); tablica je pomoć za terminal |
 | GitHub Actions — brane (fmt · clippy · test) na svakom pushu | M4 (objava) | README na engleskom je gotov 2026-09-21 (S-030); licenca je odlučena 2026-09-29 (S-039). Jedini workflow u repou danas ne vrti brane — opis: [`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §12 |
-| Obavijesti o licencama ugrađenih komponenti uz instalater (npr. `THIRD-PARTY-NOTICES`) | zakrpa 1.0.1 ili M4 — odluka | MIT · Apache-2.0 · BSD · MPL-2.0 traže da tekst licence i autorska obavijest putuju uz binarnu distribuciju; instalater ih danas ne nosi (popis je samo u `Cargo.lock` i `package-lock.json`). Alat koji to generira je nova razvojna ovisnost — namjerna radnja (pravilo #6) |
-| Verzija se nigdje ne vidi u aplikaciji (nalaz Leonove provjere instalatera 1.0.0, 2026-09-29) | zakrpa 1.0.1 ili M3 — odluka | u `apps/desktop/src` i `src-tauri/src` nema nijednog prikaza verzije; broj se vidi samo u Windowsovu popisu instaliranih aplikacija i u svojstvima izvršne datoteke. Prijedlog: redak „O aplikaciji" u Postavkama (verzija iz `[workspace.package]`, licenca) — prirodno mjesto i za obavijesti o licencama ugrađenih komponenti (red iznad) |
+| Obavijesti o licencama ugrađenih komponenti · verzija vidljiva u aplikaciji | → zakrpa 1.0.1 ([`CHANGELOG.md`](./CHANGELOG.md) `[1.0.1]`) | samo pointer |
 | Instalater NSIS | → spec M2 [§13.6](../archive/ARHITEKTURA_M2.md) (S-029) | samo pointer; od 2026-09-29 je priložen izdanju na GitHubu (S-040) |
 | Potpisan instalater · MSI · automatsko ažuriranje | M4 (objava) | S-029; nepotpisani je objavljen uz 1.0.0 (S-040) |
 | `sokratis docs .` mjeri samo korijen i `docs_dir`; `.md` pod `apps/desktop` (npr. budući README sučelja) nitko ne provjerava | M3 (profil: više `docs_dir`-ova ili `extra_docs_dirs`) | nalaz čuvara 2026-09-18 |
@@ -103,12 +102,12 @@ Izvor: izvještaj završne recenzije `.superpowers/sdd/2026-09-24-1-0-0-grane-i-
 Svi su **kandidati za M3**, ne odluke; nijedan ne gubi podatke ni ne laže u brojkama jezgre. Što od
 toga danas vidi korisnik: [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §11.
 Stavke koje su već drugdje u ovom dokumentu ovdje se ne ponavljaju (`--table` bez `until`, klik na
-obavijest, tekst grafova raste s prozorom, dani bez commita, `include_unmerged`).
+obavijest, tekst grafova raste s prozorom, dani bez commita, `include_unmerged`). m4 (množina „{n} stabala")
+je riješen zakrpom 1.0.1 — [`CHANGELOG.md`](./CHANGELOG.md) `[1.0.1]`.
 
 | izvor | stavka | mjesto |
 |---|---|---|
 | m2 | pokazatelj zatvorenih faza u razdoblju gleda samo `since`, ne `until` | `core/src/metrics/indicators.rs` |
-| m4 | „{n} stabala" bez hrvatske množine („1 stabala") | `apps/desktop/src/lib/i18n/hr.json` `overview.worktrees` |
 | m5 · 1744 | jedan commit okida 1–3 `report_updated` (višak izračuna i snimki, nije petlja); uzrok mjeriti ispisom sirove putanje u `debounce_loop` | `io/src/watch.rs` |
 | m6 | greška izračuna ide samo na stderr; kartica projekta s pokvarenim profilom trajno piše „još nije izračunano" | `desktop/src-tauri/src/engine.rs`, `commands.rs::list_projects` |
 | m8 · 988 | `Store::open` kroz `expect`; migracija i `schema_version` nisu u istoj transakciji; druga instanca otvara bazu prije odbijanja, bez `busy_timeout` | `desktop/src-tauri/src/lib.rs`, `store/src/store.rs` |
@@ -168,6 +167,19 @@ obavijest, tekst grafova raste s prozorom, dani bez commita, `include_unmerged`)
 | 1520 | `Bars` `role="button"` bez tipkovne radnje; `Tooltip role="status"` | `lib/charts/Bars.svelte`, `Tooltip.svelte` |
 | 1678 · 1679 | `chains.rs` obrnut komparator bez komentara; `perf.rs` izgubljena rečenica o `var_os` | `core/src/chains.rs`, `io/tests/perf.rs` |
 | 1696 | traka ≈ 1 px iznad ljepljivog izbornika (subpikselni rub) — mjeriti | `apps/desktop/src/views/Project.svelte` |
+
+## Iz recenzija zakrpe 1.0.1 (2026-10-10) — Minor, nisu popravljeni
+
+Recenzije tokova SUČELJE-3 (T65, T66) i OBAVIJESTI (T67) presudile su SPOJIVO; ovo su njihovi Minor
+nalazi koje zakrpa nije uzela. Kandidati za M3, nijedan ne mijenja brojke ni sadržaj obavijesti.
+
+| stavka | mjesto |
+|---|---|
+| zaglavlja „zašto ovako" dulja su od 2–5 redaka koje traži pravilo #5 (11 i 8 redaka) | `apps/desktop/scripts/notices-build.mjs`, `scripts/notices.mjs` |
+| verzija koja ne stigne (`api.appVersion()` padne) diže globalnu traku greške umjesto da ostane „—" | `apps/desktop/src/views/Settings.svelte` |
+| crtica `'—'` upisana izravno, a `format.ts` ima isti znak kao neizvezenu konstantu `DASH` | `views/Settings.svelte`, `lib/format.ts` |
+| test množine nema 111/112 (hrvatski: „stabala", ne „stablo"/„stabla") | `apps/desktop/tests/helpers.test.ts` (`worktreesLabel`) |
+| posuđeni MIT tekst (komponenta bez vlastite datoteke licence) nosi redak „Copyright" davatelja; uz posuđivača stoje i njegovi nositelji prava iz metapodataka paketa | `scripts/notices.mjs::renderNotices`, `THIRD-PARTY-NOTICES.txt` |
 
 ## Za Leona (tuđi repo, ne naš posao)
 

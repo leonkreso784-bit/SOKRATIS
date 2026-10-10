@@ -1,10 +1,12 @@
 # ARCHITECTURE — što je izgrađeno
 
-**Status:** ✅ opisuje kod verzije **1.0.0** u `main`-u (2026-09-28): jezgra i CLI iz M1 (0.1.0), desktop
-aplikacija M2 (Tauri 2 + Svelte 5, SQLite registar i snimke, watcher, instalater) i drugi rez do 1.0.0
+**Status:** ✅ opisuje kod verzije **1.0.1** u `main`-u (2026-10-10): jezgra i CLI iz M1 (0.1.0), desktop
+aplikacija M2 (Tauri 2 + Svelte 5, SQLite registar i snimke, watcher, instalater), drugi rez do 1.0.0
 (mjerenje svih lokalnih grana, dnevnik kao unija radnih stabala, ploča Projekt s grafovima, X = upit →
-izlaz bez traya, lanci nespojenih grana). Što od koda stoji bez pokrića ili s poznatim rubom je u §11 ·
-**Zadnja provjera prema kodu:** 2026-09-28 (čuvar izdanja T43, tvrdnju po tvrdnju).
+izlaz bez traya, lanci nespojenih grana) i zakrpa 1.0.1 (Postavke „O aplikaciji", obavijesti o licencama
+uz instalater, množina broja stabala). Što od koda stoji bez pokrića ili s poznatim rubom je u §11 ·
+**Zadnja provjera prema kodu:** 2026-10-10 (čuvar dokumentacije, dijelovi koje je dirala zakrpa 1.0.1;
+ostatak 2026-09-28, čuvar izdanja T43).
 
 > **Što ovaj dokument JEST:** opis sustava kakav stoji u `crates/` i `apps/` — granice između crateova, tok
 > podataka, formati koje čita i ugovori prema korisniku CLI-ja i sučelja. **Što NIJE:** kronologija (to su
@@ -64,6 +66,31 @@ razvoj time ne dira pravu bazu. **CLI ne ovisi o `sokratis-store`** i bazu ne st
 `target/release/bundle/nsis/`. Broj verzije ima jedan izvor, `[workspace.package] version` u korijenskom
 `Cargo.toml`; `apps/desktop/package.json` ga zrcali, a `tauri.conf.json` polje `version` nema (test
 `apps/desktop/tests/version.test.ts`).
+
+**Obavijesti o licencama uz instalater** (1.0.1/T67): `tauri.conf.json` `bundle.resources` je mapa
+izvor → ime u mapi instalacije — `THIRD-PARTY-NOTICES.txt` i `LICENSE` (kao `LICENSE.txt`); mapa, ne niz
+putanja, jer bi Tauri putanju s `../` spremio pod `_up_/` (test `tests/version.test.ts`).
+`THIRD-PARTY-NOTICES.txt` u korijenu repoa piše `npm run notices` (`apps/desktop/scripts/notices-build.mjs`),
+a `npm run notices:check` (dio `npm run check`) pada kad commitana datoteka nije ono što bi skripta
+napisala. Podjela je ista kao `core`/`io` (S-002): `scripts/notices.mjs` su čiste funkcije bez diska i
+procesa (testira ih `tests/notices.test.ts`; tipove za `.ts` test daje `scripts/notices.d.mts`), a sav
+I/O je u `notices-build.mjs`:
+
+- **crateovi** = što `cargo tree -p sokratis-desktop -e normal --target x86_64-pc-windows-msvc` kaže da
+  se prevodi (razrješava značajke kao pravi build); licencu, autore i mapu paketa daje `cargo metadata`.
+  Sam graf iz `cargo metadata` uzima uniju značajki workspacea i broji crateove koji se ne prevode. Cargo
+  ide s `--locked --offline` — brana ne pomiče `Cargo.lock` i ne ide na mrežu;
+- **npm paketi** = što stvarno ulazi u izgrađeno sučelje: Vite build u privremenu mapu (ne `dist/`),
+  sa sourcemapama i bez minifikacije; imena paketa daju `sources` sourcemapa i licencni banneri u CSS-u,
+  verzije `package-lock.json`. To nije skup ne-`dev` paketa iz locka;
+- **datoteke licence** u paketu: `LICENSE*` · `LICENCE*` · `COPYING*` · `NOTICE*` · `UNLICENSE`, bez
+  `*.spdx` (strojni SPDX-zapis, ne tekst; `notices.mjs::isLicenseFile`);
+- **izlaz** je determinističan (sortiran običnom usporedbom znakova, ne `localeCompare`): uvod na
+  engleskom, popis `ime verzija — SPDX izraz`, pa svaki tekst licence jednom s popisom komponenti koje ga
+  nose (`notices.mjs::renderNotices`). Komponenta bez vlastite datoteke posuđuje tekst komponente iste
+  SPDX licence, a uz nju stoje njezini nositelji prava iz metapodataka paketa; ako takve komponente nema,
+  skripta pada s popisom. Vlastiti `sokratis-*` crateovi se preskaču. Broj komponenti i tekstova piše u
+  zaglavlju same datoteke i u [`CHANGELOG.md`](../records/CHANGELOG.md) `[1.0.1]`.
 
 **Tauri ljuska** (`apps/desktop/src-tauri/src/`) — S-013: crate ne drži logiku koju bi vrijedilo
 testirati, samo posuđuje jezgru/`io`/`store`:
@@ -135,11 +162,11 @@ vremenu i oblikuje ono što jezgra izračuna (S-012; jedino izvedeno mjerilo u s
 | `lib/charts/` — temelji (`layout.ts`, `scales.ts`, `bucket.ts`, `Chart`/`Axis`/`Grid`/`Legend`/`Tooltip`) + **8 komponenata** (`Bars`/`Line`/`Ring`/`Sparkline`/`Heatmap`/`Histogram`/`Gantt`/`HBars`) | vlastiti SVG grafovi (S-018) s d3-matematikom za osi i ljestvice (S-035: `d3-scale`/`d3-shape`/`d3-array`/`d3-time-format`, UTC datumski ticksi); izgled i boje ostaju naši; ulaze animirano (M2/39). `layout.ts` računa raspored bez DOM-a (okvir i margine, grupirani/naslagani stupci, linija s datumskom skalom, najbliža točka za tooltip, `heatmapLayout` — ćelija po danu, stupac = ISO tjedan, 5 razina, `histogramLayout` — 24 sata, `ganttLayout`, `hbarsLayout`); `bucket.ts` grupira po danu/tjednu/mjesecu. Razine toplinske karte su `.heat-0…4` u `src/app.css` (jedna boja `brand-500`, `fill-opacity` 0,3–1 — jedini niz monoton na sve četiri teme). Predug natpis retka (`Gantt`/`HBars`) krati `fitLabel` u `shortLabel` s „…", puni naziv ostaje u `<title>`; zadnja oznaka X-osi dobiva `text-anchor="end"` kad bi izašla iz okvira (`XTick.anchor`); `scales.ts::dayLevelTicks` bira korak u cijelim danima, pa se oznake datuma na kratkom rasponu ne ponavljaju, a niz od jedne točke crta se kao točka u sredini; stanje faze bez trake („planirana") je tekst u području crtanja retka, ne u margini (`Gantt.svelte`, M2/62). Svih osam komponenata je uvezeno u sekcije ploče (`views/project/`) |
 | `lib/explain/` (`ids.ts`, `explain.svelte.ts`, `Explainable.svelte`, `ExplainCard.svelte`) | **kartica s objašnjenjem** (S-027, M2/41–42): `EXPLAIN_IDS` (**44**, od T61: 7 novih za grafove ploče — `tempo.heatmap`, `tempo.hours_of_day`, `branches.bars`, `kinds.over_time`, `phases.gantt`, `deliveries.weekly`, `docs.trend`) + `explainKeys(id)` → ključevi `explain.<id>.what\|how\|read`; `Explainable` je okidač (`<button aria-haspopup="dialog">`), `ExplainCard` (`role="dialog" aria-modal="false"`) prikazuje tekst; test pokrivenosti veže popis na OBA rječnika u oba smjera i na 18 id-eva pokazatelja iz prave snimke jezgre |
 | `splash/` (`Splash.svelte`, `intro.ts`) | animacija pokretanja, 4,2 s, preskočiva (S-019); zaseban Vite-ulaz `splash.html` |
-| `lib/api.ts` | sučelje `Api`; `MockApi` čita insta snapshot jezgre kroz Viteov `?raw` uvoz — dev-prikaz i vitest vide TOČNO brojke koje bi jezgra izračunala, ne ručno prepisanu kopiju (S-010); `TauriApi` (T34) svaku metodu prevodi u `invoke('<naredba>', {…})` prema `commands.rs`, `onReportUpdated`/`onSignalRaised` idu preko `listen()`; `createApi()` bira izvedbu po `'__TAURI_INTERNALS__' in window`; **od T45 (M2/45, S-036) += `quit()`/`onCloseRequested(cb)`** — `TauriApi` zove naredbu `quit` i sluša događaj `close_requested`, `MockApi` oboje nema-op (preglednik nema proces za ugasiti) |
+| `lib/api.ts` | sučelje `Api`; `MockApi` čita insta snapshot jezgre kroz Viteov `?raw` uvoz — dev-prikaz i vitest vide TOČNO brojke koje bi jezgra izračunala, ne ručno prepisanu kopiju (S-010); `TauriApi` (T34) svaku metodu prevodi u `invoke('<naredba>', {…})` prema `commands.rs`, `onReportUpdated`/`onSignalRaised` idu preko `listen()`; `createApi()` bira izvedbu po `'__TAURI_INTERNALS__' in window`; **od T45 (M2/45, S-036) += `quit()`/`onCloseRequested(cb)`** — `TauriApi` zove naredbu `quit` i sluša događaj `close_requested`, `MockApi` oboje nema-op (preglednik nema proces za ugasiti); **od 1.0.1/T66 += `appVersion()`** — `TauriApi` zove `getVersion()` iz `@tauri-apps/api/app` (Taurijeva ugrađena `plugin:app\|version`, ne naša naredba — dopušta je `core:default` u `src-tauri/capabilities/default.json`; verziju Tauri čita iz `Cargo.toml`), `MockApi` vraća `version` iz `package.json` (zrcalo) |
 | `lib/shell/ConfirmQuit.svelte` (T45, S-036) | upit „Zatvoriti Sokratis?" nakon `close_requested`; `role="dialog" aria-modal="true"`, fokus na „Odustani", Esc = odustani; NE testira se vitestom (nema jsdom-a, isti razlog kao T39/R37) — ponašanje dokazuje dimni test |
 | `lib/types.ts` | TS zrcalo `Report`-a; `tests/types.test.ts` ga veže na isti insta snapshot da se oblik ne razmine s Rustom |
 | `lib/state.svelte.ts` | Svelte 5 rune (`$state`) drže odabrani projekt, raspon, postavke, izvještaj, `epoch` (0 → 1 jednom kad glavni prozor prvi put postane vidljiv, M2/39). **Od T58 (S-034)** `enterProject(id)` (postavi `currentId`, `view = 'project'`, učitaj izvještaj) i `leaveProject()` (`view = 'overview'`, `currentId` ostaje) zamjenjuju stari `selectProject` — **obrisan**, nakon T58 bez pozivatelja (R58) |
-| `views/` — **pet** pogleda (Pregled, **Projekt**, Dnevnik, Vizije, Postavke) + `views/helpers.ts` + `views/project/` | Pregled i Postavke rade bez odabranog projekta (Postavke jedini pogled koji NE čita `app.report`); Projekt, Dnevnik i Vizije traže odabran projekt. Pogledi su `View` u `lib/types.ts` (`VIEWS` + `settings`). **Ploča Projekt** (`views/Project.svelte`, S-034) nosi osam sekcija iz `views/project/sections.ts` (`SECTIONS`: Sažetak · Tempo · Grane · Vrste rada · Faze · Isporuke · Pokazatelji · Dokumentacija — JEDAN popis za skok-izbornik, sidra `id="sec-…"` i naslove); izbornik je `position: sticky`, sidra dobivaju `scroll-margin-top` kroz `:global(h2[id^='sec-'])` u `Project.svelte`. Šest od osam sekcija ima barem jedan graf s vidljivim `<h3>` naslovom (Sažetak je bez grafa; Pokazatelji nose samo sparkline): `TempoSection` prekidač `aria-pressed` dan/tjedan/mjesec + `Heatmap` + `Histogram` doba dana; `BranchesSection` tablica `Report.branches` (natpis kad je opseg `default`), prekidač commiti/sati + `HBars`, graf samo kad postoji barem jedna grana; `KindsSection` naslagani `Bars` po tjednu (`helpers.ts::kindSeries`); `PhasesSection` `Gantt` s crtom „danas"; `DeliveriesSection` grupirani `Bars` po tjednu; `DocsSection` `Line` trend triju metrika iz dnevnih snimki (`api.getTrend`, prazno dok snimki nema). **`lib/shell/Topbar.svelte`**: nema birača projekta — ulaz u projekt je klik na karticu Pregleda (`state.svelte.ts::enterProject`); u projektu traka pokazuje „‹ Pregled" + ime projekta. **`lib/shell/Sidebar.svelte`**: pet stavki, `project`/`diary`/`visions` su `disabled` + `aria-disabled` dok nema odabranog projekta. `helpers.ts` drži čiste funkcije testirane odvojeno od komponenata (sortiranje, boja po vrsti/težini, `signalCounts`, `kindSeries`, kopiranje i spajanje putanje, zamjena vizije po indeksu) |
+| `views/` — **pet** pogleda (Pregled, **Projekt**, Dnevnik, Vizije, Postavke) + `views/helpers.ts` + `views/project/` | Pregled i Postavke rade bez odabranog projekta (Postavke jedini pogled koji NE čita `app.report`). **Postavke** (`views/Settings.svelte`) od 1.0.1/T66 imaju odjeljak **„O aplikaciji"** (ključevi `settings.about.*`): verzija se pita jednom, u `onMount`, kroz `api.appVersion()` (dok ne stigne stoji „—"; greška ide u `app.error`), a licenca i rečenica da su obavijesti o licencama u `THIRD-PARTY-NOTICES.txt` u mapi instalacije su samo tekst — poveznica ili otvaranje datoteke traže `tauri-plugin-opener`, novu ovisnost (`tests/i18n.test.ts` tvrdi ime datoteke u oba rječnika). Kartica Pregleda piše broj stabala s hrvatskom množinom (`helpers.ts::worktreesLabel` nad `pluralCategory`, ključevi `overview.worktrees.one\|few\|many`, 1.0.1/T65); Projekt, Dnevnik i Vizije traže odabran projekt. Pogledi su `View` u `lib/types.ts` (`VIEWS` + `settings`). **Ploča Projekt** (`views/Project.svelte`, S-034) nosi osam sekcija iz `views/project/sections.ts` (`SECTIONS`: Sažetak · Tempo · Grane · Vrste rada · Faze · Isporuke · Pokazatelji · Dokumentacija — JEDAN popis za skok-izbornik, sidra `id="sec-…"` i naslove); izbornik je `position: sticky`, sidra dobivaju `scroll-margin-top` kroz `:global(h2[id^='sec-'])` u `Project.svelte`. Šest od osam sekcija ima barem jedan graf s vidljivim `<h3>` naslovom (Sažetak je bez grafa; Pokazatelji nose samo sparkline): `TempoSection` prekidač `aria-pressed` dan/tjedan/mjesec + `Heatmap` + `Histogram` doba dana; `BranchesSection` tablica `Report.branches` (natpis kad je opseg `default`), prekidač commiti/sati + `HBars`, graf samo kad postoji barem jedna grana; `KindsSection` naslagani `Bars` po tjednu (`helpers.ts::kindSeries`); `PhasesSection` `Gantt` s crtom „danas"; `DeliveriesSection` grupirani `Bars` po tjednu; `DocsSection` `Line` trend triju metrika iz dnevnih snimki (`api.getTrend`, prazno dok snimki nema). **`lib/shell/Topbar.svelte`**: nema birača projekta — ulaz u projekt je klik na karticu Pregleda (`state.svelte.ts::enterProject`); u projektu traka pokazuje „‹ Pregled" + ime projekta. **`lib/shell/Sidebar.svelte`**: pet stavki, `project`/`diary`/`visions` su `disabled` + `aria-disabled` dok nema odabranog projekta. `helpers.ts` drži čiste funkcije testirane odvojeno od komponenata (sortiranje, boja po vrsti/težini, `signalCounts`, `kindSeries`, kopiranje i spajanje putanje, zamjena vizije po indeksu) |
 
 **`Diary.svelte`** ima stupac „grana" (`CommitRow.branch`): zaseban stupac od `lg`, ispod toga drugi redak unutar ćelije datuma, bez `<Explainable>` (ime grane je podatak, ne mjerenje).
 Dnevnik uređuje vrstu rada po commitu (`setOverride`, oznaka „ručno"); Vizije se dodaju, uređuju i
@@ -154,7 +181,7 @@ projekata i, ako je odabrani projekt taj koji se promijenio, i trenutačni izvje
 `epoch` poraste 0→1; okidač je `getCurrentWindow().onFocusChanged` (fokus stiže iz `splash.rs`), NE
 `document.visibilitychange` — WebView2 javlja prozor vidljivim i dok je iza splasha skriven, pa taj
 događaj nikad ne okine (Ruling R25, izmjereno u `tauri dev`). Brane su `npm run
-check` (`svelte-check` + `check:i18n` + `check:contrast` + `vitest`) i `npm run build` u
+check` (`svelte-check` + `check:i18n` + `check:contrast` + `notices:check` + `vitest`) i `npm run build` u
 `apps/desktop`, ne `cargo` ([`TESTING.md`](../workflow/TESTING.md) §1).
 
 **Što `io` danas radi** (`crates/sokratis-io/src/`): `Project::open` čita `.sokratis/profile.json`
@@ -573,9 +600,10 @@ je pogrešna uporaba (izlazni kod 3), ne panika.
    dirnuta u deset commita doda deset. Brojka odgovara na „koliko je izmjena pročitano", ne na
    „koliko datoteka projekt ima".
 
-## 11 · Što stoji u kodu, a ne izlazi ili ne radi (1.0.0)
+## 11 · Što stoji u kodu, a ne izlazi ili ne radi (1.0.1)
 
-Uredno zapisani propusti, ne skrivene rupe (CLAUDE.md #4). Napisano iznova iz stanja koda 2026-09-28.
+Uredno zapisani propusti, ne skrivene rupe (CLAUDE.md #4). Napisano iznova iz stanja koda 2026-09-28;
+zakrpa 1.0.1 (2026-10-10) je uklonila samo množinu „{n} stabala".
 Ovo je **stanje koda**; što se od toga planira i kada je u [`../records/BACKLOG.md`](../records/BACKLOG.md)
 (odjeljak „Iz završne recenzije 1.0.0" nosi i nalaze koji ovdje nisu nabrojeni jer ne mijenjaju ponašanje).
 
@@ -648,7 +676,6 @@ Ovo je **stanje koda**; što se od toga planira i kada je u [`../records/BACKLOG
 - **Tekst u grafovima raste sa širinom prozora** — `Chart.svelte` crta u `viewBox` širine 600 i rasteže
   se na `w-full`, pa su na širokom prozoru oznake osi veće od naslova.
 - **Natpisi osi imaju decimalnu točku** (`layout.ts`, `String(v)`), ne zarez, i u hrvatskom sučelju.
-- **„{n} stabala" nema hrvatsku množinu** (`hr.json`, `overview.worktrees`) — „1 stabala".
 - **Dani bez commita nemaju prazan stupac** — `Report.days` ih ne sadrži, graf preskače rupu.
 - **`Vision.state` je slobodan tekst** (`model.rs`), sučelje ga ne prevodi ni ograničava.
 - **Stupac „model" u sekciji Isporuke ponekad nosi ostatak zaglavlja dnevnika** — uzrok je parser

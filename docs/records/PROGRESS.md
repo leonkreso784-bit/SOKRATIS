@@ -1323,3 +1323,37 @@ na GitHubu (opis: [`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §12), do
   1.0.1** (verzija u Postavkama · obavijesti o licencama ugrađenih komponenti · množina „stabala").
 - **Pospremanje dokumentacije:** ROADMAP više ne kaže da tag i izdanje čekaju; BACKLOG više ne kaže da
   `gh` nije na stroju.
+- **Plan zakrpe** [`ZAKRPA_1_0_1.md`](../plan/ZAKRPA_1_0_1.md) (`363f571`, bez speca — ugovor `Report`,
+  profil i jezgra se ne diraju): T65–T67 u dva paralelna toka, svaki u svom stablu; T68 orkestrator u `main`-u.
+- **SUČELJE-3** (`feat/zakrpa-ui`): T65 množina broja stabala (`b841932`) · T66 „O aplikaciji" u
+  Postavkama (`3dbfb01`). Recenzija **SPOJIVO** (tri Minor) → spojeno `e5a1936`.
+- **OBAVIJESTI** (`feat/notices`): T67 `THIRD-PARTY-NOTICES.txt` uz instalater (`9215834`) + krug popravaka
+  orkestratora (`d4be3a1`). Recenzija **SPOJIVO** (tri Minor) → spojeno `dd7c018`. **Odstupanja od plana koja
+  je orkestrator prihvatio:** npm skup se mjeri iz izgrađenog sučelja (sourcemape + CSS banner), ne kao ne-`dev`
+  paketi iz locka · crateovi iz `cargo tree -e normal`, jer graf iz `cargo metadata` broji 18 crateova koji se ne
+  prevode · `LICENSE.spdx` se ne broji kao tekst licence · posuđeni tekst navodi i nositelje prava komponente koja
+  ga posuđuje · `scripts/notices.d.mts` (tipovi za `.ts` test) je izvan doslovnog vlasništva iz plana. Broj
+  komponenti i tekstova piše u zaglavlju samog `THIRD-PARTY-NOTICES.txt`; opis skripte:
+  [`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §1.
+- **BOM u `normalizeText`** (Minor nalaz recenzije, pravilo #5 — nevidljivi znak u regexu Leon je čitao kao
+  `/^/`): u dva commita, jer je `61c98a1` zbog greške alata pri pisanju commitao samo test, a regex je ostao s
+  nevidljivim BOM-om; `d6cf6f7` je dodao sam escape `\uFEFF`.
+- **T68 izdanje** (`f7e4a7d`, orkestrator): verzija 1.0.1 (`Cargo.toml` izvor, zrcala u `package.json` i
+  lockovima), `THIRD-PARTY-NOTICES.txt` nanovo izgrađen i nepromijenjen, CHANGELOG `[1.0.1]` netagiran. Brane na
+  `f7e4a7d` zelene — brojke: [`CHANGELOG.md`](./CHANGELOG.md) `[1.0.1]`. Grane i stabla tokova obrisani; ostalo je
+  jedno radno stablo.
+- **Minor nalazi recenzija koji nisu popravljeni** → [`BACKLOG.md`](./BACKLOG.md), „Iz recenzija zakrpe 1.0.1".
+- **Dokumentacija:** `ARCHITECTURE.md` opisuje 1.0.1 (Postavke „O aplikaciji", `appVersion`, skripta obavijesti,
+  `bundle.resources`; množina maknuta iz §11) · `TESTING.md` §4 (`notices:check` u `npm run check` i pravilo
+  „nov paket ili crate → `npm run notices`") · `RUST.md` §5 (šest TS/JS pojmova) · BACKLOG bez riješenih redaka.
+
+### Što slijedi
+- **Instalater 1.0.1 je sagrađen** iz `f7e4a7d`: `Sokratis_1.0.1_x64-setup.exe`, 3 773 466 B, sha256
+  `719265dc09caf267b7a54200061f6a53eee55b8b3d603e2ee4f621417260a717`; nepotpisan. Generirana NSIS skripta
+  (`target/release/nsis/x64/installer.nsi`) stavlja `LICENSE.txt` i `THIRD-PARTY-NOTICES.txt` u `$INSTDIR` i
+  briše ih pri deinstalaciji. **Nije instaliran ni isproban** (instalacija bi pregazila Leonovu 1.0.0) — da
+  Postavke pokazuju `1.0.1`, vidi se tek kad ga Leon instalira.
+- **Tag `v1.0.1` i izdanje na GitHubu čekaju Leonov izričit OK** (pravilo #1).
+- **Čeka Leona:** tajna `SOKRAT_DEV_DEPLOY_HOOK` za workflow `notify-sokrat-dev.yml`
+  ([`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §12).
+- Zatim, tek uz Leonov OK: M3 — brainstorming, pa spec, pa plan.

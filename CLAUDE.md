@@ -72,7 +72,7 @@ pogrešna uporaba**; `--help`/`--version` = 0) — sve rade nad pravim repozitor
 Sokrat Studyjem).
 Testovi i brane: `docs/workflow/TESTING.md`.
 
-## Stanje — TRENUTNO (2026-09-29 — verzija 1.0.0 izdana, tag `v1.0.0`)
+## Stanje — TRENUTNO (2026-10-10 — 1.0.0 izdana; zakrpa 1.0.1 izgrađena, tag `v1.0.1` čeka OK)
 - **M0 gotov, M1 zatvoren** (0.1.0), **M2 izdan kao 1.0.0** (S-024): tag `v1.0.0`, izdanje na GitHubu s
   nepotpisanim instalaterom (S-040), licenca u `LICENSE` (S-039).
 - **Aktivni plan: `docs/plan/ZAKRPA_1_0_1.md`** (T65–T68, bez speca — ne mijenja ugovor); tag `v1.0.1`
