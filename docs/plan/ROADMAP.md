@@ -6,12 +6,13 @@
 > što je izgrađeno opisuje [architecture/ARCHITECTURE.md](../architecture/ARCHITECTURE.md), što je isporučeno
 > [records/CHANGELOG.md](../records/CHANGELOG.md), a tijek sesija [records/PROGRESS.md](../records/PROGRESS.md).
 
-## Gdje smo (2026-09-29)
+## Gdje smo (2026-10-10)
 
 **M2 je izgrađen kao verzija 1.0.0** (S-024): oba reza — prvi (T1–T43, spec M2) i drugi nakon Leonovih
 nalaza nad instaliranom „1.0.0-pre" (T44–T64, S-032…S-038) — te krug popravaka završne recenzije
 (`M2/63`) su u `main`-u, a verzija u kodu je `1.0.0`. **Izdano 2026-09-29:** tag `v1.0.0`, izdanje na
-GitHubu s nepotpisanim instalaterom (S-040), licenca S-039. Nema aktivnog speca; **M3 nema spec** — piše se kad 1.0.0 bude u
+GitHubu s nepotpisanim instalaterom (S-040), licenca S-039. **Zakrpa 1.0.1 je u izvedbi** (2026-10-10, plan [ZAKRPA_1_0_1.md](./ZAKRPA_1_0_1.md): verzija u Postavkama,
+obavijesti o licencama ugrađenih komponenti, množina). Nema aktivnog speca; **M3 nema spec** — piše se kad 1.0.0 bude u
 uporabi, iz kandidata u [records/BACKLOG.md](../records/BACKLOG.md). Zapis namjere iz kojeg je prvi rez
 nastao: [archive/PLAN_DESIGNE.md](../archive/PLAN_DESIGNE.md).
 

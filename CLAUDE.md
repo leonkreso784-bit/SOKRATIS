@@ -75,8 +75,8 @@ Testovi i brane: `docs/workflow/TESTING.md`.
 ## Stanje — TRENUTNO (2026-09-29 — verzija 1.0.0 izdana, tag `v1.0.0`)
 - **M0 gotov, M1 zatvoren** (0.1.0), **M2 izdan kao 1.0.0** (S-024): tag `v1.0.0`, izdanje na GitHubu s
   nepotpisanim instalaterom (S-040), licenca u `LICENSE` (S-039).
-- **Nema aktivnog speca ni plana** — ispunjeni su u `docs/archive/`; sljedeći nastaje kad M3 krene
-  (kandidati: `docs/records/BACKLOG.md`). **M3 ne počinje bez Leonova izričitog OK-a** — redom
+- **Aktivni plan: `docs/plan/ZAKRPA_1_0_1.md`** (T65–T68, bez speca — ne mijenja ugovor); tag `v1.0.1`
+  traži Leonov OK. Spec M3 nastaje kad M3 krene (kandidati: `docs/records/BACKLOG.md`). **M3 ne počinje bez Leonova izričitog OK-a** — redom
   brainstorming, spec, plan.
 - **Čeka Leona:** tajna `SOKRAT_DEV_DEPLOY_HOOK` za jedini workflow (`ARCHITECTURE.md` §12).
 - **Leon čita kod i uči Rust:** objašnjenja idu na primjerima iz NJEGOVA koda (`datoteka:redak`).
@@ -117,12 +117,12 @@ dnevnik M1 u `PROGRESS.md`, zadani `since`, ploča, zaglavlja; brojci sati Leon 
 Uloge i protokol: `docs/workflow/AGENTI.md`. Graditelj radi **jednu ciglu u svom stablu**, recenzent presuđuje
 u dva prolaza, čuvar dokumentacije piše zapise; **samo orkestrator spaja u `main`**. Nakon compacta stanje se
 čita iz gita (`git log --oneline -15` · `git worktree list`), ne iz sjećanja. Potpuno spojena stabla i grane
-se brišu (pravilo #1). Nema aktivnog plana cigli — planovi M1, M2 i 1.0.0 su u `docs/archive/`; plan M3
-nastaje iz speca M3.
+se brišu (pravilo #1). Aktivni plan cigli: `docs/plan/ZAKRPA_1_0_1.md`; planovi M1, M2 i 1.0.0 su u
+`docs/archive/`, plan M3 nastaje iz speca M3.
 
 ## Dokumentacija — ulaz je SAMO `docs/README.md`
 Složena **po ulozi dokumenta** (kao Sokrat Study): `product/` ŠTO · `plan/` ŠTO SADA (najviše **jedan**
-aktivni spec + ROADMAP; danas samo ROADMAP — nema aktivnog speca) · `architecture/` **ŠTO JE IZGRAĐENO**
+aktivni spec + ROADMAP; danas nema speca, samo plan zakrpe 1.0.1) · `architecture/` **ŠTO JE IZGRAĐENO**
 (`docs/architecture/ARCHITECTURE.md` — granice crateova, tok podataka, sva polja profila, formati
 `.sokratis/*.json`, izlazni kodovi) · `workflow/` KAKO RADIMO · `records/` POVIJEST ·
 `archive/` ispunjeni specovi i planovi — oboje **nikad izvor istine**. Ne traži fajlove napamet — otvori indeks.

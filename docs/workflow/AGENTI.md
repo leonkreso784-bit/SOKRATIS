@@ -3,7 +3,7 @@
 > Leon (2026-09-17): *„kreirat nekoliko agenata da se sustavno radi na cijelom projektu… više agenata
 > na više branča a ti ih kontroliraš i nadzireš."* Ovo je protokol. Definicije agenata su u
 > `.claude/agents/*.md`, praćene u repou od 2026-09-18 (prije toga globalno git-ignorirane). Plan koji
-> izvode je aktivni plan cigli u `docs/archive/` — **danas ga nema**: planovi M1, M2 i 1.0.0
+> izvode je aktivni plan cigli — **danas `docs/plan/ZAKRPA_1_0_1.md`**; planovi M1, M2 i 1.0.0
 > su izvršeni i arhivirani u `docs/archive/`; plan M3 nastaje iz speca M3.
 
 ## 1 · Uloge
