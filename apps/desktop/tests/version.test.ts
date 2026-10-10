@@ -18,4 +18,13 @@ describe('verzija', () => {
     expect(b.active).toBe(true);
     expect(b.targets).toEqual(['nsis']);
   });
+  // Dopunjeno 1.0.1/T67: licence putuju uz instalater. Oblik mape (izvor → ime u mapi instalacije)
+  // jer bi niz putanja s `../` Tauri spremio pod `_up_/`, a LICENSE treba nastavak `.txt` za Windows.
+  it('instalater nosi THIRD-PARTY-NOTICES.txt i LICENSE.txt u mapu instalacije', () => {
+    const r = (conf as { bundle: { resources?: Record<string, string> } }).bundle.resources;
+    expect(r).toEqual({
+      '../../../THIRD-PARTY-NOTICES.txt': 'THIRD-PARTY-NOTICES.txt',
+      '../../../LICENSE': 'LICENSE.txt',
+    });
+  });
 });

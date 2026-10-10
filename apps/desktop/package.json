@@ -8,10 +8,12 @@
     "dev": "vite",
     "build": "vite build",
     "tauri": "tauri",
-    "check": "npm run check:svelte && npm run check:i18n && npm run check:contrast && npm run test",
+    "check": "npm run check:svelte && npm run check:i18n && npm run check:contrast && npm run notices:check && npm run test",
     "check:svelte": "svelte-check --tsconfig ./tsconfig.json",
     "check:i18n": "node scripts/check-i18n.mjs",
     "check:contrast": "node scripts/check-contrast.mjs",
+    "notices": "node scripts/notices-build.mjs",
+    "notices:check": "node scripts/notices-build.mjs --check",
     "test": "vitest run"
   },
   "dependencies": {
