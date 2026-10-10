@@ -8,12 +8,20 @@ export type Component = {
   version: string;
   license: string;
   files: LicenseFile[];
+  /** nositelji prava iz metapodataka paketa; ispisuju se uz komponentu koja posuđuje tekst */
+  holders?: string[];
 };
-export type NpmPackage = { name: string; version: string; path: string };
+export type BundledPackage = { name: string; path: string };
+export type Banner = { name: string; pattern: RegExp };
+export type Person = string | { name?: string; email?: string; url?: string };
+
+export const BANNERS: Banner[];
 
 export function isLicenseFile(name: string): boolean;
 export function normalizeSpdx(expr: string): string;
 export function normalizeText(text: string): string;
 export function parseCargoTree(stdout: string): string[];
-export function npmPackages(lock: { packages?: Record<string, { version?: string; dev?: boolean }> }): NpmPackage[];
+export function packagesFromSources(sources: string[]): BundledPackage[];
+export function packagesFromBanners(text: string): BundledPackage[];
+export function personNames(field: Person | Person[] | null | undefined): string[];
 export function renderNotices(components: Component[]): string;

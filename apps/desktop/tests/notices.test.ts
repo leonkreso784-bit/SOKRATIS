@@ -8,8 +8,11 @@ import {
   isLicenseFile,
   normalizeSpdx,
   normalizeText,
-  npmPackages,
+  BANNERS,
+  packagesFromBanners,
+  packagesFromSources,
   parseCargoTree,
+  personNames,
   renderNotices,
   type Component,
 } from '../scripts/notices.mjs';
@@ -70,9 +73,11 @@ describe('obavijesti o licencama — čiste funkcije', () => {
   it('komponenta bez vlastite datoteke dobiva uputu na tekst iste SPDX licence iz druge komponente', () => {
     const out = renderNotices([
       crate('davatelj', 'Apache-2.0 OR MIT', [{ name: 'LICENSE-MIT', text: MIT_A }, { name: 'LICENSE-APACHE', text: APACHE }]),
-      crate('bez-datoteke', 'MIT/Apache-2.0', []),
+      { ...crate('bez-datoteke', 'MIT/Apache-2.0', []), holders: ['Ivo Ivić', 'Ana Anić'] },
     ]);
-    expect(out).toContain('bez-datoteke 1.0.0 — MIT/Apache-2.0 (no licence file in the package; uses the licence text of davatelj 1.0.0)');
+    expect(out).toContain(
+      'bez-datoteke 1.0.0 — MIT/Apache-2.0 (no licence file in the package; licence terms as in the text of davatelj 1.0.0; copyright: Ivo Ivić, Ana Anić)',
+    );
     expect(out).toContain('Used by: bez-datoteke 1.0.0, davatelj 1.0.0');
   });
 
@@ -83,7 +88,10 @@ describe('obavijesti o licencama — čiste funkcije', () => {
       npm('@tauri-apps/api', [{ name: 'LICENSE_MIT', text: 'MIT License\n\nCopyright (c) Tauri' }]),
       npm('@tauri-apps/plugin-dialog', []),
     ]);
-    expect(out).toContain('@tauri-apps/plugin-dialog 2.0.0 — MIT OR Apache-2.0 (no licence file in the package; uses the licence text of @tauri-apps/api 2.0.0)');
+    // bez `holders` (ni autora u metapodacima) to se kaže izrijekom — ne izmišlja se nositelj prava
+    expect(out).toContain(
+      '@tauri-apps/plugin-dialog 2.0.0 — MIT OR Apache-2.0 (no licence file in the package; licence terms as in the text of @tauri-apps/api 2.0.0; copyright holders not stated in package metadata)',
+    );
   });
 
   it('komponenta bez datoteke i bez davatelja iste licence ruši izgradnju s njenim imenom', () => {
@@ -103,18 +111,35 @@ describe('obavijesti o licencama — čiste funkcije', () => {
     expect(parseCargoTree(stdout)).toEqual(['serde@1.0.228', 'serde_derive@1.0.228', 'sokratis-desktop@1.0.0']);
   });
 
-  it('package-lock: samo paketi bez dev: true, ime iz zadnjeg node_modules/ u ključu', () => {
-    const lock = {
-      packages: {
-        '': { name: 'sokratis-desktop', version: '1.0.0' },
-        'node_modules/@tauri-apps/api': { version: '2.11.1', license: 'Apache-2.0 OR MIT' },
-        'node_modules/vite': { version: '8.3.0', dev: true },
-        'node_modules/a/node_modules/b': { version: '0.1.0' },
-      },
-    };
-    expect(npmPackages(lock)).toEqual([
-      { name: '@tauri-apps/api', version: '2.11.1', path: 'node_modules/@tauri-apps/api' },
-      { name: 'b', version: '0.1.0', path: 'node_modules/a/node_modules/b' },
+  it('sourcemap: ime paketa iz node_modules/ (i @scope/ime, i ugniježđeni paket), vlastiti kod i virtualni moduli otpadaju', () => {
+    const sources = [
+      '../../../../Documents/x/apps/desktop/node_modules/svelte/src/internal/client/index.js',
+      '../../node_modules/svelte/src/index-client.js',
+      '../../node_modules/@tauri-apps/api/core.js',
+      '..\\..\\node_modules\\clsx\\dist\\clsx.mjs',
+      '../../node_modules/a/node_modules/b/x.js',
+      '../../src/main.ts',
+      '\0vite/preload-helper.js',
+    ];
+    expect(packagesFromSources(sources)).toEqual([
+      { name: '@tauri-apps/api', path: 'node_modules/@tauri-apps/api' },
+      { name: 'b', path: 'node_modules/a/node_modules/b' },
+      { name: 'clsx', path: 'node_modules/clsx' },
+      { name: 'svelte', path: 'node_modules/svelte' },
     ]);
+  });
+
+  it('banner u izgrađenom CSS-u imenuje paket koji sourcemap ne vidi (tailwindcss)', () => {
+    expect(BANNERS.map((b) => b.name)).toContain('tailwindcss');
+    const css = '/*! tailwindcss v4.3.3 | MIT License | https://tailwindcss.com */\n@layer theme;';
+    expect(packagesFromBanners(css)).toEqual([{ name: 'tailwindcss', path: 'node_modules/tailwindcss' }]);
+    expect(packagesFromBanners('/* tailwindcss bez uskličnika nije banner */ .a{}')).toEqual([]);
+  });
+
+  it('nositelji prava iz metapodataka: niz ili objekt, bez e-pošte i poveznice; ničega → prazno', () => {
+    expect(personNames('Ana Anić <ana@example.com> (https://example.com)')).toEqual(['Ana Anić']);
+    expect(personNames({ name: 'Ivo', email: 'ivo@example.com' })).toEqual(['Ivo']);
+    expect(personNames(['A <a@example.com>', { name: 'B' }, '', { email: 'samo@example.com' }])).toEqual(['A', 'B']);
+    expect(personNames(undefined)).toEqual([]);
   });
 });

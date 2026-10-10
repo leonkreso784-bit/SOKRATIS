@@ -1,7 +1,8 @@
 // ZAŠTO OVAKO (cigla 1.0.1/T67 — obavijesti o licencama, čiste funkcije)
-// Modul ne čita disk i ne zove procese: prima tekst (izlaz `cargo tree`, package-lock kao objekt,
-// već pročitane datoteke licence) i vraća tekst. Zato ga vitest mjeri bez carga i node_modules, a sav
-// I/O živi u `notices-build.mjs` — ista podjela kao `sokratis-core` / `sokratis-io` (S-002).
+// Modul ne čita disk i ne zove procese: prima tekst (izlaz `cargo tree`, `sources` iz sourcemapa
+// izgrađenog sučelja, izgrađeni CSS, već pročitane datoteke licence) i vraća tekst. Zato ga vitest
+// mjeri bez carga, Vitea i node_modules, a sav I/O živi u `notices-build.mjs` — ista podjela kao
+// `sokratis-core` / `sokratis-io` (S-002).
 // Isti tekst licence ide jednom: `Map` čiji je ključ tekst bez razlika u razmacima, a vrijednost
 // pamti sve komponente koje ga nose. Sortira se običnom usporedbom znakova (ne `localeCompare`),
 // jer bi jezik sustava inače mijenjao redoslijed — a `notices:check` traži isti izlaz na svakom stroju.
@@ -97,19 +98,63 @@ export function parseCargoTree(stdout) {
   return [...out].sort(compareText);
 }
 
-/** Paketi iz package-lock.json koji NISU `dev: true` (oni ulaze u izgrađeno sučelje); korijen `""` nije paket. */
-export function npmPackages(lock) {
-  const marker = 'node_modules/';
-  return Object.entries(lock?.packages ?? {})
-    .filter(([path, p]) => path !== '' && !p.dev)
-    .map(([path, p]) => ({ name: path.slice(path.lastIndexOf(marker) + marker.length), version: p.version, path }))
-    .sort((a, b) => compareText(a.path, b.path));
+const MARKER = 'node_modules/';
+
+/**
+ * Paketi čiji kod stoji u izgrađenom sučelju, iz polja `sources` njegovih sourcemapa: putanja do
+ * paketa je dio od prvog `node_modules/` do kraja imena (`@scope/ime` su dva dijela), ime je ono
+ * iza zadnjeg `node_modules/` (ugniježđena kopija paketa je zaseban paket). Vlastiti kod i Viteovi
+ * virtualni moduli (počinju znakom NUL) nemaju `node_modules/` pa otpadaju. Windowsova obrnuta kosa
+ * crta se prvo pretvara u `/`. Rezultat: `{ name, path }`, sortirano po putanji.
+ */
+export function packagesFromSources(sources) {
+  const byPath = new Map();
+  for (const raw of sources) {
+    const src = String(raw).replace(/\\/g, '/');
+    const first = src.indexOf(MARKER);
+    if (first < 0) continue;
+    const last = src.lastIndexOf(MARKER);
+    const parts = src.slice(last + MARKER.length).split('/');
+    const name = parts[0]?.startsWith('@') ? `${parts[0]}/${parts[1]}` : parts[0];
+    if (!name) continue;
+    const path = src.slice(first, last + MARKER.length) + name;
+    byPath.set(path, { name, path });
+  }
+  return [...byPath.values()].sort((a, b) => compareText(a.path, b.path));
+}
+
+/**
+ * Paketi koji u izgrađeni CSS ulaze bez sourcemape (Vite je za CSS ne piše): prepoznaju se po
+ * komentaru-banneru koji počinje sa „/*!" i koji sami ostavljaju u svom izlazu (npr.
+ * „/*! tailwindcss v4.3.3 | MIT License"). Novi paket ove vrste = novi redak ovdje.
+ */
+export const BANNERS = [{ name: 'tailwindcss', pattern: /\/\*!\s*tailwindcss v\d[^*]*\*\// }];
+
+export function packagesFromBanners(text) {
+  return BANNERS.filter((b) => b.pattern.test(String(text))).map((b) => ({ name: b.name, path: MARKER + b.name }));
+}
+
+/**
+ * Imena nositelja prava iz metapodataka paketa: Cargo `authors` (niz tekstova) ili npm `author` /
+ * `contributors` (tekst, objekt `{ name, email, url }` ili niz toga). E-pošta `<…>` i poveznica
+ * `(…)` otpadaju — obavijest imenuje nositelja, ne kontakt. Ničega → prazan niz.
+ */
+export function personNames(field) {
+  const list = Array.isArray(field) ? field : field == null ? [] : [field];
+  const names = [];
+  for (const p of list) {
+    const raw = typeof p === 'string' ? p : typeof p?.name === 'string' ? p.name : '';
+    const name = raw.replace(/<[^>]*>/g, '').replace(/\([^)]*\)/g, '').replace(/\s+/g, ' ').trim();
+    if (name && !names.includes(name)) names.push(name);
+  }
+  return names;
 }
 
 /**
  * Cijeli THIRD-PARTY-NOTICES.txt iz popisa komponenti. Komponenta bez vlastite datoteke licence
- * dobiva tekstove prve (po redoslijedu) komponente iste SPDX licence koja datoteku ima; ako takve
- * nema, funkcija baca grešku s imenima — tekst licence se ne izmišlja.
+ * dobiva tekstove komponente iste SPDX licence koja datoteku ima, a u popisu uz nju stoje njeni
+ * nositelji prava (`holders`, iz metapodataka paketa) — posuđeni tekst nosi tuđi redak „Copyright".
+ * Ako davatelja nema, funkcija baca grešku s imenima — tekst licence se ne izmišlja.
  */
 export function renderNotices(components) {
   const list = components.filter((c) => !c.name.startsWith(OWN_PREFIX)).sort(compareComponents);
@@ -158,7 +203,9 @@ export function renderNotices(components) {
 
   const line = (c) => {
     const donor = borrowedFrom.get(c);
-    const note = donor ? ` (no licence file in the package; uses the licence text of ${label(donor)})` : '';
+    if (!donor) return `  ${label(c)} — ${c.license}`;
+    const holders = c.holders?.length ? `copyright: ${c.holders.join(', ')}` : 'copyright holders not stated in package metadata';
+    const note = ` (no licence file in the package; licence terms as in the text of ${label(donor)}; ${holders})`;
     return `  ${label(c)} — ${c.license}${note}`;
   };
   const crates = list.filter((c) => c.kind === 'crate');
@@ -173,9 +220,10 @@ export function renderNotices(components) {
     'notices travel with every copy of Sokratis; this file carries them. Sokratis itself is',
     'licensed separately: see LICENSE.txt next to this file.',
     '',
-    'Generated by apps/desktop/scripts/notices-build.mjs (npm run notices) from Cargo.lock',
-    '(Rust crates compiled into Sokratis for x86_64-pc-windows-msvc) and package-lock.json',
-    '(npm packages bundled into its user interface). Do not edit by hand.',
+    'Generated by apps/desktop/scripts/notices-build.mjs (npm run notices). Rust crates: those',
+    'compiled into Sokratis for x86_64-pc-windows-msvc (cargo tree, Cargo.lock). npm packages: those',
+    'whose code is in the built user interface (its source maps and licence banners; versions from',
+    'package-lock.json). Do not edit by hand.',
     '',
     `Components: ${list.length} (Rust crates: ${crates.length}, npm packages: ${npm.length}). Licence texts: ${all.length}.`,
     '',
