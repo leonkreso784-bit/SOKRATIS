@@ -3,6 +3,12 @@
 //! vlasnik vektora (ova funkcija), više posudbi u nizu, nikad istodobno. `HashSet<&str>` nad
 //! putanjama daje O(1) provjeru „postoji li cilj poveznice" bez kopiranja stringova. Regexi su
 //! u `Patterns` (i konstantni), pa u ovoj datoteci nema ni jednog `expect()` (nalaz M6).
+//!
+//! ZAŠTO RUST OVAKO (cigla 1.0.2/T69 — zaglavlje plana)
+//! `plan_header(&str) -> &str` vraća REZ (`&content[..end]`) iste memorije, ne kopiju: nema
+//! `String`, nema alokacije. Rust iz potpisa sam zaključi (lifetime elision) da rez živi točno
+//! koliko i ulaz, pa ga ne može nadživjeti. `end` dolazi iz `find("\n## ")`, a `\n` je jedan bajt,
+//! zato je rez uvijek na granici znaka i ne može panicirati usred `⏸`.
 use crate::{DocFile, DocsHealth, Finding, Patterns, Profile};
 use std::collections::HashSet;
 
@@ -91,6 +97,19 @@ fn not_indexed(files: &[DocFile], p: &Profile, out: &mut Vec<Finding>) {
     }
 }
 
+/// Zaglavlje plana: tekst do prvog retka koji počinje s `## ` (bez tog retka), ili cijela datoteka
+/// ako takvog retka nema. Status plana („PAUZIRAN") vrijedi samo ovdje — isto slovo u tijelu
+/// (povijest, primjer) ne pauzira plan.
+fn plan_header(content: &str) -> &str {
+    if content.starts_with("## ") {
+        return "";
+    }
+    match content.find("\n## ") {
+        Some(end) => &content[..end],
+        None => content,
+    }
+}
+
 fn active_plans(files: &[DocFile], p: &Profile, pat: &Patterns, out: &mut Vec<Finding>) {
     let prefix = format!("{}/", p.plan_dir);
     let specs: Vec<&DocFile> = files
@@ -108,7 +127,7 @@ fn active_plans(files: &[DocFile], p: &Profile, pat: &Patterns, out: &mut Vec<Fi
     }
     let active: Vec<&str> = specs
         .iter()
-        .filter(|f| !pat.paused.is_match(&f.content))
+        .filter(|f| !pat.paused.is_match(plan_header(&f.content)))
         .map(|f| f.path.as_str())
         .collect();
     if active.len() > 1 {
@@ -319,6 +338,87 @@ mod tests {
             .unwrap();
         assert!(b.message.contains("5 B"), "mjeri se bez CR: {}", b.message);
         assert_eq!(h.lag_days, None);
+    }
+
+    /// Pomoćnik za T69: dva plana — `A.md` s danim sadržajem i `B.md` koji je sigurno aktivan.
+    /// Vraća provjere koje je ocjena javila o planovima.
+    fn plan_checks(a_content: &str) -> Vec<String> {
+        let p = Profile::default();
+        let pat = Patterns::compile(&p).unwrap();
+        let files = vec![
+            f("docs/README.md", "plan/A.md plan/B.md", None),
+            f("docs/plan/A.md", a_content, None),
+            f("docs/plan/B.md", "# B\n\n**Status:** AKTIVAN", None),
+        ];
+        let h = docs_health(&files, None, &p, &pat).unwrap();
+        h.findings
+            .into_iter()
+            .map(|x| x.check)
+            .filter(|c| c.ends_with("active-plan") || c.ends_with("active-plans"))
+            .collect()
+    }
+
+    #[test]
+    fn paused_status_under_title_and_blank_line_is_paused() {
+        let a = "# Plan A\n\n**Status:** ⏸️ PAUZIRAN — čeka B\n\n## Cigle\n\nnešto";
+        assert_eq!(plan_checks(a), Vec::<String>::new());
+    }
+
+    #[test]
+    fn paused_status_with_crlf_under_title_is_paused() {
+        let a = "# Plan A\r\n\r\n**Status:** ⏸️ PAUZIRAN\r\n\r\n## Cigle\r\n";
+        assert_eq!(plan_checks(a), Vec::<String>::new());
+    }
+
+    #[test]
+    fn paused_word_only_in_body_below_first_h2_keeps_plan_active() {
+        let a =
+            "# Plan A\n\n**Status:** AKTIVAN\n\n## Povijest\n\n**Status:** ⏸️ PAUZIRAN bio jednom";
+        assert_eq!(plan_checks(a), vec!["multiple-active-plans".to_string()]);
+    }
+
+    #[test]
+    fn pause_symbol_without_variation_selector_is_paused() {
+        // `⏸` bez nevidljivog U+FE0F iza (neki uređivači ga ne upišu).
+        let a = "# Plan A\n\n**Status:** \u{23F8} PAUZIRAN\n";
+        assert!(!a.contains('\u{FE0F}'));
+        assert_eq!(plan_checks(a), Vec::<String>::new());
+    }
+
+    #[test]
+    fn custom_paused_marker_applies_to_header_only() {
+        let p = Profile {
+            paused_marker: r"(?m)^STOP$".into(),
+            ..Profile::default()
+        };
+        let pat = Patterns::compile(&p).unwrap();
+        let files = vec![
+            f("docs/README.md", "plan/A.md plan/B.md", None),
+            f("docs/plan/A.md", "# A\nSTOP\n## x", None),
+            f("docs/plan/B.md", "# B\n## x\nSTOP", None),
+        ];
+        let h = docs_health(&files, None, &p, &pat).unwrap();
+        // A je pauziran (STOP u zaglavlju), B aktivan (STOP ispod `## `) → nema nalaza o planovima.
+        assert!(
+            !h.findings
+                .iter()
+                .any(|x| x.check.ends_with("active-plan") || x.check.ends_with("active-plans")),
+            "{:?}",
+            h.findings
+        );
+        let files_both_body = vec![
+            f("docs/README.md", "plan/A.md plan/B.md", None),
+            f("docs/plan/A.md", "# A\n## x\nSTOP", None),
+            f("docs/plan/B.md", "# B\n## x\nSTOP", None),
+        ];
+        let h = docs_health(&files_both_body, None, &p, &pat).unwrap();
+        assert!(
+            h.findings
+                .iter()
+                .any(|x| x.check == "multiple-active-plans"),
+            "{:?}",
+            h.findings
+        );
     }
 
     #[test]

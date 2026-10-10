@@ -82,6 +82,9 @@ pub struct Profile {
     pub docs_index: String,
     pub plan_dir: String,
     pub plan_dir_ignore: Vec<String>,
+    /// Regex koji plan u `plan_dir` proglasi PAUZIRANIM. Traži se samo u ZAGLAVLJU plana (tekst
+    /// do prvog retka koji počinje s `## `), pa „PAUZIRAN" u tijelu plana ne pauzira. Zadano: redak
+    /// `**Status:** ⏸ PAUZIRAN` bilo gdje u zaglavlju (`(?m)`), znak `⏸` sa ili bez nevidljivog U+FE0F.
     pub paused_marker: String,
     pub product_dir: String,
     pub key_file: String,
@@ -129,7 +132,7 @@ impl Default for Profile {
             docs_index: "docs/README.md".into(),
             plan_dir: "docs/plan".into(),
             plan_dir_ignore: vec!["ROADMAP.md".into()],
-            paused_marker: r"^\s*\*\*Status:\*\*\s*⏸️\s*PAUZIRAN\b".into(),
+            paused_marker: r"(?m)^\s*\*\*Status:\*\*\s*⏸\x{FE0F}?\s*PAUZIRAN\b".into(),
             product_dir: "docs/product".into(),
             key_file: "CLAUDE.md".into(),
             key_file_budget_bytes: 40_000,
