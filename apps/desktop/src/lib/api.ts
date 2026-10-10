@@ -9,7 +9,10 @@
 // dobije `MockApi`, jer ovaj modul konstruira `api` ODMAH pri uvozu (zadnji redak datoteke).
 // Dopunjeno M2/38 — `TauriApi.setSetting` pretvara `boolean` u `"on"`/`"off"` PO TIPU, ne po ključu:
 // `motion` je isti slučaj kao `autostart`, jedan mehanizam za oba (S-010).
+// `appVersion`: Tauri verziju čita iz `Cargo.toml` (jedini izvor, `tests/version.test.ts`), a mock
+// iz `package.json`, koji je njegovo zrcalo — named import `{ version }` uvozi samo to polje, ne cijelu datoteku.
 import snapRaw from '../../../../crates/sokratis-core/tests/snapshots/snapshot__report-sokratstudy-2026-09-17.snap?raw';
+import { getVersion } from '@tauri-apps/api/app';
 import { invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import type {
@@ -26,6 +29,7 @@ import type {
   VisionTotal,
   WorkKind,
 } from './types';
+import { version as packageVersion } from '../../package.json';
 
 // Insta piše YAML-zaglavlje omeđeno retkom `---` na vrhu i na dnu zaglavlja, a JSON počinje odmah
 // iza drugog `---`. Prvi `indexOf` preskače početni redak, drugi traži redak koji zatvara zaglavlje.
@@ -52,6 +56,8 @@ export interface Api {
   /** X na prozoru (S-036): Rust `prevent_close` + `close_requested` → sučelje pita → `quit()` gasi proces. */
   quit(): Promise<void>;
   onCloseRequested(cb: () => void): () => void;
+  /** Verzija aplikacije za odjeljak „O aplikaciji" u Postavkama. */
+  appVersion(): Promise<string>;
 }
 
 const MOCK_PROJECT_ID = 1;
@@ -197,6 +203,10 @@ export class MockApi implements Api {
     return () => {};
   }
 
+  async appVersion(): Promise<string> {
+    return packageVersion;
+  }
+
   // ── pomoćne metode — rastavljaju brifov zgusnuti zapis u čitljive korake, ponašanje isto ──
 
   private commitsWithOverrides(): CommitRow[] {
@@ -334,6 +344,12 @@ export class TauriApi implements Api {
   onCloseRequested(cb: () => void): () => void {
     const pending = listen<null>('close_requested', () => cb());
     return deferredUnlisten(pending);
+  }
+
+  // Ne ide kroz `invoke` naše naredbe: `getVersion` zove Tauriju ugrađenu `plugin:app|version`,
+  // koju dopušta `core:default` (preko `core:app:default` → `core:app:allow-version`).
+  async appVersion(): Promise<string> {
+    return getVersion();
   }
 }
 

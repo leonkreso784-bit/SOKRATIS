@@ -20,6 +20,12 @@ describe('i18n', () => {
       expect(params((hr as Record<string, string>)[k]!), k).toEqual(params((en as Record<string, string>)[k]!));
     }
   });
+  // Jedina dodirna točka s tokom OBAVIJESTI (plan zakrpe 1.0.1): Postavke imenuju datoteku koju
+  // instalater stavlja u mapu instalacije — ime je fiksno i mora biti isto u oba jezika.
+  it('settings.about.notices imenuje THIRD-PARTY-NOTICES.txt u oba rječnika', () => {
+    expect(hr['settings.about.notices']).toContain('THIRD-PARTY-NOTICES.txt');
+    expect(en['settings.about.notices']).toContain('THIRD-PARTY-NOTICES.txt');
+  });
   it('translate zamjenjuje parametre i ne skriva nepoznat ključ', () => {
     expect(translate({ 'x.y': 'prije {n} h' }, 'x.y', { n: 2 })).toBe('prije 2 h');
     expect(translate({}, 'nema.toga')).toBe('nema.toga');

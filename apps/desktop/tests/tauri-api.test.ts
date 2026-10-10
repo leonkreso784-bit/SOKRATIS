@@ -1,7 +1,7 @@
 // ZAŠTO OVAKO (cigla M2/34 — TauriApi testiran bez Taurija i bez DOM-a; dopunjeno M2/38 — test za
 // `setSetting` sad tvrdi i `motion`, PO TIPU vrijednosti, ne po ključu)
-// `vi.mock` zamjenjuje `@tauri-apps/api/core`/`event` lažnim `invoke`/`listen` PRIJE nego se `api.ts`
-// uveze; `vi.hoisted` diže `invokeMock`/`listenMock` iznad `vi.mock` poziva jer Vitest sam diže
+// `vi.mock` zamjenjuje `@tauri-apps/api/core`/`event`/`app` lažnim `invoke`/`listen`/`getVersion` PRIJE
+// nego se `api.ts` uveze; `vi.hoisted` diže lažne funkcije iznad `vi.mock` poziva jer Vitest sam diže
 // `vi.mock` na vrh datoteke (obični `const` bi ondje inače bio nedostupan). Testovi provjeravaju SAMO
 // ugovor prema `commands.rs` (ime naredbe, imena argumenata, oblik tereta događaja) — pravu IPC vezu
 // nad pravim prozorom provjerava ručna lista izvan vitesta (T34-dopuna, Korak 2).
@@ -9,13 +9,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { UnlistenFn } from '@tauri-apps/api/event';
 import type { Report } from '../src/lib/types';
 
-const { invokeMock, listenMock } = vi.hoisted(() => ({
+const { invokeMock, listenMock, getVersionMock } = vi.hoisted(() => ({
   invokeMock: vi.fn(),
   listenMock: vi.fn(),
+  getVersionMock: vi.fn(),
 }));
 
 vi.mock('@tauri-apps/api/core', () => ({ invoke: invokeMock }));
 vi.mock('@tauri-apps/api/event', () => ({ listen: listenMock }));
+vi.mock('@tauri-apps/api/app', () => ({ getVersion: getVersionMock }));
 
 import { createApi, MockApi, TauriApi } from '../src/lib/api';
 import { api } from '../src/lib/api';
@@ -24,6 +26,7 @@ import { app, dismissError, loadReport } from '../src/lib/state.svelte';
 beforeEach(() => {
   invokeMock.mockReset();
   listenMock.mockReset();
+  getVersionMock.mockReset();
 });
 
 describe('TauriApi — ugovor prema commands.rs', () => {
@@ -130,6 +133,14 @@ describe('TauriApi — ugovor prema commands.rs', () => {
     });
     handler?.({ payload: { project_id: 5, rule: 'unmerged-branches', severity: 'alert' } });
     expect(received).toEqual({ project_id: 5, rule: 'unmerged-branches', severity: 'alert' });
+  });
+
+  it('appVersion prosljeđuje getVersion iz @tauri-apps/api/app (Tauri čita verziju iz Cargo.toml)', async () => {
+    getVersionMock.mockResolvedValue('9.8.7');
+    const t = new TauriApi();
+    expect(await t.appVersion()).toBe('9.8.7');
+    expect(getVersionMock).toHaveBeenCalledTimes(1);
+    expect(invokeMock).not.toHaveBeenCalled();
   });
 
   it('quit zove naredbu quit bez argumenata', async () => {
