@@ -47,6 +47,10 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
+    "resources": {
+      "../../../THIRD-PARTY-NOTICES.txt": "THIRD-PARTY-NOTICES.txt",
+      "../../../LICENSE": "LICENSE.txt"
+    },
     "windows": {
       "nsis": {
         "installMode": "currentUser"
