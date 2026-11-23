@@ -1474,4 +1474,9 @@ Leon je dao OK za izdanje i odlučio da Windows instalater gradi GitHub Actions 
 Verzija 1.0.2 (`Cargo.toml` izvor, zrcala `package.json`/`package-lock.json`, `cargo update -w --offline`),
 `npm run notices` bez promjene, CHANGELOG `[1.0.2]`, plan zakrpe arhiviran, aktivan plan je `MACOS.md`.
 Nov `.github/workflows/release.yml`: na tag `v*` Windows runner gradi instalater i priloži ga nacrtu izdanja;
-orkestrator piše bilješke i objavljuje. Ishod gradnje i sha256: bilješke izdanja `v1.0.2` na GitHubu.
+orkestrator piše bilješke i objavljuje. Ishod: run `45177126154` ✅ (9 min 26 s), brane `45177120013` ✅;
+`Sokratis_1.0.2_x64-setup.exe` 3 773 178 bajtova, sha256 `a91b9785…1a442` — preuzet i provjeren na Macu (PE32,
+Nullsoft). Izdanje objavljeno 2026-11-23 12:58 UTC kao Latest; `notify-sokrat-dev.yml` prošao (7 s).
+
+**Što slijedi:** plan `MACOS.md` Faza 2 (T77 baza u `~/Library/Application Support`, T78 `joinRepoPath`, T79
+natpis autostarta, uvjetno T80/T81), zatim Faza 3 (T82 `.app`/`.dmg`, T87 licence po platformi, T83 mjerenje).
