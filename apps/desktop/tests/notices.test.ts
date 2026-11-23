@@ -14,6 +14,7 @@ import {
   parseCargoTree,
   personNames,
   renderNotices,
+  targetCrates,
   type Component,
 } from '../scripts/notices.mjs';
 
@@ -113,6 +114,26 @@ describe('obavijesti o licencama — čiste funkcije', () => {
   it('cargo tree: jedinstveni name@version, bez (*), (proc-macro) i putanje', () => {
     const stdout = 'sokratis-desktop v1.0.0 (C:\\x\\src-tauri)\nserde v1.0.228\nserde_derive v1.0.228 (proc-macro)\nserde v1.0.228 (*)\n\n';
     expect(parseCargoTree(stdout)).toEqual(['serde@1.0.228', 'serde_derive@1.0.228', 'sokratis-desktop@1.0.0']);
+  });
+
+  it('cilj: crate samo-domaćina (ovisnost proc-makroa, npr. swift-rs na Macu) otpada', () => {
+    const tree = ['base64@0.21.7', 'serde@1.0.228', 'swift-rs@1.0.7'];
+    const metadata = new Set(['serde@1.0.228', 'windows-sys@0.59.0']);
+    expect(targetCrates(tree, metadata)).toEqual(['serde@1.0.228']);
+  });
+
+  it('cilj: crate prisutan i u stablu i u metapodacima cilja ostaje; višak metapodataka ne ulazi', () => {
+    const tree = ['serde@1.0.228', 'serde_derive@1.0.228'];
+    const metadata = ['serde_derive@1.0.228', 'serde@1.0.228', 'nekoristen@2.0.0'];
+    expect(targetCrates(tree, metadata)).toEqual(['serde@1.0.228', 'serde_derive@1.0.228']);
+  });
+
+  it('cilj: izlaz je sortiran kao parseCargoTree i ne ovisi o poretku ulaza', () => {
+    const metadata = new Set(['Zeta@1.0.0', 'alfa@1.0.0', 'beta@0.10.0', 'beta@0.2.0']);
+    const a = targetCrates(['beta@0.2.0', 'alfa@1.0.0', 'Zeta@1.0.0', 'beta@0.10.0', 'alfa@1.0.0'], metadata);
+    const b = targetCrates(['beta@0.10.0', 'Zeta@1.0.0', 'beta@0.2.0', 'alfa@1.0.0'], [...metadata].reverse());
+    expect(a).toEqual(['Zeta@1.0.0', 'alfa@1.0.0', 'beta@0.10.0', 'beta@0.2.0']);
+    expect(b).toEqual(a);
   });
 
   it('sourcemap: ime paketa iz node_modules/ (i @scope/ime, i ugniježđeni paket), vlastiti kod i virtualni moduli otpadaju', () => {
