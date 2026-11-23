@@ -11,7 +11,11 @@
 // `THIRD-PARTY-NOTICES.txt` stavlja Mac popis. `LICENSE` se nasljeđuje iz glavne datoteke.
 // (cigla mac/T88 — ad-hoc potpis, S-043 O3) `signingIdentity: "-"` tjera Tauri da ad-hoc potpiše CIJELI
 // `.app` (Info.plist vezan, resursi zapečaćeni, identitet `dev.sokratis.desktop`), a ne samo Mach-O
-// linkerom — o tom identitetu macOS vodi TCC dopuštenja i obavijesti. Windows datoteka to polje nema.
+// linkerom. Uz bundle id `dev.sokratis.desktop` macOS veže obavijesti; TCC (pristup mapama) kod ad-hoc
+// potpisa veže dopuštenje uz cdhash (`codesign -d -r-` → `designated => cdhash H"…"`), pa se ono
+// vjerojatno traži ponovno nakon svakog builda. Uz `signingIdentity` Tauri sam uključuje hardened runtime
+// (`hardened_runtime` je u tauri-utils zadano true), bez entitlementa. Glavni `tauri.conf.json` je
+// zajednička osnova (Windows ga koristi bez Mac zakrpe), pa to polje nema.
 import { describe, expect, it } from 'vitest';
 import cargo from '../../../Cargo.toml?raw';
 import pkg from '../package.json';
