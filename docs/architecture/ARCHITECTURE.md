@@ -63,7 +63,8 @@ razvoj time ne dira pravu bazu. **CLI ne ovisi o `sokratis-store`** i bazu ne st
 
 **Instalater** (S-029): `npm run tauri build` u `apps/desktop` gradi NSIS instalater
 (`src-tauri/tauri.conf.json`: `bundle.targets = ["nsis"]`, `installMode: "currentUser"`, nepotpisan) u
-`target/release/bundle/nsis/`. Broj verzije ima jedan izvor, `[workspace.package] version` u korijenskom
+`target/release/bundle/nsis/`; za izdanje ga od 1.0.2 gradi `.github/workflows/release.yml` na Windows runneru (§12).
+Broj verzije ima jedan izvor, `[workspace.package] version` u korijenskom
 `Cargo.toml`; `apps/desktop/package.json` ga zrcali, a `tauri.conf.json` polje `version` nema (test
 `apps/desktop/tests/version.test.ts`).
 
@@ -705,7 +706,10 @@ preskok splasha, `prefers-reduced-motion`, četiri teme): [`TESTING.md`](../work
 
 ## 12 · Izvan crateova: GitHub Actions
 
-Dva workflowa. **`.github/workflows/gates.yml`** (mac/T85, S-043): na svaki push u `main` i pull request
+Tri workflowa. **`.github/workflows/release.yml`** (1.0.2/T73): na push taga `v*` Windows runner gradi NSIS
+instalater (`npm run tauri build`) i priloži ga **nacrtu** izdanja (veličina i sha256 u bilješci); bilješke
+piše i izdanje objavljuje orkestrator — objava okida `notify-sokrat-dev.yml`, pa instalater mora već biti tu.
+**`.github/workflows/gates.yml`** (mac/T85, S-043): na svaki push u `main` i pull request
 vrti pune brane (`cargo fmt --check` · `clippy --all-targets -D warnings` · `cargo test` · `npm run check`)
 na `macos-latest` i `windows-latest`; prije njih `npm run build` (desktop crate traži `dist/`) i `cargo fetch`
 (za `notices:check`). Toolchain čita iz `rust-toolchain.toml`.
@@ -716,4 +720,4 @@ repozitorija `SOKRAT_DEV_DEPLOY_HOOK` (deploy hook stranice sokrat.dev), da stra
 izdanja. **Bez postavljene tajne** workflow ispiše upozorenje i završi uspješno — izdanje ne pada.
 Stanje 2026-10-10: tajna **nije postavljena** (`gh secret list` prazan); postavlja je Leon.
 
-Taj workflow **ne gradi i ne testira** Sokratis; to radi `gates.yml`. Instalater se i dalje gradi lokalno.
+Taj workflow **ne gradi i ne testira** Sokratis; to rade `gates.yml` i `release.yml`.

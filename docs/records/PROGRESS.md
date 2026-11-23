@@ -1369,7 +1369,7 @@ na GitHubu (opis: [`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §12), do
   prvom retku se prepozna; poveznica u inline kodu i u `~~~` bloku daje `dead-link`; mrtva slika `.png`
   se ne javlja; kazne se zbrajaju bez granice; izvor mjerenja (vodeće stablo, S-033) se nigdje ne vidi.
   **Leonova odluka:** zakrpa 1.0.2 = pauzirani plan + primjeri u kodu + izvor mjerenja
-  ([`../plan/ZAKRPA_1_0_2.md`](../plan/ZAKRPA_1_0_2.md)); ostalo, uključujući branu repoa kao izvor
+  ([`../archive/2026-11-23-zakrpa-1-0-2.md`](../archive/2026-11-23-zakrpa-1-0-2.md)); ostalo, uključujući branu repoa kao izvor
   (`docs_gate`, kandidat otvoren), u [`BACKLOG.md`](./BACKLOG.md) za M3.
 
 ### Što slijedi
@@ -1468,3 +1468,10 @@ potvrdio i Fazu 1 (mac/T74–T76), koja je dotad bila provjerena samo na Macu.
 **T73 — izdanje 1.0.2:** tag `v1.0.2` traži Leonov OK. **Otvoreno za Leona:** Windows NSIS instalater ne
 može se graditi na Macu — Windows stroj ili build u CI-ju? Zatim Faze 2–5 plana
 [`../plan/MACOS.md`](../plan/MACOS.md).
+
+### Izdanje 1.0.2 (T73, isti dan)
+Leon je dao OK za izdanje i odlučio da Windows instalater gradi GitHub Actions (na Macu se NSIS ne gradi).
+Verzija 1.0.2 (`Cargo.toml` izvor, zrcala `package.json`/`package-lock.json`, `cargo update -w --offline`),
+`npm run notices` bez promjene, CHANGELOG `[1.0.2]`, plan zakrpe arhiviran, aktivan plan je `MACOS.md`.
+Nov `.github/workflows/release.yml`: na tag `v*` Windows runner gradi instalater i priloži ga nacrtu izdanja;
+orkestrator piše bilješke i objavljuje. Ishod gradnje i sha256: bilješke izdanja `v1.0.2` na GitHubu.

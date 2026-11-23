@@ -5,8 +5,13 @@ Isporuka = ono što je u `main`-u; sesije su u `PROGRESS.md`.
 
 ## [Unreleased]
 
-Zakrpa 1.0.2 u izvedbi ([`../plan/ZAKRPA_1_0_2.md`](../plan/ZAKRPA_1_0_2.md)); Faza 1 plana
-[`../plan/MACOS.md`](../plan/MACOS.md) i CI (mac/T85).
+Ništa još.
+
+## [1.0.2] — 2026-11-23 — zakrpa
+
+Plan [`../archive/2026-11-23-zakrpa-1-0-2.md`](../archive/2026-11-23-zakrpa-1-0-2.md) (T69–T73); uz nju Faza 1
+plana [`../plan/MACOS.md`](../plan/MACOS.md) i CI (mac/T85). Prvo izdanje čiji Windows instalater gradi
+GitHub Actions (`.github/workflows/release.yml`), jer se razvija na Macu.
 
 ### Što korisnik dobiva
 

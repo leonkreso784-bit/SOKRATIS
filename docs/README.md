@@ -57,13 +57,12 @@ redak u backlogu.
 ## `plan/` — što sada
 
 **Između milestonea** (od izdanja 1.0.0, 2026-09-28): nema aktivnog speca; spec M3 nastaje kad M3 krene.
-Aktivan je plan zakrpe 1.0.2 (bez speca). Gdje smo i što je sljedeće kaže ROADMAP („Gdje smo“), ne ovaj indeks.
+Aktivan je plan macOS (bez speca, odluke S-043). Gdje smo i što je sljedeće kaže ROADMAP („Gdje smo“), ne ovaj indeks.
 
 | Dokument | Svrha |
 |---|---|
 | [ROADMAP.md](./plan/ROADMAP.md) | 🟩 **živ** — milestonei M0–M4, status, što je sljedeće |
-| [ZAKRPA_1_0_2.md](./plan/ZAKRPA_1_0_2.md) | 📋 **aktivan** — plan cigli T69–T73 (pauzirani plan, primjeri poveznica u kodu, izvor mjerenja dokumentacije) |
-| [MACOS.md](./plan/MACOS.md) | ⏸️ **pauziran** (Faza 1 izvedena, ostalo čeka Leonove odluke O1–O7) — Sokratis na macOS-u: izmjereni nalazi, odluke O1–O7, cigle T74–T86 |
+| [MACOS.md](./plan/MACOS.md) | 📋 **aktivan** — Sokratis na macOS-u (odluke S-043; Faza 1 i CI gotovi, slijede Faze 2–5): izmjereni nalazi, odluke O1–O7, cigle T74–T86 |
 
 ## `architecture/` — što je izgrađeno
 
@@ -102,4 +101,5 @@ Aktivan je plan zakrpe 1.0.2 (bez speca). Gdje smo i što je sljedeće kaže ROA
 | [2026-09-17-m1-jezgra-i-cli.md](./archive/2026-09-17-m1-jezgra-i-cli.md) | ✅ IZVRŠEN — plan cigli M1: 22 cigle u 8 tokova, testovi i kod po koraku, vlasništvo datoteka po toku |
 | [2026-09-18-m2-desktop.md](./archive/2026-09-18-m2-desktop.md) | ✅ IZVRŠEN — plan cigli M2 (T1–T43) iz speca `ARHITEKTURA_M2.md`, uključujući rez za 1.0.0 (T36–T43) |
 | [2026-09-24-1-0-0-grane-i-ploca.md](./archive/2026-09-24-1-0-0-grane-i-ploca.md) | ✅ IZVRŠEN — plan cigli drugog reza T44–T64 u 7 tokova (DESKTOP-2 · JEZGRA-2 · IO-2 · GRAFOVI · PLOČA · LANCI · IZDANJE), iz speca `ARHITEKTURA_1_0.md` |
+| [2026-11-23-zakrpa-1-0-2.md](./archive/2026-11-23-zakrpa-1-0-2.md) | ✅ IZVRŠEN — plan cigli zakrpe 1.0.2, T69–T73 (pauzirani plan, primjeri poveznica u kodu, izvor mjerenja dokumentacije) + izdanje, bez speca |
 | [2026-10-10-zakrpa-1-0-1.md](./archive/2026-10-10-zakrpa-1-0-1.md) | ✅ IZVRŠEN — plan cigli zakrpe 1.0.1, T65–T68 u 2 toka (SUČELJE-3 · OBAVIJESTI) + izdanje, bez speca |

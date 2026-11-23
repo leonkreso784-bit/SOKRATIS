@@ -1,0 +1,52 @@
+# Windows instalater izdanja (1.0.2/T73, S-043): Leon razvija na Macu, a NSIS instalater (S-029) se gradi
+# samo na Windowsu — zato ga gradi ovaj runner, iz točno onog commita koji nosi tag. Workflow stvara NACRT
+# izdanja s priloženim instalaterom; bilješke piše i izdanje objavljuje orkestrator (`gh release edit
+# --draft=false`) tek nakon provjere — objava okida `notify-sokrat-dev.yml`, pa instalater mora već biti tu.
+name: Izdanje
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  windows-installer:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/desktop/package-lock.json
+
+      - name: npm ci
+        working-directory: apps/desktop
+        run: npm ci
+
+      # `beforeBuildCommand` (npm run build) gradi sučelje; bundle-cilj je NSIS iz `tauri.conf.json`.
+      - name: tauri build
+        working-directory: apps/desktop
+        run: npm run tauri build
+
+      - name: nacrt izdanja s instalaterom
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          VERSION="${TAG#v}"
+          FILE="target/release/bundle/nsis/Sokratis_${VERSION}_x64-setup.exe"
+          test -f "$FILE" || { echo "::error::nema $FILE"; ls target/release/bundle/nsis; exit 1; }
+          SIZE=$(stat -c %s "$FILE")
+          SHA=$(sha256sum "$FILE" | cut -d' ' -f1)
+          echo "instalater: $FILE · $SIZE bajtova · sha256 $SHA" | tee -a "$GITHUB_STEP_SUMMARY"
+          NOTES="Nacrt: instalater je izgrađen na GitHub Actions (windows-latest) iz taga $TAG. File: \`$(basename "$FILE")\` · $SIZE bytes · sha256 \`$SHA\`"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$FILE" --clobber
+          else
+            gh release create "$TAG" "$FILE" --draft --verify-tag --title "Sokratis $VERSION" --notes "$NOTES"
+          fi

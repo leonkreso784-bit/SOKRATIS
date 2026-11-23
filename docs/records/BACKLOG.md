@@ -185,7 +185,7 @@ nalazi koje zakrpa nije uzela. Kandidati za M3, nijedan ne mijenja brojke ni sad
 
 Druga sesija nad Leonovim drugim projektom (ime se ne piše u javni repo) pročitala je `core/src/docs.rs` i
 `core/src/profile.rs`; tvrdnje su izmjerene (`PROGRESS.md`, unos 2026-10-10). Kvarovi koji ne mijenjaju
-značenje ocjene idu u zakrpu 1.0.2 ([`../plan/ZAKRPA_1_0_2.md`](../plan/ZAKRPA_1_0_2.md)); ovdje je ostatak.
+značenje ocjene idu u zakrpu 1.0.2 ([`../archive/2026-11-23-zakrpa-1-0-2.md`](../archive/2026-11-23-zakrpa-1-0-2.md)); ovdje je ostatak.
 
 | stavka | bilješka |
 |---|---|

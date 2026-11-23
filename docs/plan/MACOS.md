@@ -1,9 +1,9 @@
 # Sokratis na macOS-u — plan cigli
 
-**Status:** ⏸️ PAUZIRAN — Leon je odlučio O1–O7 (S-043); po O5 prvo se dovršava zakrpa 1.0.2, a CI (T85) ide odmah. Napisan 2026-11-23 nakon pregleda cijelog
-projekta na MacBooku; Faza 1 (T74–T76) ne ovisi o §1 i izvedena je, Faze 2–5 se ne izvode dok Leon ne
-odluči. Aktivan plan je i dalje [`ZAKRPA_1_0_2.md`](./ZAKRPA_1_0_2.md). Numeracija nastavlja plan 1.0.2
-(zadnja cigla tamo je T73). Plan nije izvor istine: što je izgrađeno kaže
+**Status:** 📋 AKTIVAN — Leon je odlučio O1–O7 (S-043). Napisan 2026-11-23 nakon pregleda cijelog projekta na
+MacBooku; Faza 1 (T74–T76) i CI (T85) su izvedeni, zakrpa 1.0.2 je izdana (O5), pa slijede Faze 2–5 i
+izdanje 1.1.0. Numeracija nastavlja plan 1.0.2 ([`../archive/2026-11-23-zakrpa-1-0-2.md`](../archive/2026-11-23-zakrpa-1-0-2.md),
+zadnja cigla T73). Plan nije izvor istine: što je izgrađeno kaže
 [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md).
 
 **Cilj:** Sokratis se razvija, testira, gradi i koristi na Leonovu MacBooku (Apple Silicon, macOS 26),
