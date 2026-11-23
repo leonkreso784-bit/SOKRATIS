@@ -232,7 +232,10 @@ HEAD-u, ne nužno glavno; `worktrees_by_recency()` sortira sva stabla silazno po
 DISKA (necommitani unos vidljiv), redom od vodećeg prema starijima; plan, `docs()` (`docs_in(&lead.
 root, &lead.head)`) i `GitSource::last_changes(rev, pathspecs)` čitaju SAMO iz vodećeg stabla (`rev`
 je `"HEAD"` za glavno stablo ili puni SHA vodećeg radnog stabla — detached stablo tako ipak ima
-povijest). Ručni podaci se i dalje pišu SAMO u glavno stablo (S-015, nepromijenjeno).
+povijest). Ručni podaci se i dalje pišu SAMO u glavno stablo (S-015, nepromijenjeno). **Izvor se vidi** (zakrpa 1.0.2, T71): iz
+istog prvog stabla kao `lead` nastaje `ReportInput.docs_source` (`DocsSource`: putanja stabla, grana,
+puni SHA); granu `worktree_heads` čita iz retka `branch` istog `git worktree list --porcelain`, pa
+izvor ne košta nijedan git-proces više. Nema li popisa stabala, izvor je `None` (ne izmišlja se).
 
 **Nespojene grane su lanci, ne ravan popis** (T64, S-038, spec §1.4): `BranchInfo` dobiva `tip` (puni
 SHA vrha, `%(objectname)`) i `contained_in: Option<String>` (ime VRHA lanca koji tu granu sadrži;
@@ -255,7 +258,8 @@ tekst, docs, grane, ručni podaci, `now`, `today`, `since`, `until`, `branch`, `
 `commit_branches: HashMap<String, String>` — **od M2/46 (S-032)**, karta `sha → grana` SAMO za
 commite izvan zadane grane, prazna kad je `scope == DefaultBranch` — `worktrees: u32` te
 `branch_graph: String` — **od T64 (S-038)**, tekst `%H|%P` za sadržanost lanaca, prazan kad nema
-nespojene grane osim zadane) i vraća se jedna struktura (`Report`). Zato se jezgra testira bez gita, i
+nespojene grane osim zadane, te `docs_source: Option<DocsSource>` — **od T71**, jezgra ga samo
+prepiše u `Report`) i vraća se jedna struktura (`Report`). Zato se jezgra testira bez gita, i
 zato je CLI i desktop koriste bez ijedne izmjene (S-012).
 
 **Granica S-003:** git se čita **kroz proces**, ne kroz biblioteku. Poziv se gradi bez shella, kroz
@@ -326,10 +330,17 @@ gitov savjet o `--`. Paritet s `RAD.xlsx` ostaje test nad logom `main`-a (`scope
 
 ## 3 · Što `Report` nosi
 
-`core/src/model.rs`. Sedamnaest polja (**M2/46** dodala `scope`, `branches`): `generated_at` ·
-`since` · `until` · `branch` · `scope` · `touched` · `days` · `kinds` · `branches` · `commits` ·
-`deliveries` · `indicators` · `phases` · `visions` · `vision_totals` · `docs` (`null` kad projekt
-nema mapu s dokumentacijom — nula bi bila laž) · `signals`.
+`core/src/model.rs`. Osamnaest polja (**M2/46** dodala `scope`, `branches`; **T71** `docs_source`):
+`generated_at` · `since` · `until` · `branch` · `scope` · `touched` · `days` · `kinds` · `branches` ·
+`commits` · `deliveries` · `indicators` · `phases` · `visions` · `vision_totals` · `docs` (`null` kad
+projekt nema mapu s dokumentacijom — nula bi bila laž) · `signals` · `docs_source`.
+
+**`docs_source` (zakrpa 1.0.2, T71)** kaže iz kojeg je radnog stabla dokumentacija mjerena — vodećeg
+(S-033, §1): `DocsSource { worktree, branch: Option<String>, commit }` (`branch` `None` = detached
+HEAD, `commit` puni SHA). Puni ga `io`, jezgra ga klonira iz `ReportInput` (S-002); `docs.rs` i
+`DocsHealth` nisu dirani, zato polje stoji na `Report`-u, a ne u `DocsHealth`. `Option` i zadnje polje:
+JSON `Report`-a bez njega (zapis prije 1.0.2) čita se kao `None`. Ne ovisi o `docs` — `docs = null` uz
+poznat izvor je moguć. Sučelje ga prikazuje uz ocjenu na ploči (`DocsSection.svelte`).
 
 **Grane (M2/46, S-032, spec 1.0.0):** `scope: BranchScope` (`"all"`/`"default"`, `#[serde(rename)]`
 na varijanti; zadano `AllBranches` kroz `#[default]`) kaže koje je grane `io` obišao pri mjerenju;
@@ -573,8 +584,8 @@ radnog stabla — korijen se dobiva iz `git rev-parse --show-toplevel`.
 
 | naredba | ispis | izlazni kod |
 |---|---|---|
-| `sokratis report [putanja] [--since YYYY-MM-DD] [--until YYYY-MM-DD] [--scope all\|default] [--json\|--table]` | cijeli `Report`; **bez zastavice je JSON**, `--table` daje tablicu s hrvatskim natpisima (zaglavlje imenuje mjereni opseg i pokazuje `since`, ali ne `until` — §3, §11); `--scope` (M2/51) pregazi `profile.branch_scope` **u memoriji** (datoteka profila se ne dira), nepoznata vrijednost je pogrešna uporaba; zastavice su **isključive** (`--json --table` je pogrešna uporaba, ne „zadnja pobjeđuje") | 0 (`until < since` → prazan izvještaj, i dalje 0) |
-| `sokratis docs [putanja] [--json]` | ocjena, broj nalaza, kašnjenje; bez `docs_dir` poruka `docs: nema mape s dokumentacijom (n/a)` | 0 |
+| `sokratis report [putanja] [--since YYYY-MM-DD] [--until YYYY-MM-DD] [--scope all\|default] [--json\|--table]` | cijeli `Report`; **bez zastavice je JSON**, `--table` daje tablicu s hrvatskim natpisima (zaglavlje imenuje mjereni opseg i pokazuje `since`, ali ne `until` — §3, §11; sekcija DOKUMENTACIJA nosi isti redak `mjereno:` kao `docs`); `--scope` (M2/51) pregazi `profile.branch_scope` **u memoriji** (datoteka profila se ne dira), nepoznata vrijednost je pogrešna uporaba; zastavice su **isključive** (`--json --table` je pogrešna uporaba, ne „zadnja pobjeđuje") | 0 (`until < since` → prazan izvještaj, i dalje 0) |
+| `sokratis docs [putanja] [--json]` | ocjena, broj nalaza, kašnjenje, redak `mjereno: <grana\|detached> @ <sha7> · <stablo>` (T71, kad je izvor poznat), pa nalazi; bez `docs_dir` poruka `docs: nema mape s dokumentacijom (n/a)` i ispod nje isti redak `mjereno:`. `--json` daje `DocsHealth` s dodanim ključem `source` (= `Report.docs_source`, puna polja; isti podatak, drugo ime) | 0 |
 | `sokratis signals [putanja] [--json]` | signali s dokazom, ili `nema signala` | **0** nema · **1** Warn · **2** Alert |
 
 Svaka greška okoline (nema `git`-a na PATH-u, putanja nije repozitorij, repozitorij bez commita,

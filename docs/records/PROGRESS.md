@@ -1430,11 +1430,41 @@ presjek crateova u opisu obavijesti) · `TESTING.md` (`cargo fetch`, stderr na M
 (`canonicalize`, uzorak od niza znakova + `all`; `Component` i `matches!` više ne pokazuju na `inside_root`) i
 §5 (presjek kroz `Set`) · `MACOS.md` (Faza 1 ✅) · `ROADMAP.md`.
 
-### Što slijedi
-Nastavak zakrpe 1.0.2 s ovog Maca: T71 s grane `origin/feat/docs-source`, pa T72, T73, a zatim Faze 2–5 plana `MACOS.md`.
-
 ### Odluke i CI (isti dan)
 Leon je odgovorio na O1–O7 i N12, sve po preporuci → **S-043** (`DECISIONS.md`; sažetak i u `CLAUDE.md`).
 Nova cigla **T87** (popis licenci po platformi, O6) je u Fazi 3. Po O7 odmah ide **mac/T85**:
 `.github/workflows/gates.yml`, pune brane na `macos-latest` i `windows-latest` na svaki push u `main` i PR
-(`ARCHITECTURE.md` §12). Ishod prvog pokretanja: GitHub Actions za taj commit.
+(`ARCHITECTURE.md` §12). Prvi run (45174481416, nad `8b72557`): **macOS ✅ (~2 min), Windows ✅ (~7,5 min)** — Windows je time
+potvrdio i Fazu 1 (mac/T74–T76), koja je dotad bila provjerena samo na Macu.
+
+### Zakrpa 1.0.2: T71 i T72 u `main`-u
+- **IZVOR (T71)** → merge `0e30fa6`: `83bf692` napisan 2026-10-11 na Windowsu i do danas nerecenziran;
+  dopuna `47ed218` za macOS (dva io testa uspoređuju putanje kroz `canonicalize`, isti uzrok kao mac/T74).
+  `Report.docs_source` kaže iz kojeg stabla, grane (`None` = detached) i commita je dokumentacija mjerena;
+  `io` granu čita iz istog `git worktree list --porcelain`, bez novog procesa. CLI `docs` i `report --table`
+  pišu redak `mjereno: …`. Snapshot jezgre namjerno osvježen (samo novo polje). Opis:
+  [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §3 i §9.
+  - **Odstupanje od plana:** polje je na `Report`-u, ne `DocsHealth.source` — `DocsHealth` slaže `docs.rs`,
+    a T71 ga nije smio dirati. Stari JSON bez polja čita se kao `None` (test); nijedno mjesto danas ne
+    deserijalizira spremljeni `Report` (izmjereno u recenziji).
+  - Recenzija **SPOJIVO**. Minor ostaje zapisan: isti podatak ima dva imena u JSON-u — `source` u
+    `docs --json`, `docs_source` u JSON-u `Report`-a.
+  - Izmjereno nad pravim repoom: `docs ~/Documents/sokratstudy.f6` → `mjereno: feat/pravri @ 501fce1 ·
+    …/sokratstudy.pravri` — vodeće stablo (S-033), ne ono iz kojeg je naredba pozvana.
+- **SUČELJE-4 (T72)** → merge `f727ee9` (`efe7d96` + dopuna `0d3f1aa`): `types.ts` zrcali `DocsSource`;
+  sekcija Dokumentacija ploče uz ocjenu piše „Mjereno: grana X @ abc1234" (puni SHA i stablo u `title` i
+  `sr-only` za čitač ekrana), a redak se ne crta kad je `docs` `null`; objašnjenje ocjene spominje vodeće
+  stablo. „detached HEAD" ostaje i u HR (git-pojam). Recenzija **SPOJIVO**, dva Minor popravljena
+  (komentar u `types.ts`, `sr-only`).
+- **Redoslijed spajanja:** T71 je prvo spojen sam pa **vraćen** (`git reset --hard ORIG_HEAD`, nije bio
+  pushan): UI test ugovora (`tests/types.test.ts`) traži da TS tip ima sve ključeve snimke, pa je `main`
+  bez T72 crven. T72 je građen na grani T71 i oba su spojena zajedno. **Lekcija za planove:** cigla koja
+  mijenja ugovor `Report` i cigla koja ga zrcali u TS-u ne ulaze u `main` odvojeno.
+- **Brane na `main`-u nakon spajanja (Mac):** `cargo fmt --check` ✅ · `clippy` ✅ · `cargo test` **200
+  prošlo / 0 palo** · `npm run check` ✅ (vitest 170, svelte-check 0, i18n 353 ključa hr = en, kontrast
+  4 teme, obavijesti ✅).
+
+### Što slijedi
+**T73 — izdanje 1.0.2:** tag `v1.0.2` traži Leonov OK. **Otvoreno za Leona:** Windows NSIS instalater ne
+može se graditi na Macu — Windows stroj ili build u CI-ju? Zatim Faze 2–5 plana
+[`../plan/MACOS.md`](../plan/MACOS.md).

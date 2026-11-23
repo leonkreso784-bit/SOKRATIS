@@ -6,7 +6,7 @@ Isporuka = ono što je u `main`-u; sesije su u `PROGRESS.md`.
 ## [Unreleased]
 
 Zakrpa 1.0.2 u izvedbi ([`../plan/ZAKRPA_1_0_2.md`](../plan/ZAKRPA_1_0_2.md)); Faza 1 plana
-[`../plan/MACOS.md`](../plan/MACOS.md) (prijedlog).
+[`../plan/MACOS.md`](../plan/MACOS.md) i CI (mac/T85).
 
 ### Što korisnik dobiva
 
@@ -14,6 +14,11 @@ Zakrpa 1.0.2 u izvedbi ([`../plan/ZAKRPA_1_0_2.md`](../plan/ZAKRPA_1_0_2.md)); F
 - **Primjer poveznice u kodu** (inline kod, ograđeni blok od backtickova ili `~~~`) više ne daje `dead-link` (T70).
 - **Profil daje isti odgovor na Windowsu i Macu** (mac/T75): putanja iz profila s `\`, prefiksom pogona
   (`C:\…`) ili `\\server\share` odbija se i na macOS-u/Linuxu (do sada je tamo prolazila kao „unutar repoa").
+- **CLI kaže gdje je dokumentacija mjerena** (T71): `sokratis docs` i `report --table` uz ocjenu pišu
+  `mjereno: <grana|detached> @ <sha7> · <stablo>` — vodeće radno stablo (S-033), ne nužno ono iz kojeg je
+  naredba pozvana. JSON `Report`-a nosi `docs_source` (puna polja), `docs --json` isto pod ključem `source`.
+- **Ploča kaže gdje je dokumentacija mjerena** (T72): uz ocjenu „Mjereno: grana X @ abc1234", puni SHA i
+  stablo u opisu (i za čitač ekrana); objašnjenje ocjene kaže da se mjeri vodeće stablo.
 
 ### Za razvoj
 - **CI:** brane (`fmt` · `clippy` · `cargo test` · `npm run check`) na macOS-u i Windowsu na svaki push u `main` i PR (`.github/workflows/gates.yml`, S-043).

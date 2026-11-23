@@ -15,9 +15,9 @@ GitHubu s nepotpisanim instalaterom (S-040), licenca S-039. **Zakrpa 1.0.1 izdan
 (tag `v1.0.1`, izdanje na GitHubu; plan [archive/2026-10-10-zakrpa-1-0-1.md](../archive/2026-10-10-zakrpa-1-0-1.md):
 verzija u Postavkama, obavijesti o licencama ugrađenih komponenti, množina; isporuka:
 [CHANGELOG.md](../records/CHANGELOG.md) `[1.0.1]`). **Zakrpa 1.0.2 je u izvedbi** (plan
-[ZAKRPA_1_0_2.md](./ZAKRPA_1_0_2.md): ocjena dokumentacije — pauzirani plan, primjeri poveznica u kodu, izvor mjerenja). T69 i T70 su u `main`-u. **Razvoj se 2026-11-23 seli na Mac:** plan
-[MACOS.md](./MACOS.md) je prijedlog (odluke O1–O7 čekaju Leona), a njegova Faza 1 (brane zelene na Macu) je
-gotova, pa se 1.0.2 nastavlja s Maca. Nema aktivnog speca; **M3 nema spec** — piše se kad 1.0.0 bude u
+[ZAKRPA_1_0_2.md](./ZAKRPA_1_0_2.md): ocjena dokumentacije — pauzirani plan, primjeri poveznica u kodu, izvor mjerenja): **T69–T72 su u `main`-u, čeka T73 (izdanje; tag traži Leonov OK)**. **Razvoj se
+2026-11-23 seli na Mac:** plan [MACOS.md](./MACOS.md) je pauziran do izdanja 1.0.2 (Leonove odluke S-043);
+njegova Faza 1 (brane zelene na Macu) i CI na macOS-u i Windowsu (mac/T85) su gotovi. Nema aktivnog speca; **M3 nema spec** — piše se kad 1.0.0 bude u
 uporabi, iz kandidata u [records/BACKLOG.md](../records/BACKLOG.md). Zapis namjere iz kojeg je prvi rez
 nastao: [archive/PLAN_DESIGNE.md](../archive/PLAN_DESIGNE.md).
 
@@ -29,7 +29,7 @@ nastao: [archive/PLAN_DESIGNE.md](../archive/PLAN_DESIGNE.md).
 | **M1** | **Jezgra + CLI** | `core` · `io` (git-proces, profil, ručni podaci) · `cli` · paritet s `RAD.xlsx` · ispravak sati · docs-ocjena · signali `unmerged-branches` i `docs-lag` | …nad Sokrat Studyjem iz terminala dobiti iste brojke kao u tablici, ispravne sate, ocjenu docs-a i dva signala s dokazom; staviti `sokratis signals` u preflight | ✅ **zatvoren 2026-09-18** (0.1.0, T1–T22 + krug popravaka u `main`; grane i stabla tokova obrisani uz Leonov OK) |
 | **M2** | **Desktop — verzija 1.0.0** | Tauri 2 · Svelte 5 · tokeni Sokrat Studyja (4 teme, `brand-*` iz loga) · `sokratis-store` (SQLite: registar · snimke · keš) · watcher · autostart · obavijesti · 8 pogleda s uređivanjem + Postavke · HR/EN · znak i animacija pokretanja · **dopuna rezom 2026-09-21:** animacije grafova i pogleda · kartica s objašnjenjem · instalater za Leona · repo bez konvencija · dokumentacija točna i manja — sve u [ARHITEKTURA_M2.md](../archive/ARHITEKTURA_M2.md) (§11 + §13, ✅ ispunjen, arhiviran); **drugi rez:** mjerenje svih lokalnih grana, pogledi → ploča Projekt s 8 sekcija i grafovima (S-034), tray uklonjen (S-036) | …instalirati Sokratis, vidjeti animaciju, Pregled sa Sokrat Studyjem (pet stabala = jedan projekt) i Sokratisom, sve poglede s brojkama istim kao CLI, osvježenje bez klika, obavijest OS-a na Alert, objašnjenje svake brojke na klik — i prestati otvarati `RAD.xlsx` | ✅ **kod gotov 2026-09-28 kao 1.0.0** (T1–T64 + krug popravaka `M2/63`; drugi rez S-032…S-038 u [ARHITEKTURA_1_0.md](../archive/ARHITEKTURA_1_0.md), ✅ ispunjen) — **izdan 2026-09-29** (tag `v1.0.0`, S-040) |
 | **M3** | **Druga verzija** | iz stvarne uporabe 1.0.0: ocjena projekta F−…A+ · omjer popravaka i nova statistika · Postavke s vlastitim dodacima · kartica s dokazom · punjenje trenda iz povijesti · izvoz · izgled u iOS stilu — popis u [BACKLOG.md](../records/BACKLOG.md), spec se piše kad 1.0.0 bude u uporabi | …(određuje spec M3) | 📋 planirano |
-| **M4** | **Objava** | ostala pravila · profil za tuđe projekte · potpisan instalater · GitHub Actions; kasnije zasebnim planom: timovi · ne samo git | …instalirati Sokratis s GitHuba na čist stroj i priključiti tuđi repo | 📋 planirano |
+| **M4** | **Objava** | ostala pravila · profil za tuđe projekte · potpisan instalater · build izdanja u GitHub Actions (CI s branama postoji od mac/T85); kasnije zasebnim planom: timovi · ne samo git | …instalirati Sokratis s GitHuba na čist stroj i priključiti tuđi repo | 📋 planirano |
 
 ## Pravila vožnje (Leonova, ne mijenjaju se između milestonea)
 

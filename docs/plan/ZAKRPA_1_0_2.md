@@ -1,6 +1,7 @@
 # Zakrpa 1.0.2 — plan cigli
 
-**Status:** 📋 AKTIVAN — napisan 2026-10-10 iz Leonove odluke iste sesije, nakon vanjske analize ocjene
+**Status:** 📋 AKTIVAN do T73 — T69 i T70 ✅ (merge `f97b3c5`, 2026-10-11), T71 ✅ (merge `0e30fa6`) i
+T72 ✅ (merge `f727ee9`, oba 2026-11-23); čeka T73 (izdanje). Napisan 2026-10-10 iz Leonove odluke iste sesije, nakon vanjske analize ocjene
 dokumentacije (druga sesija, nad Leonovim drugim projektom; ime se ne piše u javni repo). Nalazi su
 izmjereni prije plana: [`../records/PROGRESS.md`](../records/PROGRESS.md), unos 2026-10-10. Spec nema:
 zakrpa popravlja kvarove pravila i **dodaje** jedno polje ugovoru `Report` (ništa postojeće se ne mijenja).
@@ -39,7 +40,7 @@ poveznice u kodu), i uvijek kaže **iz kojeg stabla, grane i commita** je mjeren
 JEZGRA-3 i IZVOR se ne dodiruju po datotekama: T71 **ne dira** `docs.rs` — izvor mjerenja upisuje u
 `report.rs` nakon što `docs_health` vrati rezultat.
 
-## T69 — Pauzirani plan se prepoznaje u zaglavlju (JEZGRA-3)
+## T69 — Pauzirani plan se prepoznaje u zaglavlju (JEZGRA-3) ✅
 
 Izmjereno 2026-10-10: plan oblika „`# Naslov`, prazan redak, `**Status:** ⏸️ PAUZIRAN`" broji se kao
 **aktivan** (`^` bez `(?m)` je početak datoteke); isti status u prvom retku se prepozna.
@@ -52,7 +53,7 @@ Izmjereno 2026-10-10: plan oblika „`# Naslov`, prazan redak, `**Status:** ⏸�
   pauziran (postojeći test ostaje) · „PAUZIRAN" samo u tijelu ispod `## ` → aktivan · `⏸` bez `FE0F` →
   pauziran.
 
-## T70 — Primjeri poveznica u kodu nisu poveznice (JEZGRA-3)
+## T70 — Primjeri poveznica u kodu nisu poveznice (JEZGRA-3) ✅
 
 Izmjereno 2026-10-10: Markdown-poveznica na nepostojeći `nema.md` napisana u inline kodu, i ista
 unutar `~~~` bloka, daju `dead-link`. (Primjer se ovdje ne piše doslovno: dok T70 nije izgrađen, ovaj bi
@@ -66,7 +67,11 @@ plan sam sebi dao dva nalaza — izmjereno pri pisanju plana.)
   ``` `` … `` ``` · prava mrtva poveznica u istom retku kao inline kod se i dalje javlja · broj retka
   nalaza ostaje točan.
 
-## T71 — Izvještaj kaže što je mjerio (IZVOR)
+## T71 — Izvještaj kaže što je mjerio (IZVOR) ✅
+
+**Izvedeno drukčije:** izvor je `Report.docs_source: Option<DocsSource>`, ne `DocsHealth.source` —
+`DocsHealth` slaže `docs.rs`, koji T71 ne smije dirati. **Spajanje:** T71 sam u `main`-u ruši UI test
+ugovora (`tests/types.test.ts`), pa su T71 i T72 spojeni zajedno (T72 građen na grani T71).
 
 Izmjereno 2026-10-10: dokumentacija se čita iz vodećeg stabla (S-033, `io/src/project.rs`, `Lead`), a
 ni `Report` ni CLI ne kažu iz kojeg.
@@ -83,7 +88,7 @@ ni `Report` ni CLI ne kažu iz kojeg.
   stablo s novijim commitom, grana i SHA su njegovi · detached stablo daje `branch = None` · CLI test
   za novi redak · snapshot jezgre namjerno osvježen (`INSTA_UPDATE`), diff snimke = samo novo polje.
 
-## T72 — Ploča pokazuje što je mjereno (SUČELJE-4, nakon T71)
+## T72 — Ploča pokazuje što je mjereno (SUČELJE-4, nakon T71) ✅
 
 - `types.ts` zrcali novo polje; `MockApi` snapshot ga nosi (dolazi iz osvježene snimke T71).
 - Sekcija Dokumentacija na ploči projekta (`views/project/DocsSection.svelte`) uz ocjenu pokazuje
