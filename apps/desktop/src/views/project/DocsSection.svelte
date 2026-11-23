@@ -21,6 +21,7 @@
   // Dopunjeno 1.0.2/T72 — redak „Mjereno: grana X @ abc1234“ ispod ocjene (`Report.docs_source`, T71).
   // Tekst i `title` slažu čiste funkcije `docsSourceLabel`/`docsSourceTitle` (`views/helpers.ts`,
   // testirane), komponenta samo crta; `null` izvor → `{#if}` redak izostavlja, ne crta prazan.
+  // Puni SHA i stablo idu i u `title` (miš) i u `sr-only` (čitač ekrana) — dopuna recenzije T72.
   import { app, setError } from '../../lib/state.svelte';
   import { api } from '../../lib/api';
   import { getDict, getLang, t } from '../../lib/i18n/index.svelte';
@@ -143,7 +144,11 @@
       {/if}
     </div>
     {#if sourceLabel !== null}
-      <p class="text-xs text-ink-2" title={sourceTitle ?? undefined}>{sourceLabel}</p>
+      <!-- `title` je za miš; isti tekst u `sr-only` dobiju i čitač ekrana i tipkovnica (`<p>` nije
+           fokusabilan, pa `title` sam do njih ne stiže). -->
+      <p class="text-xs text-ink-2" title={sourceTitle ?? undefined}>
+        {sourceLabel}{#if sourceTitle !== null}<span class="sr-only"> ({sourceTitle})</span>{/if}
+      </p>
     {/if}
 
     {#if trendEmpty}

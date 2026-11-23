@@ -11,7 +11,9 @@
 // Dopunjeno M2/47 (S-033) — `Touched.worktrees`/`diaries`: mjerač kaže koliko je stabala i tekstova
 // dnevnika dotaknuo (isto polje kao Rustov `Touched`, zadnja dva polja).
 // Dopunjeno 1.0.2/T72 — `DocsSource` i `Report.docs_source` (T71): iz kojeg je radnog stabla, grane i
-// commita dokumentacija mjerena; `null` kad dokumentacije nema ili izvor nije poznat (Rustov `Option`).
+// commita dokumentacija mjerena; `null` kad vodeće stablo nije poznato (npr. zapis prije 1.0.2, Rustov
+// `Option`). Ne ovisi o `docs` (`docs = null` uz `docs_source ≠ null` je moguć); ploča ga prikazuje
+// samo uz ocjenu (`docs`).
 import type { Lang } from './i18n/index.svelte';
 
 export type { Lang };
