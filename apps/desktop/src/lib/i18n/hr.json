@@ -334,7 +334,7 @@
   "settings.theme": "Tema",
   "settings.lang": "Jezik",
   "settings.autostart": "Pokreni sa sustavom",
-  "settings.autostart.hint": "Sokratis se otvara pri prijavi u Windows.",
+  "settings.autostart.hint": "Sokratis se otvara kad se prijaviš na računalo.",
   "settings.motion": "Animacije",
   "settings.motion.hint": "Isključi pokret u sučelju (poštuje i postavku sustava za smanjeno kretanje).",
   "settings.about": "O aplikaciji",

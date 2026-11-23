@@ -253,6 +253,19 @@ describe('joinRepoPath', () => {
   it('normalizira "/" u korijenu isto kao u putanji nalaza (Finding.path uvijek dolazi s "/")', () => {
     expect(joinRepoPath('C:/repo', 'docs/a.md')).toBe('C:\\repo\\docs\\a.md');
   });
+  // mac/T78 (N5) — razdjelnik se izvodi iz KORIJENA: Unix korijen (macOS) ostaje s "/".
+  it('Unix korijen (macOS) spaja s "/" — putanja koja postoji u Finderu', () => {
+    expect(joinRepoPath('/Users/leon/x', 'docs/a.md')).toBe('/Users/leon/x/docs/a.md');
+  });
+  it('Unix korijen sa završnom kosom crtom ne daje dvostruku "//"', () => {
+    expect(joinRepoPath('/Users/leon/x/', 'docs/a.md')).toBe('/Users/leon/x/docs/a.md');
+  });
+  it('Unix korijen s "\\" u imenu mape (legalno na macOS-u) ostaje Unix oblik', () => {
+    expect(joinRepoPath('/Users/leon/a\\b', 'docs/a.md')).toBe('/Users/leon/a\\b/docs/a.md');
+  });
+  it('UNC korijen (\\\\server\\share) je Windows oblik', () => {
+    expect(joinRepoPath('\\\\server\\share\\repo', 'docs/a.md')).toBe('\\\\server\\share\\repo\\docs\\a.md');
+  });
 });
 
 describe('copyText', () => {

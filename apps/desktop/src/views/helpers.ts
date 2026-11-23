@@ -182,12 +182,22 @@ export async function copyText(text: string): Promise<boolean> {
 // ZAŠTO OVAKO (cigla M2/28 — sastavljanje apsolutne putanje nalaza dokumentacije, Ruling brifa #5)
 // `Finding.path` je relativan prema korijenu projekta i uvijek dolazi s "/" (jezgra ga čita s gita,
 // S-012 — sučelje ništa ne izmišlja). Spajanje s `root_path` je JEDNA čista funkcija s testom — ne
-// lijepljenje stringova u `Docs.svelte` — jer Windows-put (s "\") je ono što korisnik lijepi u
-// Explorer ili urednik, ne git-put (s "/").
+// lijepljenje stringova u `Docs.svelte`.
+// Dopuna mac/T78 (N5): razdjelnik se izvodi iz KORIJENA, ne iz OS-a — sučelje ne zna OS (bez
+// `plugin-os`), ali `root_path` dolazi s diska tog OS-a. Korijen s "\" ili prefiksom pogona ("C:")
+// → Windows oblik s "\" (lijepi se u Explorer, isto kao prije); inače Unix oblik s "/" (macOS Finder).
+// Korijen koji počinje jednim "/" je UVIJEK Unix (Windows korijen nikad, UNC počinje s "\\"), jer je
+// "\" na Macu legalan znak u imenu mape.
+const WINDOWS_ROOT = /\\|^[A-Za-z]:/;
+
 export function joinRepoPath(rootPath: string, path: string): string {
-  const root = rootPath.replace(/\//g, '\\');
-  const rel = path.replace(/\//g, '\\');
-  return `${root}\\${rel}`;
+  if (!rootPath.startsWith('/') && WINDOWS_ROOT.test(rootPath)) {
+    const root = rootPath.replace(/\//g, '\\');
+    const rel = path.replace(/\//g, '\\');
+    return `${root}\\${rel}`;
+  }
+  const root = rootPath.endsWith('/') ? rootPath.slice(0, -1) : rootPath;
+  return `${root}/${path}`;
 }
 
 // ZAŠTO OVAKO (dopuna cigle M2/28 — uređivanje vizije: spec 6.2 "dodaj · uredi · promijeni stanje")

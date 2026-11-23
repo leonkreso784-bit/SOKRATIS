@@ -334,7 +334,7 @@
   "settings.theme": "Theme",
   "settings.lang": "Language",
   "settings.autostart": "Start with the system",
-  "settings.autostart.hint": "Sokratis opens when you sign in to Windows.",
+  "settings.autostart.hint": "Sokratis opens when you sign in to your computer.",
   "settings.motion": "Animations",
   "settings.motion.hint": "Turn off interface motion (also respects the system's reduced motion setting).",
   "settings.about": "About",
