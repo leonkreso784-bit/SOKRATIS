@@ -3,6 +3,8 @@
 // je `notices-build.mjs` već pročitao s diska), izlaz je tekst ili iznimka. Zato test ne treba
 // ni cargo ni node_modules — isti obrazac kao `contrast.test.ts`, koji mjeri tekst, ne datoteku.
 // `toThrow(/ime/)` provjerava da pad IMENUJE krivca: brana koja samo kaže „nešto fali" ne pomaže.
+// (cigla mac/T87) Tablica ciljeva `NOTICE_TARGETS` i `planTargets(host)` su čisti podaci i funkcija:
+// test kaže koji se popis mjeri na kojem domaćinu bez pokretanja carga na tom domaćinu.
 import { describe, expect, it } from 'vitest';
 import {
   isLicenseFile,
@@ -13,10 +15,16 @@ import {
   packagesFromSources,
   parseCargoTree,
   personNames,
+  NOTICE_TARGETS,
+  planTargets,
   renderNotices,
   targetCrates,
   type Component,
 } from '../scripts/notices.mjs';
+
+const WINDOWS = 'x86_64-pc-windows-msvc';
+/** Postojeći testovi teksta ne ovise o cilju; zaglavlje s ciljem ima svoj test niže. */
+const render = (components: Component[]) => renderNotices(components, WINDOWS);
 
 const MIT_A = 'MIT License\n\nCopyright (c) Ana\n\nPermission is hereby granted, free of charge...';
 const APACHE = 'Apache License\nVersion 2.0, January 2004\n...';
@@ -52,7 +60,7 @@ describe('obavijesti o licencama — čiste funkcije', () => {
   });
 
   it('isti tekst licence ide jednom, s popisom svih komponenti koje ga nose', () => {
-    const out = renderNotices([
+    const out = render([
       crate('beta', 'MIT', [{ name: 'LICENSE', text: MIT_A }]),
       crate('alfa', 'MIT', [{ name: 'LICENSE-MIT', text: MIT_A.replace(/\n/g, '\r\n') + '\r\n' }]),
     ]);
@@ -67,8 +75,8 @@ describe('obavijesti o licencama — čiste funkcije', () => {
       crate('alfa', 'Apache-2.0', [{ name: 'LICENSE', text: APACHE }], '0.2.0'),
       crate('alfa', 'Apache-2.0', [{ name: 'LICENSE', text: APACHE }], '0.10.0'),
     ];
-    const out = renderNotices(items);
-    expect(out).toBe(renderNotices([...items].reverse()));
+    const out = render(items);
+    expect(out).toBe(render([...items].reverse()));
     // verzije se uspoređuju kao brojevi: 0.2.0 prije 0.10.0 (kao tekst bi bilo obrnuto)
     const order = ['alfa 0.2.0', 'alfa 0.10.0', 'zeta 1.0.0', 'd3-array 3.2.4'].map((s) => out.indexOf('  ' + s + ' — '));
     expect(order.every((i) => i >= 0)).toBe(true);
@@ -76,7 +84,7 @@ describe('obavijesti o licencama — čiste funkcije', () => {
   });
 
   it('komponenta bez vlastite datoteke dobiva uputu na tekst iste SPDX licence iz druge komponente', () => {
-    const out = renderNotices([
+    const out = render([
       crate('davatelj', 'Apache-2.0 OR MIT', [{ name: 'LICENSE-MIT', text: MIT_A }, { name: 'LICENSE-APACHE', text: APACHE }]),
       { ...crate('bez-datoteke', 'MIT/Apache-2.0', []), holders: ['Ivo Ivić', 'Ana Anić'] },
     ]);
@@ -88,7 +96,7 @@ describe('obavijesti o licencama — čiste funkcije', () => {
 
   it('od više davatelja iste licence prednost ima onaj s najduljim zajedničkim početkom imena (ista obitelj paketa)', () => {
     const npm = (name: string, files: Component['files']): Component => ({ kind: 'npm', name, version: '2.0.0', license: 'MIT OR Apache-2.0', files });
-    const out = renderNotices([
+    const out = render([
       crate('anyhow', 'MIT OR Apache-2.0', [{ name: 'LICENSE-MIT', text: MIT_A }]),
       npm('@tauri-apps/api', [{ name: 'LICENSE_MIT', text: 'MIT License\n\nCopyright (c) Tauri' }]),
       npm('@tauri-apps/plugin-dialog', []),
@@ -101,12 +109,12 @@ describe('obavijesti o licencama — čiste funkcije', () => {
 
   it('komponenta bez datoteke i bez davatelja iste licence ruši izgradnju s njenim imenom', () => {
     expect(() =>
-      renderNotices([crate('ima', 'MIT', [{ name: 'LICENSE', text: MIT_A }]), crate('siroce', 'MPL-2.0', [])]),
+      render([crate('ima', 'MIT', [{ name: 'LICENSE', text: MIT_A }]), crate('siroce', 'MPL-2.0', [])]),
     ).toThrow(/siroce 1\.0\.0 \(MPL-2\.0\)/);
   });
 
   it('vlastiti crateovi sokratis-* se preskaču', () => {
-    const out = renderNotices([crate('sokratis-core', 'LicenseRef-Sokratis', []), crate('alfa', 'MIT', [{ name: 'LICENSE', text: MIT_A }])]);
+    const out = render([crate('sokratis-core', 'LicenseRef-Sokratis', []), crate('alfa', 'MIT', [{ name: 'LICENSE', text: MIT_A }])]);
     expect(out).not.toContain('sokratis-core');
     expect(out).toContain('alfa 1.0.0 — MIT');
   });
@@ -166,5 +174,43 @@ describe('obavijesti o licencama — čiste funkcije', () => {
     expect(personNames({ name: 'Ivo', email: 'ivo@example.com' })).toEqual(['Ivo']);
     expect(personNames(['A <a@example.com>', { name: 'B' }, '', { email: 'samo@example.com' }])).toEqual(['A', 'B']);
     expect(personNames(undefined)).toEqual([]);
+  });
+});
+
+describe('obavijesti o licencama — ciljevi po platformi (mac/T87)', () => {
+  const MIT = crate('alfa', 'MIT', [{ name: 'LICENSE', text: MIT_A }]);
+
+  it('dva cilja: Windows u THIRD-PARTY-NOTICES.txt, macOS (aarch64) u THIRD-PARTY-NOTICES-macos.txt', () => {
+    expect(NOTICE_TARGETS.map((t) => [t.name, t.triple, t.file])).toEqual([
+      ['Windows', 'x86_64-pc-windows-msvc', 'THIRD-PARTY-NOTICES.txt'],
+      ['macOS', 'aarch64-apple-darwin', 'THIRD-PARTY-NOTICES-macos.txt'],
+    ]);
+  });
+
+  it('na Macu se mjere oba popisa, ništa se ne preskače', () => {
+    const plan = planTargets('darwin');
+    expect(plan.measure.map((t) => t.file)).toEqual(['THIRD-PARTY-NOTICES.txt', 'THIRD-PARTY-NOTICES-macos.txt']);
+    expect(plan.skip).toEqual([]);
+  });
+
+  it('na Windowsu i Linuxu se mjeri samo Windows popis; Mac popis se preskače (proc-makroi domaćina)', () => {
+    for (const host of ['win32', 'linux']) {
+      const plan = planTargets(host);
+      expect(plan.measure.map((t) => t.file), host).toEqual(['THIRD-PARTY-NOTICES.txt']);
+      expect(plan.skip.map((t) => t.file), host).toEqual(['THIRD-PARTY-NOTICES-macos.txt']);
+    }
+  });
+
+  it('zaglavlje imenuje svoj cilj; Windows tekst je isti kao prije cigle', () => {
+    const win = renderNotices([MIT], 'x86_64-pc-windows-msvc');
+    const mac = renderNotices([MIT], 'aarch64-apple-darwin');
+    expect(win).toContain('compiled into Sokratis for x86_64-pc-windows-msvc (cargo tree, Cargo.lock). npm packages: those\n');
+    expect(mac).toContain('compiled into Sokratis for aarch64-apple-darwin (cargo tree, Cargo.lock).');
+    expect(mac).not.toContain('x86_64-pc-windows-msvc');
+    expect(mac.replace('aarch64-apple-darwin', 'x86_64-pc-windows-msvc')).toBe(win);
+  });
+
+  it('bez cilja nema teksta — zaglavlje ne smije šutke tvrditi krivi cilj', () => {
+    expect(() => renderNotices([MIT], '')).toThrow(/cilj/);
   });
 });

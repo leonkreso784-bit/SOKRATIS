@@ -15,7 +15,11 @@ export type BundledPackage = { name: string; path: string };
 export type Banner = { name: string; pattern: RegExp };
 export type Person = string | { name?: string; email?: string; url?: string };
 
+export type NoticeTarget = { name: string; triple: string; file: string; onlyOnHost: string | null };
+
 export const BANNERS: Banner[];
+export const NOTICE_TARGETS: NoticeTarget[];
+export function planTargets(host: string): { measure: NoticeTarget[]; skip: NoticeTarget[] };
 
 export function isLicenseFile(name: string): boolean;
 export function normalizeSpdx(expr: string): string;
@@ -25,4 +29,4 @@ export function targetCrates(treeKeys: Iterable<string>, metadataKeys: Iterable<
 export function packagesFromSources(sources: string[]): BundledPackage[];
 export function packagesFromBanners(text: string): BundledPackage[];
 export function personNames(field: Person | Person[] | null | undefined): string[];
-export function renderNotices(components: Component[]): string;
+export function renderNotices(components: Component[], target: string): string;
