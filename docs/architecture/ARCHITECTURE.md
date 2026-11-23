@@ -694,11 +694,15 @@ preskok splasha, `prefers-reduced-motion`, četiri teme): [`TESTING.md`](../work
 
 ## 12 · Izvan crateova: GitHub Actions
 
-Jedini workflow je **`.github/workflows/notify-sokrat-dev.yml`** (`7f19883`, 2026-10-10). Okida se kad se
+Dva workflowa. **`.github/workflows/gates.yml`** (mac/T85, S-043): na svaki push u `main` i pull request
+vrti pune brane (`cargo fmt --check` · `clippy --all-targets -D warnings` · `cargo test` · `npm run check`)
+na `macos-latest` i `windows-latest`; prije njih `npm run build` (desktop crate traži `dist/`) i `cargo fetch`
+(za `notices:check`). Toolchain čita iz `rust-toolchain.toml`.
+
+Drugi je **`.github/workflows/notify-sokrat-dev.yml`** (`7f19883`, 2026-10-10). Okida se kad se
 na GitHubu **objavi izdanje** (`release: published`) i radi samo jedno: `POST` na adresu iz tajne
 repozitorija `SOKRAT_DEV_DEPLOY_HOOK` (deploy hook stranice sokrat.dev), da stranica nanovo izgradi popis
 izdanja. **Bez postavljene tajne** workflow ispiše upozorenje i završi uspješno — izdanje ne pada.
 Stanje 2026-10-10: tajna **nije postavljena** (`gh secret list` prazan); postavlja je Leon.
 
-Workflow **ne gradi i ne testira** Sokratis — brane se vrte lokalno ([`TESTING.md`](../workflow/TESTING.md));
-CI s branama je kandidat M4 ([`BACKLOG.md`](../records/BACKLOG.md)).
+Taj workflow **ne gradi i ne testira** Sokratis; to radi `gates.yml`. Instalater se i dalje gradi lokalno.

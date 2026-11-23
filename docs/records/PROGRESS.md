@@ -1431,4 +1431,10 @@ presjek crateova u opisu obavijesti) · `TESTING.md` (`cargo fetch`, stderr na M
 §5 (presjek kroz `Set`) · `MACOS.md` (Faza 1 ✅) · `ROADMAP.md`.
 
 ### Što slijedi
-Nastavak zakrpe 1.0.2 s ovog Maca: T71 s grane `origin/feat/docs-source`, pa T72, T73. Za Faze 2–5 plana `MACOS.md` treba Leonova odluka o O1–O7.
+Nastavak zakrpe 1.0.2 s ovog Maca: T71 s grane `origin/feat/docs-source`, pa T72, T73, a zatim Faze 2–5 plana `MACOS.md`.
+
+### Odluke i CI (isti dan)
+Leon je odgovorio na O1–O7 i N12, sve po preporuci → **S-043** (`DECISIONS.md`; sažetak i u `CLAUDE.md`).
+Nova cigla **T87** (popis licenci po platformi, O6) je u Fazi 3. Po O7 odmah ide **mac/T85**:
+`.github/workflows/gates.yml`, pune brane na `macos-latest` i `windows-latest` na svaki push u `main` i PR
+(`ARCHITECTURE.md` §12). Ishod prvog pokretanja: GitHub Actions za taj commit.

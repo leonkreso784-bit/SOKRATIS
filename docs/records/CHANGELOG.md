@@ -16,7 +16,7 @@ Zakrpa 1.0.2 u izvedbi ([`../plan/ZAKRPA_1_0_2.md`](../plan/ZAKRPA_1_0_2.md)); F
   (`C:\…`) ili `\\server\share` odbija se i na macOS-u/Linuxu (do sada je tamo prolazila kao „unutar repoa").
 
 ### Za razvoj
-
+- **CI:** brane (`fmt` · `clippy` · `cargo test` · `npm run check`) na macOS-u i Windowsu na svaki push u `main` i PR (`.github/workflows/gates.yml`, S-043).
 - **Razvoj i brane rade na macOS-u** (Apple Silicon): `cargo test` i `npm run check` zeleni na Macu
   (mac/T74 — io testovi uspoređuju razriješene putanje; brojke: [`PROGRESS.md`](./PROGRESS.md) 2026-11-23).
 - **`npm run notices` ne ovisi o stroju koji gradi** (mac/T76): na Macu daje isti `THIRD-PARTY-NOTICES.txt`

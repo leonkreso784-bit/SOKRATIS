@@ -1,6 +1,6 @@
 # Sokratis na macOS-u — plan cigli
 
-**Status:** ⏸️ PAUZIRAN — čeka Leonove odluke iz §1 (O1–O7). Napisan 2026-11-23 nakon pregleda cijelog
+**Status:** ⏸️ PAUZIRAN — Leon je odlučio O1–O7 (S-043); po O5 prvo se dovršava zakrpa 1.0.2, a CI (T85) ide odmah. Napisan 2026-11-23 nakon pregleda cijelog
 projekta na MacBooku; Faza 1 (T74–T76) ne ovisi o §1 i izvedena je, Faze 2–5 se ne izvode dok Leon ne
 odluči. Aktivan plan je i dalje [`ZAKRPA_1_0_2.md`](./ZAKRPA_1_0_2.md). Numeracija nastavlja plan 1.0.2
 (zadnja cigla tamo je T73). Plan nije izvor istine: što je izgrađeno kaže
@@ -61,7 +61,9 @@ Macu ne prevodi · `windows_subsystem` (`main.rs:5`) je na Macu bez učinka · a
 
 ---
 
-## 1 · Odluke koje su Leonove (prije Faze 2)
+## 1 · Odluke (Leon, 2026-11-23 — [S-043](../records/DECISIONS.md))
+
+Odlučeno je svih sedam pitanja i N12, sve po preporuci: O1 uz Windows · O2 identifikator samo na Macu · O3 prvo samo Leonov Mac · O4 samo Apple Silicon · O5 prvo 1.0.2, pa Mac, pa 1.1.0 · O6 zasebni popis licenci po platformi · O7 CI **sada** (ne u M4) · N12 `Cmd+Q` zatvara odmah. Tablica niže je podloga odluke.
 
 | # | pitanje | preporuka | zašto |
 |---|---|---|---|
@@ -105,6 +107,7 @@ svakog commita (`CLAUDE.md`). Tokovi i stabla idu po [`../workflow/AGENTI.md`](.
 | cigla | predmet | test prvo | gotovo kad |
 |---|---|---|---|
 | **T82** | `src-tauri/tauri.macos.conf.json` (Tauri 2 ga spaja s glavnim samo na macOS-u): `bundle.targets = ["app", "dmg"]`, `minimumSystemVersion`, identifikator po O2. Glavni `tauri.conf.json` i NSIS se **ne diraju** (N8, N9) | `version.test.ts`: glavni = `["nsis"]`, Mac datoteka = `["app","dmg"]`, nijedna nema `version` | `npm run tauri build` na Macu daje `.app` i `.dmg` u `target/release/bundle/` |
+| **T87** | `THIRD-PARTY-NOTICES` po platformi (O6): `notices-build.mjs` dobiva cilj kao argument; Windows datoteka ostaje bajt-za-bajt ista, Mac popis ide u zasebnu datoteku koju nosi `.app` (`tauri.macos.conf.json` → `bundle.resources`); `notices:check` provjerava obje | `notices.test.ts` | `npm run check` zelen; `.app` nosi Mac popis |
 | **T83** | izmjeriti build: veličina `.dmg`/`.app`, ad-hoc potpis (`codesign -dv`), vrijeme do prvog prozora, pokretanje iz `/Applications` (Finder, ne terminal: tako se vidi N10). Brojke idu u `PROGRESS.md`, ne u kod | — | brojke zapisane |
 
 ### Faza 4 — ručna provjera u pravoj aplikaciji (Leon + Claude, `.app` iz T82)
@@ -118,7 +121,7 @@ Svaki nalaz dobiva test i vlastitu ciglu (pravilo #4). Popis:
 5. **Watcher (FSEvents umjesto ReadDirectoryChangesW):** commit u terminalu osvježi ploču bez klika, jednom; nema petlje na vlastiti upis u `.sokratis/` (S-016; BACKLOG m5, test pod opterećenjem).
 6. **Obavijest:** prvi Alert → macOS traži dopuštenje; obavijest nosi ime „Sokratis", ne „Terminal" (u `tauri dev` ide pod terminalom, pa vrijedi samo izgrađeni `.app`).
 7. **Autostart:** prekidač u Postavkama stvori ili makne `~/Library/LaunchAgents/…plist`; nakon odjave i prijave Sokratis se otvori.
-8. **Zatvaranje:** X i `Cmd+W` → upit (S-036); `Cmd+Q` → odluka N12 (prihvatiti macOS običaj ili presresti `RunEvent::ExitRequested`).
+8. **Zatvaranje:** X i `Cmd+W` → upit (S-036); `Cmd+Q` zatvara odmah (N12, S-043) — provjeriti da baza i watcher ne ostanu u lošem stanju.
 9. **Dijalozi:** preimenovanje i uklanjanje projekta (N6 → T80 ako ne rade).
 10. **Međuspremnik:** „Kopiraj putanju" daje putanju koja se otvara u Finderu (`Cmd+Shift+G`) (N5 nakon T78).
 11. **WebKit (N11):** znak minus i brojevi u `hr` i `en`; poredak `Cvijet < Čokolada < D…`; datumi grafova; teme (4) i kontrast; `data-motion="off"` i Postavke → Pristupačnost → Smanji kretanje.
@@ -128,8 +131,8 @@ Svaki nalaz dobiva test i vlastitu ciglu (pravilo #4). Popis:
 
 | cigla | predmet |
 |---|---|
-| **T84** | **S-043** u `DECISIONS.md` (macOS kao platforma, odluke O1–O7) · `CLAUDE.md`: stack (target po platformi umjesto „MSVC"), putanja prvog korisnika `~/Documents/sokratstudy.dev` · `README.md`: zahtjevi za macOS (Command Line Tools, build, Gatekeeper), „Windows only" → stvarno stanje · `ARCHITECTURE.md` §1 (putanja baze po OS-u, Mac bundle) · `RUST.md` §1–2 (redak MSVC, NSIS + DMG) · `TESTING.md` (izolirana baza na Macu: preusmjeriti `HOME`, odnosno ono što T77 čita, umjesto `LOCALAPPDATA`; `cargo fetch`) · `ROADMAP.md` (redak M0 za macOS) · `BACKLOG.md` (redak 8 „cross-platform": Mac stroj sada postoji) · `PROGRESS.md` + `CHANGELOG.md` |
-| **T85** | *(po O7)* `.github/workflows/gates.yml`: matrica `macos-latest` + `windows-latest` → fmt · clippy · test · `npm run check` |
+| **T84** | (S-043 je zapisan 2026-11-23) · `CLAUDE.md`: stack (target po platformi umjesto „MSVC"), putanja prvog korisnika `~/Documents/sokratstudy.dev` · `README.md`: zahtjevi za macOS (Command Line Tools, build, Gatekeeper), „Windows only" → stvarno stanje · `ARCHITECTURE.md` §1 (putanja baze po OS-u, Mac bundle) · `RUST.md` §1–2 (redak MSVC, NSIS + DMG) · `TESTING.md` (izolirana baza na Macu: preusmjeriti `HOME`, odnosno ono što T77 čita, umjesto `LOCALAPPDATA`; `cargo fetch`) · `ROADMAP.md` (redak M0 za macOS) · `BACKLOG.md` (redak 8 „cross-platform": Mac stroj sada postoji) · `PROGRESS.md` + `CHANGELOG.md` |
+| **T85** | *(O7: odmah, prije 1.0.2)* `.github/workflows/gates.yml`: matrica `macos-latest` + `windows-latest` → fmt · clippy · test · `npm run check` |
 | **T86** | izdanje **1.1.0**: verzija u `Cargo.toml` (+ zrcalo `package.json`), Mac `.dmg` (+ Windows NSIS s Windows stroja ili CI-ja). **Tag i GitHub izdanje traže Leonov izričit OK** (pravilo #1) |
 
 ---
@@ -140,7 +143,7 @@ Svaki nalaz dobiva test i vlastitu ciglu (pravilo #4). Popis:
 |---|---|---|
 | MAC-BRANE | T74 → T75 | `crates/sokratis-io/tests/**`, `crates/sokratis-core/src/profile.rs` (`inside_root`) |
 | MAC-NOTICES | T76 | `apps/desktop/scripts/notices*`, `apps/desktop/tests/notices.test.ts` |
-| MAC-LJUSKA | T77 → T81 → T82 | `apps/desktop/src-tauri/**` |
+| MAC-LJUSKA | T77 → T81 → T82 → T87 | `apps/desktop/src-tauri/**` |
 | MAC-SUČELJE | T78 → T79 → (T80) | `apps/desktop/src/**`, `apps/desktop/tests/**` (osim notices) |
 | orkestrator | T83, Faza 4, T84–T86 | `docs/**`, verzija, `.github/` |
 

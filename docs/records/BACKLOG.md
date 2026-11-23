@@ -232,7 +232,7 @@ stranih korisnika — oni će promijeniti redoslijed.
 | 5 | sati koji ne lažu | pragovi `session_gap_hours`/`session_start_hours` SU polja profila, nema sučelja; proxy označen (S-007) | prvo ručna korekcija po danu (mehanika kao `overrides.json`), pa senzor mtime-a |
 | 6 | izvoz | CLI već daje JSON | JSON/CSV = gumb + dijalog; PNG grafa kasnije |
 | 7 | tjedni izvještaj, „ovaj tjedan vs. prošli" | računljivo iz `days` bez snimki | usporedba projekata = zajednički graf (red gore) |
-| 8 | cross-platform | `CREATE_NO_WINDOW` je `#[cfg(windows)]`, autostart kroz `tauri-plugin-autostart` (sva tri OS-a), NSIS je samo odabrani bundle-cilj (S-029) | trošak: CI-matrica + `.dmg`/`.AppImage` + testovi putanja; nema Mac/Linux stroja za ručnu provjeru |
+| 8 | cross-platform | `CREATE_NO_WINDOW` je `#[cfg(windows)]`, autostart kroz `tauri-plugin-autostart` (sva tri OS-a), NSIS je samo odabrani bundle-cilj (S-029) | **macOS preuzet 2026-11-23 (S-043, plan `plan/MACOS.md`)**: Mac stroj postoji, CI-matrica macOS + Windows u `gates.yml` (mac/T85); Linux ostaje otvoren |
 | 9 | automatsko ažuriranje | instalater ručno | `tauri-plugin-updater` + GitHub Release `latest.json` + potpisni ključ; ide s prvim tagom (red „Potpisan instalater" gore) |
 | 10 | performanse na velikom repou | mjereno ≈ 330 commita u prozoru; keš po SHA-i i `--since` prozor bi trebali držati | jedan `#[ignore]` test nad velikim javnim repoom (50 000 commita, 30 grana) — „trebali" nije mjerenje |
 | 11 | engleski `docs/` | README EN (S-030), sučelje HR/EN; `docs/` HR po odluci i zbog učenja Rusta | najviše: engleski sažetak `ARCHITECTURE.md`; puni prijevod ne |

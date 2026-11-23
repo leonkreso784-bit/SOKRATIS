@@ -516,3 +516,21 @@ forka nema je privatan repo, a onda izdanje i instalater trebaju drugo javno mje
 **Odluka (Leon, 2026-10-10):** repo **ostaje javan** (S-023); fork na GitHubu se prihvaća kao posljedica
 javnog repoa. Licenca i dalje zabranjuje izmjenu i dijeljenje izvan onoga što GitHub sam radi.
 **Posljedice:** nijedna izmjena koda ni licence; otvoreno pitanje iz sesije 2026-09-29 je zatvoreno.
+
+## S-043 — macOS je druga platforma, uz Windows (2026-11-23)
+
+**Kontekst:** Leon od 2026-11-23 razvija na MacBooku (Apple Silicon). Projekt je do 1.0.1 građen i izdan
+samo za Windows. Pregled cijelog projekta na Macu izmjerio je kvarove N1–N12
+([`plan/MACOS.md`](../plan/MACOS.md) §0); Faza 1 (T74–T76) ih je za brane već riješila.
+**Odluka (Leon, 2026-11-23, sedam pitanja iz `MACOS.md` §1):**
+- **O1** Mac **uz** Windows: NSIS instalater i Windows kod ostaju.
+- **O2** identifikator se mijenja **samo na Macu** (zasebna Mac konfiguracija); Windows ostaje
+  `dev.sokratis.app`, pa nadogradnja postojećih instalacija radi kao i dosad.
+- **O3** Mac izdanje je **prvo samo za Leonov Mac** (lokalni build, bez potpisa); javni `.dmg` i potpis su M4.
+- **O4** samo **Apple Silicon** (`aarch64-apple-darwin`).
+- **O5** redoslijed: prvo **zakrpa 1.0.2** (T71–T73), zatim Mac Faze 2–5 i izdanje **1.1.0**.
+- **O6** `THIRD-PARTY-NOTICES` **zasebno po platformi**: svaki paket nosi popis onoga što je u njemu.
+- **O7** CI na GitHubu (brane na macOS-u i Windowsu na svakom pushu) **sada**, ne u M4.
+- **N12** `Cmd+Q` na Macu zatvara **odmah**, bez upita (običaj na Macu); X i `Cmd+W` i dalje pitaju (S-036).
+**Posljedice:** S-029 (NSIS) vrijedi za Windows. `CLAUDE.md`, README i `ARCHITECTURE.md` se usklađuju u
+cigli T84. Windows regresije više nitko ne vidi lokalno, pa CI postaje obavezna brana.
