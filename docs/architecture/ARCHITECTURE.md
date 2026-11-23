@@ -79,7 +79,11 @@ I/O je u `notices-build.mjs`:
 - **crateovi** = što `cargo tree -p sokratis-desktop -e normal --target x86_64-pc-windows-msvc` kaže da
   se prevodi (razrješava značajke kao pravi build); licencu, autore i mapu paketa daje `cargo metadata`.
   Sam graf iz `cargo metadata` uzima uniju značajki workspacea i broji crateove koji se ne prevode. Cargo
-  ide s `--locked --offline` — brana ne pomiče `Cargo.lock` i ne ide na mrežu;
+  ide s `--locked --offline` — brana ne pomiče `Cargo.lock` i ne ide na mrežu. `cargo tree` ovisnosti
+  proc-makroa rješava za DOMAĆINA, pa se njegov popis presijeca s `cargo metadata --filter-platform` istog
+  cilja (`notices.mjs::targetCrates`); otpali crateovi idu na stderr (mac/T76 — na Macu bi inače ušao
+  `swift-rs` → `base64`). Mac-izlaz je zato podskup Windowsova (danas isti); mjerodavan je `notices:check`
+  na Windowsu;
 - **npm paketi** = što stvarno ulazi u izgrađeno sučelje: Vite build u privremenu mapu (ne `dist/`),
   sa sourcemapama i bez minifikacije; imena paketa daju `sources` sourcemapa i licencni banneri u CSS-u,
   verzije `package-lock.json`. To nije skup ne-`dev` paketa iz locka;
@@ -281,8 +285,10 @@ Korak po korak, redoslijed je u `core/src/report.rs` (`build_report`) i nigdje d
    traže oblik `YYYY-MM-DD` → `ParseError::BadDate { field, text }`. Valjan JSON s regexom bez grupe
    ili s tipfelerom u datumu je **greška s imenom polja** (izlaz 3), ne panika i ne tiha kriva brojka.
    Uz njih se od `M2/1a` zove i `Profile::validate_paths` (ograda putanja iz profila na korijen
-   repoa): `inside_root` razlaže putanju kroz `std::path::Component` i s `matches!` odbija sve osim
-   `Normal`/`CurDir` (dakle `..`, apsolutnu putanju, `C:\…`, `\\server\share`), bez ijednog diranja
+   repoa): `inside_root` putanju čita kao čist tekst u kojem su `\` i `/` razdjelnici na **svakom** OS-u
+   i odbija početni razdjelnik (`/x`, `\x`, `\\server\share`), prefiks pogona (`C:`) i svaki `..`
+   segment; prazna putanja je korijen, dakle unutra. Profil je commitan, pa isti profil daje isti odgovor
+   na Windowsu i Macu (mac/T75; do tada `std::path::Component`, koji ovisi o OS-u). Bez ijednog diranja
    diska (S-002) → `ParseError::PathOutsideRoot { field, value }` imenuje prvo pogođeno od osam
    polja (M2/8, jezgreni dio duga I9). Io-dio ograde — `io::Project::open` zove `validate_paths()`
    odmah nakon učitavanja profila, prije nego se ijedna putanja pročita s diska (M2/14) — **dug I9 je
@@ -688,11 +694,15 @@ preskok splasha, `prefers-reduced-motion`, četiri teme): [`TESTING.md`](../work
 
 ## 12 · Izvan crateova: GitHub Actions
 
-Jedini workflow je **`.github/workflows/notify-sokrat-dev.yml`** (`7f19883`, 2026-10-10). Okida se kad se
+Dva workflowa. **`.github/workflows/gates.yml`** (mac/T85, S-043): na svaki push u `main` i pull request
+vrti pune brane (`cargo fmt --check` · `clippy --all-targets -D warnings` · `cargo test` · `npm run check`)
+na `macos-latest` i `windows-latest`; prije njih `npm run build` (desktop crate traži `dist/`) i `cargo fetch`
+(za `notices:check`). Toolchain čita iz `rust-toolchain.toml`.
+
+Drugi je **`.github/workflows/notify-sokrat-dev.yml`** (`7f19883`, 2026-10-10). Okida se kad se
 na GitHubu **objavi izdanje** (`release: published`) i radi samo jedno: `POST` na adresu iz tajne
 repozitorija `SOKRAT_DEV_DEPLOY_HOOK` (deploy hook stranice sokrat.dev), da stranica nanovo izgradi popis
 izdanja. **Bez postavljene tajne** workflow ispiše upozorenje i završi uspješno — izdanje ne pada.
 Stanje 2026-10-10: tajna **nije postavljena** (`gh secret list` prazan); postavlja je Leon.
 
-Workflow **ne gradi i ne testira** Sokratis — brane se vrte lokalno ([`TESTING.md`](../workflow/TESTING.md));
-CI s branama je kandidat M4 ([`BACKLOG.md`](../records/BACKLOG.md)).
+Taj workflow **ne gradi i ne testira** Sokratis; to radi `gates.yml`. Instalater se i dalje gradi lokalno.

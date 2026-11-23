@@ -113,6 +113,7 @@ dokaz (T64 u `main`-u 2026-09-27; vanjska lista od 14 prijedloga → BACKLOG) ·
 sesije. **[objava 1.0.0]** **S-039** licenca: besplatno korištenje, bez izmjena, dijeljenja i doprinosa (vlastiti tekst) ·
 **S-040** izdanje je javno: tag `v1.0.0`, GitHub, instalater priložen · **S-041** nakon gradnje 1.0.0 ostaje kako jest:
 dnevnik M1 u `PROGRESS.md`, zadani `since`, ploča, zaglavlja; brojci sati Leon ne vjeruje → kandidat M3 · **S-042** repo ostaje javan, fork se prihvaća.
+**[macOS]** **S-043** Mac uz Windows: identifikator samo na Macu, prvo samo Leonov Mac (bez potpisa), samo Apple Silicon, prvo 1.0.2 pa Mac pa 1.1.0, licence po platformi, CI sada, `Cmd+Q` zatvara odmah (plan `docs/plan/MACOS.md`).
 
 ## Agenti — više grana, jedan orkestrator
 Uloge i protokol: `docs/workflow/AGENTI.md`. Graditelj radi **jednu ciglu u svom stablu**, recenzent presuđuje

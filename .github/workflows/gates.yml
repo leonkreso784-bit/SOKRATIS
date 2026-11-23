@@ -1,0 +1,61 @@
+# Brane na oba sustava (mac/T85, S-043 O7): iste provjere kao pravilo #2 u CLAUDE.md, na macOS-u i
+# Windowsu, na svaki push u `main` i svaki pull request. Leon razvija na Macu, pa je ovo jedino mjesto
+# gdje se Windows regresije (`CREATE_NO_WINDOW`, NSIS, `\` u putanjama) vide prije izdanja.
+# Toolchain se ne navodi ovdje: `cargo` ga sam čita iz `rust-toolchain.toml` (pravilo #6, jedan izvor).
+name: Brane
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gates:
+    name: brane (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/desktop/package-lock.json
+
+      # Keš `target/` i registra; ključ uključuje Cargo.lock i toolchain, pa nova ovisnost gradi iznova.
+      - uses: Swatinem/rust-cache@v2
+
+      - name: npm ci
+        working-directory: apps/desktop
+        run: npm ci
+
+      # `tauri::generate_context!` traži izgrađeno sučelje (`frontendDist = ../dist`) već pri prevođenju
+      # desktop cratea, pa `dist/` mora postojati prije clippyja i testova.
+      - name: build sučelja
+        working-directory: apps/desktop
+        run: npm run build
+
+      # `notices:check` zove cargo `--offline` i s filtrom Windows cilja: na Mac runneru crateovi samo za
+      # Windows inače nisu u registru (docs/workflow/TESTING.md).
+      - name: cargo fetch
+        run: cargo fetch --locked
+
+      - name: cargo fmt --check
+        run: cargo fmt --check
+
+      - name: cargo clippy
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: cargo test
+        run: cargo test
+
+      - name: npm run check
+        working-directory: apps/desktop
+        run: npm run check

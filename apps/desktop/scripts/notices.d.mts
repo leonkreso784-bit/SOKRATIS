@@ -21,6 +21,7 @@ export function isLicenseFile(name: string): boolean;
 export function normalizeSpdx(expr: string): string;
 export function normalizeText(text: string): string;
 export function parseCargoTree(stdout: string): string[];
+export function targetCrates(treeKeys: Iterable<string>, metadataKeys: Iterable<string>): string[];
 export function packagesFromSources(sources: string[]): BundledPackage[];
 export function packagesFromBanners(text: string): BundledPackage[];
 export function personNames(field: Person | Person[] | null | undefined): string[];

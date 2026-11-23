@@ -1377,3 +1377,64 @@ na GitHubu (opis: [`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §12), do
 (`THIRD-PARTY-NOTICES.txt`, `LICENSE.txt`) · tajna `SOKRAT_DEV_DEPLOY_HOOK`
 ([`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §12). Zatim, tek uz njegov OK: M3 — brainstorming
 (glavna tema: sati kojima vjeruje), pa spec, pa plan.
+
+## 2026-11-23 (OPUS) — Sokratis na macOS-u: pregled projekta, plan MACOS.md, Faza 1 (brane zelene na Macu)
+
+**Leon od danas razvija na MacBooku** (Apple Silicon arm64, macOS 26.6); sve do sada je rađeno i izdano na
+Windowsu.
+
+### Zatečeno
+- **T69 i T70 zakrpe 1.0.2 već su u `main`-u** (merge `f97b3c5`, 2026-10-11; recenzija SPOJIVO, pet Minor),
+  a nisu imali ni unos ovdje ni redak u `CHANGELOG.md`. Redak u `CHANGELOG.md` `[Unreleased]` dopisan danas.
+- **T71 je započet, a nije spojen:** grana `origin/feat/docs-source` nosi jedan commit (`83bf692`) iznad
+  `main`-a; lokalno ni grane ni stabla nema.
+
+### Pregled i plan
+- Cijeli projekt pregledan s Maca i izmjeren: okruženje spremno, CLI nad `~/Documents/sokratstudy.f6` radi,
+  ali **`cargo test` 4 crvena i `npm run notices:check` crven** — po pravilu #2 s Maca se nije moglo
+  commitati ništa. Nalazi N1–N12, odluke O1–O7 i cigle T74–T86: [`../plan/MACOS.md`](../plan/MACOS.md)
+  (✏️ prijedlog; O1–O7 čekaju Leona). Plan je u indeksu docs-a.
+- Leon: „kreni" → izvedena je **Faza 1** (T74–T76), koja ne ovisi o O1–O7.
+
+### Isporučeno (Faza 1, dva paralelna toka)
+- **MAC-BRANE** → merge `a33359c`:
+  - **mac/T74** (`b3b3a06`) — io testovi (`tests/project.rs`, `tests/write.rs`) uspoređuju putanje kroz
+    `canonicalize()` na obje strane: `/var` je na macOS-u poveznica na `/private/var`, a git vraća
+    razriješenu putanju. Produkcijski kod nije diran. Recenzija **SPOJIVO**, jedan Minor (obrazloženje stoji uz
+    `assert`, ne u zaglavlju datoteke) — prihvaćen.
+  - **mac/T75** (`36ffbbc` + dopuna `ad57bc9`) — `inside_root` (`core/src/profile.rs`) čita putanju kao čist
+    tekst: `\` i `/` su razdjelnici na svakom OS-u, odbijeni su početni razdjelnik (i `\\server`), prefiks pogona
+    i `..`; prazno = korijen = unutra. Razlog: `profile.json` je commitan, pa isti profil mora dobiti isti
+    odgovor na svakom OS-u. Recenzija: **VRATI** u prvom krugu (zaglavlje još opisivalo M2/8 i
+    `std::path::Component`; nije bilo testa za prazan string) → popravljeno → **SPOJIVO**.
+- **MAC-NOTICES** → merge `b814d9e`:
+  - **mac/T76** (`1f12f94` + dopuna `ae4584e`) — nova čista funkcija `targetCrates` u `scripts/notices.mjs`;
+    `notices-build.mjs` presijeca `cargo tree --target` s `cargo metadata --filter-platform` cilja, jer
+    `cargo tree` ovisnosti proc-makroa rješava za domaćina (na Macu `swift-rs` → `base64 0.21.7`). Preskočeni
+    crateovi idu na stderr. `THIRD-PARTY-NOTICES.txt` je bajt-za-bajt isti kao onaj s Windowsa (izmjereno).
+    Mac-izlaz je u teoriji podskup, jer bi proc-makro ovisnost samo za Windows domaćina na Macu izostala, pa
+    je mjerodavan `notices:check` na Windowsu. Recenzija **SPOJIVO**, tri Minor popravljena (među njima
+    ublažena tvrdnja o jednakosti).
+- **Odstupanje od plana:** T76 nije dobio argument `--target` (plan je tako predlagao, uz napomenu „oblik ovisi
+  o O6"). Cilj ostaje Windows, a skripta je samo prestala ovisiti o domaćinu, pa O6 ostaje otvoren.
+  Jednokratni `cargo fetch` na novom stroju (N3a) zapisan je u [`../workflow/TESTING.md`](../workflow/TESTING.md) §4.
+
+### Provjereno (pune brane na `main`-u, Mac)
+`cargo fmt --check` ✅ · `cargo clippy --all-targets -- -D warnings` ✅ · `cargo test` **193 prošlo / 0 palo /
+2 ignorirana** · `npm run check` ✅ (vitest 165, svelte-check 0 grešaka, i18n 349 ključeva hr = en, kontrast
+4 teme). Grane `feat/mac-brane` i `feat/mac-notices` i njihova stabla obrisani (potpuno spojeni).
+
+### Dokumentacija
+`CHANGELOG.md` `[Unreleased]` (T69, T70, T74–T76) · `ARCHITECTURE.md` (`inside_root` bez `Component`;
+presjek crateova u opisu obavijesti) · `TESTING.md` (`cargo fetch`, stderr na Macu) · `RUST.md` §4
+(`canonicalize`, uzorak od niza znakova + `all`; `Component` i `matches!` više ne pokazuju na `inside_root`) i
+§5 (presjek kroz `Set`) · `MACOS.md` (Faza 1 ✅) · `ROADMAP.md`.
+
+### Što slijedi
+Nastavak zakrpe 1.0.2 s ovog Maca: T71 s grane `origin/feat/docs-source`, pa T72, T73, a zatim Faze 2–5 plana `MACOS.md`.
+
+### Odluke i CI (isti dan)
+Leon je odgovorio na O1–O7 i N12, sve po preporuci → **S-043** (`DECISIONS.md`; sažetak i u `CLAUDE.md`).
+Nova cigla **T87** (popis licenci po platformi, O6) je u Fazi 3. Po O7 odmah ide **mac/T85**:
+`.github/workflows/gates.yml`, pune brane na `macos-latest` i `windows-latest` na svaki push u `main` i PR
+(`ARCHITECTURE.md` §12). Ishod prvog pokretanja: GitHub Actions za taj commit.

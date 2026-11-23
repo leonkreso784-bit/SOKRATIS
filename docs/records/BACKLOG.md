@@ -108,7 +108,7 @@ je riješen zakrpom 1.0.1 — [`CHANGELOG.md`](./CHANGELOG.md) `[1.0.1]`.
 | izvor | stavka | mjesto |
 |---|---|---|
 | m2 | pokazatelj zatvorenih faza u razdoblju gleda samo `since`, ne `until` | `core/src/metrics/indicators.rs` |
-| m5 · 1744 | jedan commit okida 1–3 `report_updated` (višak izračuna i snimki, nije petlja); uzrok mjeriti ispisom sirove putanje u `debounce_loop` | `io/src/watch.rs` |
+| m5 · 1744 | jedan commit okida 1–3 `report_updated` (višak izračuna i snimki, nije petlja); uzrok mjeriti ispisom sirove putanje u `debounce_loop`. **Posljedica u branama (izmjereno 2026-10-11):** test `a_commit_yields_exactly_one_git_event_within_two_seconds` pada kad je stroj opterećen (paralelni build drugog stabla) — 2 pada u punoj brani; sam 8/8, cijela datoteka 3/3, puna brana na mirnom stroju zelena. Brana je tada lažno crvena | `io/src/watch.rs`, `io/tests/watch.rs:68` |
 | m6 | greška izračuna ide samo na stderr; kartica projekta s pokvarenim profilom trajno piše „još nije izračunano" | `desktop/src-tauri/src/engine.rs`, `commands.rs::list_projects` |
 | m8 · 988 | `Store::open` kroz `expect`; migracija i `schema_version` nisu u istoj transakciji; druga instanca otvara bazu prije odbijanja, bez `busy_timeout` | `desktop/src-tauri/src/lib.rs`, `store/src/store.rs` |
 | m9 | `MockApi` i cijeli insta snapshot u produkcijskom `main.js` (dinamički `import()` u `createApi`) | `apps/desktop/src/lib/api.ts` |
@@ -232,7 +232,7 @@ stranih korisnika — oni će promijeniti redoslijed.
 | 5 | sati koji ne lažu | pragovi `session_gap_hours`/`session_start_hours` SU polja profila, nema sučelja; proxy označen (S-007) | prvo ručna korekcija po danu (mehanika kao `overrides.json`), pa senzor mtime-a |
 | 6 | izvoz | CLI već daje JSON | JSON/CSV = gumb + dijalog; PNG grafa kasnije |
 | 7 | tjedni izvještaj, „ovaj tjedan vs. prošli" | računljivo iz `days` bez snimki | usporedba projekata = zajednički graf (red gore) |
-| 8 | cross-platform | `CREATE_NO_WINDOW` je `#[cfg(windows)]`, autostart kroz `tauri-plugin-autostart` (sva tri OS-a), NSIS je samo odabrani bundle-cilj (S-029) | trošak: CI-matrica + `.dmg`/`.AppImage` + testovi putanja; nema Mac/Linux stroja za ručnu provjeru |
+| 8 | cross-platform | `CREATE_NO_WINDOW` je `#[cfg(windows)]`, autostart kroz `tauri-plugin-autostart` (sva tri OS-a), NSIS je samo odabrani bundle-cilj (S-029) | **macOS preuzet 2026-11-23 (S-043, plan `plan/MACOS.md`)**: Mac stroj postoji, CI-matrica macOS + Windows u `gates.yml` (mac/T85); Linux ostaje otvoren |
 | 9 | automatsko ažuriranje | instalater ručno | `tauri-plugin-updater` + GitHub Release `latest.json` + potpisni ključ; ide s prvim tagom (red „Potpisan instalater" gore) |
 | 10 | performanse na velikom repou | mjereno ≈ 330 commita u prozoru; keš po SHA-i i `--since` prozor bi trebali držati | jedan `#[ignore]` test nad velikim javnim repoom (50 000 commita, 30 grana) — „trebali" nije mjerenje |
 | 11 | engleski `docs/` | README EN (S-030), sučelje HR/EN; `docs/` HR po odluci i zbog učenja Rusta | najviše: engleski sažetak `ARCHITECTURE.md`; puni prijevod ne |
