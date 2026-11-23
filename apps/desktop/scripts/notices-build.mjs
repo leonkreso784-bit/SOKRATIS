@@ -11,7 +11,9 @@
 // datoteka nije ono što bi skripta napisala.
 // (cigla mac/T76) `cargo tree --target` ovisnosti proc-makroa rješava za DOMAĆINA, pa na Macu donese
 // i crateove samo za macOS (`swift-rs` → `base64`). Zato se njegov popis presijeca s paketima iz
-// `cargo metadata` za cilj (`targetCrates`): popis crateova je isti gradi li se na Windowsu ili Macu.
+// `cargo metadata` za cilj (`targetCrates`). Na Macu je popis danas isti kao na Windowsu (izmjereno
+// 2026-11-23), ali proc-makro ovisnost samo za Windows domaćina na Macu bi izostala — mjerodavan je
+// `notices:check` na Windowsu. Preskočeni crateovi idu jednim retkom na stderr, da novi bude vidljiv.
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -55,7 +57,10 @@ function crateComponents() {
     byKey.set(key, p);
   }
   const tree = parseCargoTree(cargo(['tree', '-p', 'sokratis-desktop', '-e', 'normal', '--target', TARGET, '--prefix', 'none']));
-  return targetCrates(tree, byKey.keys()).map((key) => {
+  const used = targetCrates(tree, byKey.keys());
+  const skipped = tree.filter((key) => !used.includes(key));
+  if (skipped.length) console.error(`notices: preskočeno kao ovisnost domaćina: ${skipped.join(', ')}`);
+  return used.map((key) => {
     const p = byKey.get(key);
     return {
       kind: 'crate',

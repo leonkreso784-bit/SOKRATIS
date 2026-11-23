@@ -102,8 +102,9 @@ export function parseCargoTree(stdout) {
  * Crateovi koji se prevode za CILJ: ključevi iz `cargo tree --target` koje poznaje i `cargo metadata
  * --filter-platform` za isti cilj. `cargo tree` ovisnosti proc-makroa rješava za DOMAĆINA (stroj
  * koji gradi), pa na Macu donese i crateove samo za macOS (npr. `swift-rs` → `base64`) koji se u
- * Windows izvršnu datoteku ne prevode; metapodaci cilja ih nemaju i ovdje otpadaju. Sortirano kao
- * `parseCargoTree`, jedinstveno.
+ * Windows izvršnu datoteku ne prevode; metapodaci cilja ih nemaju i ovdje otpadaju. Obrnuto se ne
+ * popravlja: proc-makro ovisnost samo za Windows domaćina na Macu bi izostala, pa je Mac-popis
+ * podskup (danas isti, izmjereno 2026-11-23). Sortirano kao `parseCargoTree`, jedinstveno.
  */
 export function targetCrates(treeKeys, metadataKeys) {
   const known = new Set(metadataKeys);

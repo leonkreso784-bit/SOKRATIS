@@ -13,8 +13,8 @@ import {
   packagesFromSources,
   parseCargoTree,
   personNames,
-  targetCrates,
   renderNotices,
+  targetCrates,
   type Component,
 } from '../scripts/notices.mjs';
 
