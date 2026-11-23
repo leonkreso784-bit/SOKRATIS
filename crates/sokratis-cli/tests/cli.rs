@@ -297,3 +297,45 @@ fn not_a_repo_exits_3_with_message() {
     assert_eq!(out.status.code(), Some(3));
     assert!(String::from_utf8_lossy(&out.stderr).contains("nije git repozitorij"));
 }
+
+/// Zakrpa 1.0.2/T71: `docs` (i `report --table`) kaže ŠTO je mjerio — redak
+/// `mjereno: <grana> @ <7 znakova SHA> · <stablo>`; `docs --json` nosi puna polja pod `source`.
+/// Fixture ima mapu `docs/` jer bez nje `report --table` sekciju dokumentacije ni ne ispisuje.
+#[test]
+fn docs_names_the_branch_commit_and_worktree_it_measured() {
+    let r = Repo::init();
+    r.commit(
+        "docs/README.md",
+        "# x
+",
+        "docs: readme",
+        "2026-09-01T10:00:00+02:00",
+        "2026-09-01T10:00:00+02:00",
+    );
+    let full_sha = r.git(&["rev-parse", "HEAD"]);
+    let expected = format!("mjereno: main @ {} · ", &full_sha[..7]);
+
+    let out = bin().arg("docs").arg(r.path()).output().unwrap();
+    assert_eq!(out.status.code(), Some(0));
+    let text = String::from_utf8_lossy(&out.stdout);
+    assert!(text.contains(&expected), "{text}");
+
+    let out = bin()
+        .args(["report", "--table", "--since", "2026-09-01"])
+        .arg(r.path())
+        .output()
+        .unwrap();
+    let text = String::from_utf8_lossy(&out.stdout);
+    assert!(text.contains(&expected), "{text}");
+
+    let out = bin()
+        .args(["docs", "--json"])
+        .arg(r.path())
+        .output()
+        .unwrap();
+    let v: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert!(v["score"].is_u64(), "postojeća polja ostaju: {v}");
+    assert_eq!(v["source"]["branch"], "main");
+    assert_eq!(v["source"]["commit"], full_sha.as_str());
+    assert!(v["source"]["worktree"].is_string());
+}

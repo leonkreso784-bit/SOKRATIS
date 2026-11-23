@@ -9,6 +9,8 @@
 //! uporabe, koju `try_parse` u `run()` već pretvara u izlaz 3 (ne 2/ALERT, I4). `--scope` pregazi
 //! `Profile.branch_scope` U MEMORIJI (nakon `Project::open`, prije čitanja loga) — datoteka
 //! profila se ne dira, pa naredba ostaje bez nuspojava na disku.
+//! (zakrpa 1.0.2, T71) `docs --json` pretvori `DocsHealth` u `serde_json::Value` i u njegov
+//! objekt (`as_object_mut`) doda ključ `source` — postojeća polja ostaju ista, novo je dodano.
 mod table;
 
 use clap::{Parser, Subcommand};
@@ -109,10 +111,22 @@ fn run() -> anyhow::Result<i32> {
         }
         Cmd::Docs { path, json } => {
             let r = report_for(path, None, None, None)?;
+            let source = r.docs_source.as_ref();
             match (&r.docs, json) {
-                (Some(d), true) => println!("{}", serde_json::to_string_pretty(d)?),
-                (Some(d), false) => println!("{}", table::render_docs(d)),
-                (None, _) => println!("docs: nema mape s dokumentacijom (n/a)"),
+                (Some(d), true) => {
+                    let mut value = serde_json::to_value(d)?;
+                    if let Some(object) = value.as_object_mut() {
+                        object.insert("source".into(), serde_json::to_value(source)?);
+                    }
+                    println!("{}", serde_json::to_string_pretty(&value)?);
+                }
+                (Some(d), false) => println!("{}", table::render_docs(d, source)),
+                (None, _) => {
+                    println!("docs: nema mape s dokumentacijom (n/a)");
+                    if let Some(source) = source {
+                        println!("{}", table::source_line(source));
+                    }
+                }
             }
             Ok(0)
         }

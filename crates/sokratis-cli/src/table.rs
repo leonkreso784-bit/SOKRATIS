@@ -9,7 +9,14 @@
 //! pravilo je aritmetičko, ne rječničko. Zaglavlje se PREPIŠE (ne dopunjuje) da imenuje stvarno
 //! mjereni doseg (`opseg: …`) umjesto same zadane grane — nalaz vanjske analize: `grana main ·
 //! 334 commita` je tvrdio krivu brojku (334 su commiti SVIH grana, ne samo `main`-a).
-use sokratis_core::{BranchScope, DocsHealth, IndicatorKind, PhaseState, Report, Severity, Signal};
+//!
+//! (zakrpa 1.0.2, T71 — izvor dokumentacije) `render_docs` prima `Option<&DocsSource>`: posuđuje
+//! izvor iz `Report`-a umjesto da ga kopira, a `None` znači „redak se ne piše". Grana je
+//! `Option<String>` pa `as_deref().unwrap_or("detached")` daje `&str` u oba slučaja; kratki SHA je
+//! `get(..7)` — vraća `None` umjesto pada ako je tekst kraći, pa ni čudan ulaz ne ruši ispis.
+use sokratis_core::{
+    BranchScope, DocsHealth, DocsSource, IndicatorKind, PhaseState, Report, Severity, Signal,
+};
 use std::fmt::Write;
 
 /// Hrvatski paucal: 1 → „grana", 2–4 (osim 12–14, npr. „12 grana") → „grane", inače → „grana".
@@ -149,13 +156,21 @@ pub fn render(r: &Report) -> String {
         );
     }
     if let Some(d) = &r.docs {
-        let _ = writeln!(s, "\n{}", render_docs(d));
+        let _ = writeln!(s, "\n{}", render_docs(d, r.docs_source.as_ref()));
     }
     let _ = writeln!(s, "\nSIGNALI\n{}", render_signals(&r.signals));
     s
 }
 
-pub fn render_docs(d: &DocsHealth) -> String {
+/// Redak `mjereno: <grana ili "detached"> @ <7 znakova SHA> · <stablo>` — iz kojeg je stabla,
+/// grane i commita dokumentacija pročitana (zakrpa 1.0.2).
+pub fn source_line(source: &DocsSource) -> String {
+    let branch = source.branch.as_deref().unwrap_or("detached");
+    let short_sha = source.commit.get(..7).unwrap_or(&source.commit);
+    format!("mjereno: {branch} @ {short_sha} · {}", source.worktree)
+}
+
+pub fn render_docs(d: &DocsHealth, source: Option<&DocsSource>) -> String {
     let mut s = String::new();
     let _ = writeln!(
         s,
@@ -166,6 +181,9 @@ pub fn render_docs(d: &DocsHealth) -> String {
             .map(|x| format!("{x} dana"))
             .unwrap_or_else(|| "n/a".into())
     );
+    if let Some(source) = source {
+        let _ = writeln!(s, "{}", source_line(source));
+    }
     for f in &d.findings {
         let line = f.line.map(|l| format!(":{l}")).unwrap_or_default();
         let _ = writeln!(s, "  {:<22} {}{}  {}", f.check, f.path, line, f.message);
@@ -240,6 +258,7 @@ mod tests {
             vision_totals: vec![],
             docs: None,
             signals: vec![],
+            docs_source: None,
         };
         let s = render(&r);
         assert!(
@@ -261,6 +280,34 @@ mod tests {
         }]);
         assert!(sig.contains("WARN") && sig.contains("docs-lag") && sig.contains("  - dokaz"));
         assert_eq!(render_signals(&[]), "nema signala");
+    }
+
+    /// Zakrpa 1.0.2/T71: redak izvora ima granu ILI riječ „detached" (kad grane nema), sedam
+    /// znakova SHA-a i putanju stabla; bez izvora (`None`) redak se ne ispisuje.
+    #[test]
+    fn docs_show_where_they_were_measured() {
+        let health = DocsHealth {
+            score: 90,
+            findings: vec![],
+            lag_days: Some(0),
+        };
+        let mut source = DocsSource {
+            worktree: "fixture/wt".into(),
+            branch: Some("feat/x".into()),
+            commit: "a1b2c3d4e5f60718293a4b5c6d7e8f9012345678".into(),
+        };
+        let text = render_docs(&health, Some(&source));
+        assert!(
+            text.contains("mjereno: feat/x @ a1b2c3d · fixture/wt"),
+            "{text}"
+        );
+        source.branch = None;
+        let text = render_docs(&health, Some(&source));
+        assert!(
+            text.contains("mjereno: detached @ a1b2c3d · fixture/wt"),
+            "{text}"
+        );
+        assert!(!render_docs(&health, None).contains("mjereno"));
     }
 
     /// Gradi minimalan `Report` s danim opsegom i granama — zajednički temelj za testove
@@ -291,6 +338,7 @@ mod tests {
             vision_totals: vec![],
             docs: None,
             signals: vec![],
+            docs_source: None,
         }
     }
 
@@ -388,6 +436,7 @@ mod tests {
             vision_totals: vec![],
             docs: None,
             signals: vec![],
+            docs_source: None,
         };
         let s = render(&r);
         assert!(!s.contains("TUĐA POVIJEST"), "{s}");

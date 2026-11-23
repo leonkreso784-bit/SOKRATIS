@@ -30,6 +30,10 @@
 //! pravilima, PRIJE `Context`-a — isti obrazac kao svaki drugi korak mjerenja (sastavljanje ostaje
 //! jedino mjesto koje zna redoslijed). `Report.branches` (sekcija Grane) ostaje nedirnuta jer čita
 //! `input.branches` izravno (`branch_stats`, red iznad) — `contained_in` je novost SAMO za pravila.
+//!
+//! Dopuna (zakrpa 1.0.2, T71): `docs_source` se u `Report` samo KLONIRA iz ulaza — jezgra ne zna
+//! ni git ni disk (S-002), pa izvor dokumentacije ne računa, nego ga prenosi uz rezultat
+//! `docs_health` (koji ostaje netaknut).
 use crate::chains::{assign_containment, parse_parents};
 use crate::docs::docs_health;
 use crate::metrics::indicators::IndicatorInput;
@@ -178,6 +182,7 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
         visions: input.visions.clone(),
         docs,
         signals,
+        docs_source: input.docs_source.clone(),
     })
 }
 
@@ -186,7 +191,7 @@ pub fn build_report(input: &ReportInput, profile: &Profile) -> Result<Report, Pa
 // roditelja i potomaka, a `snapshot::tests` (brat, ne potomak) treba `report::tests::input()`.
 pub(crate) mod tests {
     use super::*;
-    use crate::{BranchInfo, BranchScope, DocFile, WorkKind};
+    use crate::{BranchInfo, BranchScope, DocFile, DocsSource, WorkKind};
     use std::collections::HashMap;
 
     const LOG: &str = "@@a1|1788700000|1788700000|2026-08-28|2026-08-28|F1/1 prije since\n1\t0\tjs/a.js\n\n@@b2|1788854400|1788854400|2026-09-04|2026-09-04|fix: kvar u js\n5\t1\tjs/b.js\n\n@@c3|1788858000|1788858000|2026-09-04|2026-09-04|docs: zapis\n3\t0\tdocs/records/PROGRESS.md\n";
@@ -222,6 +227,7 @@ pub(crate) mod tests {
             commit_branches: HashMap::new(),
             worktrees: 1,
             branch_graph: String::new(),
+            docs_source: None,
         }
     }
 
@@ -403,6 +409,37 @@ pub(crate) mod tests {
             }
             other => panic!("očekivan BadDate, dobiveno {other:?}"),
         }
+    }
+
+    /// Zakrpa 1.0.2/T71: jezgra izvor dokumentacije NE računa — prepiše ga iz ulaza u `Report`
+    /// nepromijenjenog (S-002: putanju stabla, granu i SHA zna samo `io`). `None` ostaje `None`.
+    #[test]
+    fn docs_source_is_copied_from_input_unchanged() {
+        let src = DocsSource {
+            worktree: "fixture/wt".into(),
+            branch: Some("feat/x".into()),
+            commit: "a".repeat(40),
+        };
+        let mut i = input();
+        i.docs_source = Some(src.clone());
+        let r = build_report(&i, &Profile::default()).unwrap();
+        assert_eq!(r.docs_source, Some(src));
+
+        i.docs_source = None;
+        let r = build_report(&i, &Profile::default()).unwrap();
+        assert_eq!(r.docs_source, None);
+    }
+
+    /// Zakrpa 1.0.2/T71: JSON `Report`-a iz vremena prije polja `docs_source` (nijedan se danas ne
+    /// sprema, ali sučelje ili skripta ga mogu držati) i dalje se čita — polje tipa `Option` koje u
+    /// JSON-u nedostaje serde čita kao `None`, bez `#[serde(default)]`.
+    #[test]
+    fn report_json_without_docs_source_still_deserializes() {
+        let r = build_report(&input(), &Profile::default()).unwrap();
+        let mut json = serde_json::to_value(&r).unwrap();
+        json.as_object_mut().unwrap().remove("docs_source");
+        let back: Report = serde_json::from_value(json).unwrap();
+        assert_eq!(back.docs_source, None);
     }
 
     #[test]

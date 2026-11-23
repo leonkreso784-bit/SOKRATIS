@@ -52,6 +52,7 @@ fn input(scope: BranchScope, map: &[(&str, &str)]) -> ReportInput {
             .collect(),
         worktrees: 1,
         branch_graph: String::new(),
+        docs_source: None,
     }
 }
 

@@ -41,6 +41,7 @@ fn matches_rad_xlsx_except_fixed_hours() {
         commit_branches: HashMap::new(),
         worktrees: 1,
         branch_graph: String::new(),
+        docs_source: None,
     };
     let r =
         build_report(&input, &Profile::default()).expect("fixture je čist ulaz za build_report");
