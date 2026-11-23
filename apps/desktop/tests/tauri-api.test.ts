@@ -214,6 +214,7 @@ function fakeReport(commits: number): Report {
     vision_totals: [],
     docs: null,
     signals: [],
+    docs_source: null,
   };
 }
 

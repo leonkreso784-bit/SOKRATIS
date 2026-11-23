@@ -1,5 +1,6 @@
 // ZAŠTO OVAKO (cigla M2/26 — čisti izračuni odvojeni od Overview.svelte; dopunjeno M2/58 —
-// `signalCounts` broji signale po težini za kartice sažetka ploče projekta, S-034)
+// `signalCounts` broji signale po težini za kartice sažetka ploče projekta, S-034;
+// dopunjeno 1.0.2/T72 — `shortSha`/`docsSourceLabel`/`docsSourceTitle` slažu redak „Mjereno: …“)
 // Sortiranje, boja po težini i sažetak signala su čisti izračuni bez DOM-a/Svelte runa — žive u
 // `.ts` modulu da ih vitest testira izravno (isti obrazac kao `format.ts`, S-012), a `Overview.svelte`
 // ostaje tanak prikaz koji samo poziva ove funkcije. Množina ide iz rječnika (S-021), ova datoteka
@@ -7,7 +8,7 @@
 import { translate, type Dict } from '../lib/i18n/t';
 import { kindLabel } from '../lib/format';
 import type { Series } from '../lib/charts/layout';
-import type { CommitRow, Delivery, Phase, ProjectSummary, Severity, Signal, Vision, WorkKind } from '../lib/types';
+import type { CommitRow, Delivery, DocsSource, Phase, ProjectSummary, Severity, Signal, Vision, WorkKind } from '../lib/types';
 
 const SEVERITY_RANK: Record<Severity, number> = { alert: 0, warn: 1, info: 2 };
 const NO_SIGNAL_RANK = 3;
@@ -68,6 +69,28 @@ export function signalSummary(c: { info: number; warn: number; alert: number }, 
 // je zaseban ključ i ostaje isti.
 export function worktreesLabel(dict: Dict, n: number): string {
   return translate(dict, `overview.worktrees.${pluralCategory(n)}`, { n });
+}
+
+// Kratki SHA za prikaz — 7 znakova, isto koliko CLI ispisuje u retku `mjereno:` (T71).
+export function shortSha(sha: string): string {
+  return sha.slice(0, 7);
+}
+
+// „Mjereno: grana X @ abc1234“ uz ocjenu dokumentacije (T72). `null` izvor → `null`, pa komponenta
+// redak NE crta (nema praznog „Mjereno: “). Bez grane (detached HEAD) piše `docs.source.detached`.
+export function docsSourceLabel(source: DocsSource | null, dict: Dict): string | null {
+  if (source === null) return null;
+  const ref =
+    source.branch === null
+      ? translate(dict, 'docs.source.detached')
+      : translate(dict, 'docs.source.branch', { name: source.branch });
+  return translate(dict, 'docs.source', { ref, sha: shortSha(source.commit) });
+}
+
+// Tekst za `title` istog retka: puni SHA i putanja stabla — ono što kratki redak namjerno izostavlja.
+export function docsSourceTitle(source: DocsSource | null, dict: Dict): string | null {
+  if (source === null) return null;
+  return translate(dict, 'docs.source.title', { worktree: source.worktree, commit: source.commit });
 }
 
 // Pogled Faze (cigla M2/27) razvrstava `Report.phases` po `state` u tri odjeljka; jezgra već zna

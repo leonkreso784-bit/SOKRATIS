@@ -10,6 +10,10 @@
 // `branches`: ista dva teksta ("all"/"default") kao Rustov `#[serde(rename)]`.
 // Dopunjeno M2/47 (S-033) — `Touched.worktrees`/`diaries`: mjerač kaže koliko je stabala i tekstova
 // dnevnika dotaknuo (isto polje kao Rustov `Touched`, zadnja dva polja).
+// Dopunjeno 1.0.2/T72 — `DocsSource` i `Report.docs_source` (T71): iz kojeg je radnog stabla, grane i
+// commita dokumentacija mjerena; `null` kad vodeće stablo nije poznato (npr. zapis prije 1.0.2, Rustov
+// `Option`). Ne ovisi o `docs` (`docs = null` uz `docs_source ≠ null` je moguć); ploča ga prikazuje
+// samo uz ocjenu (`docs`).
 import type { Lang } from './i18n/index.svelte';
 
 export type { Lang };
@@ -114,6 +118,14 @@ export interface DocsHealth {
   lag_days: number | null;
 }
 
+// Zrcali `DocsSource` iz `model.rs` (T71): vodeće stablo (S-033) iz kojeg je `docs` izmjeren.
+// `branch` je `null` za detached HEAD; `commit` je puni SHA (sučelje samo skraćuje za prikaz).
+export interface DocsSource {
+  worktree: string;
+  branch: string | null;
+  commit: string;
+}
+
 export interface Signal {
   rule: string;
   severity: Severity;
@@ -153,6 +165,7 @@ export interface Report {
   vision_totals: VisionTotal[];
   docs: DocsHealth | null;
   signals: Signal[];
+  docs_source: DocsSource | null;
 }
 
 // ── Ono što `model.rs` ne zna: oblici koje treba SAMO sučelje (popis projekata, raspon, postavke). ──

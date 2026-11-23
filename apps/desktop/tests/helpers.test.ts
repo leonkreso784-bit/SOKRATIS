@@ -11,6 +11,8 @@
 // sections.ts`) su popis osam sekcija na JEDNOM mjestu, provjeren protiv oba rječnika; `VIEWS`
 // (`lib/types.ts`) više nema šest prikaznih pogleda (postali su sekcije); `signalCounts` (novo u
 // `views/helpers.ts`) broji signale po težini za kartice sažetka.
+// Dopunjeno 1.0.2/T72 — `docsSourceLabel`/`docsSourceTitle`/`shortSha`: redak „Mjereno: grana X @
+// abc1234“ uz ocjenu dokumentacije (grana · detached · kratki SHA · `null` izvor), na pravim rječnicima.
 // Čiste funkcije, čist test bez DOM-a i bez Svelte runa: `hr.json` uvezen izravno kao `Dict`, isti
 // obrazac kao `tests/format.test.ts` — `signalSummary` tako vidi PRAVI rječnik, ne ručno prepisan
 // tekst (S-010), a hrvatska množina (jedan/dva-četiri/pet i više) se provjerava na stvarnim ključevima.
@@ -18,12 +20,14 @@ import { describe, expect, it, vi } from 'vitest';
 import hr from '../src/lib/i18n/hr.json';
 import en from '../src/lib/i18n/en.json';
 import { kindLabel } from '../src/lib/format';
-import type { CommitRow, Delivery, Phase, ProjectSummary, Signal, Vision, WorkKind } from '../src/lib/types';
+import type { CommitRow, Delivery, DocsSource, Phase, ProjectSummary, Signal, Vision, WorkKind } from '../src/lib/types';
 import { VIEWS } from '../src/lib/types';
 import { SECTIONS, sectionId, sectionKey } from '../src/views/project/sections';
 import {
   bricksPerDay,
   copyText,
+  docsSourceLabel,
+  docsSourceTitle,
   joinRepoPath,
   kindColor,
   kindSeries,
@@ -31,6 +35,7 @@ import {
   phaseRows,
   replaceVisionAt,
   severityClass,
+  shortSha,
   signalCounts,
   signalSummary,
   sortDeliveries,
@@ -354,5 +359,32 @@ describe('ploča projekta — sekcije', () => {
   });
   it('VIEWS više nema šest prikaznih pogleda', () => {
     expect(VIEWS).toEqual(['overview', 'project', 'diary', 'visions']);
+  });
+});
+
+describe('izvor mjerenja dokumentacije (T72)', () => {
+  const sha = 'a1b2c3d4e5f60718293a4b5c6d7e8f9012345678';
+  const onBranch: DocsSource = { worktree: '/p/sokratstudy.dev', branch: 'feat/primjer', commit: sha };
+  const detached: DocsSource = { worktree: '/p/sokratstudy.x', branch: null, commit: sha };
+
+  it('shortSha uzima prvih 7 znakova', () => {
+    expect(shortSha(sha)).toBe('a1b2c3d');
+  });
+  it('grana: HR i EN tekst s kratkim SHA-om', () => {
+    expect(docsSourceLabel(onBranch, hr)).toBe('Mjereno: grana feat/primjer @ a1b2c3d');
+    expect(docsSourceLabel(onBranch, en)).toBe('Measured: branch feat/primjer @ a1b2c3d');
+  });
+  it('detached HEAD: umjesto grane piše detached', () => {
+    expect(docsSourceLabel(detached, hr)).toBe('Mjereno: detached HEAD @ a1b2c3d');
+    expect(docsSourceLabel(detached, en)).toBe('Measured: detached HEAD @ a1b2c3d');
+  });
+  it('null izvor: nema retka (i nema naslova)', () => {
+    expect(docsSourceLabel(null, hr)).toBeNull();
+    expect(docsSourceTitle(null, hr)).toBeNull();
+  });
+  it('title nosi puni SHA i putanju stabla', () => {
+    const title = docsSourceTitle(onBranch, hr) ?? '';
+    expect(title).toContain(sha);
+    expect(title).toContain('/p/sokratstudy.dev');
   });
 });

@@ -18,11 +18,15 @@
   // `Promise.all` umjesto po pokazatelju: `docs_score` (`docs.rs`), `signals_warn`/`signals_alert`
   // (broj signala te težine, `snapshots.rs`). Snimke postoje tek OTKAD `engine.rs::try_snapshot`
   // upisuje dan — prazno prije prvog mjerenja, ne greška (kartica ispod to kaže).
+  // Dopunjeno 1.0.2/T72 — redak „Mjereno: grana X @ abc1234“ ispod ocjene (`Report.docs_source`, T71).
+  // Tekst i `title` slažu čiste funkcije `docsSourceLabel`/`docsSourceTitle` (`views/helpers.ts`,
+  // testirane), komponenta samo crta; `null` izvor → `{#if}` redak izostavlja, ne crta prazan.
+  // Puni SHA i stablo idu i u `title` (miš) i u `sr-only` (čitač ekrana) — dopuna recenzije T72.
   import { app, setError } from '../../lib/state.svelte';
   import { api } from '../../lib/api';
-  import { getLang, t } from '../../lib/i18n/index.svelte';
+  import { getDict, getLang, t } from '../../lib/i18n/index.svelte';
   import { num } from '../../lib/format';
-  import { copyText, joinRepoPath } from '../helpers';
+  import { copyText, docsSourceLabel, docsSourceTitle, joinRepoPath } from '../helpers';
   import Line from '../../lib/charts/Line.svelte';
   import Explainable from '../../lib/explain/Explainable.svelte';
   import type { Finding, ProjectSummary, Range, TrendPoint } from '../../lib/types';
@@ -32,6 +36,8 @@
   let copyTimeout: ReturnType<typeof setTimeout> | null = null;
 
   const docs = $derived(app.report?.docs ?? null);
+  const sourceLabel = $derived(docsSourceLabel(app.report?.docs_source ?? null, getDict()));
+  const sourceTitle = $derived(docsSourceTitle(app.report?.docs_source ?? null, getDict()));
   const currentProject = $derived<ProjectSummary | null>(
     app.projects.find((p) => p.id === app.currentId) ?? null,
   );
@@ -137,6 +143,13 @@
         </p>
       {/if}
     </div>
+    {#if sourceLabel !== null}
+      <!-- `title` je za miš; isti tekst u `sr-only` dobiju i čitač ekrana i tipkovnica (`<p>` nije
+           fokusabilan, pa `title` sam do njih ne stiže). -->
+      <p class="text-xs text-ink-2" title={sourceTitle ?? undefined}>
+        {sourceLabel}{#if sourceTitle !== null}<span class="sr-only"> ({sourceTitle})</span>{/if}
+      </p>
+    {/if}
 
     {#if trendEmpty}
       <p class="text-xs text-ink-2">{t('docs.trend.empty')}</p>

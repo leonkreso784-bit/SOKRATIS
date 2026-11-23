@@ -2,6 +2,8 @@
 // `?raw` je isti uvoz koji koristi `api.ts` (S-010, jedan izvor čitanja) — `node:fs` ovdje ne postoji
 // jer sučelje nema `@types/node` i nikakav `node:*` uvoz u `.ts` ne prolazi kroz `svelte-check`
 // (odluka orkestratora za ovu ciglu; `.snap` nije `.css`, pa Tailwind-plugin ne guta ovaj `?raw` uvoz).
+// Dopunjeno 1.0.2/T72 — ključ `docs_source` (T71: iz kojeg stabla, grane i commita je dokumentacija
+// mjerena) i njegov oblik.
 import { describe, expect, it } from 'vitest';
 import snapRaw from '../../../crates/sokratis-core/tests/snapshots/snapshot__report-sokratstudy-2026-09-17.snap?raw';
 import { parseSnap } from '../src/lib/api';
@@ -17,6 +19,7 @@ describe('ugovor Report', () => {
       'days',
       'deliveries',
       'docs',
+      'docs_source',
       'generated_at',
       'indicators',
       'kinds',
@@ -37,5 +40,11 @@ describe('ugovor Report', () => {
     expect(r.scope).toBe('default');
     expect(r.branches[0]).toMatchObject({ name: 'main', merged: true });
     expect(r.touched).toMatchObject({ worktrees: 1, diaries: 1 });
+    // T72: izvor mjerenja dokumentacije (T71) — `branch` je `string | null`, `commit` puni SHA.
+    expect(r.docs_source).toMatchObject({
+      worktree: expect.any(String),
+      branch: expect.any(String),
+      commit: expect.stringMatching(/^[0-9a-f]{40}$/),
+    });
   });
 });
