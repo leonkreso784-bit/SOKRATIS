@@ -768,7 +768,15 @@ fn docs_source_is_the_lead_worktree_with_its_branch_and_full_sha() {
     assert_eq!(source.branch.as_deref(), Some("feat/x"));
     assert_eq!(source.commit, full_sha);
     assert_eq!(source.commit.len(), 40, "puni SHA");
-    assert_eq!(std::path::Path::new(&source.worktree), wt_root);
+    // Cigla mac/T74 (isti obrazac): OBJE strane kroz `canonicalize()`. `worktree` je `String` koji
+    // dolazi iz gita RAZRIJEŠEN (`/private/var/…` na macOS-u, `/var` je poveznica), a `wt_root` je sirova
+    // `tempdir` putanja (`/var/…`). Na Windowsu obje dobiju isti verbatim prefiks `\\?\`.
+    assert_eq!(
+        std::path::Path::new(&source.worktree)
+            .canonicalize()
+            .unwrap(),
+        wt_root.canonicalize().unwrap()
+    );
     assert!(
         input.docs.iter().any(|d| d.path == "docs/b.md"),
         "docs su iz istog stabla koje izvor imenuje"
@@ -822,5 +830,13 @@ fn detached_lead_worktree_gives_docs_source_without_branch() {
         source.commit
     );
     assert_eq!(source.commit.len(), 40);
-    assert_eq!(std::path::Path::new(&source.worktree), dpath);
+    // Cigla mac/T74 (isti obrazac): OBJE strane kroz `canonicalize()`. `worktree` je `String` koji
+    // dolazi iz gita RAZRIJEŠEN (`/private/var/…` na macOS-u, `/var` je poveznica), a `dpath` je sirova
+    // `tempdir` putanja (`/var/…`). Na Windowsu obje dobiju isti verbatim prefiks `\\?\`.
+    assert_eq!(
+        std::path::Path::new(&source.worktree)
+            .canonicalize()
+            .unwrap(),
+        dpath.canonicalize().unwrap()
+    );
 }
