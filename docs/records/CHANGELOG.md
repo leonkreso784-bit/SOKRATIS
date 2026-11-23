@@ -5,7 +5,22 @@ Isporuka = ono što je u `main`-u; sesije su u `PROGRESS.md`.
 
 ## [Unreleased]
 
-(ništa još — sljedeće isporuke dolaze s M3)
+Zakrpa 1.0.2 u izvedbi ([`../plan/ZAKRPA_1_0_2.md`](../plan/ZAKRPA_1_0_2.md)); Faza 1 plana
+[`../plan/MACOS.md`](../plan/MACOS.md) (prijedlog).
+
+### Što korisnik dobiva
+
+- **Plan sa statusom „⏸️ PAUZIRAN" u zaglavlju** više se ne broji kao aktivan (T69).
+- **Primjer poveznice u kodu** (inline kod, ograđeni blok od backtickova ili `~~~`) više ne daje `dead-link` (T70).
+- **Profil daje isti odgovor na Windowsu i Macu** (mac/T75): putanja iz profila s `\`, prefiksom pogona
+  (`C:\…`) ili `\\server\share` odbija se i na macOS-u/Linuxu (do sada je tamo prolazila kao „unutar repoa").
+
+### Za razvoj
+
+- **Razvoj i brane rade na macOS-u** (Apple Silicon): `cargo test` i `npm run check` zeleni na Macu
+  (mac/T74 — io testovi uspoređuju razriješene putanje; brojke: [`PROGRESS.md`](./PROGRESS.md) 2026-11-23).
+- **`npm run notices` ne ovisi o stroju koji gradi** (mac/T76): na Macu daje isti `THIRD-PARTY-NOTICES.txt`
+  kao na Windowsu; preskočene crateove domaćina ispisuje na stderr. Nov stroj jednom treba `cargo fetch`.
 
 ## [1.0.1] — 2026-10-10 — zakrpa
 

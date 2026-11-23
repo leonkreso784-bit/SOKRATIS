@@ -96,6 +96,9 @@ cratea; razlog i naredba: [`AGENTI.md`](./AGENTI.md) §5.
 Vite build u privremenu mapu i `cargo tree`/`cargo metadata` s `--locked --offline`, pa je to najsporiji
 korak brane (sam `notices:check` ≈ 5–7 s, cijeli `npm run check` ≈ 20 s, izmjereno 2026-10-10) i traži `node_modules` (`npm ci`) i
 već preuzete crateove. Pada kad commitani `THIRD-PARTY-NOTICES.txt` nije ono što bi skripta napisala.
+**Nov stroj jednom treba `cargo fetch`** (u korijenu repoa) prije prvog `notices:check`, jer `--offline` pada dok
+crateovi samo za Windows cilj nisu preuzeti. Na Macu `notices:check` na stderr ispisuje crateove domaćina koje
+je preskočio — to nije greška (mac/T76).
 **Pravilo: nov ili podignut npm paket čiji kod ulazi u sučelje, ili nov/podignut crate u
 `sokratis-desktop` → `npm run notices` u `apps/desktop` i commit `THIRD-PARTY-NOTICES.txt` u istoj
 cigli** (opis skripte: [`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §1, „Obavijesti o

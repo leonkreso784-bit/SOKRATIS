@@ -63,6 +63,7 @@ Aktivan je plan zakrpe 1.0.2 (bez speca). Gdje smo i što je sljedeće kaže ROA
 |---|---|
 | [ROADMAP.md](./plan/ROADMAP.md) | 🟩 **živ** — milestonei M0–M4, status, što je sljedeće |
 | [ZAKRPA_1_0_2.md](./plan/ZAKRPA_1_0_2.md) | 📋 **aktivan** — plan cigli T69–T73 (pauzirani plan, primjeri poveznica u kodu, izvor mjerenja dokumentacije) |
+| [MACOS.md](./plan/MACOS.md) | ⏸️ **pauziran** (Faza 1 izvedena, ostalo čeka Leonove odluke O1–O7) — Sokratis na macOS-u: izmjereni nalazi, odluke O1–O7, cigle T74–T86 |
 
 ## `architecture/` — što je izgrađeno
 
