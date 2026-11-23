@@ -9,6 +9,12 @@
 //! string-uspoređivanja. `std::path` samo parsira tekst — ne dira disk — pa smije u jezgru bez I/O-a
 //! (S-002); `canonicalize` (koji disk dira) ovdje ne smije nikad.
 //!
+//! ZAŠTO RUST OVAKO (cigla mac/T75 — `inside_root` jednako na svakom OS-u)
+//! `std::path` je ovisan o sustavu: na Macu `\` nije razdjelnik, a `C:\x` nije apsolutna putanja, pa
+//! je gornji `matches!` na `Component` propuštao Windows putanje. Zato sada `str::split` s nizom
+//! znakova `['/', '\\']` kao uzorkom (svaki od njih reže) i `Iterator::all` nad segmentima: čisti
+//! tekst, isti odgovor na Windowsu i Macu — profil je commitan i putuje između njih.
+//!
 //! ZAŠTO RUST OVAKO (cigla M2/9 — `test_path_exclude`)
 //! Rani `return false` u `is_test_path` je stražarska klauzula (guard clause): isključenje se
 //! provjerava PRIJE svih uključivih pravila, pa jedan pogodak u `test_path_exclude` presiječe
@@ -24,7 +30,6 @@ use crate::ParseError;
 use crate::model::{BranchScope, WorkKind};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::path::{Component, Path};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ClassifierRule {
@@ -270,16 +275,25 @@ impl Profile {
     }
 }
 
-/// Ostaje li relativna putanja unutar korijena? Odbija `..` komponentu, apsolutnu putanju, korijen
-/// (`/x`, `\x`) i Windows prefiks (`C:`, `\\server`). Čisto parsiranje — `std::path` ne dira disk,
-/// pa smije u jezgru (S-002).
+/// Ostaje li relativna putanja unutar korijena? `\` i `/` su razdjelnici na SVAKOM sustavu, jer je
+/// profil commitan i dijeli se između Windowsa i Maca — isti profil mora dobiti isti odgovor.
+/// Odbija: početak razdjelnikom (`/x`, `\x`, `\\server\share`), prefiks pogona (`C:`, `C:\x`,
+/// `C:/x`, `C:x`) i bilo koji `..` segment. Dopušta `.` i prazne segmente u sredini ili na kraju
+/// (`a/./b`, `docs/`). Čisto parsiranje teksta — disk se ne dira, pa smije u jezgru (S-002).
 pub fn inside_root(rel: &str) -> bool {
-    let p = Path::new(rel);
-    if p.is_absolute() {
+    let separators = ['/', '\\'];
+    if rel.starts_with(separators) {
         return false;
     }
-    p.components()
-        .all(|c| matches!(c, Component::Normal(_) | Component::CurDir))
+    let mut chars = rel.chars();
+    let first = chars.next();
+    let second = chars.next();
+    if let (Some(letter), Some(':')) = (first, second)
+        && letter.is_ascii_alphabetic()
+    {
+        return false;
+    }
+    rel.split(separators).all(|segment| segment != "..")
 }
 
 pub struct Patterns {
@@ -433,6 +447,8 @@ mod tests {
             "./docs",
             "CLAUDE.md",
             "a/./b",
+            "docs\\records\\PROGRESS.md",
+            "docs/",
         ] {
             assert!(inside_root(ok), "{ok}");
         }
@@ -445,6 +461,9 @@ mod tests {
             "C:/x",
             "..",
             "docs/..",
+            "docs\\..\\..\\x",
+            "C:x",
+            "\\x",
         ] {
             assert!(!inside_root(bad), "{bad}");
         }
