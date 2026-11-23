@@ -9,6 +9,9 @@
 // Build je bez minifikacije jer minifikator briše bannere; koje module uključuje odlučuje
 // tree-shaking, isti s minifikacijom i bez nje. `--check` ne piše ništa: izlazni kod 1 kad commitana
 // datoteka nije ono što bi skripta napisala.
+// (cigla mac/T76) `cargo tree --target` ovisnosti proc-makroa rješava za DOMAĆINA, pa na Macu donese
+// i crateove samo za macOS (`swift-rs` → `base64`). Zato se njegov popis presijeca s paketima iz
+// `cargo metadata` za cilj (`targetCrates`): popis crateova je isti gradi li se na Windowsu ili Macu.
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -21,6 +24,7 @@ import {
   parseCargoTree,
   personNames,
   renderNotices,
+  targetCrates,
 } from './notices.mjs';
 
 const TARGET = 'x86_64-pc-windows-msvc';
@@ -50,10 +54,9 @@ function crateComponents() {
     if (byKey.has(key)) throw new Error(`notices: ${key} postoji iz dva izvora — ne znam čiju licencu uzeti`);
     byKey.set(key, p);
   }
-  const used = parseCargoTree(cargo(['tree', '-p', 'sokratis-desktop', '-e', 'normal', '--target', TARGET, '--prefix', 'none']));
-  return used.map((key) => {
+  const tree = parseCargoTree(cargo(['tree', '-p', 'sokratis-desktop', '-e', 'normal', '--target', TARGET, '--prefix', 'none']));
+  return targetCrates(tree, byKey.keys()).map((key) => {
     const p = byKey.get(key);
-    if (!p) throw new Error(`notices: ${key} je u cargo tree, a nema ga u cargo metadata`);
     return {
       kind: 'crate',
       name: p.name,
