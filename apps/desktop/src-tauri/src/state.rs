@@ -3,10 +3,17 @@
 //! dijela jer naredbe dolaze s više niti (svaki `invoke` iz sučelja je poziv na drugoj niti). `Store`
 //! nije `Sync` (SQLite veza), pa je `Mutex<Store>` jedini ispravan način da ga naredbe dijele — a to
 //! je i jedino mjesto gdje se `lock().map_err` pretvara u tekst kroz `text` niže.
+//!
+//! ZAŠTO RUST OVAKO (cigla mac/T77 — baza na pravom mjestu po sustavu)
+//! `data_dir` prima sustav kao `&str` i čitač okoline kao `impl Fn(&str) -> Option<OsString>`:
+//! u radu to su `std::env::consts::OS` (ime sustava upisano pri kompilaciji) i `std::env::var_os`,
+//! a u testu lažna okolina — pa se pravila za Windows, macOS i Linux provjeravaju na bilo kojem
+//! stroju. Razlog: na Macu nema `LOCALAPPDATA`, baza je tiho padala u `$TMPDIR`, koji macOS čisti.
 use sokratis_core::Report;
 use sokratis_io::{RefreshQueue, WatchEvent, Watcher};
 use sokratis_store::Store;
 use std::collections::HashMap;
+use std::ffi::OsString;
 use std::path::PathBuf;
 use std::sync::{Mutex, mpsc::Receiver};
 
@@ -34,14 +41,54 @@ pub fn db_file_name(debug: bool) -> &'static str {
     }
 }
 
-/// Putanja baze — JEDINO mjesto koje je sastavlja. `%LOCALAPPDATA%` nedostaje samo u okruženju bez
-/// korisničkog profila; tada privremena mapa drži razvoj živim umjesto da `run()` padne bez razloga.
+/// Mapa podataka Sokratisa po sustavu (mac/T77). `os` je ime kao u `std::env::consts::OS`, a `env`
+/// čita varijablu okoline — u radu `std::env::var_os`, u testu lažna tablica. Prazna varijabla vrijedi
+/// kao da je nema. `None` znači da se iz okoline ne da složiti ništa; o rezervi odlučuje pozivatelj.
+///
+/// - `"windows"`: `%LOCALAPPDATA%\sokratis` (isto kao 1.0.x — postojeće instalacije nađu svoju bazu)
+/// - `"macos"`: `$HOME/Library/Application Support/sokratis`
+/// - ostalo: `$XDG_DATA_HOME/sokratis`, inače `$HOME/.local/share/sokratis`
+pub fn data_dir(os: &str, env: impl Fn(&str) -> Option<OsString>) -> Option<PathBuf> {
+    // Pomoćnik: varijabla kao putanja, ali samo ako postoji I nije prazna.
+    let var = |name: &str| -> Option<PathBuf> {
+        env(name)
+            .filter(|value| !value.is_empty())
+            .map(PathBuf::from)
+    };
+    let base = match os {
+        "windows" => var("LOCALAPPDATA")?,
+        "macos" => var("HOME")?.join("Library").join("Application Support"),
+        _ => match var("XDG_DATA_HOME") {
+            Some(xdg) => xdg,
+            None => var("HOME")?.join(".local").join("share"),
+        },
+    };
+    Some(base.join("sokratis"))
+}
+
+/// Putanja baze — JEDINO mjesto koje je sastavlja. Mapu bira `data_dir` po sustavu (Windows
+/// `%LOCALAPPDATA%`, macOS `~/Library/Application Support`). Ako je okolina ne da složiti (proces
+/// bez korisničkog profila), privremena mapa drži razvoj živim umjesto da `run()` padne — ali to se
+/// glasno kaže, jer je baš tiha rezerva na Macu sakrila da baza živi u `$TMPDIR`, koji sustav čisti.
 pub fn db_path() -> PathBuf {
-    std::env::var_os("LOCALAPPDATA")
-        .map(PathBuf::from)
-        .unwrap_or_else(std::env::temp_dir)
-        .join("sokratis")
-        .join(db_file_name(cfg!(debug_assertions)))
+    // `var_os` je generička funkcija (`K: AsRef<OsStr>`): predana izravno, prevoditelj je veže na
+    // JEDAN životni vijek `&str`-a, a `impl Fn(&str)` traži da radi za svaki. Zatvaranje
+    // `|name| std::env::var_os(name)` je napisano baš za `&str` bilo kojeg vijeka, pa prolazi.
+    let dir = match data_dir(std::env::consts::OS, |name| std::env::var_os(name)) {
+        Some(dir) => dir,
+        None => {
+            let fallback = std::env::temp_dir().join("sokratis");
+            eprintln!(
+                "sokratis: mapa podataka za sustav {} se ne da složiti iz okoline \
+                 (nema LOCALAPPDATA, HOME ili XDG_DATA_HOME); baza ide u privremenu mapu {}, \
+                 koju sustav smije obrisati",
+                std::env::consts::OS,
+                fallback.display()
+            );
+            fallback
+        }
+    };
+    dir.join(db_file_name(cfg!(debug_assertions)))
 }
 
 /// Pretvara BILO KOJU grešku (`IoError`, `StoreError`, otrovan `Mutex`…) u tekst — Tauri naredbe
@@ -71,6 +118,81 @@ mod tests {
     fn debug_build_uses_its_own_database_file() {
         assert_eq!(db_file_name(false), "sokratis.db");
         assert_eq!(db_file_name(true), "sokratis-dev.db");
+    }
+
+    /// Lažna okolina: popis parova (ime varijable, vrijednost). Imenovani tip skraćuje potpise niže.
+    type FakeEnv = &'static [(&'static str, &'static str)];
+
+    /// Lažna okolina za `data_dir`: vraća samo zadane parove, NIKAD ne čita stvarnu okolinu
+    /// procesa — zato testovi daju isti ishod na Windowsu, Macu i u CI-ju.
+    fn fake_env(pairs: FakeEnv) -> impl Fn(&str) -> Option<OsString> {
+        move |name| {
+            pairs
+                .iter()
+                .find(|(key, _)| *key == name)
+                .map(|(_, value)| OsString::from(value))
+        }
+    }
+
+    /// mac/T77 (N4): tablica (sustav, okolina) → mapa podataka. Očekivane putanje se slažu kroz
+    /// `join`, pa usporedba ne ovisi o razdjelniku (`\` ili `/`) sustava na kojem test radi.
+    #[test]
+    fn data_dir_follows_the_operating_system() {
+        let windows = PathBuf::from("C:/Users/leon/AppData/Local");
+        let home = PathBuf::from("/Users/leon");
+        let xdg = PathBuf::from("/home/leon/.data");
+        let linux_home = PathBuf::from("/home/leon");
+
+        let cases: Vec<(&str, FakeEnv, Option<PathBuf>)> = vec![
+            // Windows: bez promjene ponašanja 1.0.x — baza ostaje gdje je bila.
+            (
+                "windows",
+                &[("LOCALAPPDATA", "C:/Users/leon/AppData/Local")],
+                Some(windows.join("sokratis")),
+            ),
+            // macOS: `Application Support`, ne `$TMPDIR` koji sustav sam čisti.
+            (
+                "macos",
+                &[("HOME", "/Users/leon")],
+                Some(
+                    home.join("Library")
+                        .join("Application Support")
+                        .join("sokratis"),
+                ),
+            ),
+            // Linux: XDG ima prednost pred HOME-om.
+            (
+                "linux",
+                &[
+                    ("XDG_DATA_HOME", "/home/leon/.data"),
+                    ("HOME", "/home/leon"),
+                ],
+                Some(xdg.join("sokratis")),
+            ),
+            (
+                "linux",
+                &[("HOME", "/home/leon")],
+                Some(linux_home.join(".local").join("share").join("sokratis")),
+            ),
+            // Ništa za složiti → `None` (pozivatelj odlučuje o rezervi i kaže zašto).
+            ("macos", &[], None),
+            ("windows", &[("HOME", "/Users/leon")], None),
+            // Prazna varijabla = kao da je nema.
+            ("macos", &[("HOME", "")], None),
+            (
+                "linux",
+                &[("XDG_DATA_HOME", ""), ("HOME", "/home/leon")],
+                Some(linux_home.join(".local").join("share").join("sokratis")),
+            ),
+        ];
+
+        for (os, pairs, expected) in cases {
+            assert_eq!(
+                data_dir(os, fake_env(pairs)),
+                expected,
+                "sustav {os}, okolina {pairs:?}"
+            );
+        }
     }
 
     /// I3: prije popravka `text` je pokazivao SAMO „profil {path}" — ime polja iz `ParseError`
