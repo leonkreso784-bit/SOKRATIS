@@ -2,9 +2,10 @@
 // Tauri je čita odande kad `tauri.conf.json` nema `version`; package.json je samo zrcalo i ovaj test
 // pada čim se raziđu (S-010 — jedna činjenica, jedno mjesto).
 // ZAŠTO OVAKO (cigla mac/T82 — Mac paket): JSON nema komentara, pa razlog stoji ovdje. Tauri 2 na macOS-u
-// spaja `tauri.macos.conf.json` preko glavnog (JSON Merge Patch): Mac gradi `.app` i `.dmg` za macOS 11+
-// (prvi za Apple Silicon, S-043 O4), a identifikator se mijenja SAMO na Macu (O2) — `.app` na kraju
-// sudara se s nastavkom paketa, dok Windows nadogradnja ovisi o starom `dev.sokratis.app`.
+// spaja `tauri.macos.conf.json` preko glavnog (JSON Merge Patch): Mac gradi `.app` i `.dmg`. Minimum je
+// macOS 13.3: WKWebView je sistemski WebKit; Tailwind v4 traži Safari 16.4, koji macOS ima u sustavu tek
+// od 13.3 (Ventura). Identifikator se mijenja SAMO na Macu (S-043 O2) — `.app` na kraju sudara se s
+// nastavkom paketa, dok Windows nadogradnja ovisi o starom `dev.sokratis.app`.
 import { describe, expect, it } from 'vitest';
 import cargo from '../../../Cargo.toml?raw';
 import pkg from '../package.json';
@@ -39,9 +40,9 @@ describe('Mac paket (tauri.macos.conf.json)', () => {
     identifier?: string;
     bundle?: { targets?: unknown; macOS?: { minimumSystemVersion?: string } };
   };
-  it('gradi .app i .dmg za macOS 11+', () => {
+  it('gradi .app i .dmg za macOS 13.3+', () => {
     expect(mac.bundle?.targets).toEqual(['app', 'dmg']);
-    expect(mac.bundle?.macOS?.minimumSystemVersion).toBe('11.0');
+    expect(mac.bundle?.macOS?.minimumSystemVersion).toBe('13.3');
   });
   it('identifikator je samo Macov: različit od glavnog i ne završava s .app', () => {
     expect(typeof mac.identifier).toBe('string');
