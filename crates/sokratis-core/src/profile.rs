@@ -4,16 +4,11 @@
 //! ignoriranje. `Patterns` drži kompilirane regexe (`Regex` nije `Serialize`), a tamo
 //! `Regex::captures_len()` prebroji grupe: regex bez grupe koju parser čita je greška, ne panika.
 //!
-//! ZAŠTO RUST OVAKO (cigla M2/8 — `inside_root`)
-//! `Component` je enum kojim `std::path` razlaže putanju; `matches!` na njemu je ograda bez ijednog
-//! string-uspoređivanja. `std::path` samo parsira tekst — ne dira disk — pa smije u jezgru bez I/O-a
-//! (S-002); `canonicalize` (koji disk dira) ovdje ne smije nikad.
-//!
-//! ZAŠTO RUST OVAKO (cigla mac/T75 — `inside_root` jednako na svakom OS-u)
-//! `std::path` je ovisan o sustavu: na Macu `\` nije razdjelnik, a `C:\x` nije apsolutna putanja, pa
-//! je gornji `matches!` na `Component` propuštao Windows putanje. Zato sada `str::split` s nizom
-//! znakova `['/', '\\']` kao uzorkom (svaki od njih reže) i `Iterator::all` nad segmentima: čisti
-//! tekst, isti odgovor na Windowsu i Macu — profil je commitan i putuje između njih.
+//! ZAŠTO RUST OVAKO (cigla M2/8 · mac/T75 — `inside_root`)
+//! `str::starts_with` i `str::split` primaju niz znakova `['/', '\\']` kao uzorak (pogađa bilo koji
+//! od njih), a `Iterator::all` traži da nijedan segment nije `..`: isti odgovor na Windowsu i Macu,
+//! jer je profil commitan i putuje između njih (do mac/T75 to je radio `std::path::Component`, koji
+//! ovisi o OS-u). Čisto parsiranje teksta, ne dira disk (S-002); `canonicalize` ovdje ne smije nikad.
 //!
 //! ZAŠTO RUST OVAKO (cigla M2/9 — `test_path_exclude`)
 //! Rani `return false` u `is_test_path` je stražarska klauzula (guard clause): isključenje se
@@ -442,6 +437,8 @@ mod tests {
     #[test]
     fn inside_root_rejects_parent_absolute_and_drive_paths() {
         for ok in [
+            // prazno = korijen = unutra (fiksira postojeće ponašanje)
+            "",
             "docs",
             "docs/records/PROGRESS.md",
             "./docs",
