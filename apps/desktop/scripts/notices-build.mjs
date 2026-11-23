@@ -14,6 +14,11 @@
 // `cargo metadata` za cilj (`targetCrates`). Na Macu je popis danas isti kao na Windowsu (izmjereno
 // 2026-11-23), ali proc-makro ovisnost samo za Windows domaćina na Macu bi izostala — mjerodavan je
 // `notices:check` na Windowsu. Preskočeni crateovi idu jednim retkom na stderr, da novi bude vidljiv.
+// (cigla mac/T87 — popis po platformi, S-043 O6) Svaki paket nosi popis onoga što je u njemu: Windows u
+// THIRD-PARTY-NOTICES.txt, macOS (aarch64-apple-darwin) u THIRD-PARTY-NOTICES-macos.txt. Windows popis
+// se mjeri na svakom domaćinu (na Macu izmjeren isti), Mac popis SAMO na Macu: drugdje bi `cargo tree`
+// propustio Mac-only ovisnosti proc-makroa i tiho napisao drukčiji popis. Zato se tamo preskače jednim
+// retkom na stderr i izlaznim kodom 0 — brana ne pada, ali i ne tvrdi ono što nije izmjerila.
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -25,14 +30,13 @@ import {
   packagesFromSources,
   parseCargoTree,
   personNames,
+  planTargets,
   renderNotices,
   targetCrates,
 } from './notices.mjs';
 
-const TARGET = 'x86_64-pc-windows-msvc';
 const desktop = fileURLToPath(new URL('..', import.meta.url));
 const root = fileURLToPath(new URL('../../..', import.meta.url));
-const outFile = join(root, 'THIRD-PARTY-NOTICES.txt');
 const check = process.argv.includes('--check');
 const NPM_CI = 'prvo `npm ci`';
 
@@ -48,18 +52,19 @@ function licenseFiles(dir, extra) {
   return names.sort().map((name) => ({ name, text: readFileSync(join(dir, name), 'utf8') }));
 }
 
-function crateComponents() {
-  const meta = JSON.parse(cargo(['metadata', '--format-version', '1', '--filter-platform', TARGET]));
+/** Crateovi prevedeni u izvršnu datoteku za cilj `triple` (Rust target triple). */
+function crateComponents(triple) {
+  const meta = JSON.parse(cargo(['metadata', '--format-version', '1', '--filter-platform', triple]));
   const byKey = new Map();
   for (const p of meta.packages) {
     const key = `${p.name}@${p.version}`;
     if (byKey.has(key)) throw new Error(`notices: ${key} postoji iz dva izvora — ne znam čiju licencu uzeti`);
     byKey.set(key, p);
   }
-  const tree = parseCargoTree(cargo(['tree', '-p', 'sokratis-desktop', '-e', 'normal', '--target', TARGET, '--prefix', 'none']));
+  const tree = parseCargoTree(cargo(['tree', '-p', 'sokratis-desktop', '-e', 'normal', '--target', triple, '--prefix', 'none']));
   const used = targetCrates(tree, byKey.keys());
   const skipped = tree.filter((key) => !used.includes(key));
-  if (skipped.length) console.error(`notices: preskočeno kao ovisnost domaćina: ${skipped.join(', ')}`);
+  if (skipped.length) console.error(`notices: ${triple}: preskočeno kao ovisnost domaćina: ${skipped.join(', ')}`);
   return used.map((key) => {
     const p = byKey.get(key);
     return {
@@ -118,18 +123,26 @@ function npmComponents() {
 }
 
 try {
-  const text = renderNotices([...crateComponents(), ...npmComponents()]);
-  if (check) {
-    const current = existsSync(outFile) ? readFileSync(outFile, 'utf8') : '';
-    if (current !== text) {
-      console.error('notices:check — THIRD-PARTY-NOTICES.txt nije ono što bi skripta napisala; pokreni `npm run notices`');
-      process.exit(1);
+  const plan = planTargets(process.platform);
+  for (const t of plan.skip) console.error(`notices: preskočeno: popis za ${t.name} (${t.file}) se mjeri samo na ${t.name} domaćinu`);
+  // Sučelje je isto na svakom cilju (Vite ne zna za platformu) — gradi se jednom za sve popise.
+  const npm = npmComponents();
+  let stale = false;
+  for (const t of plan.measure) {
+    const outFile = join(root, t.file);
+    const text = renderNotices([...crateComponents(t.triple), ...npm], t.triple);
+    if (check) {
+      const current = existsSync(outFile) ? readFileSync(outFile, 'utf8') : '';
+      if (current !== text) {
+        console.error(`notices:check — ${t.file} nije ono što bi skripta napisala; pokreni \`npm run notices\``);
+        stale = true;
+      } else console.log(`notices:check — ${t.file} odgovara lockovima i buildu sučelja`);
+    } else {
+      writeFileSync(outFile, text, 'utf8');
+      console.log(`notices — zapisano ${outFile} (${Buffer.byteLength(text)} bajtova)`);
     }
-    console.log('notices:check — THIRD-PARTY-NOTICES.txt odgovara lockovima i buildu sučelja');
-  } else {
-    writeFileSync(outFile, text, 'utf8');
-    console.log(`notices — zapisano ${outFile} (${Buffer.byteLength(text)} bajtova)`);
   }
+  if (stale) process.exit(1);
 } catch (e) {
   console.error(e instanceof Error ? e.message : String(e));
   process.exit(1);

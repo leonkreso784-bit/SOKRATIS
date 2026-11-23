@@ -6,6 +6,9 @@
 // macOS 13.3: WKWebView je sistemski WebKit; Tailwind v4 traži Safari 16.4, koji macOS ima u sustavu tek
 // od 13.3 (Ventura). Identifikator se mijenja SAMO na Macu (S-043 O2) — `.app` na kraju sudara se s
 // nastavkom paketa, dok Windows nadogradnja ovisi o starom `dev.sokratis.app`.
+// (cigla mac/T87 — popis licenci po platformi, S-043 O6) Merge Patch spaja mapu `resources` ključ po
+// ključ, a `null` BRIŠE ključ: Mac datoteka briše Windows izvor i pod istim imenom
+// `THIRD-PARTY-NOTICES.txt` stavlja Mac popis. `LICENSE` se nasljeđuje iz glavne datoteke.
 import { describe, expect, it } from 'vitest';
 import cargo from '../../../Cargo.toml?raw';
 import pkg from '../package.json';
@@ -38,7 +41,11 @@ describe('verzija', () => {
 describe('Mac paket (tauri.macos.conf.json)', () => {
   const mac = macConf as {
     identifier?: string;
-    bundle?: { targets?: unknown; macOS?: { minimumSystemVersion?: string } };
+    bundle?: {
+      targets?: unknown;
+      macOS?: { minimumSystemVersion?: string };
+      resources?: Record<string, string | null>;
+    };
   };
   it('gradi .app i .dmg za macOS 13.3+', () => {
     expect(mac.bundle?.targets).toEqual(['app', 'dmg']);
@@ -51,5 +58,22 @@ describe('Mac paket (tauri.macos.conf.json)', () => {
   });
   it('nema polje version (izvor je Cargo.toml)', () => {
     expect('version' in (mac as Record<string, unknown>)).toBe(false);
+  });
+  it('.app nosi Mac popis licenci pod imenom THIRD-PARTY-NOTICES.txt; Windows popis je obrisan (null)', () => {
+    expect(mac.bundle?.resources).toEqual({
+      '../../../THIRD-PARTY-NOTICES.txt': null,
+      '../../../THIRD-PARTY-NOTICES-macos.txt': 'THIRD-PARTY-NOTICES.txt',
+    });
+    // nakon spajanja (RFC 7396) ostaju Mac popis i LICENSE.txt iz glavne datoteke
+    const base = (conf as { bundle: { resources: Record<string, string> } }).bundle.resources;
+    const merged: Record<string, string> = { ...base };
+    for (const [k, v] of Object.entries(mac.bundle?.resources ?? {})) {
+      if (v === null) delete merged[k];
+      else merged[k] = v;
+    }
+    expect(merged).toEqual({
+      '../../../LICENSE': 'LICENSE.txt',
+      '../../../THIRD-PARTY-NOTICES-macos.txt': 'THIRD-PARTY-NOTICES.txt',
+    });
   });
 });

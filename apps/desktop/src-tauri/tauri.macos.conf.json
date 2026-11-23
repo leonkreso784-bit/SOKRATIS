@@ -5,6 +5,10 @@
     "targets": ["app", "dmg"],
     "macOS": {
       "minimumSystemVersion": "13.3"
+    },
+    "resources": {
+      "../../../THIRD-PARTY-NOTICES.txt": null,
+      "../../../THIRD-PARTY-NOTICES-macos.txt": "THIRD-PARTY-NOTICES.txt"
     }
   }
 }
