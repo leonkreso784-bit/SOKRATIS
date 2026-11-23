@@ -1,8 +1,8 @@
 # Sokratis na macOS-u — plan cigli
 
 **Status:** 📋 AKTIVAN — Leon je odlučio O1–O7 (S-043). Napisan 2026-11-23 nakon pregleda cijelog projekta na
-MacBooku; Faza 1 (T74–T76) i CI (T85) su izvedeni, zakrpa 1.0.2 je izdana (O5), pa slijede Faze 2–5 i
-izdanje 1.1.0. Numeracija nastavlja plan 1.0.2 ([`../archive/2026-11-23-zakrpa-1-0-2.md`](../archive/2026-11-23-zakrpa-1-0-2.md),
+MacBooku; Faza 1 (T74–T76), CI (T85) i Faza 2 (T77–T79) su izvedeni, zakrpa 1.0.2 je izdana (O5), pa slijede
+Faze 3–5 i izdanje 1.1.0. Numeracija nastavlja plan 1.0.2 ([`../archive/2026-11-23-zakrpa-1-0-2.md`](../archive/2026-11-23-zakrpa-1-0-2.md),
 zadnja cigla T73). Plan nije izvor istine: što je izgrađeno kaže
 [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md).
 
@@ -44,10 +44,10 @@ ništa**, pa ni preostale cigle zakrpe 1.0.2 (T71–T73). Faza 1 zato ide prva.
 
 | # | gdje | što |
 |---|---|---|
-| N4 | `apps/desktop/src-tauri/src/state.rs:39` `db_path` | `LOCALAPPDATA` na Macu ne postoji, pa baza ide u `std::env::temp_dir()` (`$TMPDIR`), **koju macOS sam čisti**: registar projekata i snimke trenda bi nestajali. Mac mjesto: `~/Library/Application Support/sokratis/`. I `expect("baza u %LOCALAPPDATA%")` u `lib.rs:56` |
-| N5 | `apps/desktop/src/views/helpers.ts:165` `joinRepoPath` | svaki `/` pretvara u `\`, pa „Kopiraj putanju" na Macu daje `/Users/leon\docs\records\…`, putanju koja ne postoji. Test `tests/helpers.test.ts:242` tvrdi samo Windows oblik |
+| N4 ✅ T77 | `apps/desktop/src-tauri/src/state.rs:39` `db_path` | `LOCALAPPDATA` na Macu ne postoji, pa baza ide u `std::env::temp_dir()` (`$TMPDIR`), **koju macOS sam čisti**: registar projekata i snimke trenda bi nestajali. Mac mjesto: `~/Library/Application Support/sokratis/`. I `expect("baza u %LOCALAPPDATA%")` u `lib.rs:56` |
+| N5 ✅ T78 | `apps/desktop/src/views/helpers.ts:165` `joinRepoPath` | svaki `/` pretvara u `\`, pa „Kopiraj putanju" na Macu daje `/Users/leon\docs\records\…`, putanju koja ne postoji. Test `tests/helpers.test.ts:242` tvrdi samo Windows oblik |
 | N6 | `apps/desktop/src/views/Overview.svelte:38`, `:49` | `prompt()` (preimenovanje) i `confirm()` (uklanjanje projekta) su ugrađeni dijalozi WebView2-a. Na macOS-u Tauri radi preko WKWebViewa, gdje ti dijalozi ovise o tome što wry implementira, pa `prompt()` može tiho vratiti `null`. **Prvo izmjeriti** (Faza 4), pa tek onda mijenjati |
-| N7 | `src/lib/i18n/hr.json:333`, `en.json:333` | „Sokratis se otvara pri prijavi u **Windows**." |
+| N7 ✅ T79 | `src/lib/i18n/hr.json:333`, `en.json:333` | „Sokratis se otvara pri prijavi u **Windows**." |
 | N8 | `src-tauri/tauri.conf.json:42` | `bundle.targets = ["nsis"]`: na Macu se ne gradi ni `.app` ni `.dmg`. Test `tests/version.test.ts:19` to i tvrdi |
 | N9 | `tauri.conf.json:4` `identifier: "dev.sokratis.app"` | Tauri na macOS-u upozorava na identifikator koji završava s `.app`, jer se sudara s nastavkom paketa aplikacije. O promjeni odlučuje O2 |
 | N10 | `crates/sokratis-io/src/git.rs` (`git_command`) | aplikacija pokrenuta iz Findera ima `PATH=/usr/bin:/bin:/usr/sbin:/sbin`: Homebrew `git` ne vidi, nego koristi `/usr/bin/git`, koji radi samo uz Command Line Tools (bez njih macOS iskoči s dijalogom za instalaciju). Leon ih ima, a tuđi Mac možda nema |
@@ -96,11 +96,13 @@ svakog commita (`CLAUDE.md`). Tokovi i stabla idu po [`../workflow/AGENTI.md`](.
 
 | cigla | predmet | test prvo | gotovo kad |
 |---|---|---|---|
-| **T77** | `db_path` po sustavu (N4): čista funkcija `data_dir(os, env)`. Na Windowsu `%LOCALAPPDATA%\sokratis` (bez promjene), na macOS-u `$HOME/Library/Application Support/sokratis`. Rezerva u privremenu mapu **samo** ako nema ni jednog ni drugog, uz `eprintln!`. Poruka u `lib.rs:56` postaje neutralna. **Bez nove ovisnosti** (bez `dirs`, bez Taurijeva `app_data_dir`, koji ovisi o identifikatoru, O2) | `state.rs` tests: tablica (os, env) → putanja | `npm run tauri dev` na Macu piše `~/Library/Application Support/sokratis/sokratis-dev.db` |
-| **T78** | `joinRepoPath` čuva razdjelnik korijena (N5): `\` ako korijen ima `\` ili prefiks pogona, inače `/`. Bez `plugin-os` (nova ovisnost nije potrebna) | `helpers.test.ts`: `/Users/leon/x` + `docs/a.md` → `/Users/leon/x/docs/a.md`; postojeća dva Windows testa ostaju | vitest zelen |
-| **T79** | natpis autostarta bez imena OS-a (N7): „…pri prijavi u sustav" / „…when you sign in" | `check:i18n` | zelen |
+| **T77** ✅ `d214d79` | `db_path` po sustavu (N4): čista funkcija `data_dir(os, env)`. Na Windowsu `%LOCALAPPDATA%\sokratis` (bez promjene), na macOS-u `$HOME/Library/Application Support/sokratis`. Rezerva u privremenu mapu **samo** ako nema ni jednog ni drugog, uz `eprintln!`. Poruka u `lib.rs:56` postaje neutralna. **Bez nove ovisnosti** (bez `dirs`, bez Taurijeva `app_data_dir`, koji ovisi o identifikatoru, O2) | `state.rs` tests: tablica (os, env) → putanja | `npm run tauri dev` na Macu piše `~/Library/Application Support/sokratis/sokratis-dev.db` |
+| **T78** ✅ `8748baf` | `joinRepoPath` čuva razdjelnik korijena (N5): `\` ako korijen ima `\` ili prefiks pogona, inače `/`; korijen koji počinje s `/` je uvijek Unix (`\` je na Macu legalan u imenu mape — dopuna recenzije `80fcae5`). Bez `plugin-os` (nova ovisnost nije potrebna) | `helpers.test.ts`: `/Users/leon/x` + `docs/a.md` → `/Users/leon/x/docs/a.md`; postojeća dva Windows testa ostaju | vitest zelen |
+| **T79** ✅ `8748baf` | natpis autostarta bez imena OS-a (N7): „Sokratis se otvara kad se prijaviš na računalo." / „Sokratis opens when you sign in to your computer." | `check:i18n` | zelen |
 | **T80** | *(uvjetno, ako Faza 4 izmjeri kvar)* `prompt`/`confirm` u `Overview.svelte` (N6) zamijeniti dijalogom u sučelju, istim obrascem kao dvokoračni gumb u `Visions.svelte` | vitest za čistu logiku dijaloga | preimenovanje i uklanjanje rade na Macu |
 | **T81** | *(uvjetno)* poruka kad `git` ne postoji ili traži Command Line Tools (N10): greška u sučelju kaže `xcode-select --install` | `io` test s nepostojećim programom | Leon vidi razumljivu poruku umjesto sirove greške procesa |
+
+➜ **T77–T79 gotovi** (✅ 2026-11-23, brane i ishod: [`../records/PROGRESS.md`](../records/PROGRESS.md) 2026-11-23). T80 i T81 ostaju uvjetni — odlučuje ih Faza 4.
 
 ### Faza 3 — pakiranje za Mac
 
@@ -131,7 +133,7 @@ Svaki nalaz dobiva test i vlastitu ciglu (pravilo #4). Popis:
 
 | cigla | predmet |
 |---|---|
-| **T84** | (S-043 je zapisan 2026-11-23) · `CLAUDE.md`: stack (target po platformi umjesto „MSVC"), putanja prvog korisnika `~/Documents/sokratstudy.dev` · `README.md`: zahtjevi za macOS (Command Line Tools, build, Gatekeeper), „Windows only" → stvarno stanje · `ARCHITECTURE.md` §1 (putanja baze po OS-u, Mac bundle) · `RUST.md` §1–2 (redak MSVC, NSIS + DMG) · `TESTING.md` (izolirana baza na Macu: preusmjeriti `HOME`, odnosno ono što T77 čita, umjesto `LOCALAPPDATA`; `cargo fetch`) · `ROADMAP.md` (redak M0 za macOS) · `BACKLOG.md` (redak 8 „cross-platform": Mac stroj sada postoji) · `PROGRESS.md` + `CHANGELOG.md` |
+| **T84** | (S-043 je zapisan 2026-11-23) · `CLAUDE.md`: stack (target po platformi umjesto „MSVC"), putanja prvog korisnika `~/Documents/sokratstudy.dev` · `README.md`: zahtjevi za macOS (Command Line Tools, build, Gatekeeper), „Windows only" → stvarno stanje · `ARCHITECTURE.md` §1 (Mac bundle; putanja baze po OS-u zapisana uz T77) · `RUST.md` §1–2 (redak MSVC, NSIS + DMG) · `TESTING.md` (`cargo fetch`; izolirana baza po sustavu je zapisana 2026-11-23 uz T77, ostaje je potvrditi prvim dimnim testom na Macu) · `ROADMAP.md` (redak M0 za macOS) · `BACKLOG.md` (redak 8 „cross-platform": Mac stroj sada postoji) · `PROGRESS.md` + `CHANGELOG.md` |
 | **T85** | *(O7: odmah, prije 1.0.2)* `.github/workflows/gates.yml`: matrica `macos-latest` + `windows-latest` → fmt · clippy · test · `npm run check` |
 | **T86** | izdanje **1.1.0**: verzija u `Cargo.toml` (+ zrcalo `package.json`), Mac `.dmg` (+ Windows NSIS s Windows stroja ili CI-ja). **Tag i GitHub izdanje traže Leonov izričit OK** (pravilo #1) |
 

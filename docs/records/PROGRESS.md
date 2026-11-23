@@ -1480,3 +1480,38 @@ Nullsoft). Izdanje objavljeno 2026-11-23 12:58 UTC kao Latest; `notify-sokrat-de
 
 **Što slijedi:** plan `MACOS.md` Faza 2 (T77 baza u `~/Library/Application Support`, T78 `joinRepoPath`, T79
 natpis autostarta, uvjetno T80/T81), zatim Faza 3 (T82 `.app`/`.dmg`, T87 licence po platformi, T83 mjerenje).
+
+### Faza 2 plana macOS (T77–T79, isti dan)
+- **MAC-LJUSKA (mac/T77)** → merge `d214d79` (`4a11684`): baza više ne pada u `$TMPDIR`, koji macOS čisti.
+  Nova čista `state::data_dir(os, env)` bira mapu po sustavu (Windows bez promjene, macOS
+  `~/Library/Application Support/sokratis`, ostalo XDG); `db_path()` joj daje `std::env::consts::OS` i
+  zatvaranje nad `var_os`, a rezerva u privremenu mapu sada se javlja `eprintln!`-om. Testira je tablica od
+  8 slučajeva (os, okolina) na bilo kojem stroju. Poruka `expect` u `lib.rs` je neutralna. Izmjereno na Macu:
+  `db_path()` = `~/Library/Application Support/sokratis/sokratis-dev.db`, a mapu stvara `Store::open`.
+  Opis: [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §1.
+  - **Odstupanje od plana:** prazan `LOCALAPPDATA` na Windowsu više ne daje relativnu putanju, nego rezervu.
+    `db_path()` ne može primiti `std::env::var_os` izravno („Fn is not general enough"), pa prima zatvaranje
+    (pojam u `RUST.md` §4).
+  - Recenzija **SPOJIVO**. Dva Minor nalaza su prihvaćena: `eprintln!` u release buildu nitko ne vidi, a
+    relativan `XDG_DATA_HOME` se ne odbacuje (to je Linux, izvan opsega). **Nalaz za dokumentaciju:** recept
+    za izoliranu bazu u dimnom testu (`LOCALAPPDATA`) na Macu više ništa ne izolira. Ispravljen je u
+    [`../workflow/TESTING.md`](../workflow/TESTING.md) §5: na Macu se preusmjerava `HOME`, uz `CARGO_HOME` i
+    `RUSTUP_HOME`. Recept na Macu još nije izveden.
+- **MAC-SUČELJE (mac/T78, mac/T79)** → merge `8748baf`:
+  - **T78** (`935c672` + dopuna `80fcae5`): `joinRepoPath` razdjelnik uzima iz korijena putanje, pa
+    „Kopiraj putanju" na Macu daje `/Users/…/docs/a.md`. Windows oblik ostaje bajt-za-bajt isti, bez `plugin-os`.
+    Recenzija **SPOJIVO**. Minor je popravljen dopunom: korijen koji počinje s `/` je uvijek Unix, jer je `\`
+    na Macu legalan znak u imenu mape.
+  - **T79** (`f72d4bb`): natpis autostarta više ne spominje Windows (autostart na Macu ide kroz LaunchAgent).
+    Plan je predlagao „pri prijavi u sustav", a recenzent je presudio za tekst iz brifa („kad se prijaviš na
+    računalo"). Drugih natpisa sa spomenom Windowsa ili WebView2 nema.
+- **Brane na `main`-u nakon spajanja (Mac):** `cargo fmt --check` ✅ · `clippy` ✅ · `cargo test` **201 prošlo /
+  0 palo** · `npm run check` ✅ (vitest 174, svelte-check 0, i18n 353 ključa hr = en, kontrast, obavijesti ✅).
+  Stabla i grane `feat/mac-ljuska` i `feat/mac-sucelje` su obrisani.
+
+**Što slijedi:** Faza 3 plana [`../plan/MACOS.md`](../plan/MACOS.md):
+- **T82:** `tauri.macos.conf.json` (`app` + `dmg`, identifikator samo na Macu po O2, `minimumSystemVersion`);
+- **T87:** popis licenci po platformi (O6);
+- **T83:** mjerenje `.app`.
+
+Zatim Faza 4, ručna provjera s Leonom u izgrađenoj aplikaciji. Ona odlučuje treba li uvjetni T80 i T81.

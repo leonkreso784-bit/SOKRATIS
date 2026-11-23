@@ -134,6 +134,17 @@ sporo se prevode) ostaju netaknute — briše se samo pet naših crateova.
   je unatoč tome i dalje preusmjeravao `LOCALAPPDATA` (dodatna sigurnost) i čitao prozor kroz Chrome
   DevTools Protocol (`--remote-debugging-port`, nad vlastitim webviewom) umjesto snimke ekrana
   (`PrintWindow`, obrazac iz S2) — provjera DOM-a je pouzdanija od piksela.
+- **Izolirana baza za dimni test ovisi o sustavu (od mac/T77).** Mapu baze bira
+  `state::data_dir(os, env)` ([`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §1), pa se preusmjerava
+  varijabla koju TAJ sustav čita: **Windows** → `LOCALAPPDATA` (kao u testovima niže); **macOS** →
+  `HOME` (baza ide u `$HOME/Library/Application Support/sokratis/`). Preusmjeren `LOCALAPPDATA` na Macu
+  **ništa ne izolira** — pokretanje bi pisalo u stvarnu `~/Library/Application Support/sokratis/sokratis-dev.db`.
+  Preusmjeren `HOME` mijenja za taj proces i sve ostalo što se čita iz kućne mape: `~/.gitconfig` i
+  `~/.ssh` (git u aplikaciji samo čita repo, pa identitet ni ključevi ne trebaju), ali i `~/.cargo` i
+  `~/.rustup` — `npm run tauri dev` gradi kroz `cargo`, koji bez njih ne nađe toolchain. Zato uz
+  preusmjeren `HOME` treba izričito postaviti `CARGO_HOME` i `RUSTUP_HOME` na stvarne mape (ili prvo
+  izgraditi, pa pokrenuti gotovu binarnu s preusmjerenim `HOME`). Recept na Macu još nije izveden u
+  dimnom testu — prvi koji ga izvede zapisuje ishod ovdje.
 - **Dimni test S4 (SUČELJE-2, T38–T42, 2026-09-23)** je prvi koji je morao raditi UZ instaliranu
   aplikaciju: `tauri dev --config identifier=dev.sokratis.app.dev` dobiva vlastiti identifikator, pa
   `single-instance` ne sudara dvije aplikacije; `LOCALAPPDATA` preusmjeren u scratchpad, CDP nad

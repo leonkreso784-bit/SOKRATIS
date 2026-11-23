@@ -25,7 +25,7 @@ sati zbog cherry-pickova — se u Sokratisu **ispravlja, ne prenosi** (S-007).
 - **Desktop:** Tauri 2 (`apps/desktop`) · sučelje **Svelte 5 + Tailwind v4** + `tokens.css`
   prenesen iz Sokrat Studyja (4 teme, zadana svijetla „Akademsko plavo"). Znak Sokratisa je **nov**.
 - **Pohrana:** ručni podaci u `<repo>/.sokratis/` (profil · overridei · vizije) · SQLite u
-  `%LOCALAPPDATA%\sokratis\`. **Bez oblaka, bez računa.**
+  `%LOCALAPPDATA%\sokratis\` (Windows) · `~/Library/Application Support/sokratis/` (macOS, T77). **Bez oblaka, bez računa.**
 
 ## Arhitektura (najvažnije)
 - **`core` ne otvara datoteke i ne zove procese** — prima tekst i strukture, vraća `Report` (S-002).
@@ -77,7 +77,7 @@ Testovi i brane: `docs/workflow/TESTING.md`.
   nepotpisanim instalaterom (S-040), licenca u `LICENSE` (S-039).
 - **Zakrpe 1.0.1 (2026-10-10) i 1.0.2 (2026-11-23) izdane** (tagovi, izdanja na GitHubu; planovi u `docs/archive/`).
   Windows instalater od 1.0.2 gradi GitHub Actions (`release.yml`), jer Leon razvija na Macu.
-  **Aktivni plan: `docs/plan/MACOS.md`** (S-043; Faza 1 i CI gotovi, slijede Faze 2–5 → 1.1.0; tag traži Leonov OK). Spec M3 nastaje kad M3 krene (kandidati: `docs/records/BACKLOG.md`). **M3 ne počinje bez Leonova izričitog OK-a** — redom
+  **Aktivni plan: `docs/plan/MACOS.md`** (S-043; Faze 1 i 2 i CI gotovi, slijede Faze 3–5 → 1.1.0; tag traži Leonov OK). Spec M3 nastaje kad M3 krene (kandidati: `docs/records/BACKLOG.md`). **M3 ne počinje bez Leonova izričitog OK-a** — redom
   brainstorming, spec, plan.
 - **Čeka Leona:** tajna `SOKRAT_DEV_DEPLOY_HOOK` za workflow `notify-sokrat-dev.yml` (`ARCHITECTURE.md` §12).
 - **Leon čita kod i uči Rust:** objašnjenja idu na primjerima iz NJEGOVA koda (`datoteka:redak`).

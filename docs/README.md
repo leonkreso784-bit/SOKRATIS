@@ -62,7 +62,7 @@ Aktivan je plan macOS (bez speca, odluke S-043). Gdje smo i što je sljedeće ka
 | Dokument | Svrha |
 |---|---|
 | [ROADMAP.md](./plan/ROADMAP.md) | 🟩 **živ** — milestonei M0–M4, status, što je sljedeće |
-| [MACOS.md](./plan/MACOS.md) | 📋 **aktivan** — Sokratis na macOS-u (odluke S-043; Faza 1 i CI gotovi, slijede Faze 2–5): izmjereni nalazi, odluke O1–O7, cigle T74–T86 |
+| [MACOS.md](./plan/MACOS.md) | 📋 **aktivan** — Sokratis na macOS-u (odluke S-043): izmjereni nalazi, odluke O1–O7, cigle T74–T87 i njihov status |
 
 ## `architecture/` — što je izgrađeno
 

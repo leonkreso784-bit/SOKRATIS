@@ -17,7 +17,7 @@ verzija u Postavkama, obavijesti o licencama ugrađenih komponenti, množina; is
 [CHANGELOG.md](../records/CHANGELOG.md) `[1.0.1]`). **Zakrpa 1.0.2 izdana 2026-11-23** (tag `v1.0.2`; plan
 [archive/2026-11-23-zakrpa-1-0-2.md](../archive/2026-11-23-zakrpa-1-0-2.md): ocjena dokumentacije — pauzirani plan, primjeri poveznica u kodu, izvor mjerenja; Windows instalater gradi GitHub Actions). **Razvoj se
 2026-11-23 seli na Mac:** aktivan je plan [MACOS.md](./MACOS.md) (Leonove odluke S-043); Faza 1 (brane zelene
-na Macu) i CI na macOS-u i Windowsu (mac/T85) su gotovi, slijede Faze 2–5 i izdanje 1.1.0. Nema aktivnog speca; **M3 nema spec** — piše se kad 1.0.0 bude u
+na Macu), CI na macOS-u i Windowsu (mac/T85) i Faza 2 (aplikacija ispravna na Macu: baza, putanja, natpis — T77–T79) su gotovi, slijede Faze 3–5 i izdanje 1.1.0. Nema aktivnog speca; **M3 nema spec** — piše se kad 1.0.0 bude u
 uporabi, iz kandidata u [records/BACKLOG.md](../records/BACKLOG.md). Zapis namjere iz kojeg je prvi rez
 nastao: [archive/PLAN_DESIGNE.md](../archive/PLAN_DESIGNE.md).
 

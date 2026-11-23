@@ -5,7 +5,16 @@ Isporuka = ono što je u `main`-u; sesije su u `PROGRESS.md`.
 
 ## [Unreleased]
 
-Ništa još.
+Plan [`../plan/MACOS.md`](../plan/MACOS.md), Faza 2.
+
+### Što korisnik dobiva
+
+- **Baza na Macu ostaje** (mac/T77): registar projekata i snimke trenda žive u
+  `~/Library/Application Support/sokratis/`, ne u privremenoj mapi koju macOS sam čisti. Windows je bez
+  promjene (`%LOCALAPPDATA%\sokratis\`).
+- **„Kopiraj putanju" na Macu daje pravu putanju** (mac/T78): `/Users/…/docs/a.md` umjesto mješavine `/` i `\`;
+  na Windowsu je oblik isti kao prije.
+- **Natpis autostarta bez Windowsa** (mac/T79): „Sokratis se otvara kad se prijaviš na računalo."
 
 ## [1.0.2] — 2026-11-23 — zakrpa
 
