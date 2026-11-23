@@ -186,10 +186,12 @@ export async function copyText(text: string): Promise<boolean> {
 // Dopuna mac/T78 (N5): razdjelnik se izvodi iz KORIJENA, ne iz OS-a — sučelje ne zna OS (bez
 // `plugin-os`), ali `root_path` dolazi s diska tog OS-a. Korijen s "\" ili prefiksom pogona ("C:")
 // → Windows oblik s "\" (lijepi se u Explorer, isto kao prije); inače Unix oblik s "/" (macOS Finder).
+// Korijen koji počinje jednim "/" je UVIJEK Unix (Windows korijen nikad, UNC počinje s "\\"), jer je
+// "\" na Macu legalan znak u imenu mape.
 const WINDOWS_ROOT = /\\|^[A-Za-z]:/;
 
 export function joinRepoPath(rootPath: string, path: string): string {
-  if (WINDOWS_ROOT.test(rootPath)) {
+  if (!rootPath.startsWith('/') && WINDOWS_ROOT.test(rootPath)) {
     const root = rootPath.replace(/\//g, '\\');
     const rel = path.replace(/\//g, '\\');
     return `${root}\\${rel}`;

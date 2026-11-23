@@ -260,6 +260,9 @@ describe('joinRepoPath', () => {
   it('Unix korijen sa završnom kosom crtom ne daje dvostruku "//"', () => {
     expect(joinRepoPath('/Users/leon/x/', 'docs/a.md')).toBe('/Users/leon/x/docs/a.md');
   });
+  it('Unix korijen s "\\" u imenu mape (legalno na macOS-u) ostaje Unix oblik', () => {
+    expect(joinRepoPath('/Users/leon/a\\b', 'docs/a.md')).toBe('/Users/leon/a\\b/docs/a.md');
+  });
   it('UNC korijen (\\\\server\\share) je Windows oblik', () => {
     expect(joinRepoPath('\\\\server\\share\\repo', 'docs/a.md')).toBe('\\\\server\\share\\repo\\docs\\a.md');
   });
