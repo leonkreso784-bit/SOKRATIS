@@ -99,13 +99,21 @@ već preuzete crateove. Pada kad commitani `THIRD-PARTY-NOTICES.txt` nije ono š
 **Nov stroj jednom treba `cargo fetch`** (u korijenu repoa) prije prvog `notices:check`, jer `--offline` pada dok
 crateovi samo za Windows cilj nisu preuzeti. Na Macu `notices:check` na stderr ispisuje crateove domaćina koje
 je preskočio — to nije greška (mac/T76).
+**Od mac/T87 `notices:check` provjerava dva popisa:** `THIRD-PARTY-NOTICES.txt` (Windows) na svakom stroju,
+`THIRD-PARTY-NOTICES-macos.txt` **samo na Macu** — Windows runner i Linux ga preskaču jednim retkom na stderr i
+izlaznim kodom 0, pa Mac popis čuva samo brana na Macu (lokalno ili macOS runner u CI-ju).
+**Mac paket se provjerava potpisom** (mac/T88), nakon `npm run tauri build` u `apps/desktop`:
+`codesign --verify --deep --strict --verbose=2 target/release/bundle/macos/Sokratis.app` mora završiti kodom 0
+(isto za `.app` u montiranom `.dmg`-u), a `codesign -dv` mora pokazati `Identifier=dev.sokratis.desktop` i
+`Sealed Resources`. `spctl` ga odbija — očekivano, paket nije notariziran (S-043 O3).
 **Pravilo: nov ili podignut npm paket čiji kod ulazi u sučelje, ili nov/podignut crate u
 `sokratis-desktop` → `npm run notices` u `apps/desktop` i commit `THIRD-PARTY-NOTICES.txt` u istoj
 cigli** (opis skripte: [`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §1, „Obavijesti o
 licencama uz instalater").
 
 Crveno ne ide u commit. **Izlazni kod 1 nije dokaz da je pao test koji testiraš** — čita se poruka
-(pouka iz Sokrat Studyja). CI (GitHub Actions) još ne postoji — `records/BACKLOG.md`, M4. Koliko testova ima
+(pouka iz Sokrat Studyja). CI (GitHub Actions) od mac/T85 vrti iste brane na macOS-u i Windowsu (`.github/workflows/gates.yml`,
+[`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §12). Koliko testova ima
 danas piše [`../records/CHANGELOG.md`](../records/CHANGELOG.md) — brojka prepisana ovamo bi ostarila.
 
 **Nakon SVAKE gradnje iz drugog radnog stabla u ZAJEDNIČKI `target`** (dimni test s

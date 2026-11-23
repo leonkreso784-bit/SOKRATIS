@@ -1378,7 +1378,7 @@ na GitHubu (opis: [`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §12), do
 ([`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §12). Zatim, tek uz njegov OK: M3 — brainstorming
 (glavna tema: sati kojima vjeruje), pa spec, pa plan.
 
-## 2026-11-23 (OPUS) — Sokratis na macOS-u: pregled projekta, plan MACOS.md, Faza 1 (brane zelene na Macu)
+## 2026-11-23 (OPUS) — Sokratis na macOS-u: pregled projekta, plan MACOS.md, Faze 1–3 (brane zelene na Macu, aplikacija ispravna, Mac paket)
 
 **Leon od danas razvija na MacBooku** (Apple Silicon arm64, macOS 26.6); sve do sada je rađeno i izdano na
 Windowsu.
@@ -1515,3 +1515,49 @@ natpis autostarta, uvjetno T80/T81), zatim Faza 3 (T82 `.app`/`.dmg`, T87 licenc
 - **T83:** mjerenje `.app`.
 
 Zatim Faza 4, ručna provjera s Leonom u izgrađenoj aplikaciji. Ona odlučuje treba li uvjetni T80 i T81.
+
+### Faza 3 plana macOS (T82, T87, T83, T88, isti dan)
+- **MAC-PAKET (mac/T82, mac/T87)** → merge `f833120`:
+  - **T82** (`d042f8e` + dopuna `3002ca1`): `apps/desktop/src-tauri/tauri.macos.conf.json` (Tauri ga kao JSON
+    Merge Patch spaja s glavnim samo na macOS-u): `.app` + `.dmg`, identifikator `dev.sokratis.desktop` samo na
+    Macu (O2), minimum macOS. Windows `tauri.conf.json` i NSIS nedirnuti. Opis:
+    [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) §1, „Mac paket".
+    - **Recenzija VRATILA** minimum 11.0 → **13.3**: izgrađeni CSS je Tailwind v4.3.3 (prag Safari 16.4:
+      `@layer`, `@property`), WKWebView je sistemski WebKit, a prvi macOS sa Safarijem 16.4 u sustavu je 13.3.
+    - Promjena identifikatora nema posljedica: autostart imenuje LaunchAgent po imenu paketa, single-instance
+      socket je `/tmp/<id>_si.sock`, a nijedan `app_data_dir`/localStorage ne ovisi o njemu (baza je T77).
+  - **T87** (`cc973e6`): popis licenci po platformi (O6). `notices.mjs` dobiva tablicu `NOTICE_TARGETS` i
+    `planTargets(host)`; Windows `THIRD-PARTY-NOTICES.txt` ostao bajt-za-bajt isti, nov
+    `THIRD-PARTY-NOTICES-macos.txt` (`aarch64-apple-darwin`) mjeri se samo na Mac domaćinu (drugdje stderr i
+    kod 0). `.app` nosi Mac popis pod imenom `THIRD-PARTY-NOTICES.txt` — `null` u Merge Patchu briše Windows
+    izvor iz `bundle.resources` (izmjereno buildom).
+    - Windows **267** komponenti (255 crateova), Mac **263** (251 crate). Samo Windows: `windows*`,
+      `webview2*`, `winreg`, `winapi`, `softbuffer`; samo Mac: `objc2*`, `core-foundation*`, `fsevent-sys`,
+      `mac-notification-sys`, `swift-rs`, `embed_plist`, `iana-time-zone`, `dirs@4` (preko `auto-launch`).
+    - Recenzija **SPOJIVO**; Minor kozmetički (JSDoc redak od 162 znaka u `notices.mjs`) ostaje.
+- **Mjerenje (mac/T83, orkestrator)**, build iz `main`-a `f833120`:
+  - `npm run tauri build` **80,8 s** (real; user 299,7 s) · `.app` **17 M** (izvršna 16 386 464 B) · `.dmg`
+    **7 707 492 B** (UDZO) · Info.plist `dev.sokratis.desktop` / `1.0.2` / `13.3` · `Contents/Resources`:
+    `LICENSE.txt`, `THIRD-PARTY-NOTICES.txt` (Mac popis), `icon.icns` · xattr `com.apple.provenance`, bez
+    karantene.
+  - **Nalaz:** potpis samo linkerom (`adhoc,linker-signed`, `Identifier=sokratis_desktop-<hash>`,
+    `Info.plist=not bound`, `Sealed Resources=none`); `codesign --verify --deep --strict` kod **1** („code has
+    no resources but signature indicates they must be present"). Na kopiji `codesign --force --deep -s -` →
+    kod 0. **Odstupanje od plana:** nalaz je postao nova cigla T88.
+  - Vrijeme do prvog prozora i pokretanje iz `/Applications` nisu izmjereni — prelaze u Fazu 4.
+- **MAC-POTPIS (mac/T88)** → merge `5bbca90` (`86212c4` + dopuna `a4c68e6`): `bundle.macOS.signingIdentity
+  = "-"` → Tauri ad-hoc potpiše cijeli paket: `Identifier=dev.sokratis.desktop`, `flags=0x10002(adhoc,runtime)`,
+  `Info.plist entries=14`, `Sealed Resources version=2`; `codesign --verify --deep --strict` kod 0 i za `.app`
+  u `.dmg`-u; `spctl` rejected (očekivano, O3 — bez notarizacije). Entitlementa nema.
+  - Tauri uz potpis sam uključuje **hardened runtime** (`hardened_runtime` zadano `true`) — to nije bio
+    cilj cigle, pa je u Fazi 4 posebna provjera.
+  - TCC (pristup mapama) je kod ad-hoc potpisa vezan uz **cdhash** (`designated => cdhash`), pa će se
+    dopuštenje vjerojatno tražiti ponovno nakon svakog builda; obavijesti su vezane uz bundle id. Dopuna
+    `a4c68e6` je to ispravila u zaglavlju.
+  - Rebuild iz `main`-a `5bbca90`: verify OK, `.app` 17 M, `.dmg` 7,3 M.
+- **Brane na `main`-u nakon spajanja (Mac):** `cargo test` **201 prošlo / 0 palo** · `npm run check` ✅
+  (vitest 184, svelte-check 0).
+
+**Što slijedi:** Faza 4 plana [`../plan/MACOS.md`](../plan/MACOS.md) — ručna provjera izgrađenog `.app`-a s
+Leonom (iz `/Applications`, pokrenut iz Findera). Ona odlučuje uvjetne T80 i T81; zatim Faza 5 (T84, T86) i
+izdanje 1.1.0.

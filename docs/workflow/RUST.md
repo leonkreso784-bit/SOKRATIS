@@ -51,6 +51,9 @@ zaseban crate samo za hash bio bi pravilo #6 naopako.
 **NSIS (instalater, T37, S-029) nije crate ni ovisnost u smislu pravila #6** — Taurijev bundler ga
 sam preuzme u `%LOCALAPPDATA%\tauri\` pri prvoj gradnji `npm run tauri build` (alat izvan repoa, ne
 ulazi u `Cargo.lock` ni `package-lock.json`, Ruling R18).
+**Ni Mac paket (`.app`, `.dmg`) ni njegov ad-hoc potpis (mac/T82, mac/T88)** — `.app` i `.dmg` slaže isti
+Taurijev bundler, a pritom zove sistemske alate macOS-a: `hdiutil` (slika diska) i `codesign` (potpis), oba
+iz sustava i Xcode Command Line Tools. Ništa se ne preuzima i ništa ne ulazi u lockove.
 
 Nova ovisnost = namjerna radnja: redak ovdje + obrazloženje u commitu (CLAUDE.md #6).
 `Cargo.lock` se commita. Ovisnost smije čekati svoju ciglu, ali samo ako je pinana u cigli koja je uvela i
@@ -271,4 +274,6 @@ uvode idu u ovu tablicu — **ne** u §4, koji je Rust.
 | `sources` sourcemape kao mjera | 1.0.1/T67 (`scripts/notices.mjs::packagesFromSources`) | sourcemapa popisuje izvorne datoteke od kojih je bundle složen; putanje `node_modules/<ime>/…` kažu koji su npm paketi stvarno ušli u sučelje nakon tree-shakinga, a ne koji samo stoje u locku |
 | presjek kroz `new Set(...)` + `filter(... has ...)` | mac/T76 (`scripts/notices.mjs::targetCrates`) | `Set` daje provjeru članstva `has` bez prolaza kroz niz, a `[...new Set(a)]` usput uklanja duplikate — ostaju ključevi iz `cargo tree` koje poznaje i `cargo metadata` cilja (JS-ekvivalent `HashSet` + `filter`, §4) |
 | regex alternacija s `^` samo na jednoj grani + `startsWith` ispred | mac/T78 (`views/helpers.ts::joinRepoPath`, `WINDOWS_ROOT = /\\\|^[A-Za-z]:/`) | `\|` dijeli uzorak na dvije neovisne grane: `\\` traži `\` BILO GDJE, a `^` veže samo drugu granu (prefiks pogona na početku); provjera `startsWith('/')` ispred odluči očit slučaj (Unix korijen) prije regexa, jer `\` smije stajati i u imenu mape na Macu |
+| tablica podataka umjesto grananja (`NOTICE_TARGETS` + `planTargets(host)`) | mac/T87 (`scripts/notices.mjs`) | cilj, datoteka i domaćin koji ga smije mjeriti stoje u jednom retku niza objekata, a čista funkcija iz njega bira što se mjeri — nov cilj je nov redak, bez nove grane `if` u I/O ljusci (isto kao tablica slučajeva u Rust testu) |
+| JSON Merge Patch (`tauri.<platforma>.conf.json`, `null` briše ključ) | mac/T82, mac/T87 (`src-tauri/tauri.macos.conf.json`) | Tauri na macOS-u spoji Mac datoteku preko glavne: objekti se spajaju ključ po ključ, nizovi i vrijednosti se zamjenjuju, a `null` ključ briše — tako `.app` dobiva Mac popis licenci umjesto Windowsova, a glavna datoteka ostaje netaknuta |
 | `git mv` + `diff -M` za preseljenja | M2/58 (šest preseljenih pogleda u `views/project/`) | `git mv` čuva povijest datoteke kao PREIMENOVANJE, ne brisanje+dodavanje; recenzija i `git log --follow` time i dalje vide izvornu povijest, a `diff -M` u pregledu prikaže samo STVARNU promjenu (uvoz, `<h1>`→`<h2>`), ne cijeli sadržaj kao nov |

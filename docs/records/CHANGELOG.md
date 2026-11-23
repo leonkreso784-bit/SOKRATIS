@@ -5,16 +5,23 @@ Isporuka = ono što je u `main`-u; sesije su u `PROGRESS.md`.
 
 ## [Unreleased]
 
-Plan [`../plan/MACOS.md`](../plan/MACOS.md), Faza 2.
+Plan [`../plan/MACOS.md`](../plan/MACOS.md), Faze 2 i 3.
 
 ### Što korisnik dobiva
 
+- **Sokratis se gradi za Mac** (mac/T82, mac/T87, mac/T88): `npm run tauri build` na Macu daje `.app` i `.dmg`
+  za Apple Silicon (macOS 13.3 ili noviji), ad-hoc potpisane (`codesign --verify` prolazi; bez notarizacije, za
+  lokalnu uporabu), s Mac popisom licenci u paketu. Windows instalater je bez promjene.
 - **Baza na Macu ostaje** (mac/T77): registar projekata i snimke trenda žive u
   `~/Library/Application Support/sokratis/`, ne u privremenoj mapi koju macOS sam čisti. Windows je bez
   promjene (`%LOCALAPPDATA%\sokratis\`).
 - **„Kopiraj putanju" na Macu daje pravu putanju** (mac/T78): `/Users/…/docs/a.md` umjesto mješavine `/` i `\`;
   na Windowsu je oblik isti kao prije.
 - **Natpis autostarta bez Windowsa** (mac/T79): „Sokratis se otvara kad se prijaviš na računalo."
+
+### Za razvoj
+- **`npm run notices` piše oba popisa licenci** (mac/T87): `THIRD-PARTY-NOTICES.txt` (Windows, bez promjene) i
+  `THIRD-PARTY-NOTICES-macos.txt`; Mac popis mjeri se i provjerava samo na Macu, drugdje se preskače kodom 0.
 
 ## [1.0.2] — 2026-11-23 — zakrpa
 

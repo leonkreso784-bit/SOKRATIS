@@ -1,8 +1,8 @@
 # Sokratis na macOS-u — plan cigli
 
 **Status:** 📋 AKTIVAN — Leon je odlučio O1–O7 (S-043). Napisan 2026-11-23 nakon pregleda cijelog projekta na
-MacBooku; Faza 1 (T74–T76), CI (T85) i Faza 2 (T77–T79) su izvedeni, zakrpa 1.0.2 je izdana (O5), pa slijede
-Faze 3–5 i izdanje 1.1.0. Numeracija nastavlja plan 1.0.2 ([`../archive/2026-11-23-zakrpa-1-0-2.md`](../archive/2026-11-23-zakrpa-1-0-2.md),
+MacBooku; Faza 1 (T74–T76), CI (T85), Faza 2 (T77–T79) i Faza 3 (T82, T87, T83, T88) su izvedeni, zakrpa 1.0.2
+je izdana (O5). **Sljedeća je Faza 4** (ručna provjera s Leonom), pa Faza 5 i izdanje 1.1.0. Numeracija nastavlja plan 1.0.2 ([`../archive/2026-11-23-zakrpa-1-0-2.md`](../archive/2026-11-23-zakrpa-1-0-2.md),
 zadnja cigla T73). Plan nije izvor istine: što je izgrađeno kaže
 [`../architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md).
 
@@ -48,8 +48,8 @@ ništa**, pa ni preostale cigle zakrpe 1.0.2 (T71–T73). Faza 1 zato ide prva.
 | N5 ✅ T78 | `apps/desktop/src/views/helpers.ts:165` `joinRepoPath` | svaki `/` pretvara u `\`, pa „Kopiraj putanju" na Macu daje `/Users/leon\docs\records\…`, putanju koja ne postoji. Test `tests/helpers.test.ts:242` tvrdi samo Windows oblik |
 | N6 | `apps/desktop/src/views/Overview.svelte:38`, `:49` | `prompt()` (preimenovanje) i `confirm()` (uklanjanje projekta) su ugrađeni dijalozi WebView2-a. Na macOS-u Tauri radi preko WKWebViewa, gdje ti dijalozi ovise o tome što wry implementira, pa `prompt()` može tiho vratiti `null`. **Prvo izmjeriti** (Faza 4), pa tek onda mijenjati |
 | N7 ✅ T79 | `src/lib/i18n/hr.json:333`, `en.json:333` | „Sokratis se otvara pri prijavi u **Windows**." |
-| N8 | `src-tauri/tauri.conf.json:42` | `bundle.targets = ["nsis"]`: na Macu se ne gradi ni `.app` ni `.dmg`. Test `tests/version.test.ts:19` to i tvrdi |
-| N9 | `tauri.conf.json:4` `identifier: "dev.sokratis.app"` | Tauri na macOS-u upozorava na identifikator koji završava s `.app`, jer se sudara s nastavkom paketa aplikacije. O promjeni odlučuje O2 |
+| N8 ✅ T82 | `src-tauri/tauri.conf.json:42` | `bundle.targets = ["nsis"]`: na Macu se ne gradi ni `.app` ni `.dmg`. Test `tests/version.test.ts:19` to i tvrdi |
+| N9 ✅ T82 | `tauri.conf.json:4` `identifier: "dev.sokratis.app"` | Tauri na macOS-u upozorava na identifikator koji završava s `.app`, jer se sudara s nastavkom paketa aplikacije. O promjeni odlučuje O2 |
 | N10 | `crates/sokratis-io/src/git.rs` (`git_command`) | aplikacija pokrenuta iz Findera ima `PATH=/usr/bin:/bin:/usr/sbin:/sbin`: Homebrew `git` ne vidi, nego koristi `/usr/bin/git`, koji radi samo uz Command Line Tools (bez njih macOS iskoči s dijalogom za instalaciju). Leon ih ima, a tuđi Mac možda nema |
 | N11 | ponašanje WebKita ≠ Chromium | `format.ts` (znak minus, ICU), hrvatsko sortiranje `C < Č < D` (`helpers.ts:29`) i `navigator.clipboard` (`helpers.ts:150`) izmjereni su na WebView2 i u Nodeu, a ne u WebKitu. Vitest je zelen, ali ne vrti WebKit |
 | N12 | macOS prečaci | `Cmd+Q` gasi aplikaciju kroz izbornik **bez** upita iz S-036 (`CloseRequested` stiže samo za X i `Cmd+W`). To je uobičajeno ponašanje na Macu, ali razlika mora biti odluka, a ne slučaj |
@@ -108,20 +108,28 @@ svakog commita (`CLAUDE.md`). Tokovi i stabla idu po [`../workflow/AGENTI.md`](.
 
 | cigla | predmet | test prvo | gotovo kad |
 |---|---|---|---|
-| **T82** | `src-tauri/tauri.macos.conf.json` (Tauri 2 ga spaja s glavnim samo na macOS-u): `bundle.targets = ["app", "dmg"]`, `minimumSystemVersion`, identifikator po O2. Glavni `tauri.conf.json` i NSIS se **ne diraju** (N8, N9) | `version.test.ts`: glavni = `["nsis"]`, Mac datoteka = `["app","dmg"]`, nijedna nema `version` | `npm run tauri build` na Macu daje `.app` i `.dmg` u `target/release/bundle/` |
-| **T87** | `THIRD-PARTY-NOTICES` po platformi (O6): `notices-build.mjs` dobiva cilj kao argument; Windows datoteka ostaje bajt-za-bajt ista, Mac popis ide u zasebnu datoteku koju nosi `.app` (`tauri.macos.conf.json` → `bundle.resources`); `notices:check` provjerava obje | `notices.test.ts` | `npm run check` zelen; `.app` nosi Mac popis |
-| **T83** | izmjeriti build: veličina `.dmg`/`.app`, ad-hoc potpis (`codesign -dv`), vrijeme do prvog prozora, pokretanje iz `/Applications` (Finder, ne terminal: tako se vidi N10). Brojke idu u `PROGRESS.md`, ne u kod | — | brojke zapisane |
+| **T82** ✅ `f833120` | `src-tauri/tauri.macos.conf.json` (Tauri 2 ga spaja s glavnim samo na macOS-u): `bundle.targets = ["app", "dmg"]`, `minimumSystemVersion` (recenzija: **13.3**, ne 11.0 — Tailwind v4 traži Safari 16.4, a WKWebView je sistemski WebKit), identifikator po O2. Glavni `tauri.conf.json` i NSIS se **ne diraju** (N8, N9) | `version.test.ts`: glavni = `["nsis"]`, Mac datoteka = `["app","dmg"]`, nijedna nema `version` | `npm run tauri build` na Macu daje `.app` i `.dmg` u `target/release/bundle/` |
+| **T87** ✅ `f833120` | `THIRD-PARTY-NOTICES` po platformi (O6): `notices-build.mjs` dobiva cilj kao argument; Windows datoteka ostaje bajt-za-bajt ista, Mac popis ide u zasebnu datoteku koju nosi `.app` (`tauri.macos.conf.json` → `bundle.resources`); `notices:check` provjerava obje (Mac popis samo na Mac domaćinu) | `notices.test.ts` | `npm run check` zelen; `.app` nosi Mac popis |
+| **T83** ✅ (orkestrator) | izmjeriti build: veličina `.dmg`/`.app`, ad-hoc potpis (`codesign -dv`), vrijeme do prvog prozora, pokretanje iz `/Applications` (Finder, ne terminal: tako se vidi N10). Brojke idu u `PROGRESS.md`, ne u kod | — | brojke zapisane ([`../records/PROGRESS.md`](../records/PROGRESS.md) 2026-11-23, „Faza 3"); nalaz: potpis samo linkerom, `codesign --verify` pada → T88. Prvi prozor i pokretanje iz `/Applications` prelaze u Fazu 4 |
+| **T88** ✅ `5bbca90` | *(iz mjerenja T83)* ad-hoc potpis cijelog paketa: `bundle.macOS.signingIdentity = "-"` u `tauri.macos.conf.json`. Tauri uz potpis sam uključuje hardened runtime; entitlementa nema | — | `codesign --verify --deep --strict` kod 0 za `.app` i za `.app` u `.dmg`-u; identitet koda `dev.sokratis.desktop` |
 
-### Faza 4 — ručna provjera u pravoj aplikaciji (Leon + Claude, `.app` iz T82)
+### Faza 4 — ručna provjera u pravoj aplikaciji (Leon + Claude, `.app` iz T82/T88)
 
-Svaki nalaz dobiva test i vlastitu ciglu (pravilo #4). Popis:
+Svaki nalaz dobiva test i vlastitu ciglu (pravilo #4). **Prije provjere `.app` ide u `/Applications`** i
+pokreće se iz Findera, ne iz terminala ni iz `target/` (autostart plist pokazuje na putanju izvršne datoteke,
+a PATH iz Findera je drukčiji, N10). **Ako išta padne pod hardened runtimeom** (T88), prvi dijagnostički korak
+je build s `"hardenedRuntime": false` u `bundle.macOS`; entitlement se dodaje tek kad to potvrdi uzrok. Popis:
 
+0. **Potpis u pokrenutoj aplikaciji:** Console.app (filtar „Sokratis") bez poruka „Code Signature Invalid" ni
+   odbijenog JIT-a (WebKit) pod hardened runtimeom.
 1. **Splash** (`decorations: false`, `alwaysOnTop`): animacija, zaobljeni rubovi, zatvaranje; glavni prozor se pojavi.
 2. **Jedna instanca:** drugi dvoklik na ikonu podigne postojeći prozor (single-instance plugin, macOS put).
-3. **Dodavanje projekta:** dijalog za mapu (`dialog:allow-open`) nad `~/Documents/sokratstudy.f6`; pet stabala = jedan projekt (S-015).
+3. **Dodavanje projekta:** dijalog za mapu (`dialog:allow-open`) nad `~/Documents/sokratstudy.f6`; pet stabala = jedan projekt (S-015). Git se tu zove iz `.app` pokrenutog iz Findera: PATH bez Homebrewa, `/usr/bin/git` je shim prema Command Line Tools, pod hardened runtimeom (N10 → T81 ako ne radi). Pristup mapi u `~/Documents` traži TCC dopuštenje.
 4. **Brojke = CLI:** ploča projekta i `cargo run -p sokratis-cli -- report …` daju iste brojke.
 5. **Watcher (FSEvents umjesto ReadDirectoryChangesW):** commit u terminalu osvježi ploču bez klika, jednom; nema petlje na vlastiti upis u `.sokratis/` (S-016; BACKLOG m5, test pod opterećenjem).
-6. **Obavijest:** prvi Alert → macOS traži dopuštenje; obavijest nosi ime „Sokratis", ne „Terminal" (u `tauri dev` ide pod terminalom, pa vrijedi samo izgrađeni `.app`).
+6. **Obavijest:** prvi Alert → macOS traži dopuštenje; obavijest nosi ime „Sokratis", ne „Terminal" (u `tauri dev` ide pod terminalom, pa vrijedi samo izgrađeni `.app`), i u Postavke sustava → Obavijesti stoji „Sokratis".
+   **Nakon rebuilda** zabilježiti traže li se TCC (mape) i obavijesti ponovno: ad-hoc potpis veže TCC uz
+   cdhash (`designated => cdhash`), koji se mijenja svakim buildom; obavijesti su vezane uz bundle id.
 7. **Autostart:** prekidač u Postavkama stvori ili makne `~/Library/LaunchAgents/…plist`; nakon odjave i prijave Sokratis se otvori.
 8. **Zatvaranje:** X i `Cmd+W` → upit (S-036); `Cmd+Q` zatvara odmah (N12, S-043) — provjeriti da baza i watcher ne ostanu u lošem stanju.
 9. **Dijalozi:** preimenovanje i uklanjanje projekta (N6 → T80 ako ne rade).
@@ -145,7 +153,7 @@ Svaki nalaz dobiva test i vlastitu ciglu (pravilo #4). Popis:
 |---|---|---|
 | MAC-BRANE | T74 → T75 | `crates/sokratis-io/tests/**`, `crates/sokratis-core/src/profile.rs` (`inside_root`) |
 | MAC-NOTICES | T76 | `apps/desktop/scripts/notices*`, `apps/desktop/tests/notices.test.ts` |
-| MAC-LJUSKA | T77 → T81 → T82 → T87 | `apps/desktop/src-tauri/**` |
+| MAC-LJUSKA | T77 → T81 → T82 → T87 → T88 | `apps/desktop/src-tauri/**` |
 | MAC-SUČELJE | T78 → T79 → (T80) | `apps/desktop/src/**`, `apps/desktop/tests/**` (osim notices) |
 | orkestrator | T83, Faza 4, T84–T86 | `docs/**`, verzija, `.github/` |
 

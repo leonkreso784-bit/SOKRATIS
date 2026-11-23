@@ -70,6 +70,20 @@ Broj verzije ima jedan izvor, `[workspace.package] version` u korijenskom
 `Cargo.toml`; `apps/desktop/package.json` ga zrcali, a `tauri.conf.json` polje `version` nema (test
 `apps/desktop/tests/version.test.ts`).
 
+**Mac paket** (mac/T82, mac/T88; S-043 O2–O4): na macOS-u Tauri preko glavnog `tauri.conf.json` primijeni
+`src-tauri/tauri.macos.conf.json` kao JSON Merge Patch (na Windowsu se ne čita) — `bundle.targets =
+["app", "dmg"]` (`target/release/bundle/macos/` i `…/dmg/`, samo `aarch64`), `identifier`
+`dev.sokratis.desktop` samo na Macu (Windows ostaje `dev.sokratis.app`, jer o njemu ovisi nadogradnja NSIS-om;
+nijedna putanja podataka ne ovisi o identifikatoru, baza je `state::data_dir`), `bundle.macOS.minimumSystemVersion
+"13.3"` (Tailwind v4 u izgrađenom CSS-u traži Safari 16.4, a WKWebView je sistemski WebKit) i
+`bundle.macOS.signingIdentity "-"`: Tauri ad-hoc potpiše cijeli paket (identitet koda `dev.sokratis.desktop`,
+Info.plist i resursi vezani u potpis) i pritom sam uključi **hardened runtime**; entitlementa nema. Bez
+notarizacije (O3), pa Gatekeeper (`spctl`) paket odbija — vrijedi za lokalni build bez karantene. Ad-hoc potpis
+veže TCC dopuštenja uz cdhash, koji se mijenja svakim buildom. `bundle.resources` u Mac zakrpi briše Windows popis
+licenci (`null`) i umjesto njega u `Contents/Resources/THIRD-PARTY-NOTICES.txt` stavlja
+`THIRD-PARTY-NOTICES-macos.txt`; `LICENSE.txt` dolazi iz glavne datoteke (test `tests/version.test.ts`).
+Izmjerene veličine i potpis: [`PROGRESS.md`](../records/PROGRESS.md) 2026-11-23, „Faza 3".
+
 **Obavijesti o licencama uz instalater** (1.0.1/T67): `tauri.conf.json` `bundle.resources` je mapa
 izvor → ime u mapi instalacije — `THIRD-PARTY-NOTICES.txt` i `LICENSE` (kao `LICENSE.txt`); mapa, ne niz
 putanja, jer bi Tauri putanju s `../` spremio pod `_up_/` (test `tests/version.test.ts`).
@@ -79,14 +93,19 @@ napisala. Podjela je ista kao `core`/`io` (S-002): `scripts/notices.mjs` su čis
 procesa (testira ih `tests/notices.test.ts`; tipove za `.ts` test daje `scripts/notices.d.mts`), a sav
 I/O je u `notices-build.mjs`:
 
-- **crateovi** = što `cargo tree -p sokratis-desktop -e normal --target x86_64-pc-windows-msvc` kaže da
+- **popis po platformi** (mac/T87, S-043 O6): ciljevi su tablica `notices.mjs::NOTICE_TARGETS` — Windows
+  (`x86_64-pc-windows-msvc` → `THIRD-PARTY-NOTICES.txt`, mjeri se na svakom domaćinu) i macOS
+  (`aarch64-apple-darwin` → `THIRD-PARTY-NOTICES-macos.txt`, mjeri se **samo na Mac domaćinu**, jer bi drugdje
+  `cargo tree` propustio Mac-only ovisnosti proc-makroa). `planTargets(host)` dijeli tablicu na mjereno i
+  preskočeno; preskočeni cilj je jedan redak na stderr i izlazni kod 0. Sučelje se gradi jednom za oba popisa;
+- **crateovi** = što `cargo tree -p sokratis-desktop -e normal --target <cilj>` kaže da
   se prevodi (razrješava značajke kao pravi build); licencu, autore i mapu paketa daje `cargo metadata`.
   Sam graf iz `cargo metadata` uzima uniju značajki workspacea i broji crateove koji se ne prevode. Cargo
   ide s `--locked --offline` — brana ne pomiče `Cargo.lock` i ne ide na mrežu. `cargo tree` ovisnosti
   proc-makroa rješava za DOMAĆINA, pa se njegov popis presijeca s `cargo metadata --filter-platform` istog
   cilja (`notices.mjs::targetCrates`); otpali crateovi idu na stderr (mac/T76 — na Macu bi inače ušao
-  `swift-rs` → `base64`). Mac-izlaz je zato podskup Windowsova (danas isti); mjerodavan je `notices:check`
-  na Windowsu;
+  `swift-rs` → `base64`). Windows popis izmjeren na Macu je zato podskup Windowsova (danas isti); mjerodavan
+  je `notices:check` na Windowsu;
 - **npm paketi** = što stvarno ulazi u izgrađeno sučelje: Vite build u privremenu mapu (ne `dist/`),
   sa sourcemapama i bez minifikacije; imena paketa daju `sources` sourcemapa i licencni banneri u CSS-u,
   verzije `package-lock.json`. To nije skup ne-`dev` paketa iz locka;

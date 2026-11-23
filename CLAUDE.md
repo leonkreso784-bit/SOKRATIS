@@ -77,7 +77,7 @@ Testovi i brane: `docs/workflow/TESTING.md`.
   nepotpisanim instalaterom (S-040), licenca u `LICENSE` (S-039).
 - **Zakrpe 1.0.1 (2026-10-10) i 1.0.2 (2026-11-23) izdane** (tagovi, izdanja na GitHubu; planovi u `docs/archive/`).
   Windows instalater od 1.0.2 gradi GitHub Actions (`release.yml`), jer Leon razvija na Macu.
-  **Aktivni plan: `docs/plan/MACOS.md`** (S-043; Faze 1 i 2 i CI gotovi, slijede Faze 3–5 → 1.1.0; tag traži Leonov OK). Spec M3 nastaje kad M3 krene (kandidati: `docs/records/BACKLOG.md`). **M3 ne počinje bez Leonova izričitog OK-a** — redom
+  **Aktivni plan: `docs/plan/MACOS.md`** (S-043; Faze 1–3 i CI gotovi, slijedi Faza 4 (provjera s Leonom), pa Faza 5 → 1.1.0; tag traži Leonov OK). Spec M3 nastaje kad M3 krene (kandidati: `docs/records/BACKLOG.md`). **M3 ne počinje bez Leonova izričitog OK-a** — redom
   brainstorming, spec, plan.
 - **Čeka Leona:** tajna `SOKRAT_DEV_DEPLOY_HOOK` za workflow `notify-sokrat-dev.yml` (`ARCHITECTURE.md` §12).
 - **Leon čita kod i uči Rust:** objašnjenja idu na primjerima iz NJEGOVA koda (`datoteka:redak`).
@@ -113,7 +113,7 @@ dokaz (T64 u `main`-u 2026-09-27; vanjska lista od 14 prijedloga → BACKLOG) ·
 sesije. **[objava 1.0.0]** **S-039** licenca: besplatno korištenje, bez izmjena, dijeljenja i doprinosa (vlastiti tekst) ·
 **S-040** izdanje je javno: tag `v1.0.0`, GitHub, instalater priložen · **S-041** nakon gradnje 1.0.0 ostaje kako jest:
 dnevnik M1 u `PROGRESS.md`, zadani `since`, ploča, zaglavlja; brojci sati Leon ne vjeruje → kandidat M3 · **S-042** repo ostaje javan, fork se prihvaća.
-**[macOS]** **S-043** Mac uz Windows: identifikator samo na Macu, prvo samo Leonov Mac (bez potpisa), samo Apple Silicon, prvo 1.0.2 pa Mac pa 1.1.0, licence po platformi, CI sada, `Cmd+Q` zatvara odmah (plan `docs/plan/MACOS.md`).
+**[macOS]** **S-043** Mac uz Windows: identifikator samo na Macu, prvo samo Leonov Mac (ad-hoc potpis, bez Apple potpisa i notarizacije), samo Apple Silicon, prvo 1.0.2 pa Mac pa 1.1.0, licence po platformi, CI sada, `Cmd+Q` zatvara odmah (plan `docs/plan/MACOS.md`).
 
 ## Agenti — više grana, jedan orkestrator
 Uloge i protokol: `docs/workflow/AGENTI.md`. Graditelj radi **jednu ciglu u svom stablu**, recenzent presuđuje
