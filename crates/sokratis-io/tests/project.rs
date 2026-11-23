@@ -517,7 +517,15 @@ fn input_unites_diaries_and_reads_docs_from_lead_worktree() {
 
     let p = Project::open(r.path()).unwrap();
     let lead = p.lead().unwrap();
-    assert_eq!(lead.root, wt_root, "stablo s najnovijim HEAD-om vodi");
+    // Cigla mac/T74: OBJE strane kroz `canonicalize()`. `lead.root` dolazi iz gita, koji vraća
+    // RAZRIJEŠENU putanju (`/private/var/…` na macOS-u, gdje je `/var` simbolička poveznica), a
+    // `wt_root` je sirova `tempdir` putanja (`/var/…`). Razrješavanje samo jedne strane palo bi na
+    // Windowsu: `canonicalize()` ondje dodaje verbatim prefiks `\\?\C:\…`, pa ga moraju imati obje.
+    assert_eq!(
+        lead.root.canonicalize().unwrap(),
+        wt_root.canonicalize().unwrap(),
+        "stablo s najnovijim HEAD-om vodi"
+    );
     let input = p.input(Some("2026-09-01")).unwrap();
     assert_eq!(input.worktrees, 2);
     assert_eq!(input.diaries.len(), 2);

@@ -4,10 +4,11 @@
 //! ignoriranje. `Patterns` drži kompilirane regexe (`Regex` nije `Serialize`), a tamo
 //! `Regex::captures_len()` prebroji grupe: regex bez grupe koju parser čita je greška, ne panika.
 //!
-//! ZAŠTO RUST OVAKO (cigla M2/8 — `inside_root`)
-//! `Component` je enum kojim `std::path` razlaže putanju; `matches!` na njemu je ograda bez ijednog
-//! string-uspoređivanja. `std::path` samo parsira tekst — ne dira disk — pa smije u jezgru bez I/O-a
-//! (S-002); `canonicalize` (koji disk dira) ovdje ne smije nikad.
+//! ZAŠTO RUST OVAKO (cigla M2/8 · mac/T75 — `inside_root`)
+//! `str::starts_with` i `str::split` primaju niz znakova `['/', '\\']` kao uzorak (pogađa bilo koji
+//! od njih), a `Iterator::all` traži da nijedan segment nije `..`: isti odgovor na Windowsu i Macu,
+//! jer je profil commitan i putuje između njih (do mac/T75 to je radio `std::path::Component`, koji
+//! ovisi o OS-u). Čisto parsiranje teksta, ne dira disk (S-002); `canonicalize` ovdje ne smije nikad.
 //!
 //! ZAŠTO RUST OVAKO (cigla M2/9 — `test_path_exclude`)
 //! Rani `return false` u `is_test_path` je stražarska klauzula (guard clause): isključenje se
@@ -24,7 +25,6 @@ use crate::ParseError;
 use crate::model::{BranchScope, WorkKind};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::path::{Component, Path};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ClassifierRule {
@@ -270,16 +270,25 @@ impl Profile {
     }
 }
 
-/// Ostaje li relativna putanja unutar korijena? Odbija `..` komponentu, apsolutnu putanju, korijen
-/// (`/x`, `\x`) i Windows prefiks (`C:`, `\\server`). Čisto parsiranje — `std::path` ne dira disk,
-/// pa smije u jezgru (S-002).
+/// Ostaje li relativna putanja unutar korijena? `\` i `/` su razdjelnici na SVAKOM sustavu, jer je
+/// profil commitan i dijeli se između Windowsa i Maca — isti profil mora dobiti isti odgovor.
+/// Odbija: početak razdjelnikom (`/x`, `\x`, `\\server\share`), prefiks pogona (`C:`, `C:\x`,
+/// `C:/x`, `C:x`) i bilo koji `..` segment. Dopušta `.` i prazne segmente u sredini ili na kraju
+/// (`a/./b`, `docs/`). Čisto parsiranje teksta — disk se ne dira, pa smije u jezgru (S-002).
 pub fn inside_root(rel: &str) -> bool {
-    let p = Path::new(rel);
-    if p.is_absolute() {
+    let separators = ['/', '\\'];
+    if rel.starts_with(separators) {
         return false;
     }
-    p.components()
-        .all(|c| matches!(c, Component::Normal(_) | Component::CurDir))
+    let mut chars = rel.chars();
+    let first = chars.next();
+    let second = chars.next();
+    if let (Some(letter), Some(':')) = (first, second)
+        && letter.is_ascii_alphabetic()
+    {
+        return false;
+    }
+    rel.split(separators).all(|segment| segment != "..")
 }
 
 pub struct Patterns {
@@ -428,11 +437,15 @@ mod tests {
     #[test]
     fn inside_root_rejects_parent_absolute_and_drive_paths() {
         for ok in [
+            // prazno = korijen = unutra (fiksira postojeće ponašanje)
+            "",
             "docs",
             "docs/records/PROGRESS.md",
             "./docs",
             "CLAUDE.md",
             "a/./b",
+            "docs\\records\\PROGRESS.md",
+            "docs/",
         ] {
             assert!(inside_root(ok), "{ok}");
         }
@@ -445,6 +458,9 @@ mod tests {
             "C:/x",
             "..",
             "docs/..",
+            "docs\\..\\..\\x",
+            "C:x",
+            "\\x",
         ] {
             assert!(!inside_root(bad), "{bad}");
         }
