@@ -9,6 +9,9 @@
 // (cigla mac/T87 — popis licenci po platformi, S-043 O6) Merge Patch spaja mapu `resources` ključ po
 // ključ, a `null` BRIŠE ključ: Mac datoteka briše Windows izvor i pod istim imenom
 // `THIRD-PARTY-NOTICES.txt` stavlja Mac popis. `LICENSE` se nasljeđuje iz glavne datoteke.
+// (cigla mac/T88 — ad-hoc potpis, S-043 O3) `signingIdentity: "-"` tjera Tauri da ad-hoc potpiše CIJELI
+// `.app` (Info.plist vezan, resursi zapečaćeni, identitet `dev.sokratis.desktop`), a ne samo Mach-O
+// linkerom — o tom identitetu macOS vodi TCC dopuštenja i obavijesti. Windows datoteka to polje nema.
 import { describe, expect, it } from 'vitest';
 import cargo from '../../../Cargo.toml?raw';
 import pkg from '../package.json';
@@ -43,7 +46,7 @@ describe('Mac paket (tauri.macos.conf.json)', () => {
     identifier?: string;
     bundle?: {
       targets?: unknown;
-      macOS?: { minimumSystemVersion?: string };
+      macOS?: { minimumSystemVersion?: string; signingIdentity?: string };
       resources?: Record<string, string | null>;
     };
   };
@@ -75,5 +78,10 @@ describe('Mac paket (tauri.macos.conf.json)', () => {
       '../../../LICENSE': 'LICENSE.txt',
       '../../../THIRD-PARTY-NOTICES-macos.txt': 'THIRD-PARTY-NOTICES.txt',
     });
+  });
+  it('cijeli paket je ad-hoc potpisan (signingIdentity "-"); glavna datoteka nema macOS.signingIdentity', () => {
+    expect(mac.bundle?.macOS?.signingIdentity).toBe('-');
+    const base = (conf as { bundle: { macOS?: Record<string, unknown> } }).bundle;
+    expect(base.macOS === undefined || !('signingIdentity' in base.macOS)).toBe(true);
   });
 });
