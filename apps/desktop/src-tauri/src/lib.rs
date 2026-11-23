@@ -53,7 +53,8 @@ pub fn run() {
             // niže: bez registra projekata nema što raditi, pa je pad odmah, s jasnom porukom,
             // bolji od tihog rada bez pohrane.
             store: Mutex::new(
-                sokratis_store::Store::open(&state::db_path()).expect("baza u %LOCALAPPDATA%"),
+                sokratis_store::Store::open(&state::db_path())
+                    .expect("baza Sokratisa se ne može otvoriti"),
             ),
             reports: Mutex::new(HashMap::new()),
             watcher: Mutex::new(None),
