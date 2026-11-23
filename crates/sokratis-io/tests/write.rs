@@ -57,12 +57,17 @@ fn writes_from_a_linked_worktree_land_in_the_main_worktree() {
     let wt = side.path().join("wt");
     r.git(&["worktree", "add", wt.to_str().unwrap(), "-b", "f1"]);
     let p = Project::open(&wt).unwrap();
-    assert_eq!(
-        p.main_root().components().collect::<Vec<_>>(),
-        r.path().components().collect::<Vec<_>>()
-    );
+    // Cigla mac/T74: uspoređuju se RAZRIJEŠENE putanje, obje strane kroz `canonicalize()`.
+    // `main_root()` dolazi iz gita (razriješeno: `/private/var/…` na macOS-u, gdje je `/var`
+    // simbolička poveznica), `r.path()` je sirova `tempdir` putanja (`/var/…`). Na Windowsu
+    // `canonicalize()` dodaje verbatim prefiks `\\?\C:\…` i ujednači `/` i `\` — zato OBJE strane.
+    let main = r.path().canonicalize().unwrap();
+    assert_eq!(p.main_root().canonicalize().unwrap(), main);
     let path = p.write_override("a1", Some(WorkKind::Planning)).unwrap();
-    assert!(path.starts_with(r.path()), "{path:?} nije u glavnom stablu");
+    assert!(
+        path.canonicalize().unwrap().starts_with(&main),
+        "{path:?} nije u glavnom stablu"
+    );
     assert!(!wt.join(".sokratis").exists(), "u sporednom stablu ništa");
     assert_eq!(
         p.overrides().unwrap().get("a1"),
